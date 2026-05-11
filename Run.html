@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Run</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>body{margin:0;background:#0c1e35;min-height:100vh;font-family:'Inter','Noto Sans KR',system-ui,sans-serif;color:#e6ecf5;}</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">
+const { useState, useEffect } = React;
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+};
+function CodeBlock({children}){return <pre style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:'10px 14px',margin:'8px 0',fontFamily:C.mono,fontSize:12,color:C.ink2,overflow:'auto',lineHeight:1.55,whiteSpace:'pre-wrap'}}>{children}</pre>;}
+
+function Step({n, title, children, state, setState, hint}){
+  const isDone = state==='done';
+  const isFail = state==='fail';
+  const dotC = isDone?C.inter : isFail?C.risk : C.frame;
+  return (
+    <div style={{display:'grid',gridTemplateColumns:'48px 1fr',gap:18,marginBottom:24,paddingBottom:22,borderBottom:`1px solid ${C.frame}`}}>
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center'}}>
+        <div className="mono" style={{width:36,height:36,border:`2px solid ${dotC}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,color:dotC,fontWeight:600}}>{isDone?'✓':isFail?'✕':n}</div>
+      </div>
+      <div>
+        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+          <h3 style={{color:C.ink,fontSize:17,margin:0,fontWeight:600}}>{title}</h3>
+          {hint && <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em'}}>{hint}</span>}
+        </div>
+        {children}
+        <div style={{display:'flex',gap:8,marginTop:10}}>
+          <button onClick={()=>setState('done')} style={{fontFamily:C.mono,fontSize:11,padding:'5px 12px',background:isDone?C.inter:'transparent',color:isDone?C.canvas:C.inter,border:`1px solid ${C.inter}`,cursor:'pointer',letterSpacing:'.06em'}}>✓ DONE</button>
+          <button onClick={()=>setState('fail')} style={{fontFamily:C.mono,fontSize:11,padding:'5px 12px',background:isFail?C.risk:'transparent',color:isFail?C.canvas:C.risk,border:`1px solid ${C.risk}`,cursor:'pointer',letterSpacing:'.06em'}}>✕ STUCK</button>
+          {isFail && <a href="Errors.html" style={{fontFamily:C.mono,fontSize:11,padding:'5px 12px',color:C.lox,border:`1px solid ${C.lox}`,textDecoration:'none',letterSpacing:'.06em'}}>→ Errors page</a>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [s, setS] = useState(()=>{
+    try { return JSON.parse(localStorage.getItem('bp_run_state')||'{}'); } catch { return {}; }
+  });
+  useEffect(()=>{ localStorage.setItem('bp_run_state', JSON.stringify(s)); },[s]);
+  const set = (k)=>(v)=>setS(p=>({...p,[k]:v}));
+  const done = Object.values(s).filter(v=>v==='done').length;
+
+  return (
+    <div style={{maxWidth:880,margin:'0 auto',padding:'32px 24px 60px'}}>
+
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:18,marginBottom:24}}>
+        <div className="mono" style={{fontSize:11,color:C.halo,letterSpacing:'.14em'}}>RUN · 6-STEP CHECKLIST</div>
+        <h1 style={{color:C.ink,fontSize:30,margin:'6px 0 8px',fontWeight:600}}>Get the server up and a model loaded.</h1>
+        <p style={{color:C.ink3,fontSize:14,margin:0,maxWidth:680,textWrap:'pretty'}}>
+          Tick boxes as you go — saved locally so you can refresh without losing place.
+          The TopNav health pill (top-right) will turn <span style={{color:C.inter}}>green</span> when the server is reachable.
+        </p>
+        <div className="mono" style={{fontSize:11,color:C.ink2,marginTop:10,letterSpacing:'.06em'}}>
+          Progress: <span style={{color:C.inter}}>{done}/6</span>
+          <span style={{display:'inline-block',width:200,height:6,background:C.frame,marginLeft:12,verticalAlign:'middle'}}><span style={{display:'block',height:6,background:C.inter,width:`${(done/6)*100}%`,transition:'width .3s'}}/></span>
+        </div>
+      </div>
+
+      <Step n="1" title="NPU driver installed" hint="windows: intel.com · linux: apt" state={s.s1} setState={set('s1')}>
+        <p style={{color:C.ink2,fontSize:13.5,margin:'0 0 4px',lineHeight:1.55}}>Confirm OpenVINO can see your NPU:</p>
+        <CodeBlock>{`python -c "from openvino import Core; print(Core().available_devices)"
+# expect: ['CPU', 'GPU', 'NPU']`}</CodeBlock>
+      </Step>
+
+      <Step n="2" title="Repo cloned & venv active" hint="any drive · no spaces in path" state={s.s2} setState={set('s2')}>
+        <CodeBlock>{`git clone https://github.com/Han-think/Blueprint_npu.git
+cd Blueprint_npu
+python3.11 -m venv .venv
+source .venv/bin/activate    # Windows: .venv\\Scripts\\activate`}</CodeBlock>
+      </Step>
+
+      <Step n="3" title="Dependencies installed" hint="~1.5 GB · 5–10 min" state={s.s3} setState={set('s3')}>
+        <CodeBlock>{`pip install -r requirements-ov.txt
+pip install -r requirements-ml.txt`}</CodeBlock>
+      </Step>
+
+      <Step n="4" title="A model is in models/ov_npu_ready/" hint="OV-IR format only" state={s.s4} setState={set('s4')}>
+        <p style={{color:C.ink2,fontSize:13.5,margin:'0 0 4px',lineHeight:1.55}}>
+          Folder must contain <span className="mono" style={{color:C.lox}}>openvino_model.xml</span>, <span className="mono" style={{color:C.lox}}>.bin</span>, <span className="mono" style={{color:C.lox}}>tokenizer.json</span>.
+          GGUF? See <a href="INSTALL.md" style={{color:C.lh2}}>INSTALL → Step 4b</a>.
+        </p>
+        <CodeBlock>{`# fast option: download OV-IR direct from HuggingFace
+huggingface-cli download OpenVINO/Qwen2.5-3B-Instruct-int4-ov \\
+  --local-dir models/ov_npu_ready/qwen2.5-3b-instruct-int4-ov`}</CodeBlock>
+      </Step>
+
+      <Step n="5" title="Server running on :7860" hint="leave terminal open" state={s.s5} setState={set('s5')}>
+        <CodeBlock>{`python ai/ui/blueprint_batch_ui.py
+# Running on http://127.0.0.1:7860`}</CodeBlock>
+        <p style={{color:C.ink3,fontSize:12,margin:'4px 0 0',fontFamily:C.mono,letterSpacing:'.04em'}}>
+          ✓ check the pill in the top-right of this page — it should flip to <span style={{color:C.inter}}>green</span> within 5 sec.
+        </p>
+      </Step>
+
+      <Step n="6" title="Open the daily UI" hint="Minimal.html — bookmark it" state={s.s6} setState={set('s6')}>
+        <p style={{color:C.ink2,fontSize:13.5,margin:'0 0 8px',lineHeight:1.55}}>That's it. Open Minimal and write a brief.</p>
+        <a href="Minimal.html" style={{display:'inline-block',fontFamily:C.mono,fontSize:12,padding:'8px 16px',background:C.lox,color:C.canvas,textDecoration:'none',letterSpacing:'.08em',fontWeight:600}}>OPEN MINIMAL →</a>
+      </Step>
+
+      <div style={{marginTop:8,padding:16,border:`1px solid ${C.frame}`,background:C.canvas2}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em',marginBottom:6}}>STUCK?</div>
+        <p style={{color:C.ink2,fontSize:13,margin:0,lineHeight:1.55}}>
+          Hit <a href="Errors.html" style={{color:C.risk}}>Errors</a> for the 5 most common failure modes,
+          or read the full <a href="INSTALL.md" style={{color:C.lox}}>INSTALL.md</a>.
+        </p>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+setTimeout(()=>window.BPMountTopNav && window.BPMountTopNav('Run'), 100);
+</script>
+</body>
+</html>

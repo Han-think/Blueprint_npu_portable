@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blueprint NPU — End-to-End (Train → Design → Print)</title>
+  <link rel="stylesheet" href="colors_and_type.css">
+  <script src="vendor/react.js"></script>
+  <script src="vendor/react-dom.js"></script>
+  <script src="vendor/babel.js"></script>
+  <style>body{margin:0;background:#0c1e35}</style>
+</head>
+<body class="bp">
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('End_to_End'),100);</script>
+
+<script type="text/babel">
+const { useState, useMemo } = React;
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lox2:'#9cd0ff', lh2:'#ffd39f', intertank:'#89ffa8', intertank2:'#b6ffb6',
+  halo:'#caa9ff', danger:'#ff9fb5', engineFill:'#1f6aa8',
+  mono:"'JetBrains Mono', ui-monospace, Menlo, monospace",
+  sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
+};
+const Chip = ({color=C.lox,children}) => <span style={{fontFamily:C.mono,fontSize:11,letterSpacing:'0.12em',textTransform:'uppercase',color}}>{children}</span>;
+const Card = ({children,style}) => <div style={{border:`1px solid ${C.frame}`,padding:20,borderRadius:2,background:C.canvas,...style}}>{children}</div>;
+const H = ({children,c=C.ink}) => <h2 style={{margin:'0 0 12px',fontWeight:600,fontSize:22,color:c,lineHeight:1.15}}>{children}</h2>;
+const Btn = ({children,variant='default',onClick,active=false}) => {
+  const b = variant==='primary'?C.lox:variant==='go'?C.intertank:variant==='warn'?C.lh2:variant==='danger'?C.danger:C.ink;
+  return <button onClick={onClick} style={{fontFamily:C.mono,fontSize:12,textTransform:'uppercase',letterSpacing:'0.08em',
+    padding:'9px 14px',background:active?b:'transparent',color:active?C.canvas:b,border:`1px solid ${b}`,borderRadius:2,cursor:'pointer'}}>{children}</button>;
+};
+
+// ============================================================
+// ARCHITECTURE DIAGRAM
+// ============================================================
+function ArchDiagram(){
+  const boxes = [
+    {x:20,  y:40, w:190, h:220, title:'TRAIN', color:C.halo, sub:'XPU · Intel Arc / iGPU',
+      items:['data/briefs.jsonl','prefs.jsonl (best/worst)','LoRA r=16, α=32','QLoRA 4-bit base','DPO on prefs','save: xpu_run1/merged']},
+    {x:240, y:40, w:190, h:220, title:'EXPORT', color:C.intertank, sub:'optimum-intel → OV',
+      items:['merge_adapter','compress INT4 NF4','model.xml + model.bin','~1–14 B params','<2 GB on disk','fits Core Ultra NPU']},
+    {x:460, y:40, w:190, h:220, title:'INFER · NPU', color:C.lox, sub:'OpenVINO 2025 · device=NPU',
+      items:['design_master prompt','sys/usr template','retrieve: checklist + DfAM','generate blueprint.md','extract ```part_tree','score & rank']},
+    {x:680, y:40, w:190, h:220, title:'DESIGN', color:C.lh2, sub:'CadQuery / OpenSCAD',
+      items:['geometry_ops[]','parametric_resolve','export STEP / STL','verify dims / overhang','clash detect','cad_brief.json']},
+    {x:900, y:40, w:170, h:220, title:'PRINT', color:C.danger, sub:'PrusaSlicer / PreForm',
+      items:['print_profile','slicer_job.yaml','G-code gen','PRINT_QUEUE.csv','FDM 0.4mm / LPBF','Ti-6Al-4V · Inconel 718']},
+  ];
+  return (
+    <div style={{border:`2px solid ${C.frame}`,padding:16,background:C.canvas,marginBottom:24}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:12}}>
+        <div style={{fontFamily:C.mono,letterSpacing:'0.12em',color:C.ink,fontSize:14}}>BLUEPRINT_NPU — END-TO-END PIPELINE</div>
+        <div style={{fontFamily:C.mono,fontSize:11,color:C.lox}}>offline · NPU · &lt;20 B · v6</div>
+      </div>
+      <svg viewBox="0 0 1090 300" width="100%" style={{display:'block'}}>
+        {/* arrows between boxes */}
+        {[[210,150,240,150],[430,150,460,150],[650,150,680,150],[870,150,900,150]].map(([x1,y1,x2,y2],i)=>(
+          <g key={i}>
+            <line x1={x1} y1={y1} x2={x2-6} y2={y2} stroke={C.ink} strokeWidth={1}/>
+            <path d={`M ${x2-6} ${y2-4} L ${x2} ${y2} L ${x2-6} ${y2+4} Z`} fill={C.ink}/>
+          </g>
+        ))}
+        {/* feedback arrow bottom: PRINT → TRAIN via prefs */}
+        <path d="M 985 260 Q 985 285 900 285 L 200 285 Q 115 285 115 260" fill="none" stroke={C.halo} strokeWidth={1} strokeDasharray="6 4"/>
+        <path d="M 119 266 L 115 260 L 111 266" fill="none" stroke={C.halo} strokeWidth={1}/>
+        <text x="550" y="280" fill={C.halo} fontSize={11} fontFamily={C.mono} textAnchor="middle">feedback · scores → prefs.jsonl → DPO</text>
+
+        {boxes.map((b,i)=>(
+          <g key={i}>
+            <rect x={b.x} y={b.y} width={b.w} height={b.h} fill="none" stroke={b.color} strokeWidth={1.6}/>
+            <text x={b.x+12} y={b.y+20} fill={b.color} fontSize={12} fontFamily={C.mono} style={{letterSpacing:'0.12em'}}>{b.title}</text>
+            <text x={b.x+12} y={b.y+36} fill={C.ink3} fontSize={10} fontFamily={C.mono}>{b.sub}</text>
+            <line x1={b.x+12} y1={b.y+44} x2={b.x+b.w-12} y2={b.y+44} stroke={C.frame} strokeWidth={1}/>
+            {b.items.map((t,j)=>(
+              <text key={j} x={b.x+12} y={b.y+62+j*22} fill={C.ink2} fontSize={11} fontFamily={C.mono}>· {t}</text>
+            ))}
+          </g>
+        ))}
+      </svg>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:12,marginTop:12,fontFamily:C.mono,fontSize:10,color:C.ink3}}>
+        <div><span style={{color:C.halo}}>TRAIN</span> — ai/train/lora_sft.py</div>
+        <div><span style={{color:C.intertank}}>EXPORT</span> — scripts/hf_pull_ov_models.py</div>
+        <div><span style={{color:C.lox}}>INFER</span> — ai/cli/genai_run.py</div>
+        <div><span style={{color:C.lh2}}>DESIGN</span> — ai/cli/gen3d_stub.py (new)</div>
+        <div><span style={{color:C.danger}}>PRINT</span> — tools/slice_queue.py (new)</div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// E2E PIPELINE SIMULATION
+// ============================================================
+const STAGES = [
+  { id:'brief',    label:'1 · BRIEF',     color:C.halo },
+  { id:'retrieve', label:'2 · RAG',       color:C.intertank },
+  { id:'generate', label:'3 · GENERATE',  color:C.lox },
+  { id:'parse',    label:'4 · PART_TREE', color:C.lox2 },
+  { id:'geometry', label:'5 · GEOMETRY',  color:C.lh2 },
+  { id:'verify',   label:'6 · VERIFY',    color:C.intertank },
+  { id:'slice',    label:'7 · SLICE',     color:C.danger },
+  { id:'queue',    label:'8 · QUEUE',     color:C.ink },
+];
+
+const SAMPLE_BRIEF = {
+  project:'leaf71-r0',
+  object:'injector_face_plate',
+  requirements:['Pc 12 MPa','OF 3.6–3.8','n_elements ≥ 24','Δp ≤ 10%','leak = 0 @ 1.5× Pc'],
+  constraints:{ material:'Inconel 718', process:'LPBF', envelope_mm:[220,220,65], min_channel_mm:1.5, min_wall_mm:0.8, overhang_deg:45 }
+};
+
+const SAMPLE_PART_TREE = {
+  id:'IFP', name:'injector_face_plate', qty:1, material:'Inconel 718', process:'LPBF',
+  children:[
+    { id:'SHELL',   name:'manifold_shell', qty:1, material:'Inconel 718', process:'LPBF' },
+    { id:'FACE',    name:'face_ring',      qty:1, material:'Inconel 718', process:'LPBF' },
+    { id:'ELEM',    name:'coax_element',   qty:24,material:'Inconel 718', process:'LPBF' },
+    { id:'SEAT',    name:'o_ring_seat',    qty:2, material:'Inconel 718', process:'machined' },
+    { id:'BOLT',    name:'M10x35_A286',    qty:12,material:'A-286',       process:'COTS' },
+  ]
+};
+
+const SAMPLE_GEOMETRY_OPS = [
+  { op:'cylinder', args:{ d:220, h:28 }, id:'SHELL.body' },
+  { op:'shell',    args:{ thickness:1.6 }, target:'SHELL.body' },
+  { op:'pattern_polar', args:{ n:24, r:78 }, child:'ELEM.coax' },
+  { op:'channel',  args:{ d:1.8, path:'ox_manifold' } },
+  { op:'channel',  args:{ d:1.8, path:'fu_manifold' } },
+  { op:'fillet',   args:{ r:0.8, edges:'all_interior' } },
+  { op:'drill',    args:{ d:10.2, qty:12, pcd:196 }, id:'BOLT.holes' },
+  { op:'engrave',  args:{ text:'IFP-r0', depth:0.4 } },
+];
+
+const SAMPLE_PRINT_PROFILE = {
+  fdm:  { printer:'Prusa MK4',  material:'PETG',        layer_mm:0.20, walls:4, infill:'25% gyroid', supports:'tree',   orientation:'+Z, face-up',  est_time:'11 h 40', filament_g:185 },
+  lpbf: { printer:'EOS M290',   material:'Inconel 718', layer_mm:0.04, hatch_mm:0.11, laser_W:285,    supports:'block',  orientation:'axis 25° off Z', est_time:'38 h 12', powder_kg:3.2 },
+};
+
+const SAMPLE_VERIFY = [
+  { check:'min wall ≥ 0.8 mm',       result:'pass', value:'1.6 mm (min)' },
+  { check:'min channel Ø ≥ 1.5 mm',  result:'pass', value:'1.8 mm' },
+  { check:'overhang ≤ 45°',          result:'warn', value:'52° on ELEM.cone (support added)' },
+  { check:'dim stack (bolt PCD)',    result:'pass', value:'±0.08 mm' },
+  { check:'clash: ox / fu channels', result:'pass', value:'min gap 0.9 mm' },
+  { check:'mass budget ≤ 2.4 kg',    result:'pass', value:'2.11 kg' },
+];
+
+const SAMPLE_RISKS = [
+  { id:'R1', desc:'ELEM overhang 52° — sagging in top layers', mit:'rotate build 15°, add block support in cone'},
+  { id:'R2', desc:'interior surface roughness Ra > 12 µm', mit:'AFM post-finish on ox/fu channels'},
+  { id:'R3', desc:'HIP-HT distortion on face ring', mit:'add 0.6 mm machining stock on datum-A'},
+  { id:'R4', desc:'powder trap in dead-end channel', mit:'add drain Ø2 plug, blow-out step in procedure'},
+  { id:'R5', desc:'LOX-incompatible lubricant on O-ring seat', mit:'spec fluorinated grease only, label in BOM'},
+];
+
+function StageBar({active,onPick}){
+  return (
+    <div style={{display:'flex',gap:0,marginBottom:16,border:`1px solid ${C.frame}`}}>
+      {STAGES.map((s,i)=>(
+        <button key={s.id} onClick={()=>onPick(i)} style={{
+          flex:1,background:active>=i?`${s.color}22`:'transparent',borderLeft:i?`1px solid ${C.frame}`:'0',
+          border:0,borderRight:0,borderTop:0,borderBottom:active===i?`2px solid ${s.color}`:`2px solid transparent`,
+          padding:'10px 8px',color:active>=i?s.color:C.ink3,fontFamily:C.mono,fontSize:11,
+          letterSpacing:'0.08em',textTransform:'uppercase',cursor:'pointer',textAlign:'center'}}>
+          {s.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Stage1_Brief({brief}){
+  return (
+    <Card>
+      <Chip color={C.halo}>1 · DESIGN BRIEF · INPUT</Chip>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20,marginTop:10}}>
+        <div>
+          <div style={{fontFamily:C.mono,fontSize:11,color:C.ink3,textTransform:'uppercase',letterSpacing:'0.08em'}}>PROJECT</div>
+          <div style={{fontFamily:C.mono,color:C.ink,fontSize:18}}>{brief.project}</div>
+          <div style={{fontFamily:C.mono,fontSize:11,color:C.ink3,marginTop:10,textTransform:'uppercase',letterSpacing:'0.08em'}}>OBJECT</div>
+          <div style={{fontFamily:C.mono,color:C.ink,fontSize:18}}>{brief.object}</div>
+          <div style={{fontFamily:C.mono,fontSize:11,color:C.ink3,marginTop:10,textTransform:'uppercase',letterSpacing:'0.08em'}}>REQUIREMENTS</div>
+          <ul style={{margin:'4px 0 0',paddingLeft:16,fontFamily:C.mono,fontSize:12,color:C.ink2,lineHeight:1.7}}>
+            {brief.requirements.map((r,i)=>(<li key={i}>{r}</li>))}
+          </ul>
+        </div>
+        <div>
+          <div style={{fontFamily:C.mono,fontSize:11,color:C.ink3,textTransform:'uppercase',letterSpacing:'0.08em'}}>CONSTRAINTS</div>
+          <pre style={{margin:'6px 0 0',background:C.canvas2,border:`1px solid ${C.frame}`,padding:12,fontFamily:C.mono,fontSize:12,color:C.ink2}}>
+{JSON.stringify(brief.constraints,null,2)}
+          </pre>
+          <div style={{fontFamily:C.mono,fontSize:10,color:C.ink3,marginTop:8}}>
+            → sent as prompt to <span style={{color:C.lox}}>genai_run.py --device NPU</span>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function Stage2_RAG(){
+  const hits = [
+    { src:'docs/criteria/01_fdm_guidelines.md', span:'Overhang 45° Rule · 얇은 벽 ≥ 1.2 mm', score:0.91 },
+    { src:'docs/criteria/00_design_checklist.md', span:'공차 스택업 · 음의 간섭 금지', score:0.88 },
+    { src:'ai/prompts/design_master.txt', span:'LEAF71 철학 · 최근 10개만 유지', score:0.85 },
+    { src:'prompts/sys_template.txt', span:'AEROTHERM · STRUCTURES · DfAM · M&P panels', score:0.82 },
+    { src:'saves/prefs.jsonl', span:'best: coax-element, r_pcd=78, n=24', score:0.77 },
+  ];
+  return (
+    <Card>
+      <Chip color={C.intertank}>2 · RAG · RETRIEVE</Chip>
+      <div style={{marginTop:10}}>
+        <div style={{fontFamily:C.mono,fontSize:11,color:C.ink3,marginBottom:6}}>
+          query embedding · bge-m3 · top-k=5 · cos&nbsp;sim
+        </div>
+        <table style={{width:'100%',borderCollapse:'collapse',fontFamily:C.mono,fontSize:12}}>
+          <thead><tr>
+            <th style={{textAlign:'left',color:C.ink3,fontWeight:400,padding:'6px 8px',borderBottom:`1px solid ${C.frame}`}}>score</th>
+            <th style={{textAlign:'left',color:C.ink3,fontWeight:400,padding:'6px 8px',borderBottom:`1px solid ${C.frame}`}}>source</th>
+            <th style={{textAlign:'left',color:C.ink3,fontWeight:400,padding:'6px 8px',borderBottom:`1px solid ${C.frame}`}}>span</th>
+          </tr></thead>
+          <tbody>
+            {hits.map((h,i)=>(
+              <tr key={i} style={{borderBottom:`1px solid ${C.canvas2}`}}>
+                <td style={{padding:'8px',color:C.lox}}>{h.score.toFixed(2)}</td>
+                <td style={{padding:'8px',color:C.ink2}}>{h.src}</td>
+                <td style={{padding:'8px',color:C.ink}}>{h.span}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+}
+
+function Stage3_Generate(){
+  const log = [
+`[LOAD] models/ov_npu_ready/qwen25_3b_int4_npu_ov  (1.82 GB)
+[LOAD] device=NPU  latency-first  compile=2.1s
+[GEN ] tokens=0/512 · stream ON`,
+``,
+`# injector_face_plate · r0
+## Design Brief
+- Inconel 718, LPBF; envelope 220×220×65 mm.
+- Pc 12 MPa, OF 3.6–3.8, 24× coax elements on PCD 156.
+
+## Part Tree
+\`\`\`part_tree
+{ "id":"IFP", "children":[...] }
+\`\`\`
+## Interfaces
+- 12× M10 on PCD 196, ±0.08.
+- Datum-A: bolted face, flatness 0.05/Ø220.`,
+``,
+`[GEN ] tokens=487/512 · score=7.4 · part_tree ✓ · dedup ✓
+[SAVE] save/sessions/20260420_103812_leaf71/run.md
+[SAVE] save/sessions/.../blueprints/01_IFP/npu/blueprint.md`,
+  ];
+  return (
+    <Card>
+      <Chip color={C.lox}>3 · GENERATE · NPU STREAM</Chip>
+      <pre style={{margin:'8px 0 0',background:C.canvas2,border:`1px solid ${C.frame}`,padding:14,
+        fontFamily:C.mono,fontSize:12,color:C.ink2,whiteSpace:'pre-wrap',lineHeight:1.55}}>
+{log.join('\n')}
+      </pre>
+    </Card>
+  );
+}
+
+function Stage4_PartTree({tree}){
+  function walk(n, depth=0){
+    return [
+      <div key={n.id} style={{fontFamily:C.mono,fontSize:12,paddingLeft:depth*18,color:C.ink}}>
+        <span style={{color:C.lox}}>{n.id}</span>
+        <span style={{color:C.ink3}}> · </span>
+        <span>{n.name}</span>
+        {n.qty && <span style={{color:C.ink3}}> · ×{n.qty}</span>}
+        {n.material && <span style={{color:C.lh2}}> · {n.material}</span>}
+        {n.process && <span style={{color:C.intertank}}> · {n.process}</span>}
+      </div>,
+      ...(n.children||[]).flatMap(c=>walk(c,depth+1))
+    ];
+  }
+  return (
+    <Card>
+      <Chip color={C.lox2}>4 · PART_TREE · PARSED JSON</Chip>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:10}}>
+        <div style={{border:`1px solid ${C.frame}`,padding:12,background:C.canvas2}}>
+          <div style={{fontFamily:C.mono,fontSize:10,color:C.ink3,marginBottom:8}}>TREE VIEW</div>
+          {walk(tree)}
+        </div>
+        <pre style={{margin:0,background:C.canvas2,border:`1px solid ${C.frame}`,padding:12,
+          fontFamily:C.mono,fontSize:11,color:C.ink2,overflow:'auto',maxHeight:320}}>
+{JSON.stringify(tree,null,2)}
+        </pre>
+      </div>
+    </Card>
+  );
+}
+
+function Stage5_Geometry({ops}){
+  return (
+    <Card>
+      <Chip color={C.lh2}>5 · GEOMETRY_OPS · CADQUERY</Chip>
+      <div style={{display:'grid',gridTemplateColumns:'1.2fr 1fr',gap:16,marginTop:10}}>
+        <div>
+          <pre style={{margin:0,background:C.canvas2,border:`1px solid ${C.frame}`,padding:12,
+            fontFamily:C.mono,fontSize:11,color:C.ink2,overflow:'auto',maxHeight:340}}>
+{ops.map(o=>`${o.op.padEnd(14)} ${JSON.stringify(o.args)}${o.id?'  // '+o.id:''}`).join('\n')}
+          </pre>
+          <div style={{fontFamily:C.mono,fontSize:10,color:C.ink3,marginTop:6}}>
+            → resolve via <span style={{color:C.lox}}>cadquery</span> · export <span style={{color:C.lox}}>STEP / STL / 3MF</span>
+          </div>
+        </div>
+        {/* iso wireframe preview */}
+        <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:10}}>
+          <div style={{fontFamily:C.mono,fontSize:10,color:C.ink3,marginBottom:6}}>ISO PREVIEW · wireframe</div>
+          <svg viewBox="0 0 360 280" width="100%">
+            {/* outer ring */}
+            <ellipse cx="180" cy="160" rx="140" ry="50" fill="none" stroke={C.ink} strokeWidth="1.2"/>
+            <ellipse cx="180" cy="120" rx="140" ry="50" fill="none" stroke={C.ink} strokeWidth="1.2"/>
+            <line x1="40" y1="120" x2="40" y2="160" stroke={C.ink}/>
+            <line x1="320" y1="120" x2="320" y2="160" stroke={C.ink}/>
+            {/* 24 coax elements as dots on PCD */}
+            {Array.from({length:24}).map((_,i)=>{
+              const a=(i/24)*Math.PI*2;
+              const x=180+Math.cos(a)*100, y=120+Math.sin(a)*35;
+              return <circle key={i} cx={x} cy={y} r="3" fill="none" stroke={C.lox} strokeWidth="1"/>;
+            })}
+            {/* bolt pattern PCD 196 */}
+            {Array.from({length:12}).map((_,i)=>{
+              const a=(i/12)*Math.PI*2;
+              const x=180+Math.cos(a)*128, y=120+Math.sin(a)*45;
+              return <g key={i}><circle cx={x} cy={y} r="4" fill="none" stroke={C.lh2} strokeWidth="1"/><line x1={x-4} y1={y} x2={x+4} y2={y} stroke={C.lh2}/><line x1={x} y1={y-4} x2={x} y2={y+4} stroke={C.lh2}/></g>;
+            })}
+            {/* dim */}
+            <line x1="40" y1="230" x2="320" y2="230" stroke={C.ink3}/>
+            <line x1="40" y1="225" x2="40" y2="235" stroke={C.ink3}/>
+            <line x1="320" y1="225" x2="320" y2="235" stroke={C.ink3}/>
+            <text x="180" y="250" fill={C.ink3} fontSize="11" fontFamily={C.mono} textAnchor="middle">Ø 220.00 mm</text>
+            <text x="180" y="30" fill={C.lox} fontSize="11" fontFamily={C.mono} textAnchor="middle">24× coax · PCD 156</text>
+            <text x="180" y="48" fill={C.lh2} fontSize="11" fontFamily={C.mono} textAnchor="middle">12× M10 · PCD 196</text>
+          </svg>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function Stage6_Verify({checks, risks}){
+  return (
+    <Card>
+      <Chip color={C.intertank}>6 · VERIFY · V&V + RISKS</Chip>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:10}}>
+        <div>
+          <div style={{fontFamily:C.mono,fontSize:10,color:C.ink3,marginBottom:6}}>AUTO CHECKS</div>
+          {checks.map((c,i)=>{
+            const col = c.result==='pass'?C.intertank:c.result==='warn'?C.lh2:C.danger;
+            const mark = c.result==='pass'?'✓':c.result==='warn'?'!':'✗';
+            return (
+              <div key={i} style={{display:'flex',gap:10,padding:'8px 0',borderBottom:`1px dashed ${C.frame}`}}>
+                <span style={{color:col,fontFamily:C.mono,fontSize:14,width:14}}>{mark}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontFamily:C.mono,fontSize:12,color:C.ink}}>{c.check}</div>
+                  <div style={{fontFamily:C.mono,fontSize:11,color:col}}>{c.value}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div>
+          <div style={{fontFamily:C.mono,fontSize:10,color:C.ink3,marginBottom:6}}>TOP 5 RISKS</div>
+          {risks.map((r,i)=>(
+            <div key={i} style={{padding:'8px 0',borderBottom:`1px dashed ${C.frame}`}}>
+              <div style={{display:'flex',gap:10}}>
+                <span style={{color:C.danger,fontFamily:C.mono,fontSize:11}}>{r.id}</span>
+                <div style={{flex:1,fontFamily:C.mono,fontSize:12,color:C.ink}}>{r.desc}</div>
+              </div>
+              <div style={{fontFamily:C.mono,fontSize:11,color:C.intertank,marginTop:4,paddingLeft:32}}>→ {r.mit}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function Stage7_Slice({profiles}){
+  const [mode,setMode]=useState('lpbf');
+  const p = profiles[mode];
+  return (
+    <Card>
+      <Chip color={C.danger}>7 · SLICE · PRINT_PROFILE + G-CODE</Chip>
+      <div style={{display:'flex',gap:10,margin:'10px 0'}}>
+        <Btn onClick={()=>setMode('fdm')}  active={mode==='fdm'}  variant='warn'>FDM · PrusaSlicer</Btn>
+        <Btn onClick={()=>setMode('lpbf')} active={mode==='lpbf'} variant='danger'>LPBF · EOSPRINT</Btn>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+        <pre style={{margin:0,background:C.canvas2,border:`1px solid ${C.frame}`,padding:12,
+          fontFamily:C.mono,fontSize:12,color:C.ink2}}>
+{`printer      : ${p.printer}
+material     : ${p.material}
+layer_mm     : ${p.layer_mm}
+${'hatch_mm' in p ? 'hatch_mm     : '+p.hatch_mm+'\n' : ''}${'laser_W' in p ? 'laser_W      : '+p.laser_W+'\n' : ''}${'walls' in p ? 'walls        : '+p.walls+'\n' : ''}${'infill' in p ? 'infill       : '+p.infill+'\n' : ''}supports     : ${p.supports}
+orientation  : ${p.orientation}
+est_time     : ${p.est_time}
+${'filament_g' in p ? 'filament_g   : '+p.filament_g : 'powder_kg    : '+p.powder_kg}`}
+        </pre>
+        <pre style={{margin:0,background:C.canvas2,border:`1px solid ${C.frame}`,padding:12,
+          fontFamily:C.mono,fontSize:11,color:C.ink2,overflow:'auto'}}>
+{mode==='fdm' ?
+`; G-code · Prusa MK4 · PETG
+; generated by slicer_job v0.2
+M140 S80
+M104 S240 T0
+G28 ; home
+G1 Z0.2 F600
+G1 X30 Y30 F3000
+; LAYER:0
+G1 F1800 E2
+...
+; total layers: 140
+; estimated time: 11h 40m
+M104 S0 ; cooldown`
+:
+`; JOB · EOSPRINT 2.x · Inconel 718
+; scan strategy: stripe 67°
+; laser: 285 W, 960 mm/s
+; hatch: 0.11 mm, layer: 0.04 mm
+; contour: 100 W, 400 mm/s
+; supports: block, thickness 2 mm
+; --- layer 000000 ---
+EXPOSE CONTOUR
+EXPOSE INFILL stripe rot=67
+RECOAT
+; ---
+; total layers: 1625
+; estimated time: 38h 12m`}
+        </pre>
+      </div>
+    </Card>
+  );
+}
+
+function Stage8_Queue({tree}){
+  const rows = useMemo(()=>{
+    const out=[];
+    (function walk(n,parent){
+      out.push({id:n.id,name:n.name,qty:n.qty||1,material:n.material||'',process:n.process||'',parent:parent||''});
+      (n.children||[]).forEach(c=>walk(c,n.id));
+    })(tree);
+    return out;
+  },[tree]);
+  return (
+    <Card>
+      <Chip>8 · QUEUE · PRINT_QUEUE.CSV</Chip>
+      <div style={{marginTop:10,border:`1px solid ${C.frame}`}}>
+        <table style={{width:'100%',borderCollapse:'collapse',fontFamily:C.mono,fontSize:12}}>
+          <thead style={{background:C.canvas2}}><tr>
+            {['id','name','qty','material','process','parent','status'].map(h=>(
+              <th key={h} style={{textAlign:'left',padding:'8px 10px',color:C.ink3,fontWeight:400,
+                borderBottom:`1px solid ${C.frame}`,textTransform:'uppercase',letterSpacing:'0.08em',fontSize:10}}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody>
+            {rows.map((r,i)=>{
+              const statuses=['queued','queued','sliced','sliced','ready','printing','done'];
+              const s=statuses[i%statuses.length];
+              const colMap={queued:C.ink3, sliced:C.lh2, ready:C.intertank, printing:C.lox, done:C.intertank};
+              return (
+                <tr key={r.id} style={{borderBottom:`1px solid ${C.canvas2}`}}>
+                  <td style={{padding:'8px 10px',color:C.lox}}>{r.id}</td>
+                  <td style={{padding:'8px 10px',color:C.ink}}>{r.name}</td>
+                  <td style={{padding:'8px 10px',color:C.ink2}}>{r.qty}</td>
+                  <td style={{padding:'8px 10px',color:C.lh2}}>{r.material}</td>
+                  <td style={{padding:'8px 10px',color:C.intertank}}>{r.process}</td>
+                  <td style={{padding:'8px 10px',color:C.ink3}}>{r.parent||'—'}</td>
+                  <td style={{padding:'8px 10px',color:colMap[s]}}>{s}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div style={{display:'flex',gap:10,marginTop:14}}>
+        <Btn variant='primary'>Export print_pack.zip</Btn>
+        <Btn variant='go'>Send to printer (OctoPrint · FTP)</Btn>
+        <Btn>Mark done → prefs.jsonl (feedback)</Btn>
+      </div>
+    </Card>
+  );
+}
+
+// ============================================================
+// ROOT
+// ============================================================
+function App(){
+  const [active,setActive]=useState(0);
+  const stages = [
+    <Stage1_Brief brief={SAMPLE_BRIEF}/>,
+    <Stage2_RAG/>,
+    <Stage3_Generate/>,
+    <Stage4_PartTree tree={SAMPLE_PART_TREE}/>,
+    <Stage5_Geometry ops={SAMPLE_GEOMETRY_OPS}/>,
+    <Stage6_Verify checks={SAMPLE_VERIFY} risks={SAMPLE_RISKS}/>,
+    <Stage7_Slice profiles={SAMPLE_PRINT_PROFILE}/>,
+    <Stage8_Queue tree={SAMPLE_PART_TREE}/>,
+  ];
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:24,fontFamily:C.sans,color:C.ink2}} data-screen-label="Blueprint NPU E2E">
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:12}}>
+        <div>
+          <div style={{fontFamily:C.mono,letterSpacing:'0.14em',color:C.ink,fontSize:22}}>BLUEPRINT_NPU</div>
+          <div style={{fontFamily:C.mono,fontSize:12,color:C.lox,marginTop:4}}>
+            NPU · OpenVINO INT4 · &lt;20 B models · offline · engineering-first design → 3D print
+          </div>
+        </div>
+        <div style={{display:'flex',gap:14,fontFamily:C.mono,fontSize:11,color:C.ink3}}>
+          <span>models: <span style={{color:C.lox}}>qwen2.5-3b · llama-3.2-3b · phi-3.5-mini</span></span>
+          <span>device: <span style={{color:C.intertank}}>Core Ultra · NPU</span></span>
+        </div>
+      </div>
+
+      <ArchDiagram/>
+
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10}}>
+        <H>End-to-end pipeline · <span style={{color:C.lox}}>injector_face_plate</span> · <span style={{color:C.ink3,fontWeight:400}}>leaf71-r0</span></H>
+        <div style={{display:'flex',gap:8}}>
+          <Btn onClick={()=>setActive(Math.max(0,active-1))}>◀ prev</Btn>
+          <Btn variant='primary' onClick={()=>setActive(Math.min(STAGES.length-1,active+1))}>next ▶</Btn>
+        </div>
+      </div>
+      <StageBar active={active} onPick={setActive}/>
+      {stages[active]}
+
+      <div style={{marginTop:28,border:`1px solid ${C.frame}`,padding:16,background:C.canvas}}>
+        <Chip color={C.halo}>FEEDBACK LOOP · CLOSES THE CIRCLE</Chip>
+        <div style={{fontFamily:C.mono,fontSize:12,color:C.ink2,marginTop:8,lineHeight:1.7}}>
+          printer outcome (pass / fail / rework) + operator rating → <span style={{color:C.lox}}>save/sessions/&lt;ts&gt;/prefs.jsonl</span><br/>
+          → periodic <span style={{color:C.intertank}}>LoRA / DPO refresh</span> on XPU → re-export INT4 → hot-swap on NPU.<br/>
+          No cloud, no telemetry. Everything stays in <span style={{color:C.lox}}>./save/</span>.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

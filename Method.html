@@ -1,0 +1,235 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Method · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif;line-height:1.6}
+.mono{font-family:'JetBrains Mono',monospace}
+h1{font-size:28px;font-weight:600;margin:0 0 4px}
+h2{font-size:16px;font-weight:600;margin:32px 0 10px;color:#9fd3ff;letter-spacing:.04em;
+   border-top:1px solid #274a79;padding-top:18px}
+h3{font-size:13px;font-weight:600;margin:18px 0 6px;color:#ffd39f;letter-spacing:.06em;text-transform:uppercase}
+p{margin:6px 0 10px;color:#cfe0f7;font-size:14px}
+ul{margin:6px 0 12px;padding-left:20px}
+li{color:#cfe0f7;font-size:13.5px;margin:3px 0}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:#0a1a2f;color:#9fd3ff;padding:1px 6px;border:1px solid #274a79}
+pre{background:#0a1a2f;border:1px solid #274a79;border-left:3px solid #9fd3ff;
+    padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+    color:#eaf2ff;line-height:1.55;overflow-x:auto;margin:8px 0 14px}
+.muted{color:#6f8cb0}
+.tag{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;
+     border:1px solid #274a79;padding:2px 6px;color:#9fb6d9;margin-right:6px}
+.row{display:grid;grid-template-columns:140px 1fr;gap:14px;margin:4px 0}
+.row .k{font-family:'JetBrains Mono',monospace;font-size:11px;color:#6f8cb0;text-align:right;padding-top:3px}
+.row .v{color:#eaf2ff;font-size:13.5px}
+table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0 14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid #274a79}
+th{color:#6f8cb0;font-family:'JetBrains Mono',monospace;font-weight:400;
+   font-size:9.5px;letter-spacing:.1em;text-transform:uppercase}
+td.mono{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#9fd3ff}
+.callout{border:1px solid #274a79;border-left:3px solid #ffd39f;background:#0a1a2f;padding:10px 14px;margin:8px 0 14px}
+.callout .lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#ffd39f}
+.callout p{margin:4px 0 0;font-size:12.5px}
+</style>
+</head><body class="bp">
+<div id="topnav"></div>
+
+<div style="max-width:880px;margin:0 auto;padding:18px 36px 80px">
+
+<h1>Method</h1>
+<p class="muted mono" style="font-size:11px;letter-spacing:.06em">
+HOW THIS BLUEPRINT WAS BUILT · for handoff &amp; future iteration
+</p>
+
+<h2>1 · What this package is</h2>
+<p>
+19개 HTML 문서 모음으로 구성된 항공우주 추진기관(NPU) 디자인 패키지입니다.
+정적 spec sheet가 아니라 <strong>cross-link 된 살아있는 문서 시스템</strong> —
+각 페이지가 React + inline JSX로 렌더되고, 공통 TopNav · 공통 색/타입 토큰으로
+시각적 통일성을 유지합니다.
+</p>
+<p>
+한 문장 요약: <em>"AS9100 흐름을 따르는 추진기관 설계·제조·운영의 전 라이프사이클 (PDR → CDR → FAI → hot-fire → refurb) 을 정적 HTML로 가시화."</em>
+</p>
+
+<h3>Document map</h3>
+<table>
+<tr><th>Cluster</th><th>Pages</th><th>Role</th></tr>
+<tr><td class="mono">_</td><td class="mono">README · Dashboard</td><td>색인 · 한눈 KPI</td></tr>
+<tr><td class="mono">STRUCTURE</td><td class="mono">Assembly · Joints · Mass</td><td>"무엇으로 구성되나"</td></tr>
+<tr><td class="mono">MATERIAL</td><td class="mono">Materials · PrintQueue · Inspection · Supply</td><td>"어떻게 만들고 받나"</td></tr>
+<tr><td class="mono">ANALYSIS</td><td class="mono">Loads · Thermal · Test · FMEA</td><td>"안전한가"</td></tr>
+<tr><td class="mono">OPS</td><td class="mono">Lineage · Ops · ECN · ICD</td><td>"수명/변경/인터페이스"</td></tr>
+<tr><td class="mono">PROGRAM</td><td class="mono">Schedule · Risk</td><td>"일정/리스크"</td></tr>
+</table>
+
+<h2>2 · Architecture</h2>
+
+<h3>File layout</h3>
+<pre>colors_and_type.css        ← design tokens (palette · fonts · base body class)
+TopNav.jsx                 ← shared top navigation (cluster grouping, active state)
+&lt;PageName&gt;.html            ← 19 documents, each self-contained
+README.html                ← index, reading paths, conventions
+Method.html                ← this document</pre>
+
+<h3>Per-page skeleton</h3>
+<p>모든 페이지가 같은 뼈대를 따릅니다 — 새 페이지 추가 시 그대로 복붙해 사용:</p>
+<pre>&lt;!DOCTYPE html&gt;&lt;html lang="en"&gt;&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;&lt;PageName&gt; · Blueprint NPU&lt;/title&gt;
+  &lt;link rel="stylesheet" href="colors_and_type.css"&gt;
+  &lt;style&gt;/* page-local styles only */&lt;/style&gt;
+&lt;/head&gt;&lt;body class="bp"&gt;
+  &lt;div id="topnav"&gt;&lt;/div&gt;
+  &lt;div id="root"&gt;&lt;/div&gt;
+  &lt;!-- React 18.3.1 + Babel 7.29.0, pinned with integrity hashes --&gt;
+  &lt;script src="https://unpkg.com/react@18.3.1/..."&gt;&lt;/script&gt;
+  &lt;script src="https://unpkg.com/react-dom@18.3.1/..."&gt;&lt;/script&gt;
+  &lt;script src="https://unpkg.com/@babel/standalone@7.29.0/..."&gt;&lt;/script&gt;
+  &lt;script type="text/babel" src="TopNav.jsx"&gt;&lt;/script&gt;
+  &lt;script type="text/babel"&gt;
+    setTimeout(()=&gt;window.BPMountTopNav &amp;&amp; window.BPMountTopNav('&lt;PageName&gt;'), 100);
+  &lt;/script&gt;
+  &lt;script type="text/babel"&gt;
+    /* page-specific React component & data */
+    ReactDOM.createRoot(document.getElementById('root')).render(&lt;App/&gt;);
+  &lt;/script&gt;
+&lt;/body&gt;&lt;/html&gt;</pre>
+
+<div class="callout">
+<div class="lbl">WHY INLINE JSX (NOT MODULES)</div>
+<p>
+각 파일이 외부 도구 없이 브라우저에서 바로 열림. CDN 의존성만 있으면 됨.
+파일을 통째로 카피해서 새 페이지를 만들기 쉬움. 단점: 컴포넌트 재사용은
+<code>window</code> globals를 통해서만 가능 — TopNav만 공유되고 나머지는
+페이지 내부에 인라인.
+</p>
+</div>
+
+<h3>Shared TopNav contract</h3>
+<p><code>TopNav.jsx</code>가 <code>window.BPMountTopNav(activeKey)</code> 글로벌 함수를 export합니다.</p>
+<ul>
+<li>네비게이션 항목은 파일 상단 배열에 선언 — 각 항목은 <code>{k, href, label, group}</code></li>
+<li><code>group</code> 값이 같은 항목들끼리 시각적으로 묶이고, 그룹 사이에 세로 구분선이 자동 삽입</li>
+<li>현재 페이지는 <code>activeKey</code>로 식별 — 색·border로 강조</li>
+<li>새 페이지 추가 = TopNav.jsx 배열에 한 줄 추가 + 새 HTML 작성</li>
+</ul>
+
+<h2>3 · Design system</h2>
+
+<h3>Color palette</h3>
+<table>
+<tr><th>Token</th><th>Hex</th><th>Semantics</th></tr>
+<tr><td class="mono">c / c2 / c3</td><td class="mono">#0c1e35 · #0a1a2f · #08152a</td><td>background layers (page · panel · inset)</td></tr>
+<tr><td class="mono">frame</td><td class="mono">#274a79</td><td>borders · dividers</td></tr>
+<tr><td class="mono">ink / ink2 / ink3</td><td class="mono">#eaf2ff · #9fb6d9 · #6f8cb0</td><td>text (primary · secondary · meta)</td></tr>
+<tr><td class="mono">lox</td><td class="mono">#9fd3ff</td><td>structural cool blue — section heads, numeric values</td></tr>
+<tr><td class="mono">lh2</td><td class="mono">#ffd39f</td><td>warning warm — pending, gate, watch</td></tr>
+<tr><td class="mono">inter</td><td class="mono">#89ffa8</td><td>pass/signed/green</td></tr>
+<tr><td class="mono">halo</td><td class="mono">#caa9ff</td><td>category accent (design, people)</td></tr>
+<tr><td class="mono">risk</td><td class="mono">#ff8c8c</td><td>fail/escalate/critical red</td></tr>
+</table>
+<p class="muted" style="font-size:12px">
+이름은 LOX/LH2/intertank 같은 로켓 용어에서 따옴 — 색의 "역할"을 추론하기 쉽게.
+새 페이지에서도 <code>C</code> 객체로 동일 토큰을 인라인 정의해 일관성 유지.
+</p>
+
+<h3>Typography</h3>
+<ul>
+<li><strong>Inter</strong>: 본문 · 라벨</li>
+<li><strong>JetBrains Mono</strong> (<code>.mono</code>): 수치, ID, 좌표, 시간, 코드 — "측정된 것"을 표현</li>
+<li>크기: 9.5px (mono meta) · 11–13px (본문) · 16–22px (KPI 숫자) · 28px (페이지 타이틀)</li>
+<li>letter-spacing: 라벨에 <code>.08–.14em</code> — 청사진/도면 느낌</li>
+</ul>
+
+<h3>Layout conventions</h3>
+<ul>
+<li>1200px max-width 컨테이너, 24px gutter</li>
+<li>패널: <code>1px solid frame</code> 보더 + <code>c2</code> 배경 + 14px 패딩</li>
+<li>주요 패널은 좌측에 3px 컬러 보더 (semantic accent)</li>
+<li>그리드 + flex로 모든 레이아웃 구성, 인라인 흐름 지양</li>
+</ul>
+
+<h2>4 · Process — how we got here</h2>
+
+<h3>Phase 1 · Scope &amp; research</h3>
+<p>
+"항공기/엔진 어셈블리"를 단순 부품 트리가 아닌 <strong>AS9100 흐름</strong>으로 해석.
+GD&amp;T (ASME Y14.5-2018), 공차 stack-up (worst-case vs RSS),
+항공우주 체결 카탈로그 (Hi-Lok · V-band · lockbolt), LPBF 결함 (witness line ·
+40° overhang · HIP), AS9100 traceability를 사전 조사.
+</p>
+
+<h3>Phase 2 · Skeleton</h3>
+<ol>
+<li><code>colors_and_type.css</code> + <code>TopNav.jsx</code> 먼저 만들고 1페이지로 검증</li>
+<li>Assembly/Parts/Materials 3종으로 시각 언어 확정 (블루프린트 dark)</li>
+<li>이후 모든 페이지가 이 시각 언어를 상속</li>
+</ol>
+
+<h3>Phase 3 · Iterate by cluster</h3>
+<p>한 번에 한 클러스터씩 추가, 사용자 승인 후 다음 클러스터:</p>
+<ol>
+<li><strong>STRUCTURE</strong>: Assembly · Joints · Mass — 물리적 형상</li>
+<li><strong>MATERIAL</strong>: Materials · PrintQueue · Inspection · Supply — 공급망 + 제조</li>
+<li><strong>ANALYSIS</strong>: Loads · Thermal · Test · FMEA — 검증</li>
+<li><strong>OPS</strong>: Lineage · Ops · ECN · ICD — 변경 · 수명 · 인터페이스</li>
+<li><strong>PROGRAM</strong>: Schedule · Risk · Dashboard — 한 단계 줌아웃</li>
+</ol>
+
+<h3>Phase 4 · Capstone</h3>
+<p>
+Dashboard가 모든 페이지를 한 화면에 요약하는 capstone. README가 reading paths
+(persona별 추천 동선)를 정리. 본 Method 문서가 빌드 매뉴얼.
+</p>
+
+<h2>5 · Cross-page invariants</h2>
+<p>모든 페이지가 같은 가상 SN-002 빌드 컨텍스트를 공유합니다 — 숫자가 페이지 간에 일치:</p>
+<div class="row"><div class="k">SN</div><div class="v">SN-002 (2nd flight unit)</div></div>
+<div class="row"><div class="k">T-0</div><div class="v">2026-05-30 build lock · 현재 T-33d</div></div>
+<div class="row"><div class="k">Mass</div><div class="v">187.4 kg (target 190, margin +1.4%)</div></div>
+<div class="row"><div class="k">Min MoS</div><div class="v">+0.18 at P08 throat, load case-3</div></div>
+<div class="row"><div class="k">Critical path</div><div class="v">V-band CoC · Eaton · 49d lead</div></div>
+<div class="row"><div class="k">Top tech risk</div><div class="v">GRCop-42 witness line (FMEA F-01 · Risk R-02)</div></div>
+
+<p class="muted" style="font-size:12px;margin-top:14px">
+새 페이지 추가 시 이 값들과 정합성 유지 — Dashboard와 Schedule이 가장 먼저
+틀어집니다.
+</p>
+
+<h2>6 · Adding a new page</h2>
+<ol>
+<li>위 <em>per-page skeleton</em> 그대로 복사해 <code>NewPage.html</code> 생성</li>
+<li>페이지 내부에 인라인 <code>C</code> palette 객체 복사 (다른 페이지 참조)</li>
+<li>데이터는 페이지 상단 const 배열로 — 직접 편집 가능하도록</li>
+<li>React 컴포넌트는 <code>App</code> 하나로, 분리 최소화</li>
+<li><code>TopNav.jsx</code> NAV 배열에 항목 추가, 적절한 group 지정</li>
+<li>README의 reading paths에 자연스럽게 등장하면 cross-link 추가</li>
+<li>Dashboard에 KPI 1개 추가 고려 (있으면)</li>
+</ol>
+
+<h2>7 · Known limitations</h2>
+<ul>
+<li>모든 데이터가 하드코드 — JSON 또는 CSV 분리하면 더 maintainable</li>
+<li>페이지 간 cross-link은 정적 — 한 페이지에서 데이터 변경 시 수동 sync 필요</li>
+<li>인쇄 스타일(<code>@media print</code>) 미적용 — PDF 익스포트 시 색 조정 필요</li>
+<li>국문/영문 혼용 — 라벨은 영어, 본문 일부는 한글. 단일 언어로 정리 권장</li>
+</ul>
+
+<h2>8 · Next steps (optional)</h2>
+<p>예산이 더 있으면 자연스러운 후속:</p>
+<ul>
+<li><strong>Data layer 분리</strong>: <code>data.json</code>으로 SN·mass·schedule 추출</li>
+<li><strong>GSE</strong>: 지상지원장비 인터페이스 (운반·점화·연료 충전)</li>
+<li><strong>Hazard</strong>: range safety / personnel safety analysis</li>
+<li><strong>Cert matrix</strong>: FAA/NASA 규정 ↔ 본 패키지 문서 매핑</li>
+</ul>
+
+</div>
+
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Method'),100);</script>
+
+</body></html>

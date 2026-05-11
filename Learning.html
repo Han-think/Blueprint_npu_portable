@@ -1,0 +1,217 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Learning · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif;line-height:1.6}
+.mono{font-family:'JetBrains Mono',monospace}
+h1{font-size:28px;font-weight:600;margin:0 0 4px}
+h2{font-size:16px;font-weight:600;margin:32px 0 10px;color:#9fd3ff;letter-spacing:.04em;
+   border-top:1px solid #274a79;padding-top:18px}
+h3{font-size:13px;font-weight:600;margin:18px 0 6px;color:#ffd39f;letter-spacing:.06em;text-transform:uppercase}
+p{margin:6px 0 10px;color:#cfe0f7;font-size:14px}
+ul,ol{margin:6px 0 12px;padding-left:20px}
+li{color:#cfe0f7;font-size:13.5px;margin:3px 0}
+code{font-family:'JetBrains Mono',monospace;font-size:12px;background:#0a1a2f;color:#9fd3ff;padding:1px 6px;border:1px solid #274a79}
+pre{background:#0a1a2f;border:1px solid #274a79;border-left:3px solid #89ffa8;
+    padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+    color:#eaf2ff;line-height:1.55;overflow-x:auto;margin:8px 0 14px}
+.muted{color:#6f8cb0}
+table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0 14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid #274a79;vertical-align:top}
+th{color:#6f8cb0;font-family:'JetBrains Mono',monospace;font-weight:400;
+   font-size:9.5px;letter-spacing:.1em;text-transform:uppercase}
+td.mono{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#9fd3ff;white-space:nowrap}
+.callout{border:1px solid #274a79;border-left:3px solid #ffd39f;background:#0a1a2f;padding:10px 14px;margin:8px 0 14px}
+.callout .lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;color:#ffd39f}
+.callout p{margin:4px 0 0;font-size:12.5px}
+.tier{display:grid;grid-template-columns:90px 1fr;gap:14px;padding:10px 0;border-bottom:1px dashed #274a79}
+.tier .t{font-family:'JetBrains Mono',monospace;font-size:11px;color:#9fd3ff;padding-top:3px}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:14px;margin:4px 0}
+.kv .k{font-family:'JetBrains Mono',monospace;font-size:11px;color:#6f8cb0;text-align:right;padding-top:3px}
+.kv .v{color:#eaf2ff;font-size:13.5px}
+</style>
+</head><body class="bp">
+<div id="topnav"></div>
+
+<div style="max-width:880px;margin:0 auto;padding:18px 36px 80px">
+
+<h1>Learning</h1>
+<p class="muted mono" style="font-size:11px;letter-spacing:.06em">
+HOW TO STUDY THIS PACKAGE · using small local LLMs (Ollama + IPEX-LLM on Intel Arc)
+</p>
+
+<h2>1 · 학습 철학</h2>
+<p>
+이 패키지는 단순 spec 모음이 아니라 <strong>20개 문서가 서로를 참조하는 시스템</strong>입니다.
+큰 모델 1번에 통째로 던지면 비용도 비싸고 깊이도 떨어집니다. 소형 LLM (7B~14B)을
+로컬로 쓰는 본인 환경에 맞춰, <strong>문서를 작게 쪼개 한 번에 한 주제씩 대화하는 방식</strong>이
+가장 효율적입니다.
+</p>
+
+<div class="callout">
+<div class="lbl">CORE LOOP</div>
+<p>
+한 페이지 → 1개 질문 → 모델 답변 → 다른 페이지로 cross-check → 모순 발견 → 학습 노트.
+이 사이클이 한 바퀴 = 30분 이내. 하루 2~3 사이클이면 1주일에 패키지 절반 마스터.
+</p>
+</div>
+
+<h2>2 · 환경 (Ollama + IPEX-LLM)</h2>
+
+<h3>왜 이 조합인가</h3>
+<ul>
+<li><strong>Ollama</strong>: 모델 관리/서빙 표준. <code>ollama pull</code> 한 줄로 모델 교체</li>
+<li><strong>IPEX-LLM</strong>: Intel Arc GPU(또는 Xeon CPU)에서 INT4 양자화로 7B~14B 모델 가속</li>
+<li>NVIDIA 의존성 없이 본인 워크스테이션에서 로컬 추론 → 비용 0, 프라이버시 ↑</li>
+<li>토큰 속도는 cloud보다 느리지만 — 학습 페이스랑 잘 맞음</li>
+</ul>
+
+<h3>설치 한 줄 요약</h3>
+<pre># IPEX-LLM 백엔드의 Ollama 빌드 사용 (Intel GPU 가속)
+# https://github.com/intel-analytics/ipex-llm 참고
+ollama serve &amp;
+ollama pull qwen2.5:14b-instruct-q4_K_M    # 본인 환경 최적
+ollama pull qwen2.5-coder:7b-instruct      # 코드 질문용
+ollama pull nomic-embed-text               # 임베딩 (RAG용)</pre>
+
+<h3>모델 선택 가이드</h3>
+<table>
+<tr><th>Task</th><th>모델</th><th>이유</th></tr>
+<tr><td>개념 설명·요약</td><td class="mono">qwen2.5:14b</td><td>한·영 모두 깔끔, 14B면 정의·예시 충분</td></tr>
+<tr><td>CSS/JSX 수정·디버깅</td><td class="mono">qwen2.5-coder:7b</td><td>빠르고 코드 특화</td></tr>
+<tr><td>표·수치 추출</td><td class="mono">qwen2.5:7b</td><td>structured output에 강함</td></tr>
+<tr><td>긴 문서 검색</td><td class="mono">+ nomic-embed</td><td>RAG로 page-pair 검색</td></tr>
+</table>
+
+<h2>3 · 4-Tier 학습 커리큘럼</h2>
+
+<div class="tier">
+<div class="t">TIER 0<br/><span class="muted" style="font-size:10px">반나절</span></div>
+<div>
+<strong>지형 파악</strong> — README + Dashboard + Method 만 정독.
+<br/><span class="muted" style="font-size:12px">
+질문: "이 패키지의 6개 cluster가 각각 무슨 역할이고, 어떤 순서로 읽어야 하나?"
+</span>
+</div>
+</div>
+
+<div class="tier">
+<div class="t">TIER 1<br/><span class="muted" style="font-size:10px">1~2일</span></div>
+<div>
+<strong>STRUCTURE 클러스터</strong> — Assembly · Joints · Mass.
+"무엇으로 이루어졌나"를 머릿속에 박는 단계.
+<br/><span class="muted" style="font-size:12px">
+질문 예: "P08 throat이 GRCop-42인 이유는? IN718과 뭐가 다른가?"
+"Hi-Lok과 V-band를 같은 인터페이스에 쓰면 안 되는 이유는?"
+</span>
+</div>
+</div>
+
+<div class="tier">
+<div class="t">TIER 2<br/><span class="muted" style="font-size:10px">3~5일</span></div>
+<div>
+<strong>MATERIAL + ANALYSIS</strong> — 제조·검증을 묶어서.
+이 단계가 가장 깊이 있는 곳. LPBF/HIP/CMM, MoS 계산, FMEA RPN.
+<br/><span class="muted" style="font-size:12px">
+질문 예: "FMEA F-01 (witness line) 의 RPN 160이 어떻게 나왔나? S/O/D 각각 근거는?"
+"Loads의 case-3 chamber pressure가 Thermal의 hot-side 894K와 동일 시점인가?"
+</span>
+</div>
+</div>
+
+<div class="tier">
+<div class="t">TIER 3<br/><span class="muted" style="font-size:10px">1주</span></div>
+<div>
+<strong>OPS + PROGRAM</strong> — Lineage · ECN · ICD · Schedule · Risk.
+"한 SN이 어떻게 태어나서 죽는가" 의 시간 차원.
+<br/><span class="muted" style="font-size:12px">
+질문 예: "ECN-014가 닫혀야 build lock 가능한 이유는? 어느 페이지 어느 항목과 연결되나?"
+"Risk R-02 (witness line) 가 FMEA F-01과 동일한가? 왜 둘 다 추적하나?"
+</span>
+</div>
+</div>
+
+<h2>4 · 질문 템플릿</h2>
+<p>소형 LLM은 컨텍스트가 짧으므로 <strong>1페이지 단위로</strong> 붙여넣고 묻습니다.</p>
+
+<h3>A. 정의·요약 (Tier 0~1)</h3>
+<pre>다음은 NPU 설계 패키지의 &lt;PageName&gt; 페이지다.
+
+&lt;페이지 본문 붙여넣기&gt;
+
+질문:
+1) 이 페이지가 다루는 핵심 개념 3가지를 한 줄씩 정의해라.
+2) 항공우주 엔지니어가 처음 보면 헷갈릴 만한 용어 5개와 그 의미.
+3) 이 페이지에서 가장 중요한 숫자 1개와 그 의미.</pre>
+
+<h3>B. Cross-page 검증 (Tier 2)</h3>
+<pre>페이지 A: &lt;Loads.html 본문&gt;
+페이지 B: &lt;Thermal.html 본문&gt;
+
+질문:
+- A의 load case-3과 B의 hot-side 894K는 동일 운영 시점인가?
+- 두 페이지에서 P08 throat을 가리키는 수치가 서로 일관적인가?
+- 모순이 있다면 어느 페이지를 신뢰해야 하나?</pre>
+
+<h3>C. Re-derive (Tier 3)</h3>
+<pre>FMEA의 F-01 (GRCop witness line):
+S=8, O=4, D=5, RPN=160
+
+질문:
+- S/O/D 각 점수의 정성적 근거를 1~10 스케일로 다시 도출해라.
+- 만약 CT 검사를 100% 도입하면 D가 얼마로 떨어지나? RPN은?
+- 그 결과 R-02 (Risk page)의 L·I 점수에는 어떤 변동이 생기나?</pre>
+
+<h2>5 · RAG 미니 셋업 (선택)</h2>
+<p>
+20개 문서가 늘어나면 매번 붙여넣기가 귀찮아집니다. 간단한 RAG로 자동화:
+</p>
+<pre># 페이지를 임베딩 → chroma/lancedb에 저장
+ollama embeddings -m nomic-embed-text "&lt;page text&gt;"
+
+# 질문 → top-K 페이지 retrieve → qwen2.5:14b에 컨텍스트 주입
+# 직접 작성하기 어렵다면 LangChain/LlamaIndex 의 Ollama 어댑터 사용</pre>
+<p class="muted" style="font-size:12px">
+청크 사이즈는 800~1200 token, overlap 100. 페이지 단위 자체가 chunk와 잘 맞음.
+</p>
+
+<h2>6 · 학습 노트 포맷</h2>
+<p>매 사이클마다 짧은 노트 1개. 본인의 학습 데이터셋이 됨:</p>
+<pre>## &lt;Date&gt; · &lt;PageName&gt; · &lt;1줄 주제&gt;
+
+Q. (LLM에 던진 질문)
+A. (모델 답 요약, 2~3줄)
+
+확인 (cross-check):
+- &lt;다른 페이지명&gt;의 &lt;섹션&gt;에서 동일/상충 정보 발견
+- 결론: 신뢰함 / 모순 있음 / 추가 조사 필요
+
+다음 질문:
+- ...</pre>
+
+<h2>7 · 발전 로드맵</h2>
+<ol>
+<li><strong>현재</strong>: 1페이지씩 붙여넣기 + Ollama에 질문</li>
+<li><strong>2단계</strong>: nomic-embed로 RAG, top-3 페이지 자동 retrieve</li>
+<li><strong>3단계</strong>: 본인 학습 노트(Step 6)를 fine-tune 데이터로 → 본인용 도메인 어시스턴트</li>
+<li><strong>4단계</strong>: ECN/Risk 자동 분류기 — 새 변경 요청을 어느 페이지에 반영해야 하는지 추천</li>
+</ol>
+
+<h2>8 · 흔한 함정</h2>
+<ul>
+<li><strong>큰 모델을 다 던지지 마라</strong> — 7B로도 페이지 단위면 충분. 모순 발견 위주로.</li>
+<li><strong>모델 답을 그대로 믿지 마라</strong> — 항공우주 fastener 같은 곳에서 hallucinate 자주.
+반드시 패키지의 다른 페이지에서 cross-check.</li>
+<li><strong>한 번에 클러스터 전체를 학습하려 하지 마라</strong> — Tier 단위로 분리. 머리가 식어야 다음 cluster.</li>
+<li><strong>RAG 너무 일찍 도입하지 마라</strong> — Tier 0~1은 그냥 페이지 정독이 빠름.</li>
+</ul>
+
+</div>
+
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Learning'),100);</script>
+
+</body></html>

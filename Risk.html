@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Risk · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Risk'),100);</script>
+<script type="text/babel">
+const {useState}=React;
+const C={c:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+  lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+// 5x5 risk matrix. likelihood 1-5, impact 1-5. score = L*I.
+const RISKS = [
+  {id:'R-01',cat:'SCHEDULE',t:'V-band 49d lead · vendor capacity',  l:4,i:4,own:'Procurement',mit:'2nd source RFQ issued · expedite PO',trend:'rising'},
+  {id:'R-02',cat:'TECH',    t:'GRCop-42 witness-line porosity',     l:3,i:5,own:'Materials',  mit:'restart SOP · CT 100% throat zone',trend:'flat'},
+  {id:'R-03',cat:'COST',    t:'IN718 powder price +18% YoY',         l:4,i:2,own:'Program',    mit:'lock 6mo contract · cost reserve 4%',trend:'rising'},
+  {id:'R-04',cat:'TECH',    t:'Regen channel blockage at hot-fire',  l:2,i:5,own:'Thermal',    mit:'cold-flow ΔP gate · borescope before HF',trend:'falling'},
+  {id:'R-05',cat:'SCHEDULE',t:'Test cell window · facility shared',  l:3,i:3,own:'Test',       mit:'reserved Mon/Wed · backup at site B',trend:'flat'},
+  {id:'R-06',cat:'TECH',    t:'Hi-Lok preload scatter ±12%',         l:3,i:3,own:'Stress',     mit:'torque-tension cal · 20% sample re-torque',trend:'flat'},
+  {id:'R-07',cat:'PEOPLE',  t:'Sole NDT inspector · vacation 2wk',   l:3,i:2,own:'QA',         mit:'cross-train backup · level-II contract',trend:'flat'},
+  {id:'R-08',cat:'COST',    t:'HIP vendor minimum charge',            l:4,i:1,own:'Program',    mit:'batch 3 chambers per cycle',trend:'flat'},
+  {id:'R-09',cat:'TECH',    t:'TVC actuator EMI on engine harness',  l:2,i:4,own:'Avionics',   mit:'shielded sleeve · EMI test pre-integration',trend:'falling'},
+  {id:'R-10',cat:'EXT',     t:'Export control · IN718 origin',        l:2,i:3,own:'Legal',      mit:'ITAR review for SN-003 · domestic spec qual',trend:'flat'},
+];
+const CAT={SCHEDULE:C.lh2,TECH:C.risk,COST:C.lox,PEOPLE:C.halo,EXT:C.inter};
+function App(){
+  const [sel,setSel]=useState('R-02');
+  const sR=RISKS.find(r=>r.id===sel);
+  // matrix bucket
+  const cell = (l,i) => RISKS.filter(r=>r.l===l && r.i===i);
+  const scoreColor = s => s>=15?C.risk : s>=8?C.lh2 : s>=4?C.inter : C.ink3;
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600}}>Risk</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          program-level register · 5×5 matrix · L × I score · weekly review
+        </span>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}}>
+        {/* matrix */}
+        <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+          <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.14em',marginBottom:10}}>5×5 MATRIX</div>
+          <div style={{display:'grid',gridTemplateColumns:'24px repeat(5,1fr)',gap:3}}>
+            <div/>
+            {[1,2,3,4,5].map(i=>(
+              <div key={'h'+i} className="mono" style={{color:C.ink3,fontSize:9,textAlign:'center'}}>I={i}</div>
+            ))}
+            {[5,4,3,2,1].map(l=>(
+              <React.Fragment key={'r'+l}>
+                <div className="mono" style={{color:C.ink3,fontSize:9,textAlign:'right',paddingRight:4,
+                    display:'flex',alignItems:'center',justifyContent:'flex-end'}}>L={l}</div>
+                {[1,2,3,4,5].map(i=>{
+                  const s = l*i;
+                  const items = cell(l,i);
+                  const bg = s>=15?'rgba(255,140,140,.25)':s>=8?'rgba(255,211,159,.18)':s>=4?'rgba(137,255,168,.12)':'transparent';
+                  return (
+                    <div key={l+'-'+i} style={{aspectRatio:'1',background:bg,border:`1px solid ${C.frame}`,
+                        padding:4,fontSize:9,lineHeight:1.3,overflow:'hidden'}}>
+                      {items.map(r=>(
+                        <div key={r.id} onClick={()=>setSel(r.id)}
+                             className="mono" style={{color:CAT[r.cat],cursor:'pointer',
+                                 fontWeight:r.id===sel?700:400}}>{r.id}</div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          </div>
+          <div style={{display:'flex',gap:12,marginTop:10,fontSize:9.5}} className="mono">
+            <span style={{color:C.ink3}}>score:</span>
+            <span style={{color:C.ink3}}>1–3 low</span>
+            <span style={{color:C.inter}}>4–7 watch</span>
+            <span style={{color:C.lh2}}>8–14 manage</span>
+            <span style={{color:C.risk}}>15+ escalate</span>
+          </div>
+        </div>
+
+        {/* detail */}
+        <div style={{border:`1px solid ${CAT[sR.cat]}`,background:C.c2,padding:14}}>
+          <div style={{display:'flex',gap:10,alignItems:'baseline',marginBottom:8}}>
+            <span className="mono" style={{color:CAT[sR.cat],fontSize:13}}>{sR.id}</span>
+            <span className="mono" style={{color:CAT[sR.cat],fontSize:9.5,
+                  border:`1px solid ${CAT[sR.cat]}`,padding:'2px 6px'}}>{sR.cat}</span>
+            <span style={{flex:1}}/>
+            <span className="mono" style={{color:scoreColor(sR.l*sR.i),fontSize:13}}>
+              L{sR.l}·I{sR.i} = {sR.l*sR.i}
+            </span>
+          </div>
+          <div style={{color:C.ink,fontSize:13,marginBottom:14,lineHeight:1.5}}>{sR.t}</div>
+          <div style={{display:'grid',gridTemplateColumns:'80px 1fr',gap:'5px 12px',fontSize:11,lineHeight:1.55}} className="mono">
+            <span style={{color:C.ink3}}>OWNER</span>      <span style={{color:C.ink}}>{sR.own}</span>
+            <span style={{color:C.ink3}}>TREND</span>      <span style={{color:sR.trend==='rising'?C.risk:sR.trend==='falling'?C.inter:C.ink2}}>
+              {sR.trend==='rising'?'↗ rising':sR.trend==='falling'?'↘ falling':'→ flat'}
+            </span>
+            <span style={{color:C.ink3}}>MITIGATION</span> <span style={{color:C.ink}}>{sR.mit}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* table */}
+      <div style={{border:`1px solid ${C.frame}`,background:C.c2}}>
+        <div className="mono" style={{display:'grid',gridTemplateColumns:'60px 80px 1fr 50px 50px 60px 100px',
+            fontSize:9.5,letterSpacing:'.08em',color:C.ink3,padding:'10px 12px',
+            borderBottom:`1px solid ${C.frame}`}}>
+          <span>ID</span><span>CAT</span><span>DESCRIPTION</span><span style={{textAlign:'center'}}>L</span>
+          <span style={{textAlign:'center'}}>I</span><span style={{textAlign:'center'}}>SCORE</span><span>OWNER</span>
+        </div>
+        {RISKS.sort((a,b)=>b.l*b.i-a.l*a.i).map(r=>(
+          <div key={r.id} onClick={()=>setSel(r.id)} className="mono"
+              style={{display:'grid',gridTemplateColumns:'60px 80px 1fr 50px 50px 60px 100px',cursor:'pointer',
+                  padding:'8px 12px',borderBottom:`1px solid ${C.frame}`,fontSize:10.5,alignItems:'center',
+                  background:sel===r.id?C.c3:'transparent'}}>
+            <span style={{color:sel===r.id?C.lox:C.ink2}}>{r.id}</span>
+            <span style={{color:CAT[r.cat],fontSize:9}}>{r.cat}</span>
+            <span style={{color:C.ink}}>{r.t}</span>
+            <span style={{textAlign:'center',color:C.ink2}}>{r.l}</span>
+            <span style={{textAlign:'center',color:C.ink2}}>{r.i}</span>
+            <span style={{textAlign:'center',color:scoreColor(r.l*r.i)}}>{r.l*r.i}</span>
+            <span style={{color:C.ink3}}>{r.own}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

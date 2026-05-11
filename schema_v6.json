@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "blueprint_npu_v6",
+  "title": "Blueprint NPU — Design-to-Print Output Contract v6",
+  "type": "object",
+  "required": ["version","ts","brief","part_tree","geometry_ops","cad_brief","verify","risk","print_profile","slicer_job"],
+  "properties": {
+    "version":   { "const": "bp-npu-r6" },
+    "ts":        { "type": "string", "format": "date-time" },
+    "project":   { "type": "string" },
+    "object":    { "type": "string" },
+
+    "brief": {
+      "type": "object",
+      "required": ["requirements","constraints"],
+      "properties": {
+        "requirements": { "type": "array", "items": { "type": "string" } },
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "material":       { "type": "string", "examples": ["Inconel 718","Ti-6Al-4V","AlSi10Mg","PETG"] },
+            "process":        { "enum": ["LPBF","DED","BinderJet","FDM","SLA"] },
+            "envelope_mm":    { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+            "min_wall_mm":    { "type": "number" },
+            "min_channel_mm": { "type": "number" },
+            "overhang_deg":   { "type": "number" },
+            "tol_mm":         { "type": "number" }
+          }
+        }
+      }
+    },
+
+    "part_tree": {
+      "type": "object",
+      "required": ["id","name","qty","children"],
+      "properties": {
+        "id":       { "type": "string" },
+        "name":     { "type": "string" },
+        "qty":      { "type": "integer", "minimum": 1 },
+        "material": { "type": "string" },
+        "process":  { "type": "string" },
+        "children": { "type": "array", "items": { "$ref": "#/properties/part_tree" } }
+      }
+    },
+
+    "geometry_ops": {
+      "type": "array",
+      "description": "Ordered parametric CAD operations. Resolved by cadquery / build123d / openscad.",
+      "items": {
+        "type": "object",
+        "required": ["op","args"],
+        "properties": {
+          "op":     { "enum": ["cylinder","box","sphere","shell","extrude","revolve","sweep","loft","fillet","chamfer","drill","boss","pocket","pattern_polar","pattern_linear","channel","engrave","mirror","union","subtract","intersect"] },
+          "args":   { "type": "object" },
+          "id":     { "type": "string" },
+          "target": { "type": "string" },
+          "child":  { "type": "string" }
+        }
+      }
+    },
+
+    "cad_brief": {
+      "type": "object",
+      "required": ["name","rev","material","envelope_mm","build_direction"],
+      "properties": {
+        "name":              { "type": "string" },
+        "rev":               { "type": "string", "pattern": "^\\d+\\.\\d+(\\.\\d+)?$" },
+        "material":          { "type": "string" },
+        "envelope_mm":       { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+        "build_direction":   { "type": "string", "examples": ["+Z","-Z","+X axis 25° off Z"] },
+        "key_dims_mm":       { "type": "object" },
+        "wall_thickness_mm": { "type": "object", "properties": { "min": {"type":"number"}, "typ": {"type":"number"} } },
+        "tolerances_mm":     { "type": "object" },
+        "surface":           { "type": "object", "properties": { "Ra_um": {"type":"number"}, "post_process": {"type":"string"} } },
+        "mass_est_g":        { "type": "number" }
+      }
+    },
+
+    "verify": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["check","result"],
+        "properties": {
+          "check":  { "type": "string" },
+          "result": { "enum": ["pass","warn","fail"] },
+          "value":  { "type": "string" },
+          "rule":   { "type": "string", "description": "reference ID into docs/criteria/*.md" }
+        }
+      }
+    },
+
+    "risk": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id","desc","mit"],
+        "properties": {
+          "id":       { "type": "string", "pattern": "^R\\d+$" },
+          "desc":     { "type": "string" },
+          "mit":      { "type": "string", "description": "mitigation / probe" },
+          "severity": { "enum": ["low","med","high"] }
+        }
+      }
+    },
+
+    "print_profile": {
+      "type": "object",
+      "description": "High-level print-shop profile; maps 1:1 to slicer_job.",
+      "required": ["printer","material","layer_mm","orientation","supports"],
+      "properties": {
+        "printer":     { "type": "string" },
+        "material":    { "type": "string" },
+        "layer_mm":    { "type": "number" },
+        "hatch_mm":    { "type": "number", "description": "LPBF only" },
+        "laser_W":     { "type": "number", "description": "LPBF only" },
+        "walls":       { "type": "integer", "description": "FDM only" },
+        "infill":      { "type": "string", "description": "FDM only" },
+        "supports":    { "enum": ["none","tree","grid","block","min"] },
+        "orientation": { "type": "string" },
+        "est_time":    { "type": "string" },
+        "filament_g":  { "type": "number" },
+        "powder_kg":   { "type": "number" }
+      }
+    },
+
+    "slicer_job": {
+      "type": "object",
+      "description": "Concrete invocation for PrusaSlicer / PreForm / EOSPRINT.",
+      "required": ["tool","input_stl","output"],
+      "properties": {
+        "tool":      { "enum": ["prusaslicer","preform","eosprint","cura","ideamaker"] },
+        "input_stl": { "type": "string", "format": "uri-reference" },
+        "output":    { "type": "string", "format": "uri-reference" },
+        "args":      { "type": "array", "items": { "type": "string" } },
+        "profile":   { "type": "string" },
+        "sha256":    { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

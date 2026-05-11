@@ -1,0 +1,229 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>ECN · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('ECN'),100);</script>
+<script type="text/babel">
+const {useState}=React;
+const C={canvas:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// Engineering Change Notices — formal record of every revision that affects baselined data.
+// Each ECN links to: ECR (request), affected parts/drawings/ICD, CCB decision, effectivity.
+const ECNS = [
+  { id:'ECN-014', d:'2026-04-22', ecr:'ECR-027', title:'Throat AFM time 60→90 min',
+    cls:'I',  status:'APPROVED', author:'Mfg-Park',     ccb:'2026-04-21',
+    affects:['P8','PrintQueue','Inspection-I04'],
+    reason:'Sa target 14µm not met at 60min in 3 of 4 coupons',
+    impact:'+30min cycle, no cost · +$0 BOM',
+    effective:'V1.2 · SN-002 forward',
+    closes:'F01' },
+  { id:'ECN-013', d:'2026-04-19', ecr:'ECR-026', title:'Hi-Lok → Taper-Lok at thrust mount',
+    cls:'II', status:'APPROVED', author:'Mech-Lee',     ccb:'2026-04-18',
+    affects:['P2','J03','Joints','ICD-IF-M01'],
+    reason:'Cyclic loading margin tight at fastener fatigue (MS +0.08)',
+    impact:'+$1.2K BOM, +1d assembly · MS now +0.34',
+    effective:'V1.2 · SN-002 forward',
+    closes:'F14' },
+  { id:'ECN-012', d:'2026-04-15', ecr:'ECR-024', title:'IN718 forward bulkhead +0.4mm',
+    cls:'I',  status:'APPROVED', author:'Loads-Han',    ccb:'2026-04-14',
+    affects:['P2','Mass','Loads-L04'],
+    reason:'Soak-back FE shows local MS −0.05 at bolt boss',
+    impact:'+0.18 kg dry mass · still under budget',
+    effective:'V1.1 · all SN',
+    closes:'F11' },
+  { id:'ECN-011', d:'2026-04-10', ecr:'ECR-022', title:'LH2 line bend radius 3D → 4D',
+    cls:'I',  status:'APPROVED', author:'Fluids-Cho',   ccb:'2026-04-09',
+    affects:['P5','ICD-IF-F02'],
+    reason:'Routing clash with vehicle MLI — see ICD review',
+    impact:'+50mm pkg length, no mass change',
+    effective:'V1.1 · all SN',
+    closes:null },
+  { id:'ECN-015', d:'2026-04-25', ecr:'ECR-028', title:'GRCop-42 lot LB-1142 release',
+    cls:'I',  status:'OPEN',     author:'Mat-Cert',     ccb:null,
+    affects:['Materials','Lineage'],
+    reason:'New powder lot — CMM coupon needed for cert',
+    impact:'TBD · waiting on coupon FAI',
+    effective:'pending',
+    closes:null },
+  { id:'ECN-016', d:'2026-04-26', ecr:'ECR-029', title:'Cycle counter reset policy',
+    cls:'II', status:'IN-CCB',   author:'Ops-Yoon',     ccb:'2026-04-29',
+    affects:['Ops','Lineage'],
+    reason:'Currently full-reset after refurb · should be partial per part',
+    impact:'process change, no hardware',
+    effective:'TBD',
+    closes:null },
+  { id:'ECN-010', d:'2026-04-02', ecr:'ECR-019', title:'Yoke pivot FPI cadence 10→5',
+    cls:'I',  status:'APPROVED', author:'Inspect-Sun',  ccb:'2026-04-01',
+    affects:['P10','Ops','Inspection-I07'],
+    reason:'P10 limit cycle = 5; FPI must match',
+    impact:'process only',
+    effective:'V1.1 · all SN',
+    closes:'F09' },
+  { id:'ECN-009', d:'2026-03-28', ecr:'ECR-018', title:'Reject ECR — chamber wall 4→3.5mm',
+    cls:'II', status:'REJECTED', author:'Mass-Park',    ccb:'2026-03-27',
+    affects:['P1'],
+    reason:'Mass-savings proposal · margin would drop to MS +0.02',
+    impact:'rejected · below +0.10 floor per Loads policy',
+    effective:'—',
+    closes:null },
+];
+
+const CLS = {
+  I:  { name:'CLASS I',  desc:'form/fit/function · F/F/F unchanged · CCB simple', c:C.inter },
+  II: { name:'CLASS II', desc:'F/F/F changes · full CCB + customer notify',       c:C.risk  },
+};
+const ST_C = {
+  APPROVED:C.inter, OPEN:C.lh2, 'IN-CCB':C.lox, REJECTED:C.ink3,
+};
+
+function App(){
+  const [sel,setSel] = useState('ECN-013');
+  const [filter,setFilter] = useState('ALL');
+
+  const filtered = ECNS.filter(e=>{
+    if(filter==='ALL') return true;
+    if(filter==='OPEN') return e.status!=='APPROVED' && e.status!=='REJECTED';
+    return e.status===filter;
+  });
+
+  const sE = ECNS.find(e=>e.id===sel) || ECNS[0];
+
+  const stats = {
+    total:    ECNS.length,
+    approved: ECNS.filter(e=>e.status==='APPROVED').length,
+    inCCB:    ECNS.filter(e=>e.status==='IN-CCB').length,
+    open:     ECNS.filter(e=>e.status==='OPEN').length,
+    rejected: ECNS.filter(e=>e.status==='REJECTED').length,
+    closed:   ECNS.filter(e=>e.closes).length,
+  };
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>ECN</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          Engineering Change Notice ledger · weekly CCB · doc BP-ECN-A
+        </span>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'TOTAL',    v:stats.total,    c:C.lox,   s:'all ECN issued'},
+          {k:'APPROVED', v:stats.approved, c:C.inter, s:'baseline updated'},
+          {k:'IN CCB',   v:stats.inCCB,    c:C.lox,   s:'this week'},
+          {k:'OPEN',     v:stats.open,     c:C.lh2,   s:'pending review'},
+          {k:'REJECTED', v:stats.rejected, c:C.ink3,  s:'archive'},
+          {k:'FMEA CLOSE',v:stats.closed,  c:C.halo,  s:'risks resolved'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.c2,padding:'10px 12px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:20,marginTop:4}}>{t.v}</div>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* filter chips */}
+      <div style={{display:'flex',gap:8,marginBottom:10}} className="mono">
+        {['ALL','APPROVED','IN-CCB','OPEN','REJECTED'].map(f=>(
+          <button key={f} onClick={()=>setFilter(f)}
+            style={{background:filter===f?C.c2:'transparent',color:filter===f?C.lox:C.ink3,
+                    border:`1px solid ${filter===f?C.lox:C.frame}`,padding:'4px 12px',
+                    fontSize:10,letterSpacing:'.1em',cursor:'pointer',fontFamily:'JetBrains Mono'}}>
+            {f}
+          </button>
+        ))}
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:14}}>
+        {/* ledger */}
+        <div style={{border:`1px solid ${C.frame}`,background:C.c2}}>
+          <div className="mono" style={{display:'grid',gridTemplateColumns:'90px 60px 1fr 90px 90px',
+                  fontSize:9.5,letterSpacing:'.08em',color:C.ink3,padding:'10px 12px',
+                  borderBottom:`1px solid ${C.frame}`}}>
+            <span>ECN</span><span>DATE</span><span>TITLE</span><span>CLS</span><span style={{textAlign:'right'}}>STATUS</span>
+          </div>
+          {filtered.map(e=>{
+            const isSel = sel===e.id;
+            return (
+              <div key={e.id} onClick={()=>setSel(e.id)}
+                style={{display:'grid',gridTemplateColumns:'90px 60px 1fr 90px 90px',cursor:'pointer',
+                        padding:'9px 12px',borderBottom:`1px solid ${C.frame}`,
+                        background:isSel?C.c3:'transparent',alignItems:'center'}}>
+                <span className="mono" style={{color:isSel?C.lox:C.ink,fontSize:10.5}}>{e.id}</span>
+                <span className="mono" style={{color:C.ink3,fontSize:9.5}}>{e.d.slice(5)}</span>
+                <span className="mono" style={{color:C.ink2,fontSize:10.5}}>{e.title}</span>
+                <span className="mono" style={{color:CLS[e.cls].c,fontSize:9.5,letterSpacing:'.06em'}}>{CLS[e.cls].name}</span>
+                <span className="mono" style={{color:ST_C[e.status],fontSize:9.5,letterSpacing:'.06em',textAlign:'right'}}>{e.status}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* detail */}
+        <div style={{border:`1px solid ${ST_C[sE.status]}`,background:C.c2,padding:16}}>
+          <div style={{display:'flex',gap:10,alignItems:'baseline',marginBottom:6}}>
+            <span className="mono" style={{color:C.lox,fontSize:13}}>{sE.id}</span>
+            <span className="mono" style={{color:C.ink3,fontSize:10}}>{sE.d}</span>
+            <span style={{flex:1}}/>
+            <span className="mono" style={{color:ST_C[sE.status],fontSize:9.5,letterSpacing:'.08em',
+                          border:`1px solid ${ST_C[sE.status]}`,padding:'2px 8px'}}>
+              {sE.status}
+            </span>
+          </div>
+          <div style={{color:C.ink,fontSize:14,marginBottom:14}}>{sE.title}</div>
+
+          <div style={{display:'grid',gridTemplateColumns:'80px 1fr',gap:'4px 12px',fontSize:11,lineHeight:1.55,marginBottom:14}} className="mono">
+            <span style={{color:C.ink3}}>FROM ECR</span>  <span style={{color:C.ink}}>{sE.ecr}</span>
+            <span style={{color:C.ink3}}>CLASS</span>     <span style={{color:CLS[sE.cls].c}}>{CLS[sE.cls].name} · {CLS[sE.cls].desc}</span>
+            <span style={{color:C.ink3}}>AUTHOR</span>    <span style={{color:C.ink}}>{sE.author}</span>
+            <span style={{color:C.ink3}}>CCB</span>       <span style={{color:C.ink2}}>{sE.ccb || '—'}</span>
+            <span style={{color:C.ink3}}>EFFECTIVE</span> <span style={{color:C.inter}}>{sE.effective}</span>
+            {sE.closes && <><span style={{color:C.ink3}}>CLOSES</span><span style={{color:C.halo}}>→ FMEA {sE.closes}</span></>}
+          </div>
+
+          <div style={{padding:10,border:`1px dashed ${C.frame}`,marginBottom:10}}>
+            <div className="mono" style={{color:C.lh2,fontSize:9.5,letterSpacing:'.12em',marginBottom:4}}>REASON</div>
+            <div className="mono" style={{color:C.ink,fontSize:11,lineHeight:1.5}}>{sE.reason}</div>
+          </div>
+          <div style={{padding:10,border:`1px dashed ${C.frame}`,marginBottom:10}}>
+            <div className="mono" style={{color:C.lh2,fontSize:9.5,letterSpacing:'.12em',marginBottom:4}}>IMPACT</div>
+            <div className="mono" style={{color:C.ink,fontSize:11,lineHeight:1.5}}>{sE.impact}</div>
+          </div>
+
+          <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em',marginBottom:6}}>AFFECTS</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+            {sE.affects.map(a=>(
+              <span key={a} className="mono" style={{color:C.lox,fontSize:10,
+                          border:`1px solid ${C.frame}`,padding:'3px 8px',background:C.c3}}>{a}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.c3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · ecn.v0.1 · doc BP-ECN-A</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "flow":     "ECR (request) → CCB review → ECN (decision) → baseline update",
+  "classes":  { "I":"no F/F/F change · simple CCB",
+                "II":"F/F/F or interface change · full CCB + customer" },
+  "ccb":      { "cadence":"weekly", "quorum":["Mech","Fluids","Mfg","Quality","PM"] },
+  "policy":   { "no_build_change_without_approved_ecn": true,
+                "lineage_version_bump": "on each approved ECN affecting hardware",
+                "icd_baselined_changes": "require customer notification" },
+  "links":    ["lineage.V##","parts.P##","joints.J##","icd.IF-##","fmea.F##","ops"]
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

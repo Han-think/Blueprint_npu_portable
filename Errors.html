@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Errors</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>body{margin:0;background:#0c1e35;min-height:100vh;font-family:'Inter','Noto Sans KR',system-ui,sans-serif;color:#e6ecf5;}</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+};
+function Code({children}){return <pre style={{background:C.canvas,border:`1px solid ${C.frame}`,padding:'8px 12px',margin:'6px 0',fontFamily:C.mono,fontSize:11.5,color:C.ink2,overflow:'auto',lineHeight:1.55,whiteSpace:'pre-wrap'}}>{children}</pre>;}
+
+const ERRORS = [
+  {
+    id:'E01', tag:'NPU not detected', sev:'fatal', accent:C.risk,
+    symptom:'NPU is missing from openvino.Core().available_devices.',
+    cause:'Driver not installed, kernel too old (<6.6 on Linux), or pre-Meteor Lake CPU.',
+    fix:[
+      ['Windows', 'Download "Intel NPU Driver" from intel.com · reboot.'],
+      ['Linux',   'sudo apt install intel-npu-driver · check kernel ≥ 6.6'],
+      ['Verify',  'python -c "from openvino import Core; print(Core().available_devices)"'],
+    ],
+    wontFix:'Pre-Meteor Lake (Core 13th gen and earlier) has no NPU. CPU fallback works but ~10× slower.',
+  },
+  {
+    id:'E02', tag:'Server offline (pill red)', sev:'common', accent:C.risk,
+    symptom:'TopNav pill says "server offline · DEMO MODE". HTML pages open but nothing computes.',
+    cause:'Python Gradio server not started, or started in a different venv.',
+    fix:[
+      ['Run', 'cd Blueprint_npu && source .venv/bin/activate'],
+      ['',    'python ai/ui/blueprint_batch_ui.py'],
+      ['Check', 'Browser → http://127.0.0.1:7860 directly. Should show Gradio.'],
+      ['Port busy?', 'export GRADIO_SERVER_PORT=7861 then rerun. Update HTML pages to match.'],
+    ],
+  },
+  {
+    id:'E03', tag:'Empty model dropdown', sev:'common', accent:C.lh2,
+    symptom:'Minimal.html shows "no models found" or dropdown is empty.',
+    cause:'models/ov_npu_ready/ has no folders, or folders are missing required files.',
+    fix:[
+      ['Required', 'Each subfolder must contain: openvino_model.xml + openvino_model.bin + tokenizer.json'],
+      ['Quick fix (download OV-IR)', 'huggingface-cli download OpenVINO/Qwen2.5-3B-Instruct-int4-ov --local-dir models/ov_npu_ready/qwen2.5-3b-instruct-int4-ov'],
+      ['Have GGUF?', 'optimum-cli export openvino --model your.gguf --weight-format int4 --task text-generation-with-past models/ov_npu_ready/converted/'],
+    ],
+  },
+  {
+    id:'E04', tag:'GGUF won\'t load on NPU', sev:'common', accent:C.lh2,
+    symptom:'Loading a .gguf file errors out. "format not supported".',
+    cause:'NPU only speaks OpenVINO IR. GGUF must be converted first — one-time only.',
+    fix:[
+      ['Convert', 'optimum-cli export openvino \\'],
+      ['',        '  --model models/gguf_inbox/model.gguf \\'],
+      ['',        '  --weight-format int4 --group-size 128 \\'],
+      ['',        '  --task text-generation-with-past \\'],
+      ['',        '  models/ov_npu_ready/model-converted/'],
+      ['Time',    '5–10 min on Arc A770 · 12–20 min on CPU. Once done, drop into ready folder.'],
+    ],
+  },
+  {
+    id:'E05', tag:'DPO retrain OOM on Arc A770', sev:'occasional', accent:C.halo,
+    symptom:'Out-of-memory during DPO finetune step on 16 GB Arc.',
+    cause:'LoRA rank too high, or no gradient checkpointing.',
+    fix:[
+      ['Lower rank', 'finetune/dpo.py → lora_config.r = 8 (was 16)'],
+      ['Checkpointing', 'pass --gradient_checkpointing in train args'],
+      ['Last resort', 'reduce per_device_train_batch_size to 1 + accumulate=4'],
+    ],
+  },
+  {
+    id:'E06', tag:'Inference < 5 tok/s', sev:'common', accent:C.halo,
+    symptom:'Generation feels slow. Less than 5 tokens/sec.',
+    cause:'Silently fell back to CPU. Check Gradio terminal for [fallback] NPU → CPU.',
+    fix:[
+      ['Force NPU', 'In Minimal/Workbench → Device dropdown → NPU (not AUTO)'],
+      ['Reload model', 'Click "Reload" button after switching device — model has to recompile.'],
+      ['Confirm', 'First token latency should be ~200ms (NPU) vs ~1.5s (CPU).'],
+    ],
+  },
+];
+
+function ErrorCard({e}){
+  return (
+    <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:18,marginBottom:14}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:10,marginBottom:6,flexWrap:'wrap'}}>
+        <span className="mono" style={{fontSize:10,color:e.accent,letterSpacing:'.12em',padding:'2px 8px',border:`1px solid ${e.accent}`}}>{e.id}</span>
+        <span style={{color:C.ink,fontSize:16,fontWeight:600}}>{e.tag}</span>
+        <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginLeft:'auto'}}>{e.sev}</span>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'80px 1fr',gap:10,marginBottom:8}}>
+        <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em'}}>SYMPTOM</span>
+        <span style={{color:C.ink2,fontSize:13,lineHeight:1.55}}>{e.symptom}</span>
+        <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em'}}>CAUSE</span>
+        <span style={{color:C.ink3,fontSize:12.5,lineHeight:1.55}}>{e.cause}</span>
+      </div>
+      <div className="mono" style={{fontSize:10,color:C.lox,letterSpacing:'.12em',marginTop:10,marginBottom:4}}>FIX</div>
+      <div>
+        {e.fix.map((row,i)=>(
+          row[1].startsWith && (row[1].includes('python') || row[1].includes('huggingface') || row[1].includes('optimum') || row[1].includes('export') || row[1].includes('cd ') || row[1].includes('sudo') || row[1].includes('  ') || row[0]==='') ? (
+            <div key={i} style={{display:'grid',gridTemplateColumns:'120px 1fr',gap:10,alignItems:'center',marginBottom:2}}>
+              <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.06em'}}>{row[0]}</span>
+              <Code>{row[1]}</Code>
+            </div>
+          ) : (
+            <div key={i} style={{display:'grid',gridTemplateColumns:'120px 1fr',gap:10,marginBottom:6,alignItems:'baseline'}}>
+              <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.06em'}}>{row[0]}</span>
+              <span style={{color:C.ink2,fontSize:12.5,lineHeight:1.5}}>{row[1]}</span>
+            </div>
+          )
+        ))}
+      </div>
+      {e.wontFix && <div style={{marginTop:10,padding:'8px 12px',background:'rgba(255,159,181,0.06)',border:`1px dashed ${C.risk}`,fontSize:12,color:C.ink3,fontFamily:C.mono,letterSpacing:'.02em'}}>⚠ won't-fix · {e.wontFix}</div>}
+    </div>
+  );
+}
+
+function App(){
+  return (
+    <div style={{maxWidth:880,margin:'0 auto',padding:'32px 24px 60px'}}>
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:16,marginBottom:22}}>
+        <div className="mono" style={{fontSize:11,color:C.risk,letterSpacing:'.14em'}}>ERRORS · TOP 6</div>
+        <h1 style={{color:C.ink,fontSize:30,margin:'6px 0 8px',fontWeight:600}}>When the install or run breaks.</h1>
+        <p style={{color:C.ink3,fontSize:14,margin:0,maxWidth:680,textWrap:'pretty'}}>
+          Symptom → cause → exact fix. If yours isn't here, see the full <a href="INSTALL.md" style={{color:C.lox}}>INSTALL.md</a> troubleshooting table or open a GitHub issue.
+        </p>
+      </div>
+
+      {ERRORS.map(e=><ErrorCard key={e.id} e={e}/>)}
+
+      <div style={{marginTop:8,padding:14,border:`1px solid ${C.frame}`,background:C.canvas2,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span className="mono" style={{fontSize:11,color:C.ink3}}>still stuck?</span>
+        <span style={{display:'flex',gap:14}}>
+          <a href="Run.html" style={{fontFamily:C.mono,fontSize:11,color:C.lox,letterSpacing:'.06em'}}>RUN CHECKLIST →</a>
+          <a href="INSTALL.md" style={{fontFamily:C.mono,fontSize:11,color:C.lox,letterSpacing:'.06em'}}>INSTALL.MD →</a>
+          <a href="https://github.com/Han-think/Blueprint_npu/issues" style={{fontFamily:C.mono,fontSize:11,color:C.lox,letterSpacing:'.06em'}}>OPEN ISSUE →</a>
+        </span>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+setTimeout(()=>window.BPMountTopNav && window.BPMountTopNav('Errors'), 100);
+</script>
+</body>
+</html>

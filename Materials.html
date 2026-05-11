@@ -1,0 +1,331 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Materials · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Materials'),100);</script>
+<script type="text/babel">
+const {useState,useMemo}=React;
+const C={canvas:'#0c1e35',canvas2:'#0a1a2f',canvas3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// ============================================================
+// MATERIAL LIBRARY — 6 alloys actually used across Blueprint NPU parts
+// ============================================================
+const MATS = [
+  {
+    id:'GRCop-42', tone:C.risk, family:'Cu-Cr-Nb',
+    process:'LPBF', density:8.756, melt:1075, yield:186, uts:298, elong:32, k_thermal:296, cte:18.3,
+    used_in:['BP-V1.2-P7 Combustion chamber','BP-V1.2-P8 Throat insert'],
+    params:{laser:370,speed:900,hatch:90,layer:30,plate:200},
+    post:['Stress relief 480°C/2h','HIP 1080°C/100MPa/3h','Solution + age','Machine critical surfaces','CMM'],
+    notes:'High-conductivity Cu-Cr-Nb for regen cooling. NASA-developed. Witness-line risk on restart — track carefully.',
+    risks:[{lvl:'HIGH', t:'Witness-line porosity survives HIP if surface-connected — see Lineage NCR-2026-103.'}],
+    lots:[
+      {lot:'GRC42-2026-W14-A', qty:'48 kg', vendor:'Praxair', cert:'CoC-9881', oxygen:380, status:'IN-USE'},
+      {lot:'GRC42-2026-W09-B', qty:'12 kg', vendor:'Praxair', cert:'CoC-9712', oxygen:410, status:'RESERVE'},
+      {lot:'GRC42-2025-W47-C', qty:'0 kg',  vendor:'Praxair', cert:'CoC-8901', oxygen:520, status:'EXHAUSTED'},
+    ],
+  },
+  {
+    id:'Inconel 718', tone:C.lh2, family:'Ni-base',
+    process:'LPBF', density:8.19, melt:1336, yield:1100, uts:1310, elong:18, k_thermal:11.4, cte:13.0,
+    used_in:['BP-V1.2-P3 Turbine housing','BP-V1.2-P4 Hot-side manifold','BP-V1.2-P11 Injector face'],
+    params:{laser:285,speed:960,hatch:110,layer:40,plate:80},
+    post:['Stress relief 1065°C/1.5h Ar','HIP 1163°C/100MPa/4h','Solution 980°C/1h','Age 720°C/8h + 620°C/8h','EDM support removal','5-axis machine','CMM'],
+    notes:'Workhorse Ni superalloy. ASTM F3055. Age-hardenable. Anisotropy ~10% along build vs transverse.',
+    risks:[{lvl:'MED', t:'Down-skin Ra ~14µm — use AFM if internal channels are flow-critical.'}],
+    lots:[
+      {lot:'IN718-2026-W12-A', qty:'92 kg', vendor:'Carpenter',     cert:'CoC-9755', oxygen:140, status:'IN-USE'},
+      {lot:'IN718-2026-W08-B', qty:'34 kg', vendor:'Carpenter',     cert:'CoC-9620', oxygen:160, status:'RESERVE'},
+    ],
+  },
+  {
+    id:'Inconel 625', tone:C.lh2, family:'Ni-base',
+    process:'LPBF', density:8.44, melt:1290, yield:760, uts:1050, elong:42, k_thermal:9.8, cte:12.8,
+    used_in:['BP-V1.2-P5 LH2 feed line','BP-V1.2-P6 Heat exchanger core'],
+    params:{laser:295,speed:840,hatch:100,layer:40,plate:80},
+    post:['Stress relief 870°C/1h','HIP 1163°C/100MPa/4h','Solution 1150°C/1h','5-axis machine','Borescope internal ch'],
+    notes:'Better corrosion + weldability than 718, lower strength. Good for cryo lines + manifolds.',
+    risks:[],
+    lots:[
+      {lot:'IN625-2026-W11-A', qty:'58 kg', vendor:'Höganäs',  cert:'CoC-9744', oxygen:120, status:'IN-USE'},
+    ],
+  },
+  {
+    id:'Ti-6Al-4V (Grade 23)', tone:C.lox, family:'Ti α+β',
+    process:'LPBF', density:4.43, melt:1604, yield:1050, uts:1180, elong:14, k_thermal:6.7, cte:8.6,
+    used_in:['BP-V1.2-P1 Nose cone bracket','BP-V1.2-P2 Strut fitting','BP-V1.2-P10 Gimbal yoke'],
+    params:{laser:240,speed:1200,hatch:120,layer:30,plate:200},
+    post:['Stress relief 670°C/3h vac','HIP 920°C/100MPa/2h (sub-β)','Aged 540°C/8h','Wire EDM','5-axis machine'],
+    notes:'Grade 23 = ELI low-O. α′ martensite in as-built → brittle. HIP sub-β preserves fine α lath structure for fatigue.',
+    risks:[{lvl:'MED', t:'O pickup during loose-powder reuse — recycle ≤5 cycles, sieve <53µm.'}],
+    lots:[
+      {lot:'TI64-2026-W13-A', qty:'124 kg', vendor:'AP&C',     cert:'CoC-9802', oxygen:1100, status:'IN-USE'},
+      {lot:'TI64-2026-W06-B', qty:'45 kg',  vendor:'AP&C',     cert:'CoC-9555', oxygen:1240, status:'RESERVE'},
+      {lot:'TI64-2025-W42-D', qty:'8 kg',   vendor:'AP&C',     cert:'CoC-8721', oxygen:1380, status:'QUARANTINE'},
+    ],
+  },
+  {
+    id:'AlSi10Mg', tone:C.inter, family:'Al-cast',
+    process:'LPBF', density:2.67, melt:577, yield:240, uts:430, elong:6, k_thermal:130, cte:21.8,
+    used_in:['BP-V1.2-P12 Cable tray','BP-V1.2-P13 Avionics housing'],
+    params:{laser:370,speed:1300,hatch:190,layer:30,plate:150},
+    post:['Stress relief 300°C/2h','T6 (optional) 535°C SHT + age','Shot peen','Anodize'],
+    notes:'Most-printed Al alloy. Strong residual stress sensitivity — pre-heat plate critical.',
+    risks:[{lvl:'LOW', t:'Hydrogen pickup → porosity if powder humid. Store <40% RH.'}],
+    lots:[
+      {lot:'ALSI-2026-W10-A', qty:'215 kg', vendor:'EOS',  cert:'CoC-9701', moist:0.018, status:'IN-USE'},
+    ],
+  },
+  {
+    id:'PA12-CF (Nylon CF)', tone:C.halo, family:'Polymer',
+    process:'SLS', density:1.10, melt:184, yield:76, uts:84, elong:4, k_thermal:0.4, cte:48,
+    used_in:['BP-V1.2-J* jigs & fixtures','Non-flight tooling only'],
+    params:{laser:42,speed:5000,hatch:250,layer:100,plate:174},
+    post:['Bead blast','Vapor smooth (optional)','IPA wipe'],
+    notes:'Carbon-fiber reinforced PA12 for fixturing only. NOT FOR FLIGHT.',
+    risks:[],
+    lots:[
+      {lot:'PA12CF-2026-Q1-A', qty:'18 kg', vendor:'EOS',  cert:'CoC-9650', moist:0.32, status:'IN-USE'},
+    ],
+  },
+];
+
+function StatusPill({s}){
+  const map={'IN-USE':C.inter,'RESERVE':C.lox,'EXHAUSTED':C.ink3,'QUARANTINE':C.risk};
+  return <span className="mono" style={{color:map[s]||C.ink2,fontSize:9.5,letterSpacing:'.08em',border:`1px solid ${map[s]||C.frame}`,padding:'1px 6px'}}>{s}</span>;
+}
+function Lvl({lvl}){
+  const map={HIGH:C.risk,MED:C.lh2,LOW:C.inter};
+  return <span className="mono" style={{color:map[lvl]||C.ink3,fontSize:9.5,letterSpacing:'.08em',padding:'1px 6px',border:`1px solid ${map[lvl]||C.frame}`}}>{lvl}</span>;
+}
+
+// Build-orientation visualisation: bar of properties along build direction (0=plate, 1=top)
+function AnisotropyBar({mat}){
+  // Synth anisotropy: most LPBF alloys ~10-15% drop in elongation transverse to build
+  // Encode as relative bars 0..1 for UTS, yield, elong, fatigue (horizontal vs vertical build)
+  const dirs=[
+    {k:'Vertical (Z)',   uts:0.92, yld:0.95, el:1.00, fat:0.78, rs:0.95},
+    {k:'Horizontal (XY)',uts:1.00, yld:1.00, el:0.85, fat:1.00, rs:0.60},
+    {k:'45° diagonal',   uts:0.96, yld:0.97, el:0.90, fat:0.88, rs:0.75},
+  ];
+  return (
+    <table className="mono" style={{width:'100%',borderCollapse:'collapse',fontSize:10.5}}>
+      <thead><tr style={{color:C.ink3,borderBottom:`1px solid ${C.frame}`}}>
+        <th style={{textAlign:'left',padding:'4px 6px'}}>BUILD DIR</th>
+        <th style={{padding:'4px 6px'}}>UTS</th><th style={{padding:'4px 6px'}}>YLD</th>
+        <th style={{padding:'4px 6px'}}>ELONG</th><th style={{padding:'4px 6px'}}>FATIGUE</th>
+        <th style={{padding:'4px 6px'}}>RESID σ</th>
+      </tr></thead>
+      <tbody>
+      {dirs.map(d=>(
+        <tr key={d.k} style={{borderBottom:`1px dashed ${C.frame}`}}>
+          <td style={{padding:'4px 6px',color:C.ink}}>{d.k}</td>
+          {['uts','yld','el','fat','rs'].map(p=>(
+            <td key={p} style={{padding:'4px 6px'}}>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <div style={{flex:1,height:6,background:C.canvas3,border:`1px solid ${C.frame}`}}>
+                  <div style={{height:'100%',width:`${d[p]*100}%`,background:p==='rs'?C.risk:C.lox}}/>
+                </div>
+                <span style={{color:C.ink2,minWidth:32,textAlign:'right'}}>{(d[p]*100|0)}%</span>
+              </div>
+            </td>
+          ))}
+        </tr>
+      ))}
+      </tbody>
+    </table>
+  );
+}
+
+function MaterialCard({m,open,onToggle}){
+  return (
+    <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,marginBottom:12}}>
+      <div onClick={onToggle} style={{padding:'12px 14px',display:'grid',gridTemplateColumns:'200px 1fr auto',gap:14,cursor:'pointer',borderBottom:open?`1px solid ${C.frame}`:'none'}}>
+        <div>
+          <div className="mono" style={{color:m.tone,fontSize:13,letterSpacing:'.04em'}}>{m.id}</div>
+          <div className="mono" style={{color:C.ink3,fontSize:10}}>{m.family} · {m.process}</div>
+        </div>
+        <div style={{display:'flex',gap:18,fontSize:10.5,color:C.ink2}} className="mono">
+          <div><span style={{color:C.ink3}}>ρ </span>{m.density} g/cc</div>
+          <div><span style={{color:C.ink3}}>σy </span>{m.yield} MPa</div>
+          <div><span style={{color:C.ink3}}>UTS </span>{m.uts} MPa</div>
+          <div><span style={{color:C.ink3}}>ε </span>{m.elong}%</div>
+          <div><span style={{color:C.ink3}}>k </span>{m.k_thermal} W/mK</div>
+          <div><span style={{color:C.ink3}}>used </span>{m.used_in.length} parts</div>
+        </div>
+        <div className="mono" style={{color:C.ink3,fontSize:11}}>{open?'▼':'▶'}</div>
+      </div>
+      {open && (
+        <div style={{padding:'14px',display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+          <div>
+            <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.1em',marginBottom:6}}>USED IN</div>
+            {m.used_in.map(u=>(<div key={u} className="mono" style={{fontSize:10.5,color:C.ink2}}>· {u}</div>))}
+
+            <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.1em',marginTop:14,marginBottom:6}}>LPBF PARAMS</div>
+            <div className="mono" style={{fontSize:10.5,color:C.ink2,lineHeight:1.6}}>
+              laser {m.params.laser}W · speed {m.params.speed}mm/s · hatch {m.params.hatch}µm<br/>
+              layer {m.params.layer}µm · plate pre-heat {m.params.plate}°C
+            </div>
+
+            <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.1em',marginTop:14,marginBottom:6}}>POST-PROCESS CHAIN</div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+              {m.post.map((p,i)=>(
+                <React.Fragment key={i}>
+                  <span className="mono" style={{fontSize:9.5,padding:'2px 6px',border:`1px solid ${C.frame}`,color:C.ink2}}>{i+1}. {p}</span>
+                  {i<m.post.length-1 && <span style={{color:C.ink3,alignSelf:'center'}}>→</span>}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {m.risks.length>0 && (
+              <>
+                <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.1em',marginTop:14,marginBottom:6}}>RISKS</div>
+                {m.risks.map((r,i)=>(
+                  <div key={i} style={{display:'flex',gap:8,alignItems:'flex-start',marginBottom:4}}>
+                    <Lvl lvl={r.lvl}/>
+                    <span className="mono" style={{fontSize:10.5,color:C.ink2}}>{r.t}</span>
+                  </div>
+                ))}
+              </>
+            )}
+
+            <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:14,paddingTop:10,borderTop:`1px dashed ${C.frame}`,fontStyle:'italic'}}>{m.notes}</div>
+          </div>
+
+          <div>
+            <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.1em',marginBottom:6}}>BUILD-DIRECTION ANISOTROPY (vs best axis)</div>
+            <AnisotropyBar mat={m}/>
+
+            <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.1em',marginTop:14,marginBottom:6}}>POWDER LOT TRACEABILITY</div>
+            <table className="mono" style={{width:'100%',borderCollapse:'collapse',fontSize:10}}>
+              <thead><tr style={{color:C.ink3,borderBottom:`1px solid ${C.frame}`}}>
+                <th style={{textAlign:'left',padding:'4px 4px'}}>LOT</th>
+                <th style={{textAlign:'right',padding:'4px 4px'}}>QTY</th>
+                <th style={{textAlign:'left',padding:'4px 4px'}}>VENDOR</th>
+                <th style={{textAlign:'left',padding:'4px 4px'}}>CoC</th>
+                <th style={{textAlign:'right',padding:'4px 4px'}}>{m.lots[0].oxygen!==undefined?'O ppm':'H₂O %'}</th>
+                <th style={{padding:'4px 4px'}}>STATUS</th>
+              </tr></thead>
+              <tbody>
+                {m.lots.map(l=>(
+                  <tr key={l.lot} style={{borderBottom:`1px dashed ${C.frame}`,opacity:l.status==='EXHAUSTED'?0.5:1}}>
+                    <td style={{padding:'4px 4px',color:C.ink}}>{l.lot}</td>
+                    <td style={{padding:'4px 4px',textAlign:'right',color:C.ink2}}>{l.qty}</td>
+                    <td style={{padding:'4px 4px',color:C.ink2}}>{l.vendor}</td>
+                    <td style={{padding:'4px 4px',color:C.ink3}}>{l.cert}</td>
+                    <td style={{padding:'4px 4px',textAlign:'right',color:l.oxygen>1200||l.moist>0.3?C.risk:C.ink2}}>{l.oxygen??l.moist}</td>
+                    <td style={{padding:'4px 4px',textAlign:'center'}}><StatusPill s={l.status}/></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.1em',marginTop:14,marginBottom:6}}>RECYCLE LEDGER</div>
+            <div className="mono" style={{fontSize:10,color:C.ink2,lineHeight:1.7}}>
+              virgin → sieve &lt;53µm → blend ≤30% with prev cycle → max 5 cycles<br/>
+              <span style={{color:C.ink3}}>O/H/N delta tracked per cycle · auto-quarantine at threshold</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Cross-reference matrix: which part uses which material
+function PartXref(){
+  const xref=[];
+  MATS.forEach(m=>m.used_in.forEach(u=>{
+    const m_ = u.match(/BP-V1\.2-P(\d+)/);
+    if(m_) xref.push({pid:m_[0], desc:u.replace(m_[0]+' ',''), mat:m.id, tone:m.tone});
+  }));
+  xref.sort((a,b)=>a.pid.localeCompare(b.pid,undefined,{numeric:true}));
+  return (
+    <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:16}}>
+      <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em',marginBottom:10}}>PART × MATERIAL XREF</div>
+      <table className="mono" style={{width:'100%',borderCollapse:'collapse',fontSize:10.5}}>
+        <thead><tr style={{color:C.ink3,borderBottom:`1px solid ${C.frame}`}}>
+          <th style={{textAlign:'left',padding:'4px 8px'}}>PART ID</th>
+          <th style={{textAlign:'left',padding:'4px 8px'}}>DESCRIPTION</th>
+          <th style={{textAlign:'left',padding:'4px 8px'}}>MATERIAL</th>
+        </tr></thead>
+        <tbody>
+        {xref.map((r,i)=>(
+          <tr key={i} style={{borderBottom:`1px dashed ${C.frame}`}}>
+            <td style={{padding:'4px 8px',color:C.ink}}>{r.pid}</td>
+            <td style={{padding:'4px 8px',color:C.ink2}}>{r.desc}</td>
+            <td style={{padding:'4px 8px',color:r.tone}}>{r.mat}</td>
+          </tr>
+        ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function App(){
+  const [open,setOpen]=useState('GRCop-42');
+  const totals=useMemo(()=>{
+    let lots=0, kg=0, alerts=0;
+    MATS.forEach(m=>m.lots.forEach(l=>{
+      lots++; kg += parseFloat(l.qty)||0;
+      if(l.status==='QUARANTINE') alerts++;
+    }));
+    return {lots,kg:kg.toFixed(0),alerts,mats:MATS.length};
+  },[]);
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>Materials</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>material library · lot traceability · build-direction anisotropy</span>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'ALLOYS',     v:totals.mats, c:C.lox,  s:'in active use'},
+          {k:'POWDER LOTS',v:totals.lots, c:C.inter,s:'tracked'},
+          {k:'INVENTORY',  v:`${totals.kg} kg`, c:C.lh2, s:'across all alloys'},
+          {k:'ALERTS',     v:totals.alerts, c:totals.alerts?C.risk:C.ink3, s:'quarantined lots'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:'12px 14px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:22,marginTop:4}}>{t.v}</div>
+            <div className="mono" style={{color:C.ink3,fontSize:10}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      {MATS.map(m=>(<MaterialCard key={m.id} m={m} open={open===m.id} onToggle={()=>setOpen(open===m.id?null:m.id)}/>))}
+
+      <div style={{marginTop:18}}>
+        <PartXref/>
+      </div>
+
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.canvas3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · materials.v0.4</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "alloy": "GRCop-42",
+  "lot":   "GRC42-2026-W14-A",
+  "coc":   "CoC-9881",
+  "vendor":"Praxair",
+  "powder_chem": { "O_ppm": 380, "N_ppm": 90, "H_ppm": 15, "sieve_um": 53 },
+  "recycle_cycle": 2,
+  "lpbf_params": { "P_W":370, "v_mm_s":900, "h_um":90, "t_um":30, "T_plate_C":200 },
+  "post_chain": ["stress_relief_480_2h","hip_1080_100mpa_3h","sol_age","machine","cmm"],
+  "consumed_by": ["BP-V1.2-P7-A0042","BP-V1.2-P8-A0011"],
+  "feeds": "lineage.fai.material_lot"
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

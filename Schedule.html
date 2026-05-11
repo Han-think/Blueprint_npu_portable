@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Schedule · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Schedule'),100);</script>
+<script type="text/babel">
+const C={c:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+  lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+// Day axis: T-300 to T+90, today = T-33
+const T0 = 300, TODAY = 300-33; // 267
+const BARS = [
+  {ph:'DESIGN',     start:0,   end:120, c:C.halo,  k:'design'},
+  {ph:'PROCURE',    start:60,  end:T0-14, c:C.lh2,  k:'supply'},
+  {ph:'FABRICATE',  start:140, end:T0-14, c:C.lox,  k:'queue'},
+  {ph:'INSPECT',    start:230, end:T0-7,  c:C.inter,k:'qa'},
+  {ph:'ASSEMBLE',   start:T0-21,end:T0,   c:C.lox,  k:'asm'},
+  {ph:'GROUND TEST',start:T0,  end:T0+45, c:C.inter,k:'test'},
+  {ph:'HOT-FIRE',   start:T0+30,end:T0+60,c:C.risk, k:'hf'},
+  {ph:'REFURB',     start:T0+60,end:T0+90,c:C.lh2,  k:'rb'},
+];
+const MS = [
+  {d:30,  l:'PDR',          c:C.lox},
+  {d:90,  l:'CDR',          c:C.lox},
+  {d:180, l:'LR / long-lead',c:C.lh2},
+  {d:T0-60, l:'FAI start',  c:C.inter},
+  {d:T0,    l:'BUILD LOCK', c:C.inter},
+  {d:T0+15, l:'cold-flow',  c:C.lh2},
+  {d:T0+30, l:'hot-fire #1',c:C.risk},
+  {d:T0+60, l:'qual close', c:C.inter},
+];
+function App(){
+  const X = d => 90 + (d/(T0+90)) * 1080;
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600}}>Schedule</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          Program SN-002 · T-300 to T+90 · today T-33d
+        </span>
+      </div>
+
+      <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+        <svg viewBox="0 0 1200 460" style={{width:'100%'}}>
+          {/* day grid */}
+          {[0,60,120,180,240,T0,T0+30,T0+60,T0+90].map(d=>(
+            <g key={d}>
+              <line x1={X(d)} y1={28} x2={X(d)} y2={420} stroke={C.frame} strokeDasharray="2 3" opacity={0.4}/>
+              <text x={X(d)} y={20} fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="middle">
+                {d===T0?'T-0':(d<T0?`T-${T0-d}`:`T+${d-T0}`)}
+              </text>
+            </g>
+          ))}
+          <line x1={X(TODAY)} y1={28} x2={X(TODAY)} y2={420} stroke={C.lox} strokeWidth="1.5"/>
+          <text x={X(TODAY)+6} y={22} fill={C.lox} fontSize="9" fontFamily="JetBrains Mono">TODAY</text>
+          <line x1={X(T0)} y1={28} x2={X(T0)} y2={420} stroke={C.inter} strokeWidth="2"/>
+
+          {/* bars */}
+          {BARS.map((b,i)=>{
+            const y = 50 + i*38;
+            const done = Math.max(0, Math.min(b.end,TODAY) - b.start);
+            const total = b.end - b.start;
+            const pct = Math.max(0, Math.min(1, done/total));
+            return (
+              <g key={b.k}>
+                <text x={85} y={y+16} fill={C.ink2} fontSize="10" fontFamily="JetBrains Mono" textAnchor="end">{b.ph}</text>
+                <rect x={X(b.start)} y={y} width={X(b.end)-X(b.start)} height={22}
+                      fill={b.c} opacity={0.18} stroke={b.c} strokeWidth="1"/>
+                <rect x={X(b.start)} y={y} width={(X(b.end)-X(b.start))*pct} height={22} fill={b.c} opacity={0.7}/>
+                <text x={X(b.start)+6} y={y+15} fill={C.ink} fontSize="9.5" fontFamily="JetBrains Mono">
+                  {Math.round(pct*100)}%
+                </text>
+              </g>
+            );
+          })}
+
+          {/* milestones */}
+          {MS.map(m=>(
+            <g key={m.l}>
+              <polygon points={`${X(m.d)},390 ${X(m.d)-6},402 ${X(m.d)+6},402`} fill={m.c}/>
+              <text x={X(m.d)} y={418} fill={m.c} fontSize="8.5" fontFamily="JetBrains Mono" textAnchor="middle">
+                {m.l}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginTop:14}}>
+        {[
+          {k:'PROGRAM LEN',v:'390d',c:C.lox},
+          {k:'COMPLETED',v:'267d · 68%',c:C.inter},
+          {k:'CRITICAL PATH',v:'V-band CoC',c:C.risk},
+          {k:'SLACK TO T-0',v:'+0d',c:C.risk},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.c2,padding:'10px 12px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:16,marginTop:3}}>{t.v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

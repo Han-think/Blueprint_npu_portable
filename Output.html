@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Output Artifacts</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>
+  body{margin:0;background:#0c1e35;min-height:100vh;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+  .sans{font-family:'Inter','Noto Sans KR',system-ui,sans-serif;}
+</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Output'),100);</script>
+<script type="text/babel">
+const { useState } = React;
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+  sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
+};
+function Chip({c=C.lox, children, style}){return <span className="mono" style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:c,...style}}>{children}</span>;}
+function StatusDot({s}){
+  const map = { ok:[C.inter,'✓ ready'], partial:[C.lh2,'⚠ partial'], todo:[C.risk,'○ roadmap'] };
+  const [c,t] = map[s];
+  return <span className="mono" style={{fontSize:10,color:c,letterSpacing:'.08em'}}>{t}</span>;
+}
+
+const ARTIFACTS = [
+  { stage:'01', name:'blueprint.md',         kind:'spec',   size:'8 KB',   status:'ok',      desc:'Human-readable design rationale + parameter ranges' },
+  { stage:'02', name:'overview_h.svg',       kind:'drawing',size:'62 KB',  status:'ok',      desc:'Side-elevation 2D blueprint, dimensioned' },
+  { stage:'02', name:'cross_section.svg',    kind:'drawing',size:'78 KB',  status:'ok',      desc:'Cut-through showing tank stack + engine bay' },
+  { stage:'03', name:'part_tree.json',       kind:'bom',    size:'14 KB',  status:'ok',      desc:'BOM tree · 142 parts · materials · process' },
+  { stage:'04', name:'F1_chamber.stl',       kind:'mesh',   size:'4.2 MB', status:'partial', desc:'Per-part 3D mesh — only primitive shapes auto-gen yet' },
+  { stage:'04', name:'F1_nozzle.stl',        kind:'mesh',   size:'6.8 MB', status:'partial', desc:'Bell extension — parametric generator working' },
+  { stage:'05', name:'assembly.json',        kind:'mating', size:'—',      status:'todo',    desc:'Bolt patterns + mating constraints — v0.5' },
+  { stage:'06', name:'print_profile.json',   kind:'slicer', size:'2 KB',   status:'ok',      desc:'LPBF parameters — 30 µm layer · Inconel 718' },
+  { stage:'06', name:'orientation_pose.json',kind:'slicer', size:'1 KB',   status:'ok',      desc:'Build-plate orientation per part · support angle' },
+  { stage:'07', name:'F1_chamber.gcode',     kind:'gcode',  size:'—',      status:'todo',    desc:'Sliced job — calls PrusaSlicer/Cura · v0.5' },
+  { stage:'08', name:'assembly_manual.pdf',  kind:'manual', size:'—',      status:'todo',    desc:'Step-by-step assembly with diagrams · v0.6' },
+];
+const KIND_COLOR = { spec:C.ink, drawing:C.lox, bom:C.halo, mesh:C.inter, mating:C.lh2, slicer:C.lh2, gcode:C.risk, manual:C.risk };
+
+function App(){
+  const [filter,setFilter] = useState('all');
+  const filtered = filter==='all'?ARTIFACTS:ARTIFACTS.filter(a=>a.status===filter);
+  const counts = { ok:0, partial:0, todo:0 };
+  ARTIFACTS.forEach(a=>counts[a.status]++);
+
+  return (
+    <div style={{maxWidth:1100,margin:'0 auto',padding:24,fontFamily:C.sans,color:C.ink2}}>
+
+      {/* DEMO badge */}
+      <div style={{border:`1px solid ${C.lh2}`,background:'rgba(255,211,159,0.06)',padding:'10px 14px',marginBottom:14,fontSize:12,color:C.ink2,fontFamily:C.mono}}>
+        <span style={{fontSize:10,letterSpacing:'.14em',color:'#0c1e35',background:C.lh2,padding:'3px 8px',marginRight:10}}>DEMO MODE</span>
+        Sample artifacts from session <span style={{color:C.lox}}>2026-04-24_142311</span> · Saturn V S-IC booster brief
+      </div>
+
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:14,marginBottom:18}}>
+        <Chip c={C.halo}>SESSION ARTIFACTS · save/sessions/&lt;ts&gt;/</Chip>
+        <h1 style={{color:C.ink,fontSize:26,margin:'4px 0 4px',fontWeight:600}}>What you actually get out</h1>
+        <p className="sans" style={{color:C.ink3,fontSize:14,margin:0,maxWidth:720,textWrap:'pretty'}}>
+          Every brief produces a folder of artifacts. Blueprint + BOM are solid today.
+          STL meshes are partial. Sliced G-code and assembly manual are on the v0.5/v0.6 roadmap.
+        </p>
+      </div>
+
+      {/* COUNTS */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:18}}>
+        {[
+          { k:'TOTAL',   v:ARTIFACTS.length, c:C.ink },
+          { k:'READY',   v:counts.ok,        c:C.inter },
+          { k:'PARTIAL', v:counts.partial,   c:C.lh2 },
+          { k:'ROADMAP', v:counts.todo,      c:C.risk },
+        ].map(s=>(
+          <div key={s.k} style={{border:`1px solid ${C.frame}`,padding:'10px 14px',background:C.canvas}}>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em'}}>{s.k}</div>
+            <div className="mono" style={{fontSize:24,color:s.c,marginTop:2}}>{s.v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* filter */}
+      <div style={{display:'flex',gap:8,marginBottom:12,alignItems:'center'}}>
+        <Chip c={C.ink3}>filter:</Chip>
+        {[['all','ALL'],['ok','READY'],['partial','PARTIAL'],['todo','ROADMAP']].map(([k,l])=>(
+          <span key={k} onClick={()=>setFilter(k)} style={{fontFamily:C.mono,fontSize:11,padding:'4px 10px',border:`1px solid ${filter===k?C.lox:C.frame}`,color:filter===k?C.lox:C.ink3,cursor:'pointer',letterSpacing:'.06em'}}>{l}</span>
+        ))}
+      </div>
+
+      {/* TABLE */}
+      <div style={{border:`1px solid ${C.frame}`,background:C.canvas2}}>
+        <div style={{display:'grid',gridTemplateColumns:'40px 1.2fr 80px 80px 110px 1.6fr',padding:'10px 14px',borderBottom:`1px solid ${C.frame}`,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase'}}>
+          <span>#</span><span>file</span><span>kind</span><span>size</span><span>status</span><span>description</span>
+        </div>
+        {filtered.map((a,i)=>(
+          <div key={i} style={{display:'grid',gridTemplateColumns:'40px 1.2fr 80px 80px 110px 1.6fr',padding:'12px 14px',borderBottom:i<filtered.length-1?`1px dashed ${C.frame}`:'none',fontFamily:C.mono,fontSize:11.5,color:C.ink2,alignItems:'center'}}>
+            <span style={{color:C.halo}}>{a.stage}</span>
+            <span style={{color:C.ink}}>{a.name}</span>
+            <span style={{color:KIND_COLOR[a.kind]}}>{a.kind}</span>
+            <span style={{color:C.ink3}}>{a.size}</span>
+            <StatusDot s={a.status}/>
+            <span style={{color:C.ink3,fontSize:11,textWrap:'pretty'}}>{a.desc}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* ASSEMBLY ORDER */}
+      <div style={{marginTop:24}}>
+        <Chip c={C.lox}>ASSEMBLY ORDER · partial</Chip>
+        <h3 style={{color:C.ink,fontSize:16,margin:'4px 0 10px',fontWeight:600}}>How parts come together (per session)</h3>
+        <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas}}>
+          {[
+            { n:1, p:'F1_chamber + F1_injector', op:'press fit · LPBF as one body', col:C.lox },
+            { n:2, p:'F1_nozzle ↦ F1_chamber',  op:'flange bolt × 24 · M8 · torque 42 Nm', col:C.lox },
+            { n:3, p:'5× F1 ↦ thrust_puck',     op:'spherical mount · gimbal ±5°', col:C.inter },
+            { n:4, p:'thrust_puck ↦ S-IC base', op:'ring weld · post-LPBF EBW', col:C.inter },
+            { n:5, p:'LOX tank ↦ S-IC mid',     op:'common bulkhead · interference fit', col:C.lh2 },
+            { n:6, p:'RP1 tank ↦ S-IC top',     op:'isogrid stiffener · friction stir', col:C.lh2 },
+          ].map(s=>(
+            <div key={s.n} style={{display:'grid',gridTemplateColumns:'30px 1fr 1.2fr',gap:14,padding:'8px 0',borderBottom:`1px dashed ${C.frame}`,alignItems:'center'}}>
+              <span className="mono" style={{fontSize:14,color:s.col}}>{s.n}</span>
+              <span className="mono" style={{fontSize:12,color:C.ink}}>{s.p}</span>
+              <span className="mono" style={{fontSize:11,color:C.ink3}}>{s.op}</span>
+            </div>
+          ))}
+        </div>
+        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:8,letterSpacing:'.04em'}}>
+          ⚠ today this is rendered from <span style={{color:C.lh2}}>part_tree.json</span> with hand-written mating notes.
+          Auto-derived bolt patterns + interference checks → v0.5.
+        </div>
+      </div>
+
+      {/* ROADMAP */}
+      <div style={{marginTop:24,border:`1px solid ${C.risk}`,background:'rgba(255,159,181,0.04)',padding:16}}>
+        <Chip c={C.risk}>ROADMAP · be honest with users</Chip>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14,marginTop:10}}>
+          <div>
+            <div className="mono" style={{fontSize:11,color:C.lh2,letterSpacing:'.08em'}}>v0.5 · ASSEMBLY</div>
+            <ul className="sans" style={{margin:'6px 0 0',paddingLeft:18,fontSize:12,color:C.ink2,lineHeight:1.6}}>
+              <li>Auto bolt-pattern from flange diameter</li>
+              <li>Interference + clearance verify[]</li>
+              <li>External slicer call (PrusaSlicer CLI)</li>
+              <li>per-part *.gcode in queue</li>
+            </ul>
+          </div>
+          <div>
+            <div className="mono" style={{fontSize:11,color:C.lh2,letterSpacing:'.08em'}}>v0.6 · MANUAL</div>
+            <ul className="sans" style={{margin:'6px 0 0',paddingLeft:18,fontSize:12,color:C.ink2,lineHeight:1.6}}>
+              <li>Step-by-step PDF generation</li>
+              <li>Exploded-view SVG per stage</li>
+              <li>Tooling list per step</li>
+              <li>QA checkpoints inline</li>
+            </ul>
+          </div>
+          <div>
+            <div className="mono" style={{fontSize:11,color:C.lh2,letterSpacing:'.08em'}}>v0.7 · MESH CODEGEN</div>
+            <ul className="sans" style={{margin:'6px 0 0',paddingLeft:18,fontSize:12,color:C.ink2,lineHeight:1.6}}>
+              <li>Full geometry_ops → STL pipeline</li>
+              <li>Parametric chamber / nozzle / tank generators</li>
+              <li>Lattice infill DfAM</li>
+              <li>STEP export (CAD interop)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <div style={{borderTop:`1px solid ${C.frame}`,marginTop:24,paddingTop:14,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>artifacts spec → schema_v6.json · session storage → save/sessions/</span>
+        <span><a href="Setup.html" style={{color:C.lox}}>Setup</a> · <a href="Minimal.html" style={{color:C.lox}}>Minimal</a> · <a href="SelfLoop.html" style={{color:C.lox}}>SelfLoop</a></span>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Loads · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Loads'),100);</script>
+<script type="text/babel">
+const {useState,useMemo}=React;
+const C={canvas:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// Load cases · NASA-STD-5001B factor convention
+// FS = 1.4 ultimate · 1.1 yield · pressure 2.0 ultimate / 1.5 proof
+// MS (Margin of Safety) = (Allowable / (FS × Applied)) − 1 · must be ≥ 0
+const FS = { yield:1.10, ultimate:1.40, pressure_proof:1.50, pressure_burst:2.00 };
+
+// load cases
+const CASES = [
+  {id:'LC01', name:'Ground / Pre-launch',          desc:'Sea-level static · stand attach',           type:'static',   col:C.lox},
+  {id:'LC02', name:'Ignition transient',           desc:'Pc rise 0→10 MPa in 200ms',                 type:'transient',col:C.lh2},
+  {id:'LC03', name:'Nominal steady-state',         desc:'Pc 10 MPa · 442s Isp · 30s soak',           type:'static',   col:C.inter},
+  {id:'LC04', name:'Max-Q + gimbal',               desc:'Aero load + ±5° TVC at Mach 1.2',           type:'combined', col:C.halo},
+  {id:'LC05', name:'MECO transient',               desc:'Pc 10→0 MPa shutdown · 150ms',              type:'transient',col:C.lh2},
+  {id:'LC06', name:'Vibration (sine sweep)',       desc:'5–2000 Hz · 12.0 grms axial',               type:'dynamic',  col:C.risk},
+  {id:'LC07', name:'Thermal soak (chamber)',       desc:'GRCop hot-wall 540°C · LH2 cold-wall −250°C', type:'thermal',  col:C.risk},
+];
+
+// margin table — each row = part × load case × allowable
+const ROWS = [
+  // P7 chamber under pressure cases
+  {part:'P7 Chamber',    mat:'GRCop-42', lc:'LC03', criterion:'Hoop yield',      applied:178, allow:285,  fs:FS.yield,         unit:'MPa', closes:'F01'},
+  {part:'P7 Chamber',    mat:'GRCop-42', lc:'LC03', criterion:'Hoop ultimate',   applied:178, allow:330,  fs:FS.ultimate,      unit:'MPa', closes:'F01'},
+  {part:'P7 Chamber',    mat:'GRCop-42', lc:'LC03', criterion:'Burst pressure',  applied:10.0,allow:21.5, fs:FS.pressure_burst,unit:'MPa', closes:'F01'},
+  {part:'P7 Chamber',    mat:'GRCop-42', lc:'LC02', criterion:'Thermal shock',   applied:240, allow:285,  fs:FS.yield,         unit:'MPa', closes:'F02'},
+
+  // P8 throat
+  {part:'P8 Throat',     mat:'GRCop-42', lc:'LC03', criterion:'Throat heat flux',applied:48,  allow:60,   fs:1.20,             unit:'MW/m²',closes:'F10'},
+  {part:'P8 Throat',     mat:'GRCop-42', lc:'LC03', criterion:'Wall ΔT',         applied:680, allow:800,  fs:1.10,             unit:'°C',   closes:'F10'},
+
+  // P3 turbine housing
+  {part:'P3 Turbine',    mat:'IN718',    lc:'LC03', criterion:'Disk burst',      applied:412, allow:1100, fs:FS.ultimate,      unit:'MPa', closes:'F03'},
+  {part:'P3 Turbine',    mat:'IN718',    lc:'LC03', criterion:'Creep 100h',      applied:380, allow:690,  fs:1.30,             unit:'MPa', closes:'F03'},
+  {part:'P3 Turbine',    mat:'IN718',    lc:'LC07', criterion:'CTE-induced',     applied:228, allow:290,  fs:FS.yield,         unit:'MPa', closes:'F11'},
+
+  // P4 hot manifold
+  {part:'P4 Manifold',   mat:'IN718',    lc:'LC03', criterion:'Web yield',       applied:182, allow:290,  fs:FS.yield,         unit:'MPa', closes:'F11'},
+
+  // P5 LH2 line
+  {part:'P5 LH2 line',   mat:'IN625',    lc:'LC03', criterion:'Internal Ø',      applied:1.05,allow:1.0,  fs:1.00,             unit:'mm',   closes:'F07'},
+  {part:'P5 LH2 line',   mat:'IN625',    lc:'LC06', criterion:'Resonance margin',applied:218, allow:350,  fs:1.30,             unit:'Hz',   closes:'F07'},
+
+  // P9 nozzle
+  {part:'P9 Nozzle',     mat:'IN718',    lc:'LC04', criterion:'Side load',       applied:8.4, allow:14.2, fs:FS.ultimate,      unit:'kN',   closes:'F04'},
+  {part:'P9 Nozzle',     mat:'IN718',    lc:'LC07', criterion:'Hot-skin ΔT',     applied:920, allow:980,  fs:1.10,             unit:'°C',   closes:'F04'},
+
+  // P10 gimbal yoke
+  {part:'P10 Yoke',      mat:'Ti-6Al-4V',lc:'LC04', criterion:'Bore fatigue',    applied:285, allow:680,  fs:1.50,             unit:'MPa',  closes:'F09'},
+  {part:'P10 Yoke',      mat:'Ti-6Al-4V',lc:'LC04', criterion:'Bore yield',      applied:285, allow:830,  fs:FS.yield,         unit:'MPa',  closes:'F09'},
+
+  // Joints
+  {part:'J1 V-band',     mat:'IN718',    lc:'LC03', criterion:'Clamp preload',   applied:18,  allow:32,   fs:1.40,             unit:'kN',   closes:'F06'},
+  {part:'J3 Hi-Lok ×32', mat:'Ti-6Al-4V',lc:'LC04', criterion:'Shear / bolt',    applied:6.8, allow:14.5, fs:FS.ultimate,      unit:'kN',   closes:'F05'},
+  {part:'J3 Hi-Lok ×32', mat:'Ti-6Al-4V',lc:'LC04', criterion:'Tension / bolt',  applied:4.2, allow:11.8, fs:FS.ultimate,      unit:'kN',   closes:'F05'},
+
+  // Assembly stack
+  {part:'ASSY stack',    mat:'—',        lc:'LC03', criterion:'Throat runout',   applied:0.31,allow:0.40, fs:1.00,             unit:'mm',   closes:'F14'},
+];
+
+function ms(r){
+  // MS = Allowable / (FS × Applied) − 1
+  return r.allow / (r.fs * r.applied) - 1;
+}
+function msColor(m){
+  if(m < 0) return C.risk;
+  if(m < 0.10) return C.lh2;
+  if(m < 0.30) return C.lox;
+  return C.inter;
+}
+
+function App(){
+  const [lc,setLc] = useState('all');
+  const [sel,setSel] = useState(0);
+
+  const filtered = useMemo(()=> lc==='all' ? ROWS : ROWS.filter(r=>r.lc===lc), [lc]);
+  const sR = ROWS[sel];
+
+  const stats = useMemo(()=>{
+    const margins = ROWS.map(ms);
+    return {
+      total: ROWS.length,
+      negative: margins.filter(m=>m<0).length,
+      tight:    margins.filter(m=>m>=0 && m<0.10).length,
+      min:      Math.min(...margins),
+      avg:      margins.reduce((s,m)=>s+m,0)/margins.length,
+    };
+  },[]);
+
+  // bar viz of margin distribution
+  const Bar = ({m,w=180})=>{
+    const span = 1.5; // -0.5 to +1.0 mapped
+    const zero = (0.5/span)*w;
+    const x = m<0 ? zero + (m/span)*w : zero;
+    const bw = Math.abs((m/span)*w);
+    const col = msColor(m);
+    return (
+      <svg width={w} height={14} style={{display:'block'}}>
+        <line x1={zero} y1={0} x2={zero} y2={14} stroke={C.ink3} strokeWidth="0.5" strokeDasharray="2 2"/>
+        <rect x={Math.min(x,zero)} y={3} width={Math.max(bw,1)} height={8} fill={col} fillOpacity="0.55"/>
+        <line x1={x+(m>=0?bw:0)} y1={1} x2={x+(m>=0?bw:0)} y2={13} stroke={col} strokeWidth="1.5"/>
+      </svg>
+    );
+  };
+
+  return (
+    <div style={{maxWidth:1240,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>Loads</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          Load cases & Margin of Safety · NASA-STD-5001B · MS = Allow / (FS × Applied) − 1
+        </span>
+      </div>
+
+      {/* summary tiles */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'CHECKS',       v:stats.total, c:C.lox,   s:'load × part rows'},
+          {k:'MS < 0',       v:stats.negative, c:C.risk,  s:'blocks release'},
+          {k:'TIGHT MARGIN', v:stats.tight, c:C.lh2,   s:'0 ≤ MS < 0.10'},
+          {k:'MIN MS',       v:stats.min.toFixed(2), c:msColor(stats.min), s:'worst margin'},
+          {k:'AVG MS',       v:stats.avg.toFixed(2), c:C.inter, s:'across all rows'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.c2,padding:'12px 14px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:22,marginTop:4}}>{t.v}</div>
+            <div className="mono" style={{color:C.ink3,fontSize:10}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* load case chips */}
+      <div style={{display:'flex',gap:6,marginBottom:10,flexWrap:'wrap'}}>
+        <button onClick={()=>setLc('all')} className="mono"
+          style={{fontSize:10,letterSpacing:'.08em',padding:'4px 10px',
+                  background:lc==='all'?C.ink:'transparent',color:lc==='all'?C.canvas:C.ink2,
+                  border:`1px solid ${lc==='all'?C.ink:C.frame}`,cursor:'pointer'}}>ALL CASES</button>
+        {CASES.map(k=>(
+          <button key={k.id} onClick={()=>setLc(k.id)} className="mono"
+            style={{fontSize:10,letterSpacing:'.08em',padding:'4px 10px',
+                    background:lc===k.id?k.col:'transparent',color:lc===k.id?C.canvas:C.ink2,
+                    border:`1px solid ${lc===k.id?k.col:C.frame}`,cursor:'pointer'}}>
+            {k.id} · {k.name}
+          </button>
+        ))}
+      </div>
+
+      {/* table */}
+      <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14,marginBottom:14}}>
+        <table className="mono" style={{width:'100%',borderCollapse:'collapse',fontSize:10.5}}>
+          <thead><tr style={{color:C.ink3,borderBottom:`1px solid ${C.frame}`}}>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>PART</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>MAT</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>LC</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>CRITERION</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>APPLIED</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>ALLOW</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>FS</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>MS</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>MARGIN</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>FMEA</th>
+          </tr></thead>
+          <tbody>
+          {filtered.map((r)=>{
+            const i = ROWS.indexOf(r);
+            const m = ms(r);
+            const col = msColor(m);
+            const caseCol = CASES.find(c=>c.id===r.lc).col;
+            return (
+              <tr key={i} onClick={()=>setSel(i)}
+                  style={{cursor:'pointer',background:sel===i?'rgba(159,211,255,0.08)':'transparent',
+                          borderBottom:`1px dashed ${C.frame}`}}>
+                <td style={{padding:'4px 6px',color:C.ink}}>{r.part}</td>
+                <td style={{padding:'4px 6px',color:C.ink3,fontSize:9.5}}>{r.mat}</td>
+                <td style={{padding:'4px 6px',color:caseCol,fontSize:9.5}}>{r.lc}</td>
+                <td style={{padding:'4px 6px',color:C.ink2}}>{r.criterion}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink2}}>{r.applied} {r.unit}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink2}}>{r.allow} {r.unit}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink3}}>{r.fs.toFixed(2)}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:col,fontWeight:600}}>{m.toFixed(2)}</td>
+                <td style={{padding:'4px 6px',width:200}}><Bar m={m}/></td>
+                <td style={{padding:'4px 6px',color:C.halo,fontSize:9.5}}>{r.closes}</td>
+              </tr>
+            );
+          })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* selected detail + calculation */}
+      {sR && (
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+          <div style={{border:`1px solid ${msColor(ms(sR))}`,background:C.c2,padding:16}}>
+            <div className="mono" style={{color:C.ink3,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SELECTED CHECK</div>
+            <div style={{color:C.ink,fontSize:14,fontWeight:500,marginBottom:10}}>{sR.part} · {sR.criterion}</div>
+            <div style={{display:'grid',gridTemplateColumns:'90px 1fr',gap:'4px 12px',fontSize:11,lineHeight:1.55}} className="mono">
+              <span style={{color:C.ink3}}>MATERIAL</span>  <span style={{color:C.lox}}>→ {sR.mat}</span>
+              <span style={{color:C.ink3}}>LOAD CASE</span> <span style={{color:CASES.find(c=>c.id===sR.lc).col}}>{sR.lc} · {CASES.find(c=>c.id===sR.lc).name}</span>
+              <span style={{color:C.ink3}}>APPLIED</span>   <span style={{color:C.ink}}>{sR.applied} {sR.unit}</span>
+              <span style={{color:C.ink3}}>ALLOWABLE</span> <span style={{color:C.ink}}>{sR.allow} {sR.unit}</span>
+              <span style={{color:C.ink3}}>FACTOR FS</span> <span style={{color:C.ink}}>{sR.fs.toFixed(2)}</span>
+              <span style={{color:C.ink3}}>CLOSES</span>    <span style={{color:C.halo}}>→ FMEA {sR.closes}</span>
+            </div>
+          </div>
+
+          <div style={{border:`1px solid ${C.frame}`,background:C.c3,padding:16}} className="mono">
+            <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:10}}>CALCULATION</div>
+            <pre style={{margin:0,fontSize:11,color:C.ink2,lineHeight:1.7,background:'transparent',border:0,padding:0}}>{
+`MS = Allow / (FS × Applied) − 1
+
+   = ${sR.allow} / (${sR.fs.toFixed(2)} × ${sR.applied}) − 1
+   = ${sR.allow} / ${(sR.fs*sR.applied).toFixed(3)} − 1
+   = ${(sR.allow/(sR.fs*sR.applied)).toFixed(4)} − 1
+`}</pre>
+            <div style={{borderTop:`1px dashed ${C.frame}`,marginTop:10,paddingTop:10,
+                         display:'flex',alignItems:'center',gap:14}}>
+              <span style={{color:C.ink3,fontSize:10}}>RESULT</span>
+              <span style={{color:msColor(ms(sR)),fontSize:32,fontWeight:600}}>{ms(sR).toFixed(3)}</span>
+              <span style={{color:msColor(ms(sR)),fontSize:11,letterSpacing:'.08em'}}>
+                {ms(sR)<0 ? '✕ NEGATIVE — redesign' : ms(sR)<0.10 ? '△ TIGHT — monitor' : ms(sR)<0.30 ? '○ OK' : '✓ COMFORTABLE'}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* legend + schema */}
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.c3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · loads.v0.3 · NASA-STD-5001B</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "FS": { "yield": 1.10, "ultimate": 1.40,
+          "pressure_proof": 1.50, "pressure_burst": 2.00 },
+  "MS_formula": "Allow / (FS × Applied) − 1",
+  "policy":     { "any_negative_MS": "blocks lineage.fai_release",
+                  "tight_<0.10": "requires test.coupon validation" },
+  "links":      ["materials.allowable", "fmea.F##", "test.coupon"]
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

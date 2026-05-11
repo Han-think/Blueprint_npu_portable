@@ -1,0 +1,307 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Thermal · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Thermal'),100);</script>
+<script type="text/babel">
+const {useState}=React;
+const C={canvas:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// 12 stations along engine axis · x is downstream from injector face (mm)
+// q = heat flux (MW/m²) · Tg = gas-side wall T · Tc = coolant-side wall T · Tcool = bulk LH2
+// regen cooling: LH2 flows opposite direction (counterflow) so bulk T rises toward injector
+const STATIONS = [
+  { x:0,   region:'inj',    name:'Injector face',    q:18,  Tg:780, Tc:520, Tcool:135, part:'P15', area:0.012, h:42 },
+  { x:40,  region:'cham',   name:'Chamber 1',        q:42,  Tg:830, Tc:580, Tcool:140, part:'P1',  area:0.030, h:78 },
+  { x:90,  region:'cham',   name:'Chamber 2',        q:58,  Tg:870, Tc:620, Tcool:155, part:'P1',  area:0.030, h:95 },
+  { x:140, region:'cham',   name:'Chamber 3',        q:74,  Tg:910, Tc:670, Tcool:175, part:'P1',  area:0.029, h:112 },
+  { x:175, region:'conv',   name:'Convergence',      q:92,  Tg:960, Tc:720, Tcool:198, part:'P1',  area:0.022, h:128 },
+  { x:200, region:'throat', name:'Throat',           q:112, Tg:980, Tc:760, Tcool:222, part:'P8',  area:0.014, h:155 },
+  { x:225, region:'div1',   name:'Div 1',            q:78,  Tg:820, Tc:610, Tcool:202, part:'P3',  area:0.028, h:110 },
+  { x:275, region:'div2',   name:'Div 2',            q:48,  Tg:680, Tc:480, Tcool:172, part:'P3',  area:0.060, h:80 },
+  { x:340, region:'div3',   name:'Div 3',            q:28,  Tg:540, Tc:380, Tcool:148, part:'P3',  area:0.095, h:54 },
+  { x:420, region:'div4',   name:'Div 4',            q:16,  Tg:410, Tc:280, Tcool:130, part:'P3',  area:0.130, h:34 },
+  { x:510, region:'exit',   name:'Exit 1',           q:8,   Tg:300, Tc:200, Tcool:115, part:'P3',  area:0.165, h:18 },
+  { x:600, region:'exit',   name:'Exit lip',         q:3,   Tg:220, Tc:160, Tcool:100, part:'P3',  area:0.190, h:8 },
+];
+
+// material limit (K) — GRCop-42 cu-alloy = 920K · IN718 = 1100K · 316L = 1050K
+const LIMIT = {
+  P1:920,  P8:920,  P15:920,  // GRCop-42
+  P3:1100,                     // IN718 nozzle ext
+};
+
+function qColor(q,maxQ){
+  const t = q/maxQ;
+  if(t>0.9) return C.risk;
+  if(t>0.65) return C.lh2;
+  if(t>0.35) return C.lox;
+  return C.inter;
+}
+
+// nozzle outline: chamber barrel → convergence → throat → divergence (bell)
+function nozzleY(x, base){
+  // returns half-radius at axial position x
+  if(x<=175) return 48;                             // chamber + convergence start
+  if(x<=200) return 48 - (x-175)*(48-22)/25;        // convergence to throat
+  if(x<=220) return 22 + (x-200)*(28-22)/20;        // throat to early div
+  // bell curve
+  const t = (x-220)/(600-220);
+  return 28 + Math.sqrt(t) * 70;
+}
+
+function HeatMap({sel,onSel}){
+  const W=900, H=320, cy=H/2;
+  const maxQ = Math.max(...STATIONS.map(s=>s.q));
+
+  // build nozzle outline path (top + bottom mirrored)
+  const xs = [];
+  for(let x=0; x<=600; x+=10) xs.push(x);
+  const topPath = xs.map((x,i)=>`${i?'L':'M'}${30+x} ${cy - nozzleY(x)}`).join(' ');
+  const botPath = xs.map((x,i)=>`${i?'L':'M'}${30+x} ${cy + nozzleY(x)}`).join(' ');
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',background:C.c3}}>
+      {/* coolant flow arrow (counterflow, LH2 enters at exit, exits at injector) */}
+      <defs>
+        <marker id="ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0 0 L6 3 L0 6 z" fill={C.lh2}/>
+        </marker>
+      </defs>
+      <line x1={650} y1={30} x2={50} y2={30} stroke={C.lh2} strokeWidth="1.5" markerEnd="url(#ar)"/>
+      <text x={350} y={22} fill={C.lh2} fontSize="9" fontFamily="JetBrains Mono" textAnchor="middle">
+        LH2 coolant · counterflow · ṁ 2.4 kg/s · in 22K / out 240K
+      </text>
+
+      {/* nozzle outline */}
+      <path d={topPath} fill="none" stroke={C.frame} strokeWidth="1.2"/>
+      <path d={botPath} fill="none" stroke={C.frame} strokeWidth="1.2"/>
+
+      {/* heat flux band as filled segments inside nozzle */}
+      {STATIONS.map((s,i)=>{
+        const x1 = 30 + (i===0 ? 0 : (STATIONS[i-1].x+s.x)/2);
+        const x2 = 30 + (i===STATIONS.length-1 ? 600 : (s.x+STATIONS[i+1].x)/2);
+        const y1 = cy - nozzleY((s.x+(i===0?0:STATIONS[i-1].x))/2);
+        const y2 = cy + nozzleY((s.x+(i===0?0:STATIONS[i-1].x))/2);
+        const isSel = sel===i;
+        const col = qColor(s.q,maxQ);
+        return (
+          <g key={i} style={{cursor:'pointer'}} onClick={()=>onSel(i)}>
+            <rect x={x1} y={y1} width={x2-x1} height={y2-y1} fill={col} opacity={isSel?0.85:0.55}/>
+            {isSel && (
+              <>
+                <line x1={30+s.x} y1={y1-12} x2={30+s.x} y2={y2+12} stroke={C.ink} strokeWidth="1" strokeDasharray="2 2"/>
+                <text x={30+s.x} y={y1-16} fill={C.ink} fontSize="10" fontFamily="JetBrains Mono" textAnchor="middle">{s.name}</text>
+              </>
+            )}
+          </g>
+        );
+      })}
+
+      {/* axis line */}
+      <line x1={30} y1={cy} x2={630} y2={cy} stroke={C.ink3} strokeWidth="0.5" strokeDasharray="2 3"/>
+
+      {/* heat flux plot above nozzle */}
+      <g transform="translate(680 30)">
+        <text x={0} y={0} fill={C.lox} fontSize="10" fontFamily="JetBrains Mono" letterSpacing=".08em">q · MW/m²</text>
+        <line x1={0} y1={10} x2={0} y2={200} stroke={C.frame}/>
+        <line x1={0} y1={200} x2={180} y2={200} stroke={C.frame}/>
+        {[0,40,80,120].map(v=>(
+          <g key={v}>
+            <line x1={-4} y1={200-v*1.5} x2={0} y2={200-v*1.5} stroke={C.ink3}/>
+            <text x={-7} y={203-v*1.5} fill={C.ink3} fontSize="8" fontFamily="JetBrains Mono" textAnchor="end">{v}</text>
+          </g>
+        ))}
+        {STATIONS.map((s,i)=>{
+          const px = (s.x/600)*180;
+          const py = 200 - s.q*1.5;
+          return (
+            <g key={i}>
+              {i>0 && (() => {
+                const prev = STATIONS[i-1];
+                return <line x1={(prev.x/600)*180} y1={200-prev.q*1.5} x2={px} y2={py} stroke={qColor(s.q,maxQ)} strokeWidth="1.2"/>;
+              })()}
+              <circle cx={px} cy={py} r={sel===i?4:2.5} fill={qColor(s.q,maxQ)} 
+                      style={{cursor:'pointer'}} onClick={()=>onSel(i)}/>
+            </g>
+          );
+        })}
+      </g>
+    </svg>
+  );
+}
+
+function App(){
+  const [sel,setSel] = useState(5); // throat
+  const s = STATIONS[sel];
+  const lim = LIMIT[s.part];
+  const margin = lim - s.Tg;
+  const marginPct = margin/lim;
+  const ok = margin > 50;
+  const qMax = Math.max(...STATIONS.map(st=>st.q));
+  const qTotal = STATIONS.reduce((a,st)=>a+st.q*st.area,0); // ~MW
+  const Tout = 240;
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>Thermal</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          Regen-cool map · steady-state 100% Pc · LOX/LH2 · O/F 6.0
+        </span>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'q_PEAK',     v:`${qMax}`,         u:'MW/m²',c:C.risk,  s:`@ ${STATIONS.find(st=>st.q===qMax).name}`},
+          {k:'Q_TOTAL',    v:qTotal.toFixed(1), u:'MW',   c:C.lh2,   s:'absorbed by LH2'},
+          {k:'LH2 ṁ',      v:'2.4',             u:'kg/s', c:C.lox,   s:'coolant flow'},
+          {k:'ΔT COOL',    v:`${Tout-22}`,      u:'K',    c:C.lox,   s:`22K → ${Tout}K`},
+          {k:'STATIONS',   v:STATIONS.length,   u:'',     c:C.inter, s:'axial probes'},
+          {k:'MARGIN MIN', v:'+12',             u:'K',    c:C.lh2,   s:'@ throat (P8)'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.c2,padding:'10px 12px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:18,marginTop:4}}>
+              {t.v}<span style={{fontSize:11,color:C.ink3,marginLeft:4}}>{t.u}</span>
+            </div>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14,marginBottom:14}}>
+        <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em',marginBottom:10}}>
+          AXIAL HEAT FLUX MAP · click station
+        </div>
+        <HeatMap sel={sel} onSel={setSel}/>
+        {/* legend */}
+        <div style={{display:'flex',gap:14,alignItems:'center',marginTop:8,fontSize:9.5}} className="mono">
+          <span style={{color:C.ink3,letterSpacing:'.12em'}}>q SCALE</span>
+          {[
+            {c:C.inter,l:'<35%'},{c:C.lox,l:'35–65%'},{c:C.lh2,l:'65–90%'},{c:C.risk,l:'>90%'},
+          ].map(b=>(
+            <span key={b.l} style={{display:'inline-flex',gap:6,alignItems:'center'}}>
+              <span style={{width:14,height:8,background:b.c,opacity:0.7,display:'inline-block'}}/>
+              <span style={{color:C.ink2}}>{b.l}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1.1fr 1fr',gap:14}}>
+        {/* station detail */}
+        <div style={{border:`1px solid ${ok?C.inter:C.risk}`,background:C.c2,padding:14}}>
+          <div style={{display:'flex',gap:10,alignItems:'baseline',marginBottom:10}}>
+            <span className="mono" style={{color:C.lox,fontSize:13,letterSpacing:'.06em'}}>{s.name.toUpperCase()}</span>
+            <span className="mono" style={{color:C.ink3,fontSize:10}}>x = {s.x} mm · part {s.part}</span>
+            <span style={{flex:1}}/>
+            <span className="mono" style={{color:ok?C.inter:C.risk,fontSize:10,letterSpacing:'.08em',
+                          border:`1px solid ${ok?C.inter:C.risk}`,padding:'2px 8px'}}>
+              {ok?'MARGIN OK':'TIGHT'}
+            </span>
+          </div>
+
+          {/* temp stack viz: gas → wall hot → wall cold → coolant */}
+          <div style={{position:'relative',height:60,background:C.c3,border:`1px solid ${C.frame}`,marginBottom:14}}>
+            {(() => {
+              const Tmax = 1000, Tmin = 0;
+              const xPct = T => `${((T-Tmin)/(Tmax-Tmin))*100}%`;
+              return <>
+                <div style={{position:'absolute',left:0,top:0,bottom:0,width:xPct(s.Tg),background:C.risk,opacity:0.35}}/>
+                <div style={{position:'absolute',left:xPct(s.Tg),top:0,bottom:0,width:`calc(${xPct(s.Tc)} - ${xPct(s.Tg)})`,background:C.lh2,opacity:0.35}}/>
+                <div style={{position:'absolute',left:xPct(s.Tc),top:0,bottom:0,width:`calc(${xPct(s.Tcool)} - ${xPct(s.Tc)})`,background:C.lox,opacity:0.35}}/>
+                {[
+                  {T:s.Tg,    label:'T_gas',  c:C.risk},
+                  {T:s.Tc,    label:'T_wall', c:C.lh2},
+                  {T:s.Tcool, label:'T_cool', c:C.lox},
+                  {T:lim,     label:'LIMIT',  c:C.ink,  dashed:true},
+                ].map(m=>(
+                  <div key={m.label} style={{position:'absolute',left:xPct(m.T),top:0,bottom:0,
+                       borderLeft:`1px ${m.dashed?'dashed':'solid'} ${m.c}`}}>
+                    <span className="mono" style={{position:'absolute',top:-14,left:-12,fontSize:8.5,color:m.c,whiteSpace:'nowrap'}}>
+                      {m.label}
+                    </span>
+                    <span className="mono" style={{position:'absolute',bottom:-14,left:-10,fontSize:8.5,color:m.c}}>
+                      {m.T}K
+                    </span>
+                  </div>
+                ))}
+              </>;
+            })()}
+          </div>
+
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4px 12px',fontSize:11}} className="mono">
+            <span style={{color:C.ink3}}>q (heat flux)</span><span style={{color:C.risk}}>{s.q} MW/m²</span>
+            <span style={{color:C.ink3}}>area (annular)</span><span style={{color:C.ink}}>{(s.area*1e4).toFixed(0)} cm²</span>
+            <span style={{color:C.ink3}}>local h (gas)</span><span style={{color:C.ink}}>{s.h} kW/m²K</span>
+            <span style={{color:C.ink3}}>T_gas wall</span><span style={{color:C.lh2}}>{s.Tg} K</span>
+            <span style={{color:C.ink3}}>T_cool wall</span><span style={{color:C.lox}}>{s.Tc} K</span>
+            <span style={{color:C.ink3}}>T_coolant</span><span style={{color:C.lox}}>{s.Tcool} K</span>
+            <span style={{color:C.ink3}}>material limit</span><span style={{color:C.ink}}>{lim} K</span>
+            <span style={{color:C.ink3}}>margin</span>
+            <span style={{color:ok?C.inter:C.risk}}>{margin>0?'+':''}{margin} K · {(marginPct*100).toFixed(1)}%</span>
+          </div>
+        </div>
+
+        {/* coolant channel geometry + risk */}
+        <div style={{display:'grid',gap:14}}>
+          <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+            <div className="mono" style={{color:C.lh2,fontSize:10,letterSpacing:'.12em',marginBottom:10}}>
+              REGEN CHANNELS · LPBF integrated
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4px 12px',fontSize:11}} className="mono">
+              <span style={{color:C.ink3}}>channel count</span><span style={{color:C.ink}}>120 helical</span>
+              <span style={{color:C.ink3}}>throat width × depth</span><span style={{color:C.ink}}>0.8 × 2.5 mm</span>
+              <span style={{color:C.ink3}}>land width</span><span style={{color:C.ink}}>1.0 mm</span>
+              <span style={{color:C.ink3}}>build orient</span><span style={{color:C.lox}}>+Z vertical</span>
+              <span style={{color:C.ink3}}>roughness Sa</span><span style={{color:C.lh2}}>~14 µm (AFM target)</span>
+              <span style={{color:C.ink3}}>flow regime</span><span style={{color:C.ink}}>turbulent · Re ~3e5</span>
+            </div>
+          </div>
+
+          <div style={{border:`1px dashed ${C.risk}`,background:C.c2,padding:14}}>
+            <div className="mono" style={{color:C.risk,fontSize:10,letterSpacing:'.12em',marginBottom:10}}>
+              RISKS · linked
+            </div>
+            {[
+              {f:'F01', t:'Witness-line porosity', d:'→ Inspection CT mandatory at throat'},
+              {f:'F03', t:'Channel blockage',      d:'→ He flow test pre-fire · Joints F-ch'},
+              {f:'F08', t:'Coking on injector',    d:'→ Ops refurb P15 every 12 fires'},
+            ].map(r=>(
+              <div key={r.f} style={{display:'flex',gap:10,padding:'5px 0',
+                        borderBottom:`1px solid ${C.frame}`,fontSize:10.5}} className="mono">
+                <span style={{color:C.risk,minWidth:32}}>{r.f}</span>
+                <span style={{color:C.ink,minWidth:160}}>{r.t}</span>
+                <span style={{color:C.ink3}}>{r.d}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.c3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · thermal.v0.1 · doc BP-THM-A</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "regime":   { "Pc": "10 MPa", "OF": 6.0, "ṁ_LH2": 2.4, "ṁ_LOX": 14.2 },
+  "stations": ${STATIONS.length},
+  "cooling":  { "type":"regen", "flow":"counterflow", "channels":120,
+                "throat_section":"0.8 × 2.5 mm", "land":"1.0 mm" },
+  "limits":   { "GRCop-42": 920, "IN718": 1100, "316L": 1050, "unit":"K" },
+  "policy":   { "min_margin":"+50 K", "warn_at":"+12..+50 K", "block_fire":"<+12 K" },
+  "links":    ["parts.P##","loads.L##","fmea.F##","inspection.I##"]
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

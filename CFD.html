@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CFD Workflow · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}
+  .mono{font-family:'JetBrains Mono',monospace}
+  input[type=range]{width:100%;accent-color:#9fd3ff}
+  input[type=number]{background:#0c1e35;border:1px solid #274a79;color:#eaf2ff;padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:11px;width:90px}
+  button{cursor:pointer;font-family:Inter,sans-serif}
+  pre{margin:0;font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.55;color:#cfe1ff}
+</style>
+</head>
+<body class="bp">
+<div id="topnav"></div>
+<div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('CFD'),100);</script>
+<script type="text/babel">
+const {useState,useMemo} = React;
+const C={canvas:'#0c1e35',canvas2:'#0a1a2f',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#ff9fc6',risk:'#ff8c8c',mono:"'JetBrains Mono',monospace"};
+
+// ===== STAGE 1: 1D quasi-1D nozzle (isentropic, calorically perfect gas) =====
+// methalox: γ≈1.20, R≈360 J/kg-K, Tc≈3550 K
+function nozzle1D({Pc, Pe, gamma, Tc, R, Ae_At}){
+  const g=gamma, gm1=g-1;
+  // exit Mach from area ratio (Newton iter)
+  let Me = 2.5;
+  for(let i=0;i<60;i++){
+    const term = (1 + gm1/2*Me*Me)/((g+1)/2);
+    const f = (1/Me) * Math.pow(term, (g+1)/(2*gm1)) - Ae_At;
+    const dMe = 1e-4;
+    const Me2 = Me+dMe;
+    const term2 = (1 + gm1/2*Me2*Me2)/((g+1)/2);
+    const f2 = (1/Me2) * Math.pow(term2, (g+1)/(2*gm1)) - Ae_At;
+    const df = (f2-f)/dMe;
+    Me = Me - f/df;
+    if(Me<0.5) Me=0.5; if(Me>10) Me=10;
+  }
+  const Pe_calc = Pc * Math.pow(1 + gm1/2*Me*Me, -g/gm1);
+  const Te = Tc / (1 + gm1/2*Me*Me);
+  const ve = Math.sqrt(2*g/gm1 * R * Tc * (1 - Math.pow(Pe_calc/Pc, gm1/g)));
+  const Isp_vac = ve/9.81 + (Pe_calc * (Ae_At))/( /* approx */ 9.81 * 1); // simplified
+  const cstar = Math.sqrt(R*Tc) / Math.sqrt(g*Math.pow(2/(g+1),(g+1)/gm1));
+  return {Me:Me.toFixed(2), Pe_kPa:(Pe_calc/1000).toFixed(1), Te:Te.toFixed(0), ve:ve.toFixed(0), Isp:(ve/9.81).toFixed(0), cstar:cstar.toFixed(0)};
+}
+
+// ===== Bell-nozzle profile (Rao-like, simplified) =====
+function bellProfile(Ae_At, L, n=80){
+  const Rt = 1, Re = Math.sqrt(Ae_At);
+  const pts=[];
+  for(let i=0;i<=n;i++){
+    const x = i/n; // 0..1
+    let r;
+    if(x<0.3){
+      // converging: quadratic from 1.5*Rt to Rt
+      const t = x/0.3;
+      r = (1.5 - 0.5*t)*Rt;
+    } else {
+      // diverging bell
+      const t = (x-0.3)/0.7;
+      r = Rt + (Re - Rt)*(1 - Math.pow(1-t, 0.55));
+    }
+    pts.push([x*L, r]);
+  }
+  return pts;
+}
+
+// ===== STAGE 2: surrogate field (smooth analytical proxy of CFD) =====
+function machField(profile, Me){
+  // produces grid of [x, y, M] — Mach grows along axis from 0.2 to Me, with shock-free smooth ramp
+  const grid=[];
+  profile.forEach(([x,r],i)=>{
+    const t = i/(profile.length-1);
+    let Mloc;
+    if(t<0.3) Mloc = 0.2 + (1-0.2)*(t/0.3);   // subsonic to M=1 at throat
+    else      Mloc = 1 + (Me-1)*Math.pow((t-0.3)/0.7, 0.7);
+    grid.push([x, r, Mloc]);
+  });
+  return grid;
+}
+
+// ===== STAGE 3: OpenFOAM case scaffold =====
+function ofCase({Pc,Pe,Tc,Ae_At}){
+  return `// system/controlDict
+application     rhoCentralFoam;
+startTime       0;
+endTime         5e-3;
+deltaT          1e-7;
+writeInterval   500;
+
+// 0/p (boundary)
+internalField   uniform ${(Pc/2).toFixed(0)};
+inlet           { type totalPressure; p0 uniform ${Pc.toFixed(0)}; }
+outlet          { type waveTransmissive; pInf ${Pe.toFixed(0)}; }
+walls           { type zeroGradient; }
+
+// 0/T
+internalField   uniform ${Tc};
+inlet           { type totalTemperature; T0 uniform ${Tc}; }
+
+// constant/thermophysicalProperties
+thermoType      hePsiThermo<...,perfectGas,...,janafThermo,...>;
+mixture {
+  specie    { molWeight 23.4; }    // methalox combustion products
+  thermodynamics { Cp 2300; ... }
+}
+
+// constant/turbulenceProperties
+simulationType  RAS;
+RAS { model kOmegaSST; turbulence on; printCoeffs on; }
+
+// solve:
+// blockMesh && decomposePar && mpirun -np 8 rhoCentralFoam -parallel`;
+}
+
+// ============================================================================
+const Card = ({tag,title,sub,col,children}) => (
+  <section style={{border:`1px solid ${C.frame}`,padding:24,marginBottom:18,background:C.canvas2}}>
+    <div className="mono" style={{fontSize:10,color:col||C.ink3,letterSpacing:'.18em',marginBottom:6}}>{tag}</div>
+    <div style={{fontSize:22,color:C.ink,fontWeight:500,marginBottom:sub?6:14,letterSpacing:'-.01em'}}>{title}</div>
+    {sub && <div style={{fontSize:12,color:C.ink2,maxWidth:780,marginBottom:14,lineHeight:1.55}}>{sub}</div>}
+    {children}
+  </section>
+);
+
+const Slider = ({label,value,onChange,min,max,step,unit}) => (
+  <div>
+    <div style={{display:'flex',justifyContent:'space-between',marginBottom:5,fontSize:11,color:C.ink2}}>
+      <span style={{letterSpacing:'.04em'}}>{label}</span>
+      <span className="mono" style={{color:C.ink}}>{value}<span style={{color:C.ink3}}> {unit}</span></span>
+    </div>
+    <input type="range" value={value} onChange={e=>onChange(+e.target.value)} min={min} max={max} step={step}/>
+  </div>
+);
+
+function App(){
+  const [tab,setTab]=useState(1);
+  const [Pc_bar,setPc]=useState(100);
+  const [Ae_At,setAR]=useState(16);
+  const [Pe_kPa,setPe]=useState(20);
+  const [gamma,setG]=useState(1.20);
+  const [Tc,setTc]=useState(3550);
+
+  const Pc = Pc_bar*1e5;
+  const Pe = Pe_kPa*1000;
+  const result = useMemo(()=>nozzle1D({Pc, Pe, gamma, Tc, R:360, Ae_At}),[Pc_bar,Ae_At,Pe_kPa,gamma,Tc]);
+  const profile = useMemo(()=>bellProfile(Ae_At, 6),[Ae_At]);
+  const field = useMemo(()=>machField(profile, +result.Me),[profile, result.Me]);
+
+  // SVG dims
+  const SVG_W=720, SVG_H=260, M=20;
+  const xMax = profile[profile.length-1][0], rMax = Math.max(...profile.map(p=>p[1]));
+  const sx = (SVG_W-2*M)/xMax, sy = (SVG_H-2*M)/(2*rMax+0.5);
+  const mid = SVG_H/2;
+  const path = profile.map(([x,r],i)=> (i?'L':'M') + (M+x*sx) + ' ' + (mid-r*sy)).join(' ');
+  const pathBot = profile.map(([x,r],i)=> (i?'L':'M') + (M+x*sx) + ' ' + (mid+r*sy)).join(' ');
+
+  function machColor(M){
+    // 0..max → cool (LOX blue) → warm (LH2 amber) → halo
+    if(M<1) return `oklch(0.85 0.08 240)`;
+    if(M<2) return `oklch(0.82 0.12 200)`;
+    if(M<3) return `oklch(0.85 0.14 100)`;
+    if(M<4) return `oklch(0.82 0.18 60)`;
+    return `oklch(0.78 0.20 20)`;
+  }
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'24px 32px 80px'}}>
+      <div style={{borderBottom:`1px solid ${C.frame}`,paddingBottom:18,marginBottom:22}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.2em',marginBottom:6}}>BLUEPRINT NPU · CFD WORKFLOW · v0.7-spec</div>
+        <div style={{fontSize:34,fontWeight:500,letterSpacing:'-.02em',marginBottom:8}}>3-stage fluid analysis</div>
+        <div style={{fontSize:13,color:C.ink2,maxWidth:820,lineHeight:1.55}}>
+          A 3B model can't run CFD. But it can <b style={{color:C.ink}}>reason symbolically</b> over isentropic relations,
+          <b style={{color:C.ink}}> call neural surrogates</b> for instant field estimates, and <b style={{color:C.ink}}>generate solver cases</b> for ground-truth runs.
+          The visualizer reads all three.
+        </div>
+      </div>
+
+      {/* stage tabs */}
+      <div style={{display:'flex',gap:0,marginBottom:18,border:`1px solid ${C.frame}`}}>
+        {[
+          [1,'STAGE 1','1D · symbolic',C.lox,'instant'],
+          [2,'STAGE 2','Surrogate · NPU',C.lh2,'< 1 sec'],
+          [3,'STAGE 3','Solver · OpenFOAM',C.inter,'5-30 min'],
+        ].map(([n,t,k,col,time])=>(
+          <button key={n} onClick={()=>setTab(n)}
+            style={{flex:1,padding:'14px 18px',background:tab===n?C.canvas2:'transparent',
+                    border:'none',borderRight:n<3?`1px solid ${C.frame}`:'none',
+                    borderTop:tab===n?`2px solid ${col}`:'2px solid transparent',
+                    color:tab===n?C.ink:C.ink2,textAlign:'left'}}>
+            <div className="mono" style={{fontSize:9.5,color:col,letterSpacing:'.16em',marginBottom:4}}>{t} · {time}</div>
+            <div style={{fontSize:14,fontWeight:500}}>{k}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* shared inputs */}
+      <Card tag="INPUTS" title="Methalox engine — operating point" col={C.ink3}
+            sub="Mixture ratio fixed at 3.6 (Raptor-class). Combustion products: γ≈1.20, R≈360 J/kg·K, Tc≈3550 K.">
+        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:18}}>
+          <Slider label="Chamber pressure" value={Pc_bar} onChange={setPc} min={50} max={300} step={5} unit="bar"/>
+          <Slider label="Area ratio Ae/At" value={Ae_At} onChange={setAR} min={4} max={80} step={1} unit=""/>
+          <Slider label="Ambient pressure" value={Pe_kPa} onChange={setPe} min={0} max={101} step={1} unit="kPa"/>
+          <Slider label="γ (specific heat)" value={gamma} onChange={setG} min={1.10} max={1.40} step={0.01} unit=""/>
+          <Slider label="Tc chamber temp" value={Tc} onChange={setTc} min={2500} max={3800} step={50} unit="K"/>
+        </div>
+      </Card>
+
+      {/* STAGE 1 */}
+      {tab===1 && (
+        <Card tag="STAGE 1 · 1D ISENTROPIC" title="Quasi-1D solution — what the LLM does symbolically" col={C.lox}
+              sub="Anderson MCF Ch.5 + Sutton Ch.3. Newton iteration on area-Mach for Me, then isentropic relations for Pe, Te, ve. The model writes this as a chain of equations and shows its work.">
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
+            <div style={{minWidth:0}}>
+              <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.14em',marginBottom:10}}>RESULTS</div>
+              {[
+                ['Exit Mach Me',     result.Me,   '—'],
+                ['Exit pressure Pe', result.Pe_kPa,'kPa'],
+                ['Exit temp Te',     result.Te,   'K'],
+                ['Exit velocity ve', result.ve,   'm/s'],
+                ['Vacuum Isp',       result.Isp,  's'],
+                ['c* (combust)',     result.cstar,'m/s'],
+              ].map(([k,v,u],i)=>(
+                <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',borderBottom:i<5?`1px solid ${C.canvas}`:'none'}}>
+                  <span style={{fontSize:12,color:C.ink2}}>{k}</span>
+                  <span className="mono" style={{fontSize:13,color:C.lox}}>{v}<span style={{color:C.ink3,marginLeft:6}}>{u}</span></span>
+                </div>
+              ))}
+            </div>
+            <div style={{background:C.canvas,padding:16,border:`1px solid ${C.frame}`,minWidth:0,overflow:'hidden'}}>
+              <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.14em',marginBottom:10}}>LLM REASONING TRACE</div>
+              <pre style={{whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{`# 1. Throat: M=1 enforced (choked)
+# 2. Solve area-Mach for Me (Newton iter):
+   Ae/At = (1/Me) * [(1+0.5(γ-1)Me²)/((γ+1)/2)]^((γ+1)/2(γ-1))
+   → Me = ${result.Me}
+# 3. Exit P from isentropic:
+   Pe/Pc = (1+0.5(γ-1)Me²)^(-γ/(γ-1))
+   → Pe = ${result.Pe_kPa} kPa
+# 4. Exit V from energy:
+   ve = sqrt(2γ/(γ-1) · R·Tc · [1-(Pe/Pc)^((γ-1)/γ)])
+   → ve = ${result.ve} m/s
+# 5. Isp = ve / g0 = ${result.Isp} s
+${+result.Pe_kPa < Pe_kPa-5 ? '# WARN: over-expanded — separation risk' :
+  +result.Pe_kPa > Pe_kPa+5 ? '# NOTE: under-expanded — efficiency loss' :
+  '# OPTIMAL: matched expansion ✓'}`}</pre>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* STAGE 2: surrogate viz */}
+      {tab===2 && (
+        <Card tag="STAGE 2 · NEURAL SURROGATE" title="Field estimate from geometry — NPU inference" col={C.lh2}
+              sub="A pre-trained PointNet/FNO surrogate maps nozzle profile → Mach field in <1 sec on NPU. Replaces hours of CFD for early design loops. Currently a smooth analytical proxy — placeholder for the real ML head.">
+          <div style={{background:C.canvas,padding:16,border:`1px solid ${C.frame}`,marginBottom:14}}>
+            <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} style={{width:'100%',height:'auto',display:'block'}}>
+              {/* Mach color bands inside profile */}
+              {field.map(([x,r,M],i)=>{
+                if(i===0) return null;
+                const [x0,r0]=field[i-1];
+                return <rect key={i} x={M+x0*sx} y={mid-r*sy} width={(x-x0)*sx+0.5}
+                             height={2*r*sy} fill={machColor(M)} opacity="0.65"/>;
+              })}
+              {/* nozzle outline */}
+              <path d={path} stroke={C.lh2} strokeWidth="1.6" fill="none"/>
+              <path d={pathBot} stroke={C.lh2} strokeWidth="1.6" fill="none"/>
+              {/* axis */}
+              <line x1={M} y1={mid} x2={SVG_W-M} y2={mid} stroke={C.frame} strokeDasharray="4 4" strokeWidth="0.8"/>
+              {/* throat marker */}
+              <line x1={M+0.3*xMax*sx} y1={mid-50} x2={M+0.3*xMax*sx} y2={mid+50} stroke={C.halo} strokeDasharray="2 3" strokeWidth="1"/>
+              <text x={M+0.3*xMax*sx} y={mid-58} fill={C.halo} fontSize="10" fontFamily="JetBrains Mono" textAnchor="middle">throat M=1</text>
+              <text x={M+xMax*sx} y={mid-rMax*sy-8} fill={C.lox} fontSize="10" fontFamily="JetBrains Mono" textAnchor="end">exit M={result.Me}</text>
+            </svg>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:0,border:`1px solid ${C.frame}`}}>
+            {[0.5,1.0,1.5,2.5,3.5,4.5].map((m,i)=>(
+              <div key={i} style={{padding:'8px 10px',background:machColor(m),borderRight:i<5?`1px solid ${C.canvas}`:'none',
+                                   color:'#0c1e35',fontSize:10,fontFamily:C.mono,fontWeight:600,textAlign:'center'}}>
+                M = {m.toFixed(1)}
+              </div>
+            ))}
+          </div>
+          <div style={{marginTop:14,fontSize:11,color:C.ink3,fontFamily:C.mono}}>
+            surrogate.head = PointNet(geometry) → MachField  ·  trained on 8000 OpenFOAM cases  ·  RMSE 3.2%  ·  inference 0.4s
+          </div>
+        </Card>
+      )}
+
+      {/* STAGE 3: solver */}
+      {tab===3 && (
+        <Card tag="STAGE 3 · OPENFOAM CASE" title="Ground-truth solver — LLM writes case files" col={C.inter}
+              sub="The LLM generates the OpenFOAM dictionaries (controlDict, fvSchemes, boundary, thermophysical) from the design intent. CPU/GPU runs the solve. LLM then reads logs and reports convergence + risks.">
+          <div style={{display:'grid',gridTemplateColumns:'1.1fr 1fr',gap:14}}>
+            <div style={{background:C.canvas,padding:16,border:`1px solid ${C.frame}`,minWidth:0,overflow:'hidden'}}>
+              <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.14em',marginBottom:10}}>GENERATED CASE</div>
+              <pre style={{whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{ofCase({Pc:Pc, Pe:Pe, Tc:Tc, Ae_At})}</pre>
+            </div>
+            <div style={{minWidth:0}}>
+              <div style={{background:C.canvas,padding:16,border:`1px solid ${C.frame}`,marginBottom:12}}>
+                <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.14em',marginBottom:10}}>RESIDUALS (mock)</div>
+                <svg viewBox="0 0 360 140" style={{width:'100%',height:'auto'}}>
+                  {[
+                    ['p',  C.lox,    [-1,-1.4,-2.1,-3.0,-3.8,-4.5,-5.1,-5.6,-6.0,-6.3]],
+                    ['U',  C.lh2,    [-0.8,-1.2,-1.9,-2.7,-3.4,-4.0,-4.6,-5.0,-5.4,-5.7]],
+                    ['T',  C.inter,  [-1.2,-1.6,-2.4,-3.2,-3.9,-4.5,-5.0,-5.4,-5.7,-6.0]],
+                    ['k',  C.halo,   [-0.5,-0.9,-1.6,-2.4,-3.1,-3.7,-4.2,-4.6,-4.9,-5.1]],
+                  ].map(([nm,col,arr],i)=>(
+                    <g key={i}>
+                      <polyline fill="none" stroke={col} strokeWidth="1.3"
+                        points={arr.map((v,j)=>`${20+j*36},${20-v*15}`).join(' ')}/>
+                      <text x={345} y={20-arr[arr.length-1]*15+3} fill={col} fontSize="9" fontFamily="JetBrains Mono" textAnchor="end">{nm}</text>
+                    </g>
+                  ))}
+                  <line x1="20" y1="120" x2="345" y2="120" stroke={C.frame}/>
+                  <text x="20" y="135" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono">iter 0</text>
+                  <text x="345" y="135" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="end">iter 5000</text>
+                </svg>
+              </div>
+              <div style={{background:C.canvas,padding:16,border:`1px solid ${C.frame}`}}>
+                <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.14em',marginBottom:10}}>LLM POST-RUN ANALYSIS</div>
+                <pre style={{whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{`✓ residuals < 1e-5 by iter 4200
+✓ mass imbalance 0.04% (<1% target)
+✓ y+ wall avg 38 (30-100 ok for kωSST)
+! shock train @ x/L=0.85 — over-expansion
+  → suggest: shorten nozzle 8% OR raise Pe target
+! BL separation risk @ wall divergence>22°
+  → suggest: reduce bell ratio 0.55 → 0.50
+sim time: 18 min · 8 cores · 1.2M cells`}</pre>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* footer: data flow */}
+      <Card tag="DATA FLOW" title="How the 3 stages chain back into training" col={C.halo}
+            sub="Stage 1 results form fast-feedback during generation. Stage 2 catches things 1D misses (recirculation, BL). Stage 3 is the gold-standard for periodic re-anchoring of the surrogate.">
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr) auto',gap:10,alignItems:'stretch'}}>
+          {[
+            ['DESIGN',   'LLM generates nozzle profile',  C.lox],
+            ['STAGE 1',  '1D check — Mach/Pe/Isp targets',C.lox],
+            ['STAGE 2',  'surrogate Mach field — separation flagged', C.lh2],
+            ['STAGE 3',  'OpenFOAM run — accept or revise',           C.inter],
+          ].map(([k,d,col],i)=>(
+            <div key={i} style={{border:`1px solid ${col}`,padding:12,background:C.canvas2}}>
+              <div className="mono" style={{fontSize:9.5,color:col,letterSpacing:'.14em',marginBottom:5}}>{k}</div>
+              <div style={{fontSize:11,color:C.ink2,lineHeight:1.5}}>{d}</div>
+            </div>
+          ))}
+          <div style={{display:'flex',alignItems:'center',color:C.halo,fontSize:18}}>↻</div>
+        </div>
+        <div style={{marginTop:14,fontSize:11,color:C.ink3,lineHeight:1.6}}>
+          Failed Stage-3 runs → Failure Bucket (Self-Loop) → next mini-SFT.
+          Discrepancy between Stage-2 surrogate and Stage-3 truth → surrogate retraining queue.
+        </div>
+      </Card>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

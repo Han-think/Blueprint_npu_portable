@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Compare</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>body{margin:0;background:#0c1e35;min-height:100vh;font-family:'Inter','Noto Sans KR',system-ui,sans-serif;color:#e6ecf5;}</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">
+const { useState } = React;
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+};
+const VERSIONS = [
+  { id:'base', name:'qwen2.5-3b · base',  prefs:0,   col:C.ink3 },
+  { id:'v1',   name:'qwen2.5-3b · v1',    prefs:42,  col:C.lh2 },
+  { id:'v2',   name:'qwen2.5-3b · v2',    prefs:118, col:C.inter },
+];
+const BRIEFS = ['Saturn V S-IC booster','Pencil engine transition','Low-noise drone prop','Ramjet inlet M2-4'];
+const SAMPLE = {
+  base: {
+    text:`# F-1 cluster v0\n- 5× chamber, fixed nozzle\n- TWR target: 2.1\n- Material: Inconel 718\n- DfAM: ⚠ no overhang check\n- Mass: ~8400 kg (uncertain)`,
+    metrics:{ mass:'⚠', dfam:'fail', cost:'high', verify:2 }, color:C.ink3,
+  },
+  v1: {
+    text:`# F-1 cluster v1\n- 5× chamber, gimbal ±5°\n- TWR target: 2.4 (±0.1)\n- Material: Inconel 718, post-HIP\n- DfAM: ✓ overhang ≥ 30° checked\n- Mass: 7820 kg ±2.1%`,
+    metrics:{ mass:'✓', dfam:'partial', cost:'mid', verify:5 }, color:C.lh2,
+  },
+  v2: {
+    text:`# F-1 cluster v2 (DPO)\n- 5× chamber, regen + film cooling\n- TWR: 2.51 (±0.06)\n- Material: GRCop-42 + IN718 hybrid\n- DfAM: ✓ overhang · ✓ channel ≥ 1.5 mm · ✓ stock\n- Mass: 7240 kg ±1.4%\n- Assembly: bolt M8 × 24 · torque 42 Nm`,
+    metrics:{ mass:'✓', dfam:'pass', cost:'low', verify:8 }, color:C.inter,
+  },
+};
+
+function Pill({c,children}){return <span className="mono" style={{fontSize:10,color:c,border:`1px solid ${c}`,padding:'2px 8px',letterSpacing:'.08em'}}>{children}</span>;}
+
+function Pane({v}){
+  const d = SAMPLE[v.id];
+  return (
+    <div style={{border:`1px solid ${v.col}`,padding:16,background:C.canvas2}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10,gap:10}}>
+        <div>
+          <div className="mono" style={{fontSize:10,color:v.col,letterSpacing:'.12em'}}>{v.name.toUpperCase()}</div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:2}}>{v.prefs} prefs in lineage</div>
+        </div>
+        <Pill c={v.col}>{v.id}</Pill>
+      </div>
+      <pre style={{fontFamily:C.mono,fontSize:11.5,color:C.ink2,whiteSpace:'pre-wrap',lineHeight:1.55,margin:0,padding:'10px 12px',border:`1px dashed ${C.frame}`,minHeight:170}}>{d.text}</pre>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginTop:10}}>
+        {[
+          ['MASS', d.metrics.mass, d.metrics.mass==='✓'?C.inter:C.risk],
+          ['DfAM', d.metrics.dfam, d.metrics.dfam==='pass'?C.inter:d.metrics.dfam==='partial'?C.lh2:C.risk],
+          ['COST', d.metrics.cost, d.metrics.cost==='low'?C.inter:d.metrics.cost==='mid'?C.lh2:C.risk],
+          ['VERIFY[]', `${d.metrics.verify}/8`, d.metrics.verify>=7?C.inter:d.metrics.verify>=4?C.lh2:C.risk],
+        ].map(([k,vl,c])=>(
+          <div key={k} style={{padding:'6px 8px',border:`1px solid ${C.frame}`,textAlign:'center'}}>
+            <div className="mono" style={{fontSize:9,color:C.ink3,letterSpacing:'.08em'}}>{k}</div>
+            <div className="mono" style={{fontSize:11,color:c,marginTop:3}}>{vl}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [a,setA] = useState('base');
+  const [b,setB] = useState('v2');
+  const [brief,setBrief] = useState(BRIEFS[0]);
+  const va = VERSIONS.find(v=>v.id===a), vb = VERSIONS.find(v=>v.id===b);
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'28px 24px 60px'}}>
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:14,marginBottom:18}}>
+        <div className="mono" style={{fontSize:11,color:C.halo,letterSpacing:'.14em'}}>COMPARE · MODEL VERSIONS</div>
+        <h1 style={{color:C.ink,fontSize:28,margin:'4px 0 4px',fontWeight:600}}>Did the retrain actually help?</h1>
+        <p style={{color:C.ink3,fontSize:13,margin:0,maxWidth:760}}>Same brief, two model versions side-by-side. The whole point of the self-loop — make it visible.</p>
+      </div>
+
+      {/* controls */}
+      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr',gap:14,marginBottom:14,alignItems:'end'}}>
+        <div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.1em',marginBottom:4}}>BRIEF</div>
+          <select value={brief} onChange={e=>setBrief(e.target.value)} style={{width:'100%',padding:'7px 10px',background:C.canvas2,color:C.ink,border:`1px solid ${C.frame}`,fontFamily:C.mono,fontSize:12}}>
+            {BRIEFS.map(b=><option key={b}>{b}</option>)}
+          </select>
+        </div>
+        <div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.1em',marginBottom:4}}>LEFT</div>
+          <select value={a} onChange={e=>setA(e.target.value)} style={{width:'100%',padding:'7px 10px',background:C.canvas2,color:C.ink,border:`1px solid ${C.frame}`,fontFamily:C.mono,fontSize:12}}>
+            {VERSIONS.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.1em',marginBottom:4}}>RIGHT</div>
+          <select value={b} onChange={e=>setB(e.target.value)} style={{width:'100%',padding:'7px 10px',background:C.canvas2,color:C.ink,border:`1px solid ${C.frame}`,fontFamily:C.mono,fontSize:12}}>
+            {VERSIONS.map(v=><option key={v.id} value={v.id}>{v.name}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* panes */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:18}}>
+        <Pane v={va}/><Pane v={vb}/>
+      </div>
+
+      {/* delta */}
+      <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas2}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em',marginBottom:8}}>DELTA · {va.name} → {vb.name}</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+          {[
+            ['Mass uncertainty','±2.1% → ±1.4%', C.inter],
+            ['DfAM checks',     '0 → 3 passing', C.inter],
+            ['verify[] coverage','2/8 → 8/8',    C.inter],
+            ['Diversity (vs siblings)','0.42 → 0.61', C.lh2],
+          ].map(([k,v,c])=>(
+            <div key={k} style={{padding:10,border:`1px dashed ${C.frame}`}}>
+              <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.06em'}}>{k}</div>
+              <div className="mono" style={{fontSize:12,color:c,marginTop:4}}>{v}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{marginTop:18,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>compare reads from save/sessions/&lt;ts&gt;/blueprint.md per version</span>
+        <span><a href="SelfLoop.html" style={{color:C.lox}}>SelfLoop</a> · <a href="Minimal.html" style={{color:C.lox}}>Minimal</a> · <a href="Output.html" style={{color:C.lox}}>Output</a></span>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Compare'),100);
+</script>
+</body>
+</html>

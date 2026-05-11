@@ -1,0 +1,42 @@
+{
+  "schema_version": "bp-npu-backend-1",
+  "mode": "file_only_placeholder",
+  "note": "This file only records the intended local runtime. It does not install, start, or download anything.",
+  "preferred_backend": "ollama_ipex_portable",
+  "backends": {
+    "ollama_ipex_portable": {
+      "type": "ollama_api",
+      "runtime_status": "planned_optional_external_runtime",
+      "release_basis": {
+        "project": "ipex-llm",
+        "tag": "v2.3.0-nightly",
+        "release_url": "https://github.com/ipex-llm/ipex-llm/releases/tag/v2.3.0-nightly",
+        "windows_asset": "ollama-ipex-llm-2.3.0b20250725-win.zip",
+        "ubuntu_asset": "ollama-ipex-llm-2.3.0b20250725-ubuntu.tgz",
+        "ollama_compatibility_note": "Release notes state that ollama-ipex-llm portable zip supports Ollama v0.9.3 starting from 2.3.0b20250630."
+      },
+      "acceleration_target": "Intel GPU/iGPU/Arc through IPEX-LLM portable Ollama; NPU/OpenVINO is separate future evaluation.",
+      "host": "http://127.0.0.1:11434",
+      "portable_root": "C:/Ollama-IPEX",
+      "ollama_exe": "C:/Ollama-IPEX/ollama.exe",
+      "default_model": "qwen2.5:7b",
+      "candidate_models": [
+        "qwen2.5:7b",
+        "llama3.1:8b",
+        "gemma2:9b",
+        "deepseek-r1:7b"
+      ],
+      "options": {
+        "num_ctx": 8192,
+        "temperature": 0.35,
+        "top_p": 0.9,
+        "repeat_penalty": 1.08
+      }
+    },
+    "browser_demo": {
+      "type": "static_html",
+      "enabled": true,
+      "description": "HTML files can be opened directly without backend. Buttons may remain demo-only until bridge integration."
+    }
+  }
+}

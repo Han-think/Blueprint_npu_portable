@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Home</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>body{margin:0;background:#0c1e35;min-height:100vh;font-family:'Inter','Noto Sans KR',system-ui,sans-serif;color:#e6ecf5;}</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+  sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
+};
+function Card({href, num, title, sub, accent, status}){
+  return (
+    <a href={href} style={{display:'block',textDecoration:'none',border:`1px solid ${C.frame}`,padding:22,background:C.canvas2,position:'relative',transition:'border-color .15s'}}
+       onMouseEnter={e=>e.currentTarget.style.borderColor=accent} onMouseLeave={e=>e.currentTarget.style.borderColor=C.frame}>
+      <div className="mono" style={{fontSize:10,color:accent,letterSpacing:'.14em',marginBottom:8}}>STEP {num}{status?` · ${status}`:''}</div>
+      <div style={{color:C.ink,fontSize:18,fontWeight:600,marginBottom:6}}>{title}</div>
+      <div style={{color:C.ink3,fontSize:13,lineHeight:1.5,textWrap:'pretty'}}>{sub}</div>
+      <div className="mono" style={{position:'absolute',top:18,right:20,fontSize:14,color:accent}}>→</div>
+    </a>
+  );
+}
+
+function App(){
+  return (
+    <div style={{maxWidth:1100,margin:'0 auto',padding:'40px 24px 60px'}}>
+
+      {/* HERO */}
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:28,marginBottom:32}}>
+        <div className="mono" style={{fontSize:11,color:C.halo,letterSpacing:'.16em'}}>BLUEPRINT · NPU · v0.4-alpha</div>
+        <h1 style={{color:C.ink,fontSize:42,margin:'10px 0 12px',fontWeight:600,letterSpacing:'-0.01em',textWrap:'balance'}}>
+          Local AI design copilot for <span style={{color:C.lox}}>3D-printable</span> mechanical parts.
+        </h1>
+        <p style={{color:C.ink2,fontSize:16,margin:0,maxWidth:780,textWrap:'pretty',lineHeight:1.6}}>
+          Brief → 3 candidate blueprints → BOM + drawings → print queue.
+          Runs entirely on your Intel NPU. Nothing leaves your machine.
+        </p>
+        <div style={{display:'flex',gap:16,marginTop:18,fontFamily:C.mono,fontSize:11,color:C.ink3,letterSpacing:'.06em'}}>
+          <span>● intel npu 4 / arc xpu</span>
+          <span>● openvino int4</span>
+          <span>● offline · zero telemetry</span>
+        </div>
+      </div>
+
+      {/* PRIMARY PATH */}
+      <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.14em',marginBottom:14}}>FIRST TIME HERE? FOLLOW STEPS 1→3.</div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14,marginBottom:32}}>
+        <Card href="Setup.html"   num="01" accent={C.lox}   title="Setup"   sub="Driver · venv · deps · drop a model into models/ov_npu_ready/. ~30 min once." status="check"/>
+        <Card href="Run.html"     num="02" accent={C.inter} title="Run"     sub="Single-page checklist. Verify NPU, launch python, open the daily UI." status="checklist"/>
+        <Card href="Minimal.html" num="03" accent={C.halo}  title="Design"  sub="Daily driver. Brief → 3 variants → choose → retrain." status="daily"/>
+      </div>
+
+      {/* TROUBLESHOOT */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:32}}>
+        <a href="Errors.html" style={{textDecoration:'none',border:`1px dashed ${C.risk}`,padding:18,background:'rgba(255,159,181,0.04)'}}>
+          <div className="mono" style={{fontSize:10,color:C.risk,letterSpacing:'.14em',marginBottom:6}}>TROUBLESHOOT</div>
+          <div style={{color:C.ink,fontSize:15,fontWeight:600,marginBottom:4}}>Something not working?</div>
+          <div style={{color:C.ink3,fontSize:12.5,lineHeight:1.5}}>5 most common failures (NPU not found · server offline · GGUF · DPO OOM · empty model folder) + exact fix paths.</div>
+        </a>
+        <a href="Output.html" style={{textDecoration:'none',border:`1px solid ${C.frame}`,padding:18,background:C.canvas2}}>
+          <div className="mono" style={{fontSize:10,color:C.lh2,letterSpacing:'.14em',marginBottom:6}}>WHAT YOU GET OUT</div>
+          <div style={{color:C.ink,fontSize:15,fontWeight:600,marginBottom:4}}>Output artifacts</div>
+          <div style={{color:C.ink3,fontSize:12.5,lineHeight:1.5}}>Per-session tree: blueprint.md · part_tree.json · *.svg · *.stl · *.gcode + assembly order. Honest about what works today vs roadmap.</div>
+        </a>
+      </div>
+
+      {/* SECONDARY (vision/explore) */}
+      <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.14em',marginBottom:14}}>EXPLORE THE VISION (MOCK · NOT WIRED YET)</div>
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:32}}>
+        <a href="SelfLoop.html" style={{textDecoration:'none',border:`1px solid ${C.frame}`,padding:18,background:C.canvas2}}>
+          <div className="mono" style={{fontSize:10,color:C.halo,letterSpacing:'.14em',marginBottom:6}}>VISION · SelfLoop</div>
+          <div style={{color:C.ink,fontSize:15,fontWeight:600,marginBottom:4}}>Self-improving loop</div>
+          <div style={{color:C.ink3,fontSize:12.5,lineHeight:1.5}}>Generate → judge → DPO retrain → diversity-press. Failure bucket on the side. The North Star UI.</div>
+        </a>
+        <a href="End_to_End.html" style={{textDecoration:'none',border:`1px solid ${C.frame}`,padding:18,background:C.canvas2}}>
+          <div className="mono" style={{fontSize:10,color:C.halo,letterSpacing:'.14em',marginBottom:6}}>VISION · Pipeline</div>
+          <div style={{color:C.ink,fontSize:15,fontWeight:600,marginBottom:4}}>End-to-end pipeline</div>
+          <div style={{color:C.ink3,fontSize:12.5,lineHeight:1.5}}>8-stage architecture: brief → tokens → spec → mesh → slice → gcode → print → verify.</div>
+        </a>
+      </div>
+
+      {/* FOOTER */}
+      <div style={{borderTop:`1px solid ${C.frame}`,paddingTop:16,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>github.com/Han-think/Blueprint_npu</span>
+        <span>design-system: <a href="ui_kits/blueprint_artifact/index.html" style={{color:C.lox}}>blueprint_artifact</a> · <a href="ui_kits/gradio_workbench/index.html" style={{color:C.lox}}>gradio_workbench</a></span>
+      </div>
+
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+window.BPMountTopNav && window.BPMountTopNav('Home');
+setTimeout(()=>window.BPMountTopNav && window.BPMountTopNav('Home'), 100);
+</script>
+</body>
+</html>

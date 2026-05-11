@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blueprint Artifact — UI Kit</title>
+  <link rel="stylesheet" href="../../colors_and_type.css">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    body{margin:0;background:#0c1e35;}
+    #root{padding:24px;}
+  </style>
+</head>
+<body class="bp">
+  <div id="root"></div>
+  <script type="text/babel" src="Components.jsx"></script>
+  <script type="text/babel">
+    const tree = {
+      id:"SV", name:"saturn_v",
+      children:[
+        {id:"S-IC", name:"stage_1", qty:1, material:"Al-alloy", process:"AM + machining",
+          children:[{id:"F1", name:"engine_F1", qty:5, material:"Inconel 718"}]},
+        {id:"S-II",  name:"stage_2", qty:1},
+        {id:"S-IVB", name:"stage_3", qty:1}
+      ]
+    };
+
+    function Demo(){
+      return (
+        <Frame title="SATURN V — HORIZONTAL STAGE OVERVIEW (1→2→3)" subtitle="Scale 12.0 mm/m" width={900} height={640}>
+          <svg viewBox="0 0 900 580" width="100%" style={{display:'block'}}>
+            {/* S-IC */}
+            <Stage x={40} y={70} w={120} h={500} label="S‑IC (1단)" diameter="Ø33 ft"/>
+            <Tank x={46} y={76} w={108} h={200} color={BP_COLORS.lox} label="LOX"/>
+            <Interstage x={46} y={282} w={108} dashes="8 4" color={BP_COLORS.intertank} label=""/>
+            <Tank x={46} y={296} w={108} h={266} color={BP_COLORS.lh2} label="RP‑1" radius={28}/>
+            <EngineRow cx={100} y={574} count={5} size={16} gap={22} label="F‑1 ×5"/>
+
+            {/* S-II */}
+            <Stage x={280} y={276} w={120} h={300} label="S‑II (2단)" diameter="Ø33 ft"/>
+            <Tank x={286} y={282} w={108} h={60} color={BP_COLORS.lox} label="LOX" radius={22}/>
+            <Tank x={286} y={364} w={108} h={190} color={BP_COLORS.intertank2} label="LH2" radius={24}/>
+            <EngineRow cx={340} y={578} count={5} size={14} gap={18} label="J‑2 ×5"/>
+
+            {/* S-IVB */}
+            <Stage x={500} y={360} w={80} h={215} label="S‑IVB (3단)" diameter="Ø21.7 ft"/>
+            <Tank x={506} y={366} w={68} h={50} color={BP_COLORS.lox} label="LOX" radius={18}/>
+            <Tank x={506} y={434} w={68} h={120} color={BP_COLORS.intertank2} label="LH2" radius={20}/>
+            <EngineRow cx={540} y={578} count={1} size={14} gap={18} label="J‑2 ×1"/>
+
+            {/* Legend */}
+            <Legend x={660} y={20} width={220} items={[
+              {color:BP_COLORS.lox, label:'LOX tank/line'},
+              {color:BP_COLORS.intertank2, label:'LH2 tank'},
+              {color:BP_COLORS.lh2, label:'RP‑1 tank'},
+              {color:BP_COLORS.engineStroke, label:'Engine schematics'},
+            ]}/>
+          </svg>
+
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16}}>
+            <div className="card">
+              <div className="chip">PART TREE</div>
+              <PartTreeBlock tree={tree}/>
+            </div>
+            <div className="card">
+              <div className="chip">ACTIONS</div>
+              <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:8}}>
+                <Button variant="primary">Run NPU only</Button>
+                <Button variant="go">Run Both</Button>
+                <Button variant="warn">Build brief</Button>
+                <Button>Add to Batch</Button>
+              </div>
+              <div style={{marginTop:14,display:'flex',gap:8,flexWrap:'wrap'}}>
+                <LaneChip color={BP_COLORS.lox}>LOX</LaneChip>
+                <LaneChip color={BP_COLORS.lh2}>LH2</LaneChip>
+                <LaneChip color={BP_COLORS.intertank}>INTERTANK</LaneChip>
+                <LaneChip color={BP_COLORS.halo}>INSTRUMENT UNIT</LaneChip>
+              </div>
+            </div>
+          </div>
+        </Frame>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+  </script>
+</body>
+</html>

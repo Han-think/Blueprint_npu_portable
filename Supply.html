@@ -1,0 +1,263 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Supply · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Supply'),100);</script>
+<script type="text/babel">
+const {useState}=React;
+const C={canvas:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// BOM with vendor, lot, lead-time, AS9100 CoC. Build target: 2026-05-30 (T-0)
+// "today" = 2026-04-27 → 33 days to T-0
+const T0_DAYS = 33;
+const ITEMS = [
+  { id:'M-GR42',  cat:'powder',   desc:'GRCop-42 powder · 30µm AP', qty:'18 kg', vendor:'Carpenter',  lot:'LB-1142', lead:42, eta:6,  coc:'pending', usedBy:['P1','P8','P15'] },
+  { id:'M-IN718', cat:'powder',   desc:'IN718 powder · 25µm AP',    qty:'12 kg', vendor:'AP&C',       lot:'AP-3309', lead:35, eta:-2, coc:'received', usedBy:['P2','P9','P14','P4'] },
+  { id:'M-T64',   cat:'powder',   desc:'Ti-6Al-4V powder · 30µm',   qty:'4 kg',  vendor:'AP&C',       lot:'AP-3287', lead:28, eta:-8, coc:'received', usedBy:['P10'] },
+  { id:'M-316L',  cat:'stock',    desc:'316L bar · Ø80 × 200 mm',   qty:'2 ea',  vendor:'McMaster',   lot:'MC-9120', lead:7,  eta:-12,coc:'received', usedBy:['P5'] },
+  { id:'F-HL08',  cat:'fastener', desc:'Hi-Lok HL18 Ti · 8mm × 24', qty:'120 ea',vendor:'LISI Aero',  lot:'LI-7741', lead:21, eta:-5, coc:'received', usedBy:['J03','J05'] },
+  { id:'F-VB02',  cat:'fastener', desc:'Marman V-band · Ø150',     qty:'4 ea',  vendor:'Eaton',      lot:'EA-2218', lead:49, eta:14, coc:'pending', usedBy:['J07','J08'] },
+  { id:'B-SP01',  cat:'bearing',  desc:'Spherical bearing GE20',    qty:'4 ea',  vendor:'SKF',        lot:'SK-4429', lead:14, eta:-6, coc:'received', usedBy:['P10','J11'] },
+  { id:'S-OR03',  cat:'seal',     desc:'O-ring cryo · Viton ETP',   qty:'40 ea', vendor:'Parker',     lot:'PK-1812', lead:10, eta:-4, coc:'received', usedBy:['J04','J06'] },
+  { id:'E-CN41',  cat:'elec',     desc:'MIL-DTL-38999 · 41pin',     qty:'2 ea',  vendor:'Amphenol',   lot:'AM-7702', lead:56, eta:21, coc:'pending', usedBy:['P12','ICD-IF-E01'] },
+  { id:'E-CN13',  cat:'elec',     desc:'MIL-DTL-38999 · 13pin TVC', qty:'4 ea',  vendor:'Amphenol',   lot:'AM-7704', lead:49, eta:14, coc:'pending', usedBy:['P10','ICD-IF-E02'] },
+  { id:'T-AFM',   cat:'service',  desc:'AFM throat polish service', qty:'1 lot', vendor:'Extrude Hone',lot:'EH-0451',lead:14, eta:-2, coc:'received', usedBy:['P8'] },
+  { id:'T-HIP',   cat:'service',  desc:'HIP cycle · Ar 100MPa/1180C',qty:'1 lot',vendor:'Aalberts',   lot:'AB-2247', lead:21, eta:5,  coc:'pending', usedBy:['P1','P8','P15'] },
+];
+
+const CAT = {
+  powder:  {name:'POWDER',   c:C.lox},
+  stock:   {name:'STOCK',    c:C.lox},
+  fastener:{name:'FASTENER', c:C.inter},
+  bearing: {name:'BEARING',  c:C.inter},
+  seal:    {name:'SEAL',     c:C.lh2},
+  elec:    {name:'ELEC',     c:C.halo},
+  service: {name:'SERVICE',  c:C.lh2},
+};
+
+function statusOf(eta){
+  if(eta < 0)  return {label:'ON-HAND', c:C.inter, days:`${-eta}d ago`};
+  if(eta === 0) return {label:'ARRIVES TODAY', c:C.lh2, days:'0d'};
+  if(eta <= T0_DAYS) return {label:'IN TRANSIT', c:C.lh2, days:`T-${T0_DAYS-eta}d`};
+  return {label:'LATE · BLOCKS BUILD', c:C.risk, days:`T+${eta-T0_DAYS}d`};
+}
+
+function App(){
+  const [sel,setSel] = useState('F-VB02');
+  const [filter,setFilter] = useState('ALL');
+
+  const filtered = ITEMS.filter(i=>{
+    if(filter==='ALL') return true;
+    if(filter==='LATE') return i.eta > T0_DAYS;
+    if(filter==='PENDING-COC') return i.coc==='pending';
+    return i.cat===filter.toLowerCase();
+  });
+  const sI = ITEMS.find(i=>i.id===sel) || ITEMS[0];
+
+  const onHand   = ITEMS.filter(i=>i.eta<=0).length;
+  const inTransit= ITEMS.filter(i=>i.eta>0 && i.eta<=T0_DAYS).length;
+  const late     = ITEMS.filter(i=>i.eta>T0_DAYS).length;
+  const pendCoC  = ITEMS.filter(i=>i.coc==='pending').length;
+  const totalCoC = ITEMS.length;
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>Supply</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          BOM · vendor · lot · CoC · T-0 lock 2026-05-30 · {T0_DAYS} days remaining
+        </span>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(6,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'BOM ITEMS', v:ITEMS.length, c:C.lox,   s:'unique line items'},
+          {k:'ON HAND',   v:onHand,       c:C.inter, s:'received w/ CoC'},
+          {k:'IN TRANSIT',v:inTransit,    c:C.lh2,   s:'arrive before T-0'},
+          {k:'LATE',      v:late,         c:C.risk,  s:'blocks build'},
+          {k:'COC PEND',  v:`${pendCoC}/${totalCoC}`, c:C.lh2, s:'AS9100 docs'},
+          {k:'LONG LEAD', v:'V-band',     c:C.risk,  s:'49d critical path'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.c2,padding:'10px 12px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:18,marginTop:4}}>{t.v}</div>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* timeline: each item as horizontal bar from order → eta, with T-0 line */}
+      <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14,marginBottom:14}}>
+        <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em',marginBottom:10}}>
+          DELIVERY TIMELINE · T-0 = build lock
+        </div>
+        <svg viewBox="0 0 1100 380" style={{width:'100%',height:'auto',background:C.c3}}>
+          {/* time axis: -60d on left, +30d on right (90d span) */}
+          {(() => {
+            const xMin=-60, xMax=30;
+            const xPx = d => 130 + ((d-xMin)/(xMax-xMin)) * 940;
+            const t0X = xPx(T0_DAYS - T0_DAYS); // T-0 = relative day 0 (today is T-33)
+            // Actually let's redo: today=0, T-0=+33
+            const X = d => 130 + ((d-xMin)/(xMax-xMin)) * 940;
+            return <>
+              {/* day grid */}
+              {[-60,-40,-20,0,T0_DAYS].map(d=>(
+                <g key={d}>
+                  <line x1={X(d)} y1={20} x2={X(d)} y2={360} stroke={C.frame} strokeDasharray="2 3" opacity={0.5}/>
+                  <text x={X(d)} y={14} fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="middle">
+                    {d===0?'TODAY':d===T0_DAYS?'T-0':`${d>0?'+':''}${d}d`}
+                  </text>
+                </g>
+              ))}
+              {/* today marker (bolder) */}
+              <line x1={X(0)} y1={20} x2={X(0)} y2={360} stroke={C.lox} strokeWidth="1"/>
+              <line x1={X(T0_DAYS)} y1={20} x2={X(T0_DAYS)} y2={360} stroke={C.inter} strokeWidth="1.5"/>
+
+              {/* item bars */}
+              {ITEMS.map((it,i)=>{
+                const y = 30 + i*27;
+                const orderDay = it.eta - it.lead;
+                const etaDay = it.eta;
+                const st = statusOf(it.eta);
+                const isSel = sel===it.id;
+                const col = it.eta>T0_DAYS ? C.risk : (it.eta>0 ? C.lh2 : C.inter);
+                return (
+                  <g key={it.id} style={{cursor:'pointer'}} onClick={()=>setSel(it.id)}>
+                    {/* label */}
+                    <text x={125} y={y+3} fill={isSel?C.lox:C.ink2} fontSize="10" fontFamily="JetBrains Mono" textAnchor="end">
+                      {it.id}
+                    </text>
+                    {/* bar from order to eta */}
+                    <line x1={X(orderDay)} y1={y} x2={X(etaDay)} y2={y} stroke={col} strokeWidth={isSel?5:3} opacity={isSel?1:0.6}/>
+                    {/* eta tick */}
+                    <circle cx={X(etaDay)} cy={y} r={isSel?4:3} fill={col}/>
+                    {/* days label */}
+                    <text x={X(etaDay)+8} y={y+3} fill={col} fontSize="9" fontFamily="JetBrains Mono">{st.days}</text>
+                  </g>
+                );
+              })}
+            </>;
+          })()}
+        </svg>
+        <div style={{display:'flex',gap:14,marginTop:8,fontSize:9.5}} className="mono">
+          {[
+            {c:C.inter,l:'on hand'},{c:C.lh2,l:'in transit'},{c:C.risk,l:'late · blocks T-0'},
+          ].map(b=>(
+            <span key={b.l} style={{display:'inline-flex',gap:6,alignItems:'center'}}>
+              <span style={{width:14,height:3,background:b.c,display:'inline-block'}}/>
+              <span style={{color:C.ink2}}>{b.l}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* filter + ledger */}
+      <div style={{display:'flex',gap:6,marginBottom:10,flexWrap:'wrap'}} className="mono">
+        {['ALL','LATE','PENDING-COC','POWDER','FASTENER','SERVICE','ELEC'].map(f=>(
+          <button key={f} onClick={()=>setFilter(f)}
+            style={{background:filter===f?C.c2:'transparent',color:filter===f?C.lox:C.ink3,
+                    border:`1px solid ${filter===f?C.lox:C.frame}`,padding:'4px 12px',
+                    fontSize:10,letterSpacing:'.1em',cursor:'pointer',fontFamily:'JetBrains Mono'}}>
+            {f}
+          </button>
+        ))}
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1.3fr 1fr',gap:14}}>
+        <div style={{border:`1px solid ${C.frame}`,background:C.c2}}>
+          <div className="mono" style={{display:'grid',gridTemplateColumns:'70px 70px 1fr 90px 90px',
+                  fontSize:9.5,letterSpacing:'.08em',color:C.ink3,padding:'10px 12px',
+                  borderBottom:`1px solid ${C.frame}`}}>
+            <span>ID</span><span>CAT</span><span>DESC · VENDOR</span><span>LOT</span><span style={{textAlign:'right'}}>STATUS</span>
+          </div>
+          {filtered.map(it=>{
+            const isSel = sel===it.id;
+            const st = statusOf(it.eta);
+            return (
+              <div key={it.id} onClick={()=>setSel(it.id)}
+                style={{display:'grid',gridTemplateColumns:'70px 70px 1fr 90px 90px',cursor:'pointer',
+                        padding:'9px 12px',borderBottom:`1px solid ${C.frame}`,
+                        background:isSel?C.c3:'transparent',alignItems:'center'}}>
+                <span className="mono" style={{color:isSel?C.lox:C.ink,fontSize:10.5}}>{it.id}</span>
+                <span className="mono" style={{color:CAT[it.cat].c,fontSize:9}}>{CAT[it.cat].name}</span>
+                <div>
+                  <div className="mono" style={{color:C.ink,fontSize:10.5}}>{it.desc}</div>
+                  <div className="mono" style={{color:C.ink3,fontSize:9}}>{it.vendor} · {it.qty}</div>
+                </div>
+                <span className="mono" style={{color:C.ink2,fontSize:9.5}}>{it.lot}</span>
+                <span className="mono" style={{color:st.c,fontSize:9,letterSpacing:'.06em',textAlign:'right'}}>{st.label}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* detail */}
+        <div style={{border:`1px solid ${CAT[sI.cat].c}`,background:C.c2,padding:16}}>
+          <div style={{display:'flex',gap:10,alignItems:'baseline',marginBottom:10}}>
+            <span className="mono" style={{color:CAT[sI.cat].c,fontSize:13}}>{sI.id}</span>
+            <span className="mono" style={{color:C.ink3,fontSize:10}}>{CAT[sI.cat].name}</span>
+            <span style={{flex:1}}/>
+            <span className="mono" style={{color:statusOf(sI.eta).c,fontSize:9.5,letterSpacing:'.08em',
+                          border:`1px solid ${statusOf(sI.eta).c}`,padding:'2px 8px'}}>
+              {statusOf(sI.eta).label}
+            </span>
+          </div>
+          <div style={{color:C.ink,fontSize:13,marginBottom:14}}>{sI.desc}</div>
+
+          <div style={{display:'grid',gridTemplateColumns:'90px 1fr',gap:'4px 12px',fontSize:11,lineHeight:1.55,marginBottom:14}} className="mono">
+            <span style={{color:C.ink3}}>VENDOR</span>   <span style={{color:C.ink}}>{sI.vendor}</span>
+            <span style={{color:C.ink3}}>QTY</span>      <span style={{color:C.ink}}>{sI.qty}</span>
+            <span style={{color:C.ink3}}>LOT / S/N</span><span style={{color:C.lox}}>{sI.lot}</span>
+            <span style={{color:C.ink3}}>LEAD TIME</span><span style={{color:C.ink}}>{sI.lead} days</span>
+            <span style={{color:C.ink3}}>ETA</span>      <span style={{color:statusOf(sI.eta).c}}>{statusOf(sI.eta).days}</span>
+            <span style={{color:C.ink3}}>AS9100 CoC</span><span style={{color:sI.coc==='received'?C.inter:C.lh2}}>
+              {sI.coc.toUpperCase()}
+            </span>
+          </div>
+
+          <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em',marginBottom:6}}>USED BY</div>
+          <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:14}}>
+            {sI.usedBy.map(u=>(
+              <span key={u} className="mono" style={{color:C.lox,fontSize:10,
+                          border:`1px solid ${C.frame}`,padding:'3px 8px',background:C.c3}}>{u}</span>
+            ))}
+          </div>
+
+          {sI.coc==='pending' && (
+            <div style={{padding:10,border:`1px dashed ${C.lh2}`,background:C.c3}}>
+              <div className="mono" style={{color:C.lh2,fontSize:9.5,letterSpacing:'.12em',marginBottom:4}}>
+                AS9100 GATE
+              </div>
+              <div className="mono" style={{color:C.ink,fontSize:10.5,lineHeight:1.5}}>
+                CoC required before lot can release to build. Powder lots also need coupon FAI.
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.c3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · supply.v0.1 · doc BP-SPL-A</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "T-0":      "2026-05-30 · build lock for SN-002",
+  "policy":   { "no_install_without_coc": true,
+                "powder_lot_requires_fai_coupon": true,
+                "late_eta_blocks_build": "eta > T-0" },
+  "vendors":  { "AS9100_certified": ["Carpenter","AP&C","LISI","Eaton","Aalberts","Amphenol"] },
+  "lot_trace":"every install logged to Lineage with vendor lot + CoC ref",
+  "links":    ["parts.P##","joints.J##","lineage","ops","ecn"]
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

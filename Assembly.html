@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Assembly Tree · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>
+  body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}
+  .mono{font-family:'JetBrains Mono',monospace}
+  button{cursor:pointer;font-family:Inter,sans-serif;background:transparent;border:1px solid #274a79;color:#eaf2ff;padding:6px 12px;font-size:11px;letter-spacing:.04em}
+  button:hover{border-color:#9fd3ff;color:#9fd3ff}
+  button.on{background:#9fd3ff;color:#0c1e35;border-color:#9fd3ff}
+</style>
+</head>
+<body class="bp">
+<div id="topnav"></div>
+<div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Assembly'),100);</script>
+<script type="text/babel">
+const {useState,useMemo} = React;
+const C={canvas:'#0c1e35',canvas2:'#0a1a2f',canvas3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#ff9fc6',risk:'#ff8c8c',mono:"'JetBrains Mono',monospace"};
+
+// PRINTER ENVELOPE (Bambu X1C class)
+const BED = {x:256, y:256, z:256}; // mm
+
+// HIERARCHY: VEHICLE > ASSEMBLY > SUBASSY > PART
+// Each part has bbox + datum origin (anchor on vehicle) + print_pose (orientation for FDM/LPBF)
+const TREE = {
+  id:'V1', label:'Methalox demonstrator · 1/8 scale', kind:'vehicle',
+  children:[
+    {id:'A1', label:'Propellant section', kind:'assembly', color:C.lox,
+     children:[
+       {id:'S1', label:'LOX tank', kind:'subassy',
+        children:[
+          {id:'P1', label:'Dome upper',  kind:'part', bbox:[180,180,40], origin:[0,0,420], pose:'flat',  mat:'PA-CF', t:120, prio:1},
+          {id:'P2', label:'Barrel ring', kind:'part', bbox:[180,180,60], origin:[0,0,360], pose:'flat',  mat:'PA-CF', t:140, prio:1},
+          {id:'P3', label:'Dome lower',  kind:'part', bbox:[180,180,40], origin:[0,0,300], pose:'flat',  mat:'PA-CF', t:120, prio:1},
+        ]},
+       {id:'S2', label:'CH4 tank', kind:'subassy',
+        children:[
+          {id:'P4', label:'Dome upper',  kind:'part', bbox:[180,180,40], origin:[0,0,260], pose:'flat',  mat:'PA-CF', t:120, prio:2},
+          {id:'P5', label:'Barrel ring', kind:'part', bbox:[180,180,60], origin:[0,0,200], pose:'flat',  mat:'PA-CF', t:140, prio:2},
+          {id:'P6', label:'Dome lower',  kind:'part', bbox:[180,180,40], origin:[0,0,140], pose:'flat',  mat:'PA-CF', t:120, prio:2},
+        ]},
+     ]},
+    {id:'A2', label:'Thrust section', kind:'assembly', color:C.inter,
+     children:[
+       {id:'S3', label:'Thrust chamber', kind:'subassy',
+        children:[
+          {id:'P7', label:'Combustion chamber',  kind:'part', bbox:[140,140,180], origin:[0,0,80], pose:'vertical', mat:'GRCop-42 LPBF', t:480, prio:3, critical:true},
+          {id:'P8', label:'Injector head',       kind:'part', bbox:[140,140,60],  origin:[0,0,120], pose:'flat',   mat:'Inconel 718',  t:300, prio:3, critical:true},
+          {id:'P9', label:'Nozzle extension',    kind:'part', bbox:[200,200,160], origin:[0,0,-80], pose:'vertical',mat:'Inconel 625', t:540, prio:3, critical:true},
+        ]},
+       {id:'S4', label:'Thrust mount', kind:'subassy',
+        children:[
+          {id:'P10', label:'Gimbal ring',  kind:'part', bbox:[220,220,30], origin:[0,0,60], pose:'flat',  mat:'Ti-6Al-4V', t:240, prio:4},
+          {id:'P11', label:'Strut × 4',    kind:'part', bbox:[40,40,180], origin:[80,0,150], pose:'angled', mat:'Ti-6Al-4V', t:80,  prio:4, qty:4},
+        ]},
+     ]},
+    {id:'A3', label:'Avionics & lines', kind:'assembly', color:C.lh2,
+     children:[
+       {id:'S5', label:'Plumbing manifold', kind:'subassy',
+        children:[
+          {id:'P12', label:'Feed manifold',  kind:'part', bbox:[120,80,100], origin:[60,0,180], pose:'flat',  mat:'AlSi10Mg', t:200, prio:5},
+          {id:'P13', label:'Pressurant tee', kind:'part', bbox:[60,60,60],   origin:[80,0,240], pose:'flat',  mat:'AlSi10Mg', t:60,  prio:5},
+        ]},
+       {id:'S6', label:'Avionics bay', kind:'subassy',
+        children:[
+          {id:'P14', label:'Bay housing',  kind:'part', bbox:[120,90,80],   origin:[-70,0,200], pose:'flat', mat:'PETG-CF', t:180, prio:6},
+          {id:'P15', label:'Battery tray', kind:'part', bbox:[100,70,30],   origin:[-70,0,160], pose:'flat', mat:'PETG-CF', t:90,  prio:6},
+        ]},
+     ]},
+  ]
+};
+
+function flatten(node, depth=0, out=[]){
+  out.push({...node, depth});
+  (node.children||[]).forEach(c=>flatten(c, depth+1, out));
+  return out;
+}
+const FLAT = flatten(TREE);
+const PARTS = FLAT.filter(n=>n.kind==='part');
+
+// DEPENDENCY rules: subassy must be assembled before parent assembly
+const DEPS = {
+  'A1':['S1','S2'], 'A2':['S3','S4'], 'A3':['S5','S6'],
+  'V1':['A1','A2','A3'],
+  'S1':['P1','P2','P3'], 'S2':['P4','P5','P6'], 'S3':['P7','P8','P9'],
+  'S4':['P10','P11'], 'S5':['P12','P13'], 'S6':['P14','P15'],
+};
+
+// =========================================================================
+function App(){
+  const [sel, setSel] = useState('V1');
+  const [view, setView] = useState('xz'); // xz | xy
+  const [showOversize, setShowOversize] = useState(true);
+
+  const selNode = FLAT.find(n=>n.id===sel);
+
+  const oversize = PARTS.filter(p => p.bbox[0]>BED.x || p.bbox[1]>BED.y || p.bbox[2]>BED.z);
+  const totalTime = PARTS.reduce((s,p)=>s + (p.t * (p.qty||1)), 0);
+  const totalParts = PARTS.reduce((s,p)=>s + (p.qty||1), 0);
+  const critical = PARTS.filter(p=>p.critical).length;
+
+  function colorOf(node){
+    if(node.kind==='vehicle') return C.ink;
+    if(node.kind==='assembly') return node.color;
+    if(node.kind==='subassy')  return C.ink2;
+    // part: inherit assembly color
+    let p = FLAT.find(x=>x.id===node.id);
+    let parent = FLAT.find(x=>(x.children||[]).some(c=>c.id===p.id));
+    while(parent && parent.kind!=='assembly') parent = FLAT.find(x=>(x.children||[]).some(c=>c.id===parent.id));
+    return parent?.color || C.ink2;
+  }
+
+  // Build assembly order via topological walk
+  const order = useMemo(()=>{
+    // simple: assemble bottom-up by priority of constituent parts
+    const subs = FLAT.filter(n=>n.kind==='subassy').map(s=>{
+      const ps = s.children;
+      const earliest = Math.min(...ps.map(p=>p.prio));
+      const latest   = Math.max(...ps.map(p=>p.prio));
+      return {id:s.id, label:s.label, earliest, latest, parts:ps.length};
+    }).sort((a,b)=>a.earliest-b.earliest);
+    return subs;
+  },[]);
+
+  return (
+    <div style={{maxWidth:1300,margin:'0 auto',padding:'24px 28px 80px'}}>
+
+      {/* HEADER */}
+      <div style={{borderBottom:`1px solid ${C.frame}`,paddingBottom:18,marginBottom:22}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.2em',marginBottom:6}}>BLUEPRINT NPU · ASSEMBLY TREE · v0.5-spec</div>
+        <div style={{fontSize:34,fontWeight:500,letterSpacing:'-.02em',marginBottom:8}}>Vehicle → Assembly → Sub-assy → Part</div>
+        <div style={{fontSize:13,color:C.ink2,maxWidth:880,lineHeight:1.55}}>
+          A 256 mm³ desktop printer can't print a rocket in one go. Decompose the design into a hierarchy of <b style={{color:C.ink}}>independently-printable parts</b>,
+          each with a <b style={{color:C.ink}}>datum origin</b> in vehicle coordinates. Print in dependency order, assemble back to whole.
+          The LLM proposes the split; the verifier checks bbox fits, joint integrity, and assembly sequencing.
+        </div>
+      </div>
+
+      {/* TOP STATS */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:18}}>
+        {[
+          ['PARTS',          totalParts,           '#',     C.lox],
+          ['CRITICAL (LPBF)',critical,             '#',     C.halo],
+          ['PRINT TIME',     (totalTime/60).toFixed(1), 'hr',C.lh2],
+          ['OVERSIZE',       oversize.length,      'parts', oversize.length?C.risk:C.inter],
+          ['BED',            `${BED.x}³`,          'mm',    C.ink2],
+        ].map(([k,v,u,col],i)=>(
+          <div key={i} style={{border:`1px solid ${col}`,padding:'14px 16px',background:C.canvas2}}>
+            <div className="mono" style={{fontSize:9.5,color:col,letterSpacing:'.14em',marginBottom:6}}>{k}</div>
+            <div style={{fontSize:24,fontWeight:500,color:C.ink,lineHeight:1}}>{v}<span className="mono" style={{fontSize:11,color:C.ink3,marginLeft:6}}>{u}</span></div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'380px 1fr',gap:14}}>
+
+        {/* LEFT: TREE */}
+        <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:12}}>HIERARCHY</div>
+          {FLAT.map(n=>{
+            const col = colorOf(n);
+            const isSel = n.id===sel;
+            const oversized = n.kind==='part' && (n.bbox[0]>BED.x||n.bbox[1]>BED.y||n.bbox[2]>BED.z);
+            return (
+              <div key={n.id} onClick={()=>setSel(n.id)}
+                style={{paddingLeft:n.depth*16,paddingRight:8,paddingTop:4,paddingBottom:4,cursor:'pointer',
+                        background:isSel?C.canvas3:'transparent',display:'flex',alignItems:'center',gap:8,
+                        borderLeft:isSel?`2px solid ${col}`:`2px solid transparent`,marginBottom:1}}>
+                <span className="mono" style={{fontSize:10,color:col,minWidth:32,letterSpacing:'.05em'}}>{n.id}</span>
+                <span style={{fontSize:n.kind==='vehicle'?12.5:n.kind==='assembly'?12:11.5,
+                              color:isSel?C.ink:C.ink2,fontWeight:n.kind==='vehicle'||n.kind==='assembly'?500:400,flex:1}}>{n.label}</span>
+                {n.critical && <span className="mono" style={{fontSize:9,color:C.halo,letterSpacing:'.08em'}}>CRIT</span>}
+                {oversized && <span className="mono" style={{fontSize:9,color:C.risk,letterSpacing:'.08em'}}>BIG</span>}
+                {n.qty>1 && <span className="mono" style={{fontSize:9,color:C.ink3}}>×{n.qty}</span>}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* RIGHT: DETAIL */}
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+
+          {/* VEHICLE COORD VIEW */}
+          <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18,gridColumn:'1/3'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+              <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em'}}>VEHICLE COORDINATES · {view.toUpperCase()} PLANE</div>
+              <div style={{display:'flex',gap:6}}>
+                <button className={view==='xz'?'on':''} onClick={()=>setView('xz')}>XZ side</button>
+                <button className={view==='xy'?'on':''} onClick={()=>setView('xy')}>XY top</button>
+              </div>
+            </div>
+            <svg viewBox="0 0 700 360" style={{width:'100%',display:'block'}}>
+              {/* axis */}
+              {view==='xz' ? (
+                <>
+                  <line x1="350" y1="20" x2="350" y2="340" stroke={C.frame} strokeDasharray="2 4"/>
+                  <line x1="60" y1="180" x2="640" y2="180" stroke={C.frame} strokeDasharray="2 4"/>
+                  <text x="640" y="174" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="end">+X</text>
+                  <text x="358" y="28" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono">+Z</text>
+                </>
+              ) : (
+                <>
+                  <line x1="350" y1="20" x2="350" y2="340" stroke={C.frame} strokeDasharray="2 4"/>
+                  <line x1="60" y1="180" x2="640" y2="180" stroke={C.frame} strokeDasharray="2 4"/>
+                  <text x="640" y="174" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="end">+X</text>
+                  <text x="358" y="28" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono">+Y</text>
+                </>
+              )}
+              {/* parts */}
+              {PARTS.map(p=>{
+                const [bx,by,bz]=p.bbox;
+                const [ox,oy,oz]=p.origin;
+                const col = colorOf(p);
+                const isSel = p.id===sel;
+                let x,y,w,h;
+                if(view==='xz'){
+                  // map x:[-200..200] → screen 60..640 ; z:[-100..460] → 340..20 (z up)
+                  const sx=v=>350+v*0.7, sz=v=>340-(v+100)*0.55;
+                  x = sx(ox-bx/2); y = sz(oz+bz/2);
+                  w = bx*0.7;      h = bz*0.55;
+                } else {
+                  const sx=v=>350+v*0.7, sy=v=>180+v*0.7;
+                  x = sx(ox-bx/2); y = sy(oy-by/2);
+                  w = bx*0.7;      h = by*0.7;
+                }
+                return (
+                  <g key={p.id} onClick={()=>setSel(p.id)} style={{cursor:'pointer'}}>
+                    <rect x={x} y={y} width={w} height={h} fill={col} fillOpacity={isSel?0.35:0.15}
+                          stroke={col} strokeWidth={isSel?1.6:0.8}/>
+                    {isSel && (
+                      <text x={x+w/2} y={y-4} fill={col} fontSize="10" fontFamily="JetBrains Mono" textAnchor="middle">{p.id}</text>
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+
+          {/* DETAIL PANEL */}
+          <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:10}}>SELECTED · {selNode.id}</div>
+            <div style={{fontSize:18,fontWeight:500,marginBottom:14}}>{selNode.label}</div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>KIND</div>
+            <div style={{fontSize:12,color:C.ink2,marginBottom:14}}>{selNode.kind}</div>
+            {selNode.kind==='part' && (
+              <>
+                <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>BOUNDING BOX</div>
+                <div className="mono" style={{fontSize:12,color:C.ink,marginBottom:14}}>
+                  {selNode.bbox.join(' × ')} mm
+                  {(selNode.bbox[0]>BED.x||selNode.bbox[1]>BED.y||selNode.bbox[2]>BED.z) &&
+                    <span style={{color:C.risk,marginLeft:8}}>· exceeds bed</span>}
+                </div>
+                <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>DATUM ORIGIN (vehicle frame)</div>
+                <div className="mono" style={{fontSize:12,color:C.ink,marginBottom:14}}>X={selNode.origin[0]} Y={selNode.origin[1]} Z={selNode.origin[2]} mm</div>
+                <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>PRINT POSE / MATERIAL</div>
+                <div className="mono" style={{fontSize:12,color:C.ink,marginBottom:14}}>{selNode.pose} · {selNode.mat}</div>
+                <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>EST. PRINT TIME</div>
+                <div className="mono" style={{fontSize:12,color:C.lh2,marginBottom:14}}>{selNode.t} min · priority {selNode.prio}</div>
+              </>
+            )}
+            {selNode.kind!=='part' && (
+              <>
+                <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>CHILDREN</div>
+                <div style={{fontSize:12,color:C.ink2,lineHeight:1.7}}>
+                  {(selNode.children||[]).map(c=>(
+                    <div key={c.id} className="mono" style={{fontSize:11}}>
+                      <span style={{color:colorOf(c),marginRight:8}}>{c.id}</span>
+                      {c.label}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* ASSEMBLY ORDER */}
+          <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:12}}>ASSEMBLY ORDER · TOPO-SORTED</div>
+            <div style={{display:'flex',flexDirection:'column',gap:0}}>
+              {order.map((s,i)=>(
+                <div key={s.id} style={{display:'grid',gridTemplateColumns:'24px 1fr auto',gap:10,padding:'9px 0',
+                                        borderBottom:i<order.length-1?`1px dashed ${C.frame}`:'none',alignItems:'center'}}>
+                  <span className="mono" style={{fontSize:10,color:C.ink3}}>0{i+1}</span>
+                  <span style={{fontSize:12,color:C.ink2}}><span className="mono" style={{color:C.lox,marginRight:8}}>{s.id}</span>{s.label}</span>
+                  <span className="mono" style={{fontSize:10,color:C.ink3}}>{s.parts} parts</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* DATA SCHEMA */}
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18,marginTop:14}}>
+        <div className="mono" style={{fontSize:10,color:C.halo,letterSpacing:'.16em',marginBottom:12}}>SCHEMA · assembly.json (v0.5 spec)</div>
+        <pre className="mono" style={{margin:0,fontSize:10.5,lineHeight:1.6,color:C.ink2,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{`{
+  "schema": "assembly.v0.5",
+  "vehicle": "V1",
+  "frame": "+X aft, +Z up, origin at engine throat",
+  "bed_envelope": { "x_mm": 256, "y_mm": 256, "z_mm": 256 },
+  "parts": [
+    {
+      "id": "P7",
+      "label": "Combustion chamber",
+      "bbox_mm": [140, 140, 180],
+      "origin_mm": [0, 0, 80],
+      "pose": "vertical",
+      "material": "GRCop-42 LPBF",
+      "print_time_min": 480,
+      "priority": 3,
+      "critical": true,
+      "depends_on": [],
+      "joins": [
+        { "to": "P8", "type": "bolt-flange", "fasteners": "M6 × 12, 304SS", "torque_Nm": 8 },
+        { "to": "P9", "type": "v-clamp", "spec": "MS21924-08" }
+      ],
+      "datum_features": ["A: throat axis", "B: injector mount face"],
+      "tolerance_mm": 0.05
+    }
+  ],
+  "assembly_order": ["S1","S2","S3","S4","S5","S6","A1","A2","A3","V1"]
+}`}</pre>
+      </div>
+
+      <div style={{marginTop:20,fontSize:11,color:C.ink3,fontFamily:C.mono,lineHeight:1.6}}>
+        flow: LLM proposes split → verifier checks bbox ≤ bed envelope · all parts have datum + join spec · DAG is acyclic
+        → fail: re-prompt with "subdivide P-x further" · pass: emit assembly.json · slicer queues per part in priority order
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

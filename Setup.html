@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Setup</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>
+  body{margin:0;background:#0c1e35;min-height:100vh;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+  .sans{font-family:'Inter','Noto Sans KR',system-ui,sans-serif;}
+  pre{margin:0;}
+  details>summary{list-style:none;cursor:pointer;}
+  details>summary::-webkit-details-marker{display:none;}
+</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Setup'),100);</script>
+
+<script type="text/babel">
+const { useState } = React;
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  term_bg:'#000', term_green:'#2ee66b', term_dim:'#177a3a', term_warn:'#ffd37a',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+  sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
+};
+function Chip({c=C.lox, children, style}){return <span className="mono" style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:c,...style}}>{children}</span>;}
+function Btn({children, variant='default', onClick, disabled, style, size='md'}){
+  const col = variant==='primary'?C.lox:variant==='go'?C.inter:variant==='risk'?C.risk:C.ink;
+  const pad = size==='sm'?'5px 10px':'8px 14px';
+  return <button onClick={onClick} disabled={disabled} style={{fontFamily:C.mono,fontSize:size==='sm'?11:12,textTransform:'uppercase',letterSpacing:'.08em',padding:pad,background:'transparent',color:col,border:`1px solid ${col}`,borderRadius:2,cursor:disabled?'not-allowed':'pointer',opacity:disabled?.4:1,...style}}>{children}</button>;
+}
+
+// ============ STEP CARD ============
+function Step({ n, title, kicker, status, children, color=C.lox }){
+  const stateCol = status==='ok'?C.inter:status==='fail'?C.risk:status==='running'?C.lh2:C.ink3;
+  const stateLabel = status==='ok'?'✓ READY':status==='fail'?'✗ NOT FOUND':status==='running'?'◐ CHECKING':'○ PENDING';
+  return (
+    <div style={{border:`1px solid ${C.frame}`,background:C.canvas,padding:16,marginBottom:12}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:6}}>
+        <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+          <span className="mono" style={{fontSize:24,color,letterSpacing:'.06em'}}>{String(n).padStart(2,'0')}</span>
+          <div>
+            <Chip c={color}>{kicker}</Chip>
+            <h3 style={{margin:'2px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>{title}</h3>
+          </div>
+        </div>
+        <Chip c={stateCol}>{stateLabel}</Chip>
+      </div>
+      <div>{children}</div>
+    </div>
+  );
+}
+
+function Code({ children, lang='bash' }){
+  return (
+    <div style={{border:`1px solid ${C.frame}`,background:C.term_bg,padding:'10px 12px',marginTop:8,position:'relative'}}>
+      <span className="mono" style={{position:'absolute',top:6,right:10,fontSize:9,color:C.term_dim,letterSpacing:'.1em'}}>{lang.toUpperCase()}</span>
+      <pre className="mono" style={{fontSize:11.5,color:C.term_green,whiteSpace:'pre-wrap',lineHeight:1.55}}>{children}</pre>
+    </div>
+  );
+}
+
+// ============ APP ============
+function App(){
+  const [os,setOs] = useState('windows');
+  const [checks,setChecks] = useState({ driver:'pending', python:'pending', deps:'pending', model:'pending' });
+  const [busy,setBusy] = useState(null);
+
+  function runCheck(key){
+    setBusy(key);
+    setChecks(c=>({...c,[key]:'running'}));
+    setTimeout(()=>{
+      setChecks(c=>({...c,[key]:'ok'}));
+      setBusy(null);
+    }, 900);
+  }
+
+  const allOk = Object.values(checks).every(v=>v==='ok');
+
+  const driverCmd = {
+    windows: 'Download "Intel NPU Driver" from intel.com/content/www/us/en/download/...\nReboot after install.',
+    linux:   'sudo apt install intel-npu-driver\n# kernel ≥ 6.6 required',
+    mac:     '# Apple Silicon does not have Intel NPU.\n# Use the CPU/GPU fallback profile instead.',
+  }[os];
+
+  return (
+    <div style={{maxWidth:980,margin:'0 auto',padding:24,fontFamily:C.sans,color:C.ink2}}>
+
+      {/* title */}
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:14,marginBottom:18}}>
+        <Chip c={C.lh2}>FIRST RUN · ONE-TIME SETUP</Chip>
+        <h1 style={{color:C.ink,fontSize:28,margin:'6px 0 4px',fontWeight:600,letterSpacing:'-0.01em'}}>
+          Install once, then just drop in models.
+        </h1>
+        <p className="sans" style={{color:C.ink3,fontSize:14,margin:0,maxWidth:720,textWrap:'pretty'}}>
+          Blueprint NPU is a <span style={{color:C.lox}}>local desktop tool</span> — not a website.
+          The browser UI you see talks to a Python server running on your machine, which talks to your Intel NPU.
+          Setup takes ~30 minutes. After that, adding new models is drag-and-drop.
+        </p>
+      </div>
+
+      {/* HONESTY BOX */}
+      <div style={{border:`1px solid ${C.lh2}`,background:'rgba(255,211,159,0.06)',padding:14,marginBottom:14}}>
+        <Chip c={C.lh2} style={{display:'block',marginBottom:8}}>BEFORE YOU INSTALL · READ THIS</Chip>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,fontSize:12,color:C.ink2,lineHeight:1.55}}>
+          <div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>install location</div>
+            Anywhere you want — any drive, any folder.
+            Just <span style={{color:C.lox}}>avoid spaces / Korean / special chars</span> in the path
+            (PyTorch can fail saving weights to such paths).
+          </div>
+          <div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>model formats</div>
+            <span style={{color:C.inter}}>✓ OpenVINO IR (.xml + .bin)</span> — runs on NPU directly.<br/>
+            <span style={{color:C.risk}}>✗ GGUF / AWQ / GPTQ</span> — won't run on NPU as-is.
+            <span style={{color:C.lh2}}>Step 4b below</span> auto-converts GGUF → OV IR (5–10 min, one time).
+          </div>
+          <div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>what you get out</div>
+            <span style={{color:C.inter}}>✓ Blueprint (Markdown spec + SVG drawings)</span><br/>
+            <span style={{color:C.inter}}>✓ part_tree.json (BOM with materials/process)</span><br/>
+            <span style={{color:C.lh2}}>⚠ STL meshes / G-code / assembly manual</span> — schema-defined, partial mesh codegen, slicer integration v0.5 roadmap. See <a href="Output.html" style={{color:C.lox}}>Output.html</a>.
+          </div>
+          <div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>privacy</div>
+            Once setup is done, <span style={{color:C.lox}}>nothing leaves your machine</span>.
+            No telemetry, no API calls, no HF pulls at runtime.
+            HuggingFace is touched only during Step 4 if you download via CLI.
+          </div>
+        </div>
+      </div>
+
+      {/* WHAT IS THIS — flow ribbon */}
+      <div style={{border:`1px solid ${C.frame}`,padding:14,marginBottom:18,background:C.canvas}}>
+        <Chip c={C.halo} style={{display:'block',marginBottom:10}}>HOW IT REALLY WORKS</Chip>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 24px 1fr 24px 1fr 24px 1fr',gap:6,alignItems:'center'}}>
+          {[
+            {k:'BROWSER',v:'Minimal.html\n(this UI)',c:C.lox},
+            {k:'PYTHON',v:'Gradio :7860\n(localhost)',c:C.inter},
+            {k:'OPENVINO',v:'INT4 inference\n+ DPO export',c:C.lh2},
+            {k:'NPU',v:'Intel Core Ultra\n12 TOPS',c:C.halo},
+          ].map((b,i,arr)=>(
+            <React.Fragment key={i}>
+              <div style={{border:`1px solid ${b.c}`,padding:10,textAlign:'center'}}>
+                <div className="mono" style={{fontSize:10,color:b.c,letterSpacing:'.08em'}}>{b.k}</div>
+                <div className="mono" style={{fontSize:11,color:C.ink,marginTop:3,whiteSpace:'pre-line'}}>{b.v}</div>
+              </div>
+              {i<arr.length-1 && <span className="mono" style={{color:C.ink3,textAlign:'center'}}>→</span>}
+            </React.Fragment>
+          ))}
+        </div>
+        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:10,letterSpacing:'.04em'}}>
+          ⚠ <span style={{color:C.lh2}}>Pure-web mode is not possible</span> — the browser cannot reach the NPU directly.
+          The Python server is required for both inference and retraining.
+        </div>
+      </div>
+
+      {/* OS SELECTOR */}
+      <div style={{display:'flex',gap:8,marginBottom:18}}>
+        <Chip c={C.ink3} style={{alignSelf:'center'}}>your OS:</Chip>
+        {[['windows','Windows 11'],['linux','Linux (Ubuntu 24+)'],['mac','macOS (CPU fallback)']].map(([k,l])=>(
+          <Btn key={k} size="sm" variant={os===k?'primary':'default'} onClick={()=>setOs(k)}>{l}</Btn>
+        ))}
+      </div>
+
+      {/* STEP 1 — DRIVER */}
+      <Step n={1} kicker="HARDWARE" title="Intel NPU driver" status={checks.driver} color={C.lox}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
+          Required for the NPU to be visible to OpenVINO. Skip if you only have CPU/GPU.
+        </p>
+        <Code>{driverCmd}</Code>
+        <div style={{display:'flex',gap:8,marginTop:10}}>
+          <Btn variant="primary" onClick={()=>runCheck('driver')} disabled={busy==='driver'}>
+            {busy==='driver'?'◐ probing…':'check NPU visible'}
+          </Btn>
+          <span className="mono" style={{fontSize:10,color:C.ink3,alignSelf:'center'}}>
+            runs: <span style={{color:C.term_green}}>python -c "from openvino import Core; print('NPU' in Core().available_devices)"</span>
+          </span>
+        </div>
+      </Step>
+
+      {/* STEP 2 — PYTHON */}
+      <Step n={2} kicker="RUNTIME" title="Python 3.11 + venv" status={checks.python} color={C.inter}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
+          One isolated env so this doesn't pollute your system Python.
+        </p>
+        <Code>{`git clone https://github.com/Han-think/Blueprint_npu.git
+cd Blueprint_npu
+python3.11 -m venv .venv
+${os==='windows'?'.venv\\Scripts\\activate':'source .venv/bin/activate'}`}</Code>
+        <div style={{display:'flex',gap:8,marginTop:10}}>
+          <Btn variant="primary" onClick={()=>runCheck('python')} disabled={busy==='python'}>
+            {busy==='python'?'◐ probing…':'check python 3.11'}
+          </Btn>
+        </div>
+      </Step>
+
+      {/* STEP 3 — DEPS */}
+      <Step n={3} kicker="DEPENDENCIES" title="OpenVINO + Gradio + finetune libs" status={checks.deps} color={C.lh2}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
+          Two requirement files — inference is enough to run, finetune is needed only for retraining.
+        </p>
+        <Code>{`pip install -r requirements-ov.txt   # ~250 MB · openvino, gradio, transformers
+pip install -r requirements-ml.txt   # ~1.2 GB · torch, peft, trl, bitsandbytes (XPU build for Intel Arc)`}</Code>
+        <div style={{display:'flex',gap:8,marginTop:10}}>
+          <Btn variant="primary" onClick={()=>runCheck('deps')} disabled={busy==='deps'}>
+            {busy==='deps'?'◐ probing…':'check imports'}
+          </Btn>
+        </div>
+      </Step>
+
+      {/* STEP 4 — MODEL */}
+      <Step n={'4a'} kicker="MODEL FILES · OV IR" title="Drop an OpenVINO IR model into models/ov_npu_ready/" status={checks.model} color={C.halo}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
+          This is the only step you'll repeat. After setup, every new model = drag a folder. No reinstall.
+        </p>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginTop:10}}>
+          <div style={{border:`1px solid ${C.frame}`,padding:12,background:C.canvas2}}>
+            <Chip c={C.lox}>RECOMMENDED · 3B</Chip>
+            <div className="mono" style={{fontSize:12,color:C.ink,marginTop:6}}>qwen2.5-3b-instruct-int4-ov</div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:3}}>1.9 GB · 12 tok/s on NPU · best balance</div>
+            <a className="mono" style={{display:'inline-block',marginTop:8,fontSize:10,color:C.lox,letterSpacing:'.06em'}}
+              href="https://huggingface.co/OpenVINO/Qwen2.5-3B-Instruct-int4-ov" target="_blank">huggingface.co/OpenVINO/Qwen2.5-3B-Instruct-int4-ov ↗</a>
+          </div>
+          <div style={{border:`1px solid ${C.frame}`,padding:12,background:C.canvas2}}>
+            <Chip c={C.inter}>SMALLER · 1B</Chip>
+            <div className="mono" style={{fontSize:12,color:C.ink,marginTop:6}}>llama-3.2-1b-instruct-int4-ov</div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:3}}>0.7 GB · 28 tok/s on NPU · for laptops</div>
+            <a className="mono" style={{display:'inline-block',marginTop:8,fontSize:10,color:C.inter,letterSpacing:'.06em'}}
+              href="https://huggingface.co/OpenVINO/Llama-3.2-1B-Instruct-int4-ov" target="_blank">huggingface.co/OpenVINO/Llama-3.2-1B-Instruct-int4-ov ↗</a>
+          </div>
+        </div>
+        <Code>{`# put the unzipped folder here:
+Blueprint_npu/
+  models/
+    ov_npu_ready/
+      qwen2.5-3b-instruct-int4-ov/   ← drop folder here
+        openvino_model.xml
+        openvino_model.bin
+        tokenizer.json`}</Code>
+        <div style={{display:'flex',gap:8,marginTop:10,alignItems:'center'}}>
+          <Btn variant="primary" onClick={()=>runCheck('model')} disabled={busy==='model'}>
+            {busy==='model'?'◐ scanning…':'scan models/ folder'}
+          </Btn>
+          <span className="mono" style={{fontSize:10,color:C.ink3}}>auto-rescans every 10s while server is up</span>
+        </div>
+      </Step>
+
+      {/* STEP 4b — GGUF INBOX */}
+      <Step n={'4b'} kicker="OPTIONAL · GGUF INBOX" title="Already have a GGUF? Drop it and we'll convert." status="pending" color={C.lh2}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
+          NPU can't run GGUF directly — but the server watches <span className="mono" style={{color:C.lh2}}>models/gguf_inbox/</span> and
+          auto-converts to OV-IR INT4 with one command. After conversion the new model appears in the picker.
+        </p>
+        <Code>{`# 1) drop your file:
+Blueprint_npu/
+  models/
+    gguf_inbox/
+      qwen2.5-3b-instruct-q4_k_m.gguf    ← drop here
+
+# 2) the watcher runs (or trigger manually):
+optimum-cli export openvino \\
+  --model models/gguf_inbox/qwen2.5-3b-instruct-q4_k_m.gguf \\
+  --weight-format int4 --group-size 128 \\
+  --task text-generation-with-past \\
+  models/ov_npu_ready/qwen2.5-3b-q4km-converted/
+
+# 3) takes ~5–10 min on Arc A770, ~12–20 min on CPU. one time only.`}</Code>
+        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:8,letterSpacing:'.04em'}}>
+          shortcut: <span style={{color:C.lh2}}>optimum-cli export openvino --model Qwen/Qwen2.5-3B-Instruct --weight-format int4 ./models/ov_npu_ready/qwen25-3b-int4</span> — convert directly from HF without GGUF middle step.
+        </div>
+      </Step>
+
+      {/* LAUNCH */}
+      <div style={{border:`1px solid ${allOk?C.inter:C.frame}`,padding:18,marginTop:18,background:allOk?'rgba(137,255,168,0.04)':C.canvas}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10}}>
+          <div>
+            <Chip c={allOk?C.inter:C.ink3}>{allOk?'✓ ALL GREEN · LAUNCH':'○ FINISH STEPS ABOVE TO LAUNCH'}</Chip>
+            <h3 style={{margin:'4px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>Start the server</h3>
+          </div>
+          {allOk && <Btn variant="go" onClick={()=>{ window.location.href='Minimal.html'; }}>open minimal runner →</Btn>}
+        </div>
+        <Code>{`python ai/ui/blueprint_batch_ui.py
+# → Running on http://127.0.0.1:7860
+# Then open Minimal.html — it auto-connects to :7860`}</Code>
+        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:10,letterSpacing:'.04em'}}>
+          The UI files (Minimal.html · SelfLoop.html) are <span style={{color:C.lh2}}>view-layer only</span> —
+          they expect the Python server on :7860. Without it, the buttons render but do nothing.
+        </div>
+      </div>
+
+      {/* TROUBLESHOOTING */}
+      <details style={{border:`1px solid ${C.frame}`,marginTop:14,background:C.canvas}}>
+        <summary style={{padding:'12px 16px',color:C.ink2}}>
+          <Chip c={C.ink3}>▸ TROUBLESHOOTING</Chip>
+          <span style={{marginLeft:10,fontFamily:C.mono,fontSize:11,color:C.ink3}}>NPU not detected · slow inference · DPO fails</span>
+        </summary>
+        <div style={{padding:'4px 16px 16px',fontFamily:C.mono,fontSize:11,color:C.ink2,lineHeight:1.7}}>
+          <div><span style={{color:C.risk}}>NPU device not in available_devices →</span> reinstall driver, reboot, then `python -c "from openvino import Core; print(Core().available_devices)"` — should list `['CPU','GPU','NPU']`</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>tok/s under 5 →</span> model is falling back to CPU. Verify with `--device NPU` flag and check the Gradio log for `[fallback] NPU → CPU`.</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>DPO OOM on Arc A770 →</span> drop LoRA r from 16 → 8 in `finetune/dpo.py`, or use `--gradient_checkpointing`.</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>"this is just a demo" →</span> you opened Minimal.html without starting the Python server. Run step 5 above.</div>
+        </div>
+      </details>
+
+      {/* FOOTER */}
+      <div style={{borderTop:`1px solid ${C.frame}`,marginTop:24,paddingTop:14,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>blueprint_npu · setup v1 · offline-only · no telemetry</span>
+        <span>after launch: <a href="Minimal.html" style={{color:C.lox}}>Minimal.html</a> · <a href="SelfLoop.html" style={{color:C.lox}}>SelfLoop.html</a> · <a href="End_to_End.html" style={{color:C.lox}}>End_to_End.html</a></span>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
