@@ -23,7 +23,9 @@
 <script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Setup'),100);</script>
 
 <script type="text/babel">
-const { useState } = React;
+const { useState, useEffect } = React;
+const OLLAMA = 'http://127.0.0.1:11434';
+
 const C = {
   canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
   lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
@@ -31,19 +33,29 @@ const C = {
   mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
   sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
 };
-function Chip({c=C.lox, children, style}){return <span className="mono" style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:c,...style}}>{children}</span>;}
+
+function Chip({c=C.lox, children, style}){
+  return <span className="mono" style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:c,...style}}>{children}</span>;
+}
 function Btn({children, variant='default', onClick, disabled, style, size='md'}){
   const col = variant==='primary'?C.lox:variant==='go'?C.inter:variant==='risk'?C.risk:C.ink;
   const pad = size==='sm'?'5px 10px':'8px 14px';
-  return <button onClick={onClick} disabled={disabled} style={{fontFamily:C.mono,fontSize:size==='sm'?11:12,textTransform:'uppercase',letterSpacing:'.08em',padding:pad,background:'transparent',color:col,border:`1px solid ${col}`,borderRadius:2,cursor:disabled?'not-allowed':'pointer',opacity:disabled?.4:1,...style}}>{children}</button>;
+  return (
+    <button onClick={onClick} disabled={disabled}
+      style={{fontFamily:C.mono,fontSize:size==='sm'?11:12,textTransform:'uppercase',letterSpacing:'.08em',
+              padding:pad,background:'transparent',color:col,border:`1px solid ${col}`,
+              borderRadius:2,cursor:disabled?'not-allowed':'pointer',opacity:disabled?.4:1,...style}}>
+      {children}
+    </button>
+  );
 }
 
-// ============ STEP CARD ============
-function Step({ n, title, kicker, status, children, color=C.lox }){
-  const stateCol = status==='ok'?C.inter:status==='fail'?C.risk:status==='running'?C.lh2:C.ink3;
+function Step({n, title, kicker, status, children, color=C.lox}){
+  const stateCol   = status==='ok'?C.inter:status==='fail'?C.risk:status==='running'?C.lh2:C.ink3;
   const stateLabel = status==='ok'?'✓ READY':status==='fail'?'✗ NOT FOUND':status==='running'?'◐ CHECKING':'○ PENDING';
   return (
-    <div style={{border:`1px solid ${C.frame}`,background:C.canvas,padding:16,marginBottom:12}}>
+    <div style={{border:`1px solid ${status==='ok'?C.inter:status==='fail'?C.risk:C.frame}`,
+                 background:C.canvas,padding:16,marginBottom:12}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:6}}>
         <div style={{display:'flex',alignItems:'baseline',gap:12}}>
           <span className="mono" style={{fontSize:24,color,letterSpacing:'.06em'}}>{String(n).padStart(2,'0')}</span>
@@ -59,7 +71,7 @@ function Step({ n, title, kicker, status, children, color=C.lox }){
   );
 }
 
-function Code({ children, lang='bash' }){
+function Code({children, lang='powershell'}){
   return (
     <div style={{border:`1px solid ${C.frame}`,background:C.term_bg,padding:'10px 12px',marginTop:8,position:'relative'}}>
       <span className="mono" style={{position:'absolute',top:6,right:10,fontSize:9,color:C.term_dim,letterSpacing:'.1em'}}>{lang.toUpperCase()}</span>
@@ -68,85 +80,105 @@ function Code({ children, lang='bash' }){
   );
 }
 
-// ============ APP ============
-function App(){
-  const [os,setOs] = useState('windows');
-  const [checks,setChecks] = useState({ driver:'pending', python:'pending', deps:'pending', model:'pending' });
-  const [busy,setBusy] = useState(null);
+function ModelList({models}){
+  if(!models.length) return (
+    <div className="mono" style={{fontSize:11,color:C.ink3,marginTop:8}}>모델 없음</div>
+  );
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:4,marginTop:8}}>
+      {models.map(m=>(
+        <div key={m.name} style={{display:'flex',justifyContent:'space-between',padding:'6px 10px',
+                                   border:`1px solid ${C.frame}`,background:C.canvas2,fontFamily:C.mono,fontSize:11}}>
+          <span style={{color:C.inter}}>● {m.name}</span>
+          <span style={{color:C.ink3}}>{m.size?(m.size/1e9).toFixed(1)+' GB':'—'}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  function runCheck(key){
-    setBusy(key);
-    setChecks(c=>({...c,[key]:'running'}));
-    setTimeout(()=>{
-      setChecks(c=>({...c,[key]:'ok'}));
-      setBusy(null);
-    }, 900);
+function App(){
+  const [checks, setChecks] = useState({
+    ollama: 'pending',   // pending | running | ok | fail
+    models: 'pending',
+    server: 'pending',
+  });
+  const [models,    setModels]    = useState([]);
+  const [busy,      setBusy]      = useState(null);
+  const [serverLog, setServerLog] = useState('');
+
+  function setCheck(k, v){ setChecks(c=>({...c,[k]:v})); }
+
+  // ── 1. Ollama ping ──
+  async function checkOllama(){
+    setBusy('ollama'); setCheck('ollama','running');
+    try {
+      const r = await fetch(`${OLLAMA}/api/tags`, {signal: AbortSignal.timeout(3000)});
+      if(r.ok){ setCheck('ollama','ok'); } else { setCheck('ollama','fail'); }
+    } catch { setCheck('ollama','fail'); }
+    setBusy(null);
+  }
+
+  // ── 2. Model list ──
+  async function checkModels(){
+    setBusy('models'); setCheck('models','running');
+    try {
+      const r    = await fetch(`${OLLAMA}/api/tags`, {signal: AbortSignal.timeout(3000)});
+      const data = await r.json();
+      const list = data.models || [];
+      setModels(list);
+      setCheck('models', list.length>0 ? 'ok' : 'fail');
+    } catch { setCheck('models','fail'); }
+    setBusy(null);
+  }
+
+  // ── 3. Quick server smoke test ──
+  async function checkServer(){
+    setBusy('server'); setCheck('server','running');
+    try {
+      const r = await fetch(`${OLLAMA}/api/generate`, {
+        method:'POST', signal: AbortSignal.timeout(8000),
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ model: models[0]?.name || 'qwen2.5:7b',
+                               prompt:'Reply with exactly: OK', stream:false,
+                               options:{num_predict:5,temperature:0} }),
+      });
+      const data = await r.json();
+      const reply = (data.response||'').trim();
+      setServerLog(reply);
+      setCheck('server', reply ? 'ok' : 'fail');
+    } catch(e) {
+      setServerLog(e.message);
+      setCheck('server','fail');
+    }
+    setBusy(null);
   }
 
   const allOk = Object.values(checks).every(v=>v==='ok');
-
-  const driverCmd = {
-    windows: 'Download "Intel NPU Driver" from intel.com/content/www/us/en/download/...\nReboot after install.',
-    linux:   'sudo apt install intel-npu-driver\n# kernel ≥ 6.6 required',
-    mac:     '# Apple Silicon does not have Intel NPU.\n# Use the CPU/GPU fallback profile instead.',
-  }[os];
 
   return (
     <div style={{maxWidth:980,margin:'0 auto',padding:24,fontFamily:C.sans,color:C.ink2}}>
 
       {/* title */}
       <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:14,marginBottom:18}}>
-        <Chip c={C.lh2}>FIRST RUN · ONE-TIME SETUP</Chip>
+        <Chip c={C.lh2}>SETUP · OLLAMA IPEX MODE</Chip>
         <h1 style={{color:C.ink,fontSize:28,margin:'6px 0 4px',fontWeight:600,letterSpacing:'-0.01em'}}>
-          Install once, then just drop in models.
+          로컬 Ollama가 실행 중인지 확인합니다.
         </h1>
         <p className="sans" style={{color:C.ink3,fontSize:14,margin:0,maxWidth:720,textWrap:'pretty'}}>
-          Blueprint NPU is a <span style={{color:C.lox}}>local desktop tool</span> — not a website.
-          The browser UI you see talks to a Python server running on your machine, which talks to your Intel NPU.
-          Setup takes ~30 minutes. After that, adding new models is drag-and-drop.
+          Blueprint NPU는 <span style={{color:C.lox}}>C:\Ollama-IPEX\ollama.exe</span>를 백엔드로 사용합니다.
+          Python, npm, pip 설치 불필요. Ollama만 실행하면 됩니다.
         </p>
       </div>
 
-      {/* HONESTY BOX */}
-      <div style={{border:`1px solid ${C.lh2}`,background:'rgba(255,211,159,0.06)',padding:14,marginBottom:14}}>
-        <Chip c={C.lh2} style={{display:'block',marginBottom:8}}>BEFORE YOU INSTALL · READ THIS</Chip>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,fontSize:12,color:C.ink2,lineHeight:1.55}}>
-          <div>
-            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>install location</div>
-            Anywhere you want — any drive, any folder.
-            Just <span style={{color:C.lox}}>avoid spaces / Korean / special chars</span> in the path
-            (PyTorch can fail saving weights to such paths).
-          </div>
-          <div>
-            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>model formats</div>
-            <span style={{color:C.inter}}>✓ OpenVINO IR (.xml + .bin)</span> — runs on NPU directly.<br/>
-            <span style={{color:C.risk}}>✗ GGUF / AWQ / GPTQ</span> — won't run on NPU as-is.
-            <span style={{color:C.lh2}}>Step 4b below</span> auto-converts GGUF → OV IR (5–10 min, one time).
-          </div>
-          <div>
-            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>what you get out</div>
-            <span style={{color:C.inter}}>✓ Blueprint (Markdown spec + SVG drawings)</span><br/>
-            <span style={{color:C.inter}}>✓ part_tree.json (BOM with materials/process)</span><br/>
-            <span style={{color:C.lh2}}>⚠ STL meshes / G-code / assembly manual</span> — schema-defined, partial mesh codegen, slicer integration v0.5 roadmap. See <a href="Output.html" style={{color:C.lox}}>Output.html</a>.
-          </div>
-          <div>
-            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>privacy</div>
-            Once setup is done, <span style={{color:C.lox}}>nothing leaves your machine</span>.
-            No telemetry, no API calls, no HF pulls at runtime.
-            HuggingFace is touched only during Step 4 if you download via CLI.
-          </div>
-        </div>
-      </div>
-
-      {/* WHAT IS THIS — flow ribbon */}
+      {/* architecture ribbon */}
       <div style={{border:`1px solid ${C.frame}`,padding:14,marginBottom:18,background:C.canvas}}>
-        <Chip c={C.halo} style={{display:'block',marginBottom:10}}>HOW IT REALLY WORKS</Chip>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 24px 1fr 24px 1fr 24px 1fr',gap:6,alignItems:'center'}}>
+        <Chip c={C.halo} style={{display:'block',marginBottom:10}}>아키텍처</Chip>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 24px 1fr 24px 1fr',gap:6,alignItems:'center'}}>
           {[
-            {k:'BROWSER',v:'Minimal.html\n(this UI)',c:C.lox},
-            {k:'PYTHON',v:'Gradio :7860\n(localhost)',c:C.inter},
-            {k:'OPENVINO',v:'INT4 inference\n+ DPO export',c:C.lh2},
-            {k:'NPU',v:'Intel Core Ultra\n12 TOPS',c:C.halo},
+            {k:'BROWSER',  v:'index.html\nMinimal.html',   c:C.lox},
+            {k:'OLLAMA',   v:'127.0.0.1:11434\n/api/generate', c:C.inter},
+            {k:'GPU/iGPU', v:'IPEX-LLM\nIntel Arc/iGPU',  c:C.lh2},
           ].map((b,i,arr)=>(
             <React.Fragment key={i}>
               <div style={{border:`1px solid ${b.c}`,padding:10,textAlign:'center'}}>
@@ -158,167 +190,159 @@ function App(){
           ))}
         </div>
         <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:10,letterSpacing:'.04em'}}>
-          ⚠ <span style={{color:C.lh2}}>Pure-web mode is not possible</span> — the browser cannot reach the NPU directly.
-          The Python server is required for both inference and retraining.
+          브라우저 → Ollama API 직접 호출 · Python 서버 불필요 · 완전 오프라인
         </div>
       </div>
 
-      {/* OS SELECTOR */}
-      <div style={{display:'flex',gap:8,marginBottom:18}}>
-        <Chip c={C.ink3} style={{alignSelf:'center'}}>your OS:</Chip>
-        {[['windows','Windows 11'],['linux','Linux (Ubuntu 24+)'],['mac','macOS (CPU fallback)']].map(([k,l])=>(
-          <Btn key={k} size="sm" variant={os===k?'primary':'default'} onClick={()=>setOs(k)}>{l}</Btn>
-        ))}
-      </div>
-
-      {/* STEP 1 — DRIVER */}
-      <Step n={1} kicker="HARDWARE" title="Intel NPU driver" status={checks.driver} color={C.lox}>
-        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
-          Required for the NPU to be visible to OpenVINO. Skip if you only have CPU/GPU.
+      {/* STEP 1 — Ollama 실행 */}
+      <Step n={1} kicker="RUNTIME" title="Ollama IPEX 실행" status={checks.ollama} color={C.lox}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 8px'}}>
+          <span style={{color:C.lox}}>C:\Ollama-IPEX\</span>에 있는 Ollama를 시작합니다.
+          이미 실행 중이면 바로 Check를 누르세요.
         </p>
-        <Code>{driverCmd}</Code>
+        <Code lang="batch">{`REM 방법 1: 전용 배치 파일 (권장)
+C:\\Ollama-IPEX\\start-ollama.bat
+
+REM 방법 2: 직접 실행
+C:\\Ollama-IPEX\\ollama-serve.bat
+
+REM 방법 3: PowerShell
+cd C:\\Ollama-IPEX
+.\\ollama.exe serve`}</Code>
         <div style={{display:'flex',gap:8,marginTop:10}}>
-          <Btn variant="primary" onClick={()=>runCheck('driver')} disabled={busy==='driver'}>
-            {busy==='driver'?'◐ probing…':'check NPU visible'}
+          <Btn variant="primary" onClick={checkOllama} disabled={busy==='ollama'}>
+            {busy==='ollama'?'◐ checking…':'check :11434'}
           </Btn>
           <span className="mono" style={{fontSize:10,color:C.ink3,alignSelf:'center'}}>
-            runs: <span style={{color:C.term_green}}>python -c "from openvino import Core; print('NPU' in Core().available_devices)"</span>
+            → <span style={{color:C.term_green}}>GET http://127.0.0.1:11434/api/tags</span>
           </span>
         </div>
+        {checks.ollama==='fail' && (
+          <div className="mono" style={{fontSize:11,color:C.risk,marginTop:8}}>
+            ✗ 연결 실패 — Ollama가 실행 중인지 확인하세요. start-ollama.bat을 먼저 실행하세요.
+          </div>
+        )}
       </Step>
 
-      {/* STEP 2 — PYTHON */}
-      <Step n={2} kicker="RUNTIME" title="Python 3.11 + venv" status={checks.python} color={C.inter}>
-        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
-          One isolated env so this doesn't pollute your system Python.
+      {/* STEP 2 — 모델 확인 */}
+      <Step n={2} kicker="MODELS" title="설치된 모델 확인" status={checks.models} color={C.inter}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 8px'}}>
+          Ollama에 최소 1개 모델이 필요합니다. 없으면 아래 명령으로 받으세요.
         </p>
-        <Code>{`git clone https://github.com/Han-think/Blueprint_npu.git
-cd Blueprint_npu
-python3.11 -m venv .venv
-${os==='windows'?'.venv\\Scripts\\activate':'source .venv/bin/activate'}`}</Code>
+        <Code lang="powershell">{`# 권장 — 빠르고 균형 잡힌 7B 모델
+C:\\Ollama-IPEX\\ollama.exe pull qwen2.5:7b
+
+# 소형 — 저사양 PC용
+C:\\Ollama-IPEX\\ollama.exe pull qwen2.5:3b
+
+# 설치된 모델 목록 확인
+C:\\Ollama-IPEX\\ollama.exe list`}</Code>
         <div style={{display:'flex',gap:8,marginTop:10}}>
-          <Btn variant="primary" onClick={()=>runCheck('python')} disabled={busy==='python'}>
-            {busy==='python'?'◐ probing…':'check python 3.11'}
+          <Btn variant="primary" onClick={checkModels} disabled={busy==='models'}>
+            {busy==='models'?'◐ scanning…':'scan models'}
           </Btn>
         </div>
+        {models.length>0 && <ModelList models={models}/>}
+        {checks.models==='fail' && (
+          <div className="mono" style={{fontSize:11,color:C.risk,marginTop:8}}>
+            ✗ 모델 없음 — <span style={{color:C.lh2}}>ollama pull qwen2.5:7b</span> 실행 후 재스캔
+          </div>
+        )}
       </Step>
 
-      {/* STEP 3 — DEPS */}
-      <Step n={3} kicker="DEPENDENCIES" title="OpenVINO + Gradio + finetune libs" status={checks.deps} color={C.lh2}>
-        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
-          Two requirement files — inference is enough to run, finetune is needed only for retraining.
+      {/* STEP 3 — 실제 생성 테스트 */}
+      <Step n={3} kicker="SMOKE TEST" title="실제 생성 테스트" status={checks.server} color={C.lh2}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 8px'}}>
+          모델에 짧은 프롬프트를 보내 실제 응답이 오는지 확인합니다. (~5초 소요)
         </p>
-        <Code>{`pip install -r requirements-ov.txt   # ~250 MB · openvino, gradio, transformers
-pip install -r requirements-ml.txt   # ~1.2 GB · torch, peft, trl, bitsandbytes (XPU build for Intel Arc)`}</Code>
-        <div style={{display:'flex',gap:8,marginTop:10}}>
-          <Btn variant="primary" onClick={()=>runCheck('deps')} disabled={busy==='deps'}>
-            {busy==='deps'?'◐ probing…':'check imports'}
-          </Btn>
-        </div>
-      </Step>
-
-      {/* STEP 4 — MODEL */}
-      <Step n={'4a'} kicker="MODEL FILES · OV IR" title="Drop an OpenVINO IR model into models/ov_npu_ready/" status={checks.model} color={C.halo}>
-        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
-          This is the only step you'll repeat. After setup, every new model = drag a folder. No reinstall.
-        </p>
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginTop:10}}>
-          <div style={{border:`1px solid ${C.frame}`,padding:12,background:C.canvas2}}>
-            <Chip c={C.lox}>RECOMMENDED · 3B</Chip>
-            <div className="mono" style={{fontSize:12,color:C.ink,marginTop:6}}>qwen2.5-3b-instruct-int4-ov</div>
-            <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:3}}>1.9 GB · 12 tok/s on NPU · best balance</div>
-            <a className="mono" style={{display:'inline-block',marginTop:8,fontSize:10,color:C.lox,letterSpacing:'.06em'}}
-              href="https://huggingface.co/OpenVINO/Qwen2.5-3B-Instruct-int4-ov" target="_blank">huggingface.co/OpenVINO/Qwen2.5-3B-Instruct-int4-ov ↗</a>
-          </div>
-          <div style={{border:`1px solid ${C.frame}`,padding:12,background:C.canvas2}}>
-            <Chip c={C.inter}>SMALLER · 1B</Chip>
-            <div className="mono" style={{fontSize:12,color:C.ink,marginTop:6}}>llama-3.2-1b-instruct-int4-ov</div>
-            <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:3}}>0.7 GB · 28 tok/s on NPU · for laptops</div>
-            <a className="mono" style={{display:'inline-block',marginTop:8,fontSize:10,color:C.inter,letterSpacing:'.06em'}}
-              href="https://huggingface.co/OpenVINO/Llama-3.2-1B-Instruct-int4-ov" target="_blank">huggingface.co/OpenVINO/Llama-3.2-1B-Instruct-int4-ov ↗</a>
-          </div>
-        </div>
-        <Code>{`# put the unzipped folder here:
-Blueprint_npu/
-  models/
-    ov_npu_ready/
-      qwen2.5-3b-instruct-int4-ov/   ← drop folder here
-        openvino_model.xml
-        openvino_model.bin
-        tokenizer.json`}</Code>
+        <Code lang="json">{`POST http://127.0.0.1:11434/api/generate
+{ "model": "${models[0]?.name||'qwen2.5:7b'}", "prompt": "Reply with exactly: OK", "stream": false }`}</Code>
         <div style={{display:'flex',gap:8,marginTop:10,alignItems:'center'}}>
-          <Btn variant="primary" onClick={()=>runCheck('model')} disabled={busy==='model'}>
-            {busy==='model'?'◐ scanning…':'scan models/ folder'}
+          <Btn variant="primary" onClick={checkServer} disabled={busy==='server'||checks.models!=='ok'}>
+            {busy==='server'?'◐ testing…':'run smoke test'}
           </Btn>
-          <span className="mono" style={{fontSize:10,color:C.ink3}}>auto-rescans every 10s while server is up</span>
+          {checks.models!=='ok' && <span className="mono" style={{fontSize:10,color:C.ink3}}>먼저 Step 2를 완료하세요</span>}
         </div>
-      </Step>
-
-      {/* STEP 4b — GGUF INBOX */}
-      <Step n={'4b'} kicker="OPTIONAL · GGUF INBOX" title="Already have a GGUF? Drop it and we'll convert." status="pending" color={C.lh2}>
-        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 0'}}>
-          NPU can't run GGUF directly — but the server watches <span className="mono" style={{color:C.lh2}}>models/gguf_inbox/</span> and
-          auto-converts to OV-IR INT4 with one command. After conversion the new model appears in the picker.
-        </p>
-        <Code>{`# 1) drop your file:
-Blueprint_npu/
-  models/
-    gguf_inbox/
-      qwen2.5-3b-instruct-q4_k_m.gguf    ← drop here
-
-# 2) the watcher runs (or trigger manually):
-optimum-cli export openvino \\
-  --model models/gguf_inbox/qwen2.5-3b-instruct-q4_k_m.gguf \\
-  --weight-format int4 --group-size 128 \\
-  --task text-generation-with-past \\
-  models/ov_npu_ready/qwen2.5-3b-q4km-converted/
-
-# 3) takes ~5–10 min on Arc A770, ~12–20 min on CPU. one time only.`}</Code>
-        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:8,letterSpacing:'.04em'}}>
-          shortcut: <span style={{color:C.lh2}}>optimum-cli export openvino --model Qwen/Qwen2.5-3B-Instruct --weight-format int4 ./models/ov_npu_ready/qwen25-3b-int4</span> — convert directly from HF without GGUF middle step.
-        </div>
+        {serverLog && (
+          <div className="mono" style={{fontSize:11,marginTop:8,
+                                        color:checks.server==='ok'?C.inter:C.risk}}>
+            model replied: "{serverLog}"
+          </div>
+        )}
       </Step>
 
       {/* LAUNCH */}
-      <div style={{border:`1px solid ${allOk?C.inter:C.frame}`,padding:18,marginTop:18,background:allOk?'rgba(137,255,168,0.04)':C.canvas}}>
+      <div style={{border:`1px solid ${allOk?C.inter:C.frame}`,padding:18,marginTop:18,
+                   background:allOk?'rgba(137,255,168,0.04)':C.canvas}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10}}>
           <div>
-            <Chip c={allOk?C.inter:C.ink3}>{allOk?'✓ ALL GREEN · LAUNCH':'○ FINISH STEPS ABOVE TO LAUNCH'}</Chip>
-            <h3 style={{margin:'4px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>Start the server</h3>
+            <Chip c={allOk?C.inter:C.ink3}>{allOk?'✓ ALL GREEN · 준비 완료':'○ 위 단계를 먼저 완료하세요'}</Chip>
+            <h3 style={{margin:'4px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>Minimal Runner 열기</h3>
           </div>
-          {allOk && <Btn variant="go" onClick={()=>{ window.location.href='Minimal.html'; }}>open minimal runner →</Btn>}
+          {allOk && <Btn variant="go" onClick={()=>{ window.location.href='Minimal.html'; }}>open minimal →</Btn>}
         </div>
-        <Code>{`python ai/ui/blueprint_batch_ui.py
-# → Running on http://127.0.0.1:7860
-# Then open Minimal.html — it auto-connects to :7860`}</Code>
-        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:10,letterSpacing:'.04em'}}>
-          The UI files (Minimal.html · SelfLoop.html) are <span style={{color:C.lh2}}>view-layer only</span> —
-          they expect the Python server on :7860. Without it, the buttons render but do nothing.
+        <div className="mono" style={{fontSize:11,color:C.ink3,marginTop:6,letterSpacing:'.04em'}}>
+          Ollama가 실행 중인 상태에서 Minimal.html을 열면 자동으로 연결됩니다.<br/>
+          <span style={{color:C.lh2}}>CORS 오류 발생 시</span> — 브라우저에서 file:// 대신{' '}
+          <span style={{color:C.lox}}>http://127.0.0.1:8080</span>으로 열어야 합니다.{' '}
+          <a href="#cors-fix" style={{color:C.lox}}>아래 CORS 해결법 참조 ↓</a>
         </div>
       </div>
 
-      {/* TROUBLESHOOTING */}
-      <details style={{border:`1px solid ${C.frame}`,marginTop:14,background:C.canvas}}>
+      {/* CORS FIX */}
+      <details id="cors-fix" style={{border:`1px solid ${C.frame}`,marginTop:14,background:C.canvas}}>
         <summary style={{padding:'12px 16px',color:C.ink2}}>
-          <Chip c={C.ink3}>▸ TROUBLESHOOTING</Chip>
-          <span style={{marginLeft:10,fontFamily:C.mono,fontSize:11,color:C.ink3}}>NPU not detected · slow inference · DPO fails</span>
+          <Chip c={C.lh2}>▸ CORS / file:// 오류 해결법</Chip>
+          <span style={{marginLeft:10,fontFamily:C.mono,fontSize:11,color:C.ink3}}>
+            fetch 차단 시 로컬 HTTP 서버로 열기
+          </span>
         </summary>
-        <div style={{padding:'4px 16px 16px',fontFamily:C.mono,fontSize:11,color:C.ink2,lineHeight:1.7}}>
-          <div><span style={{color:C.risk}}>NPU device not in available_devices →</span> reinstall driver, reboot, then `python -c "from openvino import Core; print(Core().available_devices)"` — should list `['CPU','GPU','NPU']`</div>
-          <div style={{marginTop:6}}><span style={{color:C.risk}}>tok/s under 5 →</span> model is falling back to CPU. Verify with `--device NPU` flag and check the Gradio log for `[fallback] NPU → CPU`.</div>
-          <div style={{marginTop:6}}><span style={{color:C.risk}}>DPO OOM on Arc A770 →</span> drop LoRA r from 16 → 8 in `finetune/dpo.py`, or use `--gradient_checkpointing`.</div>
-          <div style={{marginTop:6}}><span style={{color:C.risk}}>"this is just a demo" →</span> you opened Minimal.html without starting the Python server. Run step 5 above.</div>
+        <div style={{padding:'4px 16px 16px'}}>
+          <p className="sans" style={{fontSize:13,color:C.ink2}}>
+            브라우저가 file:// 프로토콜에서 로컬 fetch를 막는 경우 serve.py로 HTTP로 서빙합니다.
+          </p>
+          <Code lang="powershell">{`# 방법 1: server/serve.py 사용 (포함됨)
+cd C:\\Ollama-IPEX\\Blueprint_npu_portable-main
+python server\\serve.py
+# → http://127.0.0.1:8080 으로 브라우저 열기
+
+# 방법 2: Python 내장 서버
+python -m http.server 8080
+# → http://127.0.0.1:8080
+
+# 방법 3: start.bat 더블클릭 (Ollama + HTTP 서버 동시 시작)
+C:\\Ollama-IPEX\\Blueprint_npu_portable-main\\start.bat`}</Code>
+          <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:8,letterSpacing:'.04em'}}>
+            Ollama는 기본적으로 localhost CORS를 허용합니다. HTTP 서버 origin은 통과됩니다.
+          </div>
         </div>
       </details>
 
-      {/* FOOTER */}
-      <div style={{borderTop:`1px solid ${C.frame}`,marginTop:24,paddingTop:14,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
-        <span>blueprint_npu · setup v1 · offline-only · no telemetry</span>
-        <span>after launch: <a href="Minimal.html" style={{color:C.lox}}>Minimal.html</a> · <a href="SelfLoop.html" style={{color:C.lox}}>SelfLoop.html</a> · <a href="End_to_End.html" style={{color:C.lox}}>End_to_End.html</a></span>
+      {/* TROUBLESHOOT */}
+      <details style={{border:`1px solid ${C.frame}`,marginTop:14,background:C.canvas}}>
+        <summary style={{padding:'12px 16px',color:C.ink2}}>
+          <Chip c={C.ink3}>▸ TROUBLESHOOT</Chip>
+          <span style={{marginLeft:10,fontFamily:C.mono,fontSize:11,color:C.ink3}}>
+            Ollama 미응답 · 모델 없음 · 느린 속도
+          </span>
+        </summary>
+        <div style={{padding:'4px 16px 16px',fontFamily:C.mono,fontSize:11,color:C.ink2,lineHeight:1.7}}>
+          <div><span style={{color:C.risk}}>:11434 연결 거부 →</span> start-ollama.bat 실행. 방화벽이 11434 포트를 막지 않는지 확인.</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>모델 로딩 매우 느림 →</span> IPEX-LLM이 iGPU/Arc로 offload 중인지 확인. ollama.exe 로그에서 "sycl" 표시 확인.</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>fetch failed (CORS) →</span> file://로 열지 말고 serve.py 또는 python -m http.server 8080 사용.</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>모델 응답이 비어있음 →</span> num_predict가 너무 작거나 모델이 로드 중. 잠시 후 재시도.</div>
+        </div>
+      </details>
+
+      <div style={{borderTop:`1px solid ${C.frame}`,marginTop:24,paddingTop:14,fontFamily:C.mono,
+                   fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>blueprint_npu · setup · ollama ipex mode · no python server required</span>
+        <span>다음: <a href="Minimal.html" style={{color:C.lox}}>Minimal.html</a></span>
       </div>
     </div>
   );
 }
+
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>

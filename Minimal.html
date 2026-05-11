@@ -25,7 +25,9 @@
 <script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Minimal'),100);</script>
 
 <script type="text/babel">
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
+
+const OLLAMA = 'http://127.0.0.1:11434';
 
 const C = {
   canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
@@ -35,63 +37,124 @@ const C = {
   sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
 };
 
-function Chip({c=C.lox, children, style}){return <span className="mono" style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:c,...style}}>{children}</span>;}
-function Btn({children, variant='default', onClick, disabled, style, size='md'}){
-  const col = variant==='primary'?C.lox:variant==='go'?C.inter:variant==='warn'?C.lh2:variant==='risk'?C.risk:C.ink;
-  const pad = size==='sm'?'5px 10px':'8px 14px';
-  const fs = size==='sm'?11:12;
-  return <button onClick={onClick} disabled={disabled} style={{fontFamily:C.mono,fontSize:fs,textTransform:'uppercase',letterSpacing:'.08em',padding:pad,background:'transparent',color:col,border:`1px solid ${col}`,borderRadius:2,cursor:disabled?'not-allowed':'pointer',opacity:disabled?.4:1,...style}}>{children}</button>;
+// ── Ollama API helpers ──────────────────────────────────────────────────────
+
+async function ollamaTags() {
+  const r = await fetch(`${OLLAMA}/api/tags`);
+  if (!r.ok) throw new Error('tags failed');
+  return r.json(); // { models: [{name, size, ...}] }
 }
-function KV({ k, v, c=C.ink }){
+
+async function* ollamaGenerate(model, system, prompt, options = {}) {
+  const r = await fetch(`${OLLAMA}/api/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model,
+      system,
+      prompt,
+      stream: true,
+      options: { temperature: 0.7, num_predict: 600, ...options },
+    }),
+  });
+  if (!r.ok) throw new Error(`generate ${r.status}`);
+  const reader = r.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.trim()) continue;
+      try { yield JSON.parse(line); } catch {}
+    }
+  }
+}
+
+// ── UI primitives ──────────────────────────────────────────────────────────
+
+function Chip({ c = C.lox, children, style }) {
+  return <span className="mono" style={{ fontSize:11, letterSpacing:'.12em', textTransform:'uppercase', color:c, ...style }}>{children}</span>;
+}
+function Btn({ children, variant = 'default', onClick, disabled, style, size = 'md' }) {
+  const col = variant==='primary'?C.lox:variant==='go'?C.inter:variant==='warn'?C.lh2:variant==='risk'?C.risk:C.ink;
+  const pad = size==='sm' ? '5px 10px' : '8px 14px';
+  const fs  = size==='sm' ? 11 : 12;
   return (
-    <div style={{padding:'6px 0',borderBottom:`1px dashed ${C.frame}`,display:'flex',justifyContent:'space-between',fontFamily:C.mono,fontSize:11}}>
-      <span style={{color:C.ink3,letterSpacing:'.06em',textTransform:'uppercase'}}>{k}</span>
-      <span style={{color:c}}>{v}</span>
+    <button onClick={onClick} disabled={disabled}
+      style={{ fontFamily:C.mono, fontSize:fs, textTransform:'uppercase', letterSpacing:'.08em',
+               padding:pad, background:'transparent', color:col, border:`1px solid ${col}`,
+               borderRadius:2, cursor:disabled?'not-allowed':'pointer', opacity:disabled?.4:1, ...style }}>
+      {children}
+    </button>
+  );
+}
+function KV({ k, v, c = C.ink }) {
+  return (
+    <div style={{ padding:'6px 0', borderBottom:`1px dashed ${C.frame}`, display:'flex',
+                  justifyContent:'space-between', fontFamily:C.mono, fontSize:11 }}>
+      <span style={{ color:C.ink3, letterSpacing:'.06em', textTransform:'uppercase' }}>{k}</span>
+      <span style={{ color:c }}>{v}</span>
     </div>
   );
 }
 
-// ============ MODEL PICKER (Ollama-like) ============
-const MODELS = [
-  { id:'qwen25-3b-v3',  name:'qwen2.5-3b-int4',  version:'v3', age:'2h',  prefs:248, size:'1.9 GB', active:true,  base:'Qwen2.5-3B-Instruct', adapter:'lora_r16_a32 + DPO' },
-  { id:'qwen25-3b-v2',  name:'qwen2.5-3b-int4',  version:'v2', age:'1d',  prefs:181, size:'1.9 GB', active:false, base:'Qwen2.5-3B-Instruct', adapter:'lora_r16_a32' },
-  { id:'qwen25-3b-v1',  name:'qwen2.5-3b-int4',  version:'v1', age:'3d',  prefs:92,  size:'1.9 GB', active:false, base:'Qwen2.5-3B-Instruct', adapter:'lora_r16_a32' },
-  { id:'qwen25-3b-base',name:'qwen2.5-3b-int4',  version:'base', age:'7d',prefs:0,   size:'1.9 GB', active:false, base:'Qwen2.5-3B-Instruct', adapter:'—' },
-];
-function ModelPicker({ activeId, setActiveId, onPull, onTerm }){
-  return (
-    <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10}}>
-        <Chip c={C.lox}>MODELS · click to swap</Chip>
-        <Btn size="sm" onClick={onPull}>+ pull base</Btn>
+// ── Model Picker ────────────────────────────────────────────────────────────
+
+function ModelPicker({ models, loading, activeModel, setActiveModel, onTerm }) {
+  if (loading) return (
+    <div style={{ border:`1px solid ${C.frame}`, padding:14, background:C.canvas }}>
+      <Chip c={C.ink3}>MODELS · loading…</Chip>
+      <div className="mono" style={{ fontSize:11, color:C.ink3, marginTop:10 }}>Fetching from Ollama…</div>
+    </div>
+  );
+
+  if (!models.length) return (
+    <div style={{ border:`1px solid ${C.risk}`, padding:14, background:C.canvas }}>
+      <Chip c={C.risk}>NO MODELS FOUND</Chip>
+      <div className="mono" style={{ fontSize:11, color:C.ink2, marginTop:8, lineHeight:1.6 }}>
+        Ollama에 모델이 없습니다.<br/>
+        <span style={{ color:C.lh2 }}>ollama pull qwen2.5:7b</span> 실행 후 새로고침.
       </div>
-      <div style={{display:'flex',flexDirection:'column',gap:6}}>
-        {MODELS.map(m=>{
-          const on = m.id===activeId;
-          const swap = () => {
-            if (on) return;
-            setActiveId(m.id);
-            onTerm([
-              {c:C.term_dim, t:`[npu] unloading current model…`},
-              {c:C.term_green, t:`[npu] loading ${m.name}:${m.version}`},
-              {c:C.term_green, t:`[npu] ov_ir → INT4 → NPU OK (1.9 GB)`},
-              {c:C.term_green, t:`[npu] ready · ${m.prefs} prefs in lineage`},
-            ]);
-          };
+    </div>
+  );
+
+  return (
+    <div style={{ border:`1px solid ${C.frame}`, padding:14, background:C.canvas }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:10 }}>
+        <Chip c={C.lox}>MODELS · {models.length}개 설치됨</Chip>
+      </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+        {models.map(m => {
+          const on = m.name === activeModel;
+          const sizeMB = m.size ? `${(m.size/1e9).toFixed(1)} GB` : '—';
           return (
-            <div key={m.id} onClick={swap}
-              style={{border:`${on?1.6:1}px solid ${on?C.lox:C.frame}`,padding:'10px 12px',cursor:'pointer',background:on?'rgba(159,211,255,0.06)':'transparent',display:'grid',gridTemplateColumns:'16px 1fr auto',gap:10,alignItems:'center'}}>
-              <span style={{color:on?C.lox:C.ink3,fontFamily:C.mono,fontSize:14}}>{on?'●':'○'}</span>
+            <div key={m.name} onClick={() => {
+              if (on) return;
+              setActiveModel(m.name);
+              onTerm([
+                { c:C.term_dim,   t:`[ollama] unloading current model…` },
+                { c:C.term_green, t:`[ollama] loading ${m.name}` },
+                { c:C.term_green, t:`[ollama] ready` },
+              ]);
+            }}
+              style={{ border:`${on?1.6:1}px solid ${on?C.lox:C.frame}`, padding:'10px 12px',
+                       cursor:'pointer', background:on?'rgba(159,211,255,0.06)':'transparent',
+                       display:'grid', gridTemplateColumns:'16px 1fr auto', gap:10, alignItems:'center' }}>
+              <span style={{ color:on?C.lox:C.ink3, fontFamily:C.mono, fontSize:14 }}>{on?'●':'○'}</span>
               <div>
-                <div className="mono" style={{fontSize:13,color:C.ink}}>
-                  {m.name} <span style={{color:C.halo}}>:{m.version}</span>
-                  {on && <span style={{color:C.inter,marginLeft:8}}>▸ active</span>}
+                <div className="mono" style={{ fontSize:13, color:C.ink }}>
+                  {m.name}
+                  {on && <span style={{ color:C.inter, marginLeft:8 }}>▸ active</span>}
                 </div>
-                <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:2}}>
-                  {m.age} ago · {m.prefs} prefs · {m.adapter}
+                <div className="mono" style={{ fontSize:10, color:C.ink3, marginTop:2 }}>
+                  {m.modified_at ? new Date(m.modified_at).toLocaleDateString('ko-KR') : ''}
                 </div>
               </div>
-              <span className="mono" style={{fontSize:11,color:C.ink3}}>{m.size}</span>
+              <span className="mono" style={{ fontSize:11, color:C.ink3 }}>{sizeMB}</span>
             </div>
           );
         })}
@@ -100,24 +163,24 @@ function ModelPicker({ activeId, setActiveId, onPull, onTerm }){
   );
 }
 
-// ============ STATUS LAMPS ============
-function StatusLamps(){
+// ── Status Lamps (live Ollama ping) ────────────────────────────────────────
+
+function StatusLamps({ ollamaOnline }) {
   const items = [
-    { k:'NPU',   v:'ready · 12 TOPS', c:C.inter },
-    { k:'XPU',   v:'Arc A770 · 16 GB', c:C.inter },
-    { k:'DISK',  v:'184 GB free', c:C.inter },
-    { k:'MODE',  v:'OFFLINE', c:C.lh2 },
+    { k:'OLLAMA', v: ollamaOnline ? 'online · :11434' : 'offline', c: ollamaOnline ? C.inter : C.risk },
+    { k:'MODE',   v:'OFFLINE · LOCAL', c:C.lh2 },
   ];
   return (
-    <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas}}>
-      <Chip c={C.inter} style={{marginBottom:10,display:'block'}}>SYSTEM · live</Chip>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-        {items.map(i=>(
-          <div key={i.k} style={{display:'flex',alignItems:'center',gap:8,padding:'8px 10px',border:`1px solid ${C.frame}`,background:C.canvas2}}>
-            <span style={{width:8,height:8,borderRadius:8,background:i.c,boxShadow:`0 0 6px ${i.c}`}}/>
+    <div style={{ border:`1px solid ${C.frame}`, padding:14, background:C.canvas }}>
+      <Chip c={C.inter} style={{ marginBottom:10, display:'block' }}>SYSTEM</Chip>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+        {items.map(i => (
+          <div key={i.k} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px',
+                                   border:`1px solid ${C.frame}`, background:C.canvas2 }}>
+            <span style={{ width:8, height:8, borderRadius:8, background:i.c, boxShadow:`0 0 6px ${i.c}` }}/>
             <div>
-              <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em'}}>{i.k}</div>
-              <div className="mono" style={{fontSize:11,color:C.ink,marginTop:1}}>{i.v}</div>
+              <div className="mono" style={{ fontSize:10, color:C.ink3, letterSpacing:'.08em' }}>{i.k}</div>
+              <div className="mono" style={{ fontSize:11, color:C.ink, marginTop:1 }}>{i.v}</div>
             </div>
           </div>
         ))}
@@ -126,275 +189,377 @@ function StatusLamps(){
   );
 }
 
-// ============ VARIANT DATA ============
-const VARIANTS = [
-  { id:'A', title:'Regen · channel-cooled', seed:7,
-    metrics:{ mass:'38.2 t', print:'46 h', parts:142, cost:'$21.4k' },
-    pass:6, fail:2,
-    note:'channel Ø 1.42 mm FAIL · interference 12.4 mm³' },
-  { id:'B', title:'Film-cooled · F-1A uprated', seed:8,
-    metrics:{ mass:'34.9 t', print:'41 h', parts:118, cost:'$19.1k' },
-    pass:8, fail:0,
-    note:'all checks pass · min_wall 1.31 mm margin' },
-  { id:'C', title:'Aerospike · methalox SC', seed:11,
-    metrics:{ mass:'31.2 t', print:'62 h', parts:186, cost:'$28.7k' },
-    pass:5, fail:3,
-    note:'novel · bbox near 420 mm limit · overhang 52°' },
-];
+// ── Variant Card ────────────────────────────────────────────────────────────
 
-function VariantCard({ v, chosen, rejected, onChoose, onReject }){
-  const state = chosen?C.inter:rejected?C.risk:C.frame;
+function VariantCard({ v, chosen, rejected, onChoose, onReject }) {
+  const state = chosen ? C.inter : rejected ? C.risk : C.frame;
+  const shortText = v.text ? v.text.slice(0, 200) + (v.text.length > 200 ? '…' : '') : '';
   return (
-    <div style={{border:`${chosen||rejected?1.6:1}px solid ${state}`,padding:14,background:C.canvas,position:'relative'}}>
-      {(chosen||rejected) && <div style={{position:'absolute',top:-9,left:10,background:C.canvas,padding:'0 6px'}}><Chip c={state}>{chosen?'✓ chosen':'✗ rejected'}</Chip></div>}
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
-        <div className="mono" style={{fontSize:18,color:C.ink,letterSpacing:'.08em'}}>{v.id}</div>
-        <Chip c={C.halo}>seed {v.seed}</Chip>
+    <div style={{ border:`${chosen||rejected?1.6:1}px solid ${state}`, padding:14,
+                  background:C.canvas, position:'relative' }}>
+      {(chosen||rejected) && (
+        <div style={{ position:'absolute', top:-9, left:10, background:C.canvas, padding:'0 6px' }}>
+          <Chip c={state}>{chosen ? '✓ chosen' : '✗ rejected'}</Chip>
+        </div>
+      )}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline' }}>
+        <div className="mono" style={{ fontSize:18, color:C.ink, letterSpacing:'.08em' }}>Variant {v.id}</div>
+        <Chip c={C.halo}>temp {v.temp}</Chip>
       </div>
-      <div className="sans" style={{fontSize:12,color:C.ink2,marginTop:4,textWrap:'pretty',minHeight:28}}>{v.title}</div>
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:4,marginTop:10,borderTop:`1px solid ${C.frame}`,paddingTop:8}}>
-        {[['mass',v.metrics.mass,C.lox],['print',v.metrics.print,C.lh2],['parts',v.metrics.parts,C.inter],['cost',v.metrics.cost,C.halo]].map(m=>(
-          <div key={m[0]} style={{padding:'2px 0'}}>
-            <div className="mono" style={{fontSize:9,color:C.ink3,letterSpacing:'.1em'}}>{m[0].toUpperCase()}</div>
-            <div className="mono" style={{fontSize:13,color:m[2]}}>{m[1]}</div>
-          </div>
-        ))}
-      </div>
-      <div style={{display:'flex',gap:8,marginTop:10,alignItems:'center'}}>
-        <Chip c={C.inter}>✓ {v.pass}</Chip>
-        {v.fail>0 && <Chip c={C.risk}>✗ {v.fail}</Chip>}
-      </div>
-      <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:6,textWrap:'pretty',minHeight:26}}>{v.note}</div>
-      <div style={{display:'flex',gap:6,marginTop:10}}>
-        <Btn size="sm" variant="go" onClick={()=>onChoose(v.id)} disabled={chosen}>✓ choose</Btn>
-        <Btn size="sm" variant="risk" onClick={()=>onReject(v.id)} disabled={rejected}>✗ reject</Btn>
-      </div>
+      {v.generating ? (
+        <div className="mono" style={{ fontSize:11, color:C.term_green, marginTop:8 }}>
+          ◐ generating… {v.tokens} tokens
+        </div>
+      ) : v.error ? (
+        <div className="mono" style={{ fontSize:11, color:C.risk, marginTop:8 }}>{v.error}</div>
+      ) : (
+        <div className="mono" style={{ fontSize:11, color:C.ink2, marginTop:8, lineHeight:1.6,
+                                       maxHeight:120, overflow:'hidden', textWrap:'pretty' }}>
+          {shortText}
+        </div>
+      )}
+      {!v.generating && !v.error && v.text && (
+        <div style={{ display:'flex', gap:6, marginTop:10 }}>
+          <Btn size="sm" variant="go"   onClick={() => onChoose(v.id)} disabled={chosen}>✓ choose</Btn>
+          <Btn size="sm" variant="risk" onClick={() => onReject(v.id)} disabled={rejected}>✗ reject</Btn>
+        </div>
+      )}
     </div>
   );
 }
 
-// ============ TERMINAL ============
-function Terminal({ lines, running }){
+// ── Terminal ────────────────────────────────────────────────────────────────
+
+function Terminal({ lines, running }) {
   const ref = useRef();
-  useEffect(()=>{ if(ref.current) ref.current.scrollTop = ref.current.scrollHeight; },[lines]);
+  useEffect(() => { if (ref.current) ref.current.scrollTop = ref.current.scrollHeight; }, [lines]);
   return (
-    <div style={{border:`1px solid ${C.frame}`,background:C.canvas}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderBottom:`1px solid ${C.frame}`}}>
-        <Chip c={C.term_green}>TERMINAL · save/retrain.log</Chip>
-        <div style={{display:'flex',gap:6,alignItems:'center'}}>
-          <span style={{width:7,height:7,borderRadius:7,background:running?C.term_green:C.ink3,boxShadow:running?`0 0 6px ${C.term_green}`:'none',animation:running?'pulse 1.4s infinite':''}}/>
-          <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em'}}>{running?'STREAMING':'IDLE'}</span>
+    <div style={{ border:`1px solid ${C.frame}`, background:C.canvas }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center',
+                    padding:'8px 12px', borderBottom:`1px solid ${C.frame}` }}>
+        <Chip c={C.term_green}>TERMINAL · ollama output</Chip>
+        <div style={{ display:'flex', gap:6, alignItems:'center' }}>
+          <span style={{ width:7, height:7, borderRadius:7, background:running?C.term_green:C.ink3,
+                         boxShadow:running?`0 0 6px ${C.term_green}`:'none',
+                         animation:running?'pulse 1.4s infinite':'' }}/>
+          <span className="mono" style={{ fontSize:10, color:C.ink3, letterSpacing:'.08em' }}>
+            {running ? 'STREAMING' : 'IDLE'}
+          </span>
         </div>
       </div>
-      <div ref={ref} className="term" style={{background:C.term_bg,padding:'12px 14px',height:260,overflow:'auto',fontFamily:C.mono,fontSize:11.5,lineHeight:1.5}}>
-        {lines.length===0 && <span style={{color:C.term_dim}}>$ waiting for input…</span>}
-        {lines.map((l,i)=>(
-          <div key={i} style={{color:l.c||C.term_green,whiteSpace:'pre-wrap'}}>{l.t}</div>
+      <div ref={ref} className="term"
+        style={{ background:C.term_bg, padding:'12px 14px', height:280, overflow:'auto',
+                 fontFamily:C.mono, fontSize:11.5, lineHeight:1.5 }}>
+        {lines.length === 0 && <span style={{ color:C.term_dim }}>$ waiting for input…</span>}
+        {lines.map((l, i) => (
+          <div key={i} style={{ color:l.c||C.term_green, whiteSpace:'pre-wrap' }}>{l.t}</div>
         ))}
-        {running && <span style={{color:C.term_green}}>▊</span>}
+        {running && <span style={{ color:C.term_green }}>▊</span>}
       </div>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
     </div>
   );
 }
 
-// ============ ROOT ============
-function App(){
-  const [activeId,setActiveId] = useState('qwen25-3b-v3');
-  const active = MODELS.find(m=>m.id===activeId);
+// ── Preset selector ────────────────────────────────────────────────────────
 
-  const [brief,setBrief] = useState('Saturn V S-IC booster · LOX/RP-1 · reusable 10 cycles · LPBF Inconel 718 · min_wall ≥ 1.2 mm · overhang ≤ 45°');
-  const [variantsShown,setVariantsShown] = useState(false);
-  const [generating,setGenerating] = useState(false);
-  const [chosen,setChosen] = useState(null);
-  const [rejected,setRejected] = useState(null);
-  const [prefsAdded,setPrefsAdded] = useState(0);
-  const [retraining,setRetraining] = useState(false);
-  const [term,setTerm] = useState([
-    {c:C.term_dim, t:'$ blueprint-npu --model qwen2.5-3b-int4:v3 --offline'},
-    {c:C.term_green, t:'[npu] OpenVINO 2025.0 · device=NPU · INT4 · ready'},
-    {c:C.term_dim,   t:'$ listening for prompts on :7860'},
+const PRESETS = {
+  general_mechanical: {
+    label: 'General Mechanical',
+    sys: 'You are Blueprint NPU, an expert mechanical design assistant specializing in 3D-printable parts. Given a design brief, generate a concise structured design review covering: key requirements, constraints, part tree overview, print/manufacturing notes, potential risks, and 3 clarifying questions you would ask the engineer. Keep responses practical and precise.',
+  },
+  propulsion: {
+    label: 'Propulsion / Aero',
+    sys: 'You are Blueprint NPU, an expert in propulsion and aerospace design for 3D-printable components. Given a design brief, generate a concise structured design review covering: propulsion requirements, material constraints, thermal/pressure considerations, part tree, manufacturing notes, risks, and 3 clarifying questions. Keep responses practical and conceptual — no export-controlled specifics.',
+  },
+  drone_aero: {
+    label: 'Drone / Aero',
+    sys: 'You are Blueprint NPU, an expert in drone and aerodynamic part design for 3D printing. Given a design brief, generate a concise structured design review covering: aerodynamic requirements, weight constraints, part tree, print orientation notes, risks, and 3 clarifying questions. Keep responses practical and precise.',
+  },
+  electronics_enclosure: {
+    label: 'Electronics / Enclosure',
+    sys: 'You are Blueprint NPU, an expert in electronics enclosure design for 3D printing. Given a design brief, generate a concise structured design review covering: thermal/EMI requirements, fit and finish constraints, part tree, print material notes, risks, and 3 clarifying questions. Keep responses practical and precise.',
+  },
+  repair_fixture: {
+    label: 'Repair Jig / Fixture',
+    sys: 'You are Blueprint NPU, an expert in jig, fixture, and repair adapter design for 3D printing. Given a design brief, generate a structured design review covering: functional requirements, tolerance and material constraints, part tree, print notes, risks, and 3 clarifying questions. Keep responses practical and precise.',
+  },
+};
+
+// ── Root App ────────────────────────────────────────────────────────────────
+
+function App() {
+  // model state
+  const [models, setModels]           = useState([]);
+  const [modelsLoading, setModelsLoading] = useState(true);
+  const [activeModel, setActiveModel] = useState('');
+  const [ollamaOnline, setOllamaOnline] = useState(false);
+
+  // brief + preset
+  const [brief, setBrief]     = useState('Design a compact 80mm fan duct bracket for a 3D printer hotend cooling system. Material: PETG. Must be printable without supports. Wall thickness ≥ 1.2mm.');
+  const [preset, setPreset]   = useState('general_mechanical');
+
+  // generation state
+  const [generating, setGenerating] = useState(false);
+  const abortRef = useRef(null);
+
+  // variants: [{id:'A'|'B'|'C', temp, text, tokens, generating, error}]
+  const [variants, setVariants]     = useState([]);
+  const [variantsShown, setVariantsShown] = useState(false);
+  const [chosen, setChosen]         = useState(null);
+  const [rejected, setRejected]     = useState(null);
+  const [prefsAdded, setPrefsAdded] = useState(0);
+
+  // terminal
+  const [term, setTerm] = useState([
+    { c:C.term_dim,   t:'$ blueprint-npu · ollama mode' },
+    { c:C.term_green, t:'[init] fetching model list from :11434…' },
   ]);
 
-  function pushTerm(lines){ setTerm(t=>[...t, ...(Array.isArray(lines)?lines:[lines])]); }
+  function pushTerm(lines) {
+    setTerm(t => [...t, ...(Array.isArray(lines) ? lines : [lines])]);
+  }
 
-  function onGenerate(){
-    if(!brief.trim()) return;
-    setGenerating(true); setVariantsShown(false); setChosen(null); setRejected(null);
-    pushTerm([
-      {c:C.term_dim,   t:`$ npu_generate --n 3 --temp 0.9 --model ${active.name}:${active.version}`},
-      {c:C.term_green, t:`[npu] seeds = [7, 8, 11] · max_new_tokens=384`},
-    ]);
-    let step=0;
-    const id=setInterval(()=>{
-      step++;
-      if(step===1) pushTerm({c:C.term_green,t:`[npu] variant A … 112 tok/s · 3.4s`});
-      if(step===2) pushTerm({c:C.term_green,t:`[npu] variant B … 108 tok/s · 3.5s`});
-      if(step===3) pushTerm({c:C.term_green,t:`[npu] variant C … 104 tok/s · 3.7s`});
-      if(step===4){
-        pushTerm([
-          {c:C.term_green, t:`[verify] A: 6 pass / 2 fail · B: 8 pass / 0 fail · C: 5 pass / 3 fail`},
-          {c:C.term_dim,   t:`$ ready · pick one best + one worst`},
-        ]);
-        setVariantsShown(true); setGenerating(false); clearInterval(id);
+  // ── load models on mount ──
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      try {
+        const data = await ollamaTags();
+        if (!alive) return;
+        const list = data.models || [];
+        setModels(list);
+        setOllamaOnline(true);
+        if (list.length > 0) {
+          setActiveModel(list[0].name);
+          pushTerm([
+            { c:C.term_green, t:`[init] ${list.length} model(s) found: ${list.map(m=>m.name).join(', ')}` },
+            { c:C.term_green, t:`[init] active model → ${list[0].name}` },
+            { c:C.term_dim,   t:'$ ready · enter a brief and click Generate' },
+          ]);
+        } else {
+          pushTerm({ c:C.term_warn, t:'[warn] no models installed — run: ollama pull qwen2.5:7b' });
+        }
+      } catch {
+        if (!alive) return;
+        setOllamaOnline(false);
+        pushTerm({ c:C.term_risk, t:'[err] ollama not reachable at :11434 — start C:\\Ollama-IPEX\\start-ollama.bat' });
+      } finally {
+        if (alive) setModelsLoading(false);
       }
-    },500);
-  }
+    };
+    load();
+    return () => { alive = false; };
+  }, []);
 
-  function commitPair(ch, rj){
-    if(!ch||!rj||ch===rj) return;
+  // ── generate 3 variants ──
+  async function onGenerate() {
+    if (!brief.trim() || !activeModel || generating) return;
+
+    setGenerating(true);
+    setVariantsShown(false);
+    setChosen(null);
+    setRejected(null);
+
+    const temps = [0.6, 0.8, 1.0];
+    const ids   = ['A', 'B', 'C'];
+    const sys   = PRESETS[preset]?.sys || PRESETS.general_mechanical.sys;
+    const userPrompt = `Design Brief:\n${brief}\n\nProvide a structured design review.`;
+
+    setVariants(ids.map((id, i) => ({ id, temp:temps[i], text:'', tokens:0, generating:true, error:null })));
+    setVariantsShown(true);
+
     pushTerm([
-      {c:C.term_dim,   t:`$ append_pref --brief "${brief.slice(0,40)}…" --chosen ${ch} --rejected ${rj}`},
-      {c:C.term_green, t:`[prefs] +1 row → save/prefs/${new Date().toISOString().slice(0,10)}.jsonl`},
-      {c:C.term_green, t:`[prefs] session total ${prefsAdded+1} · lineage total ${active.prefs+prefsAdded+1}`},
+      { c:C.term_dim,   t:`$ generate 3 variants · model: ${activeModel} · preset: ${preset}` },
+      { c:C.term_green, t:`[gen] temperatures: ${temps.join(', ')}` },
     ]);
-    setPrefsAdded(n=>n+1);
-    setTimeout(()=>{
-      setChosen(null); setRejected(null); setVariantsShown(false);
-      pushTerm({c:C.term_dim, t:`$ ready for next brief`});
-    },700);
-  }
-  function onChoose(id){ setChosen(id); if(rejected) commitPair(id, rejected); }
-  function onReject(id){ setRejected(id); if(chosen) commitPair(chosen, id); }
 
-  function onRetrain(){
-    if(prefsAdded<2){
-      pushTerm({c:C.term_risk, t:`[err] need ≥ 2 prefs in this session (have ${prefsAdded})`});
-      return;
+    for (let i = 0; i < 3; i++) {
+      const id   = ids[i];
+      const temp = temps[i];
+      pushTerm({ c:C.term_green, t:`[gen] variant ${id} · temp ${temp} · streaming…` });
+
+      try {
+        let full = '';
+        let tokens = 0;
+        for await (const chunk of ollamaGenerate(activeModel, sys, userPrompt, { temperature: temp, num_predict: 500 })) {
+          if (chunk.response) {
+            full   += chunk.response;
+            tokens += 1;
+          }
+          setVariants(vs => vs.map(v => v.id === id ? { ...v, text:full, tokens } : v));
+          if (chunk.done) break;
+        }
+        setVariants(vs => vs.map(v => v.id === id ? { ...v, generating:false } : v));
+        pushTerm({ c:C.term_green, t:`[gen] variant ${id} done · ${tokens} tokens` });
+      } catch (e) {
+        setVariants(vs => vs.map(v => v.id === id ? { ...v, generating:false, error:`Error: ${e.message}` } : v));
+        pushTerm({ c:C.term_risk, t:`[err] variant ${id}: ${e.message}` });
+      }
     }
-    setRetraining(true);
-    const seq = [
-      {c:C.term_dim,  t:`$ bash run_retrain.sh --base ${active.name} --adapter lora_r16`},
-      {c:C.term_green,t:`[1/4] sft · failures (14 rows) …`},
-      {c:C.term_green,t:`      step 0014/0028 · loss 0.62 · 00:42`},
-      {c:C.term_green,t:`      step 0028/0028 · loss 0.31 · done`},
-      {c:C.term_green,t:`[2/4] dpo · prefs (${active.prefs+prefsAdded} pairs · β=0.1) …`},
-      {c:C.term_green,t:`      step 0050/0200 · margin +0.18 · lr 1e-4`},
-      {c:C.term_green,t:`      step 0120/0200 · margin +0.34`},
-      {c:C.term_green,t:`      step 0200/0200 · margin +0.41 · done`},
-      {c:C.term_green,t:`[3/4] merge lora → fp16 …`},
-      {c:C.term_green,t:`      lora_r16 merged · 3.07 GB (fp16)`},
-      {c:C.term_green,t:`[4/4] export ov int4 → models/ov_npu_ready/qwen25_3b_int4_v4 …`},
-      {c:C.term_green,t:`      nncf INT4 · group=128 · 1.91 GB · done`},
-      {c:C.term_dim,  t:`$ hot-swap → NPU`},
-      {c:C.term_green,t:`[npu] unloading v3 · loading v4 · ready (1.1s)`},
-      {c:C.term_warn, t:`[done] v4 available · 248 → ${active.prefs+prefsAdded} prefs baked in`},
-    ];
-    let i=0;
-    const id=setInterval(()=>{
-      pushTerm(seq[i]); i++;
-      if(i>=seq.length){ clearInterval(id); setRetraining(false); setPrefsAdded(0); }
-    },420);
+
+    pushTerm({ c:C.term_dim, t:'$ done · pick best + worst to log preference' });
+    setGenerating(false);
   }
+
+  function onStop() {
+    if (abortRef.current) abortRef.current.abort();
+    setGenerating(false);
+    pushTerm({ c:C.term_warn, t:'[user] generation stopped' });
+  }
+
+  // ── preference logging ──
+  function commitPair(ch, rj) {
+    if (!ch || !rj || ch === rj) return;
+    const entry = { ts: new Date().toISOString(), model: activeModel, preset, brief, chosen:ch, rejected:rj };
+    const existing = JSON.parse(localStorage.getItem('bp_prefs') || '[]');
+    existing.push(entry);
+    localStorage.setItem('bp_prefs', JSON.stringify(existing));
+    pushTerm([
+      { c:C.term_dim,   t:`$ log preference: chosen=${ch} rejected=${rj}` },
+      { c:C.term_green, t:`[prefs] saved to localStorage · total ${existing.length} pairs` },
+      { c:C.term_dim,   t:'$ ready for next brief' },
+    ]);
+    setPrefsAdded(n => n + 1);
+    setTimeout(() => { setChosen(null); setRejected(null); setVariantsShown(false); setVariants([]); }, 800);
+  }
+  function onChoose(id) { setChosen(id);   if (rejected) commitPair(id, rejected); }
+  function onReject(id) { setRejected(id); if (chosen)   commitPair(chosen,   id); }
+
+  const totalPrefs = JSON.parse(localStorage.getItem('bp_prefs') || '[]').length;
 
   return (
-    <div style={{maxWidth:1280,margin:'0 auto',padding:20,fontFamily:C.sans,color:C.ink2}}>
-
-      {/* DEMO badge banner */}
-      <div style={{border:`1px solid ${C.lh2}`,background:'rgba(255,211,159,0.06)',padding:'10px 14px',marginBottom:14,display:'flex',justifyContent:'space-between',alignItems:'center',gap:14}}>
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <span style={{fontFamily:C.mono,fontSize:10,letterSpacing:'.14em',color:'#0c1e35',background:C.lh2,padding:'3px 8px'}}>DEMO MODE</span>
-          <span className="mono" style={{fontSize:11,color:C.ink2}}>UI mock — no Python server connected. Buttons simulate output. Run <a href="Setup.html" style={{color:C.lox}}>Setup</a> to wire it to a real NPU.</span>
-        </div>
-        <a href="Setup.html" style={{fontFamily:C.mono,fontSize:11,color:C.lh2,letterSpacing:'.08em',textTransform:'uppercase',border:`1px solid ${C.lh2}`,padding:'5px 10px',textDecoration:'none'}}>open setup →</a>
-      </div>
+    <div style={{ maxWidth:1280, margin:'0 auto', padding:20, fontFamily:C.sans, color:C.ink2 }}>
 
       {/* title row */}
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',borderBottom:`2px solid ${C.frame}`,paddingBottom:10,marginBottom:16}}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline',
+                    borderBottom:`2px solid ${C.frame}`, paddingBottom:10, marginBottom:16 }}>
         <div>
-          <div className="mono" style={{letterSpacing:'.14em',color:C.ink,fontSize:18}}>BLUEPRINT_NPU · MINIMAL</div>
-          <div className="mono" style={{fontSize:11,color:C.lox,marginTop:2}}>3B · offline · every button is wired · no flaky features</div>
+          <div className="mono" style={{ letterSpacing:'.14em', color:C.ink, fontSize:18 }}>BLUEPRINT_NPU · MINIMAL</div>
+          <div className="mono" style={{ fontSize:11, color:C.lox, marginTop:2 }}>
+            ollama mode · {activeModel || 'no model'} · {totalPrefs + prefsAdded} prefs stored
+          </div>
         </div>
-        <Chip c={C.halo}>{active.name}:{active.version} · {active.prefs+prefsAdded} prefs</Chip>
+        <Chip c={ollamaOnline ? C.inter : C.risk}>
+          {ollamaOnline ? '● ollama online' : '✗ ollama offline'}
+        </Chip>
       </div>
 
       {/* top row: model picker + status */}
-      <div style={{display:'grid',gridTemplateColumns:'1.3fr 1fr',gap:14,marginBottom:16}}>
-        <ModelPicker activeId={activeId} setActiveId={setActiveId} onTerm={pushTerm}
-          onPull={()=>pushTerm([{c:C.term_dim,t:'$ ollama-style pull not enabled offline · place .gguf/.ov_ir in models/bases/'}])}/>
-        <div style={{display:'flex',flexDirection:'column',gap:14}}>
-          <StatusLamps/>
-          {/* active lineage card */}
-          <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas}}>
-            <Chip c={C.halo} style={{marginBottom:8,display:'block'}}>ACTIVE LINEAGE</Chip>
-            <KV k="base" v={active.base} c={C.lox}/>
-            <KV k="adapter" v={active.adapter} c={C.halo}/>
-            <KV k="version" v={`${active.version} · ${active.age} ago`} c={C.inter}/>
-            <KV k="prefs baked" v={active.prefs} c={C.lh2}/>
-          </div>
+      <div style={{ display:'grid', gridTemplateColumns:'1.3fr 1fr', gap:14, marginBottom:16 }}>
+        <ModelPicker
+          models={models} loading={modelsLoading}
+          activeModel={activeModel} setActiveModel={setActiveModel}
+          onTerm={pushTerm} />
+        <StatusLamps ollamaOnline={ollamaOnline} />
+      </div>
+
+      {/* preset selector */}
+      <div style={{ border:`1px solid ${C.frame}`, padding:14, background:C.canvas, marginBottom:14 }}>
+        <Chip c={C.halo} style={{ display:'block', marginBottom:10 }}>00 · PRESET DOMAIN</Chip>
+        <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+          {Object.entries(PRESETS).map(([k, p]) => (
+            <Btn key={k} size="sm" variant={preset===k?'primary':'default'} onClick={() => setPreset(k)}>
+              {p.label}
+            </Btn>
+          ))}
         </div>
       </div>
 
       {/* 01 brief */}
-      <div style={{border:`1px solid ${C.frame}`,padding:16,background:C.canvas,marginBottom:14}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
+      <div style={{ border:`1px solid ${C.frame}`, padding:16, background:C.canvas, marginBottom:14 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:8 }}>
           <Chip c={C.lox}>01 · BRIEF</Chip>
-          <span className="mono" style={{fontSize:10,color:C.ink3}}>one line of intent · the model generates 3 takes</span>
+          <span className="mono" style={{ fontSize:10, color:C.ink3 }}>
+            설계 요청을 한 줄로 — 모델이 3가지 변형안을 생성합니다
+          </span>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:12,alignItems:'stretch'}}>
-          <textarea value={brief} onChange={e=>setBrief(e.target.value)} rows={2}
-            style={{fontFamily:C.mono,fontSize:13,background:C.canvas2,color:C.ink,border:`1px solid ${C.frame}`,padding:'10px 12px',borderRadius:2,outline:'none',resize:'vertical'}}/>
-          <Btn variant="primary" onClick={onGenerate} disabled={generating}>
-            {generating?'◐ generating':'▶ generate 3'}
-          </Btn>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr auto', gap:12, alignItems:'stretch' }}>
+          <textarea value={brief} onChange={e => setBrief(e.target.value)} rows={3}
+            style={{ fontFamily:C.mono, fontSize:13, background:C.canvas2, color:C.ink,
+                     border:`1px solid ${C.frame}`, padding:'10px 12px', borderRadius:2,
+                     outline:'none', resize:'vertical' }}/>
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            <Btn variant="primary" onClick={onGenerate} disabled={generating || !activeModel || modelsLoading}>
+              {generating ? '◐ generating' : '▶ generate 3'}
+            </Btn>
+            {generating && (
+              <Btn variant="risk" size="sm" onClick={onStop}>■ stop</Btn>
+            )}
+          </div>
         </div>
 
-        {/* advanced drawer */}
-        <details style={{marginTop:10}}>
-          <summary style={{cursor:'pointer',fontFamily:C.mono,fontSize:11,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase'}}>▸ advanced · temperature · axis locks · failure bucket</summary>
-          <div style={{marginTop:10,padding:12,border:`1px dashed ${C.frame}`,background:C.canvas2,fontFamily:C.mono,fontSize:11,color:C.ink3}}>
-            defaults are tuned for 3B · temp 0.9 · novelty free · no axis locks · failure SFT off<br/>
-            advanced loop (Diversity Pressure, Failure Bucket, composed recipe) → see <a href="SelfLoop.html" style={{color:C.lox}}>SelfLoop.html</a>
+        <details style={{ marginTop:10 }}>
+          <summary style={{ cursor:'pointer', fontFamily:C.mono, fontSize:11, color:C.ink3,
+                            letterSpacing:'.08em', textTransform:'uppercase' }}>
+            ▸ 설정 · temperatures · preset system prompt
+          </summary>
+          <div style={{ marginTop:10, padding:12, border:`1px dashed ${C.frame}`,
+                        background:C.canvas2, fontFamily:C.mono, fontSize:11, color:C.ink3, lineHeight:1.7 }}>
+            Variant A: temp 0.6 (conservative) · B: 0.8 (balanced) · C: 1.0 (creative)<br/>
+            model: <span style={{ color:C.lox }}>{activeModel || '—'}</span> · preset: <span style={{ color:C.halo }}>{preset}</span><br/>
+            preferences are saved to <span style={{ color:C.lh2 }}>localStorage</span> — cleared on browser data clear.
           </div>
         </details>
       </div>
 
       {/* 02 variants */}
-      <div style={{marginBottom:14}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
-          <Chip c={C.halo}>02 · PICK — one best, one worst</Chip>
-          <span className="mono" style={{fontSize:10,color:C.ink3}}>chosen: {chosen||'—'} · rejected: {rejected||'—'}</span>
+      <div style={{ marginBottom:14 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:8 }}>
+          <Chip c={C.halo}>02 · PICK — 가장 좋은 것과 가장 나쁜 것</Chip>
+          <span className="mono" style={{ fontSize:10, color:C.ink3 }}>
+            chosen: {chosen || '—'} · rejected: {rejected || '—'}
+          </span>
         </div>
         {!variantsShown ? (
-          <div style={{border:`1px dashed ${C.frame}`,padding:'36px 16px',textAlign:'center',fontFamily:C.mono,fontSize:12,color:C.ink3,background:C.canvas}}>
-            {generating?'◐ generating on NPU…':'(click Generate above)'}
+          <div style={{ border:`1px dashed ${C.frame}`, padding:'36px 16px', textAlign:'center',
+                        fontFamily:C.mono, fontSize:12, color:C.ink3, background:C.canvas }}>
+            (위에서 Generate 클릭)
           </div>
         ) : (
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
-            {VARIANTS.map(v=>(
-              <VariantCard key={v.id} v={v} chosen={chosen===v.id} rejected={rejected===v.id} onChoose={onChoose} onReject={onReject}/>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:12 }}>
+            {variants.map(v => (
+              <VariantCard key={v.id} v={v}
+                chosen={chosen===v.id} rejected={rejected===v.id}
+                onChoose={onChoose} onReject={onReject} />
             ))}
           </div>
         )}
       </div>
 
-      {/* 03 retrain */}
-      <div style={{border:`1px solid ${C.frame}`,padding:16,background:C.canvas,marginBottom:14}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+      {/* 03 preferences log */}
+      <div style={{ border:`1px solid ${C.frame}`, padding:16, background:C.canvas, marginBottom:14 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
-            <Chip c={C.risk}>03 · RETRAIN</Chip>
-            <div className="sans" style={{fontSize:12,color:C.ink2,marginTop:4}}>
-              run SFT(failures) → DPO(prefs) → merge → export OV INT4 → hot-swap NPU · all in one script
+            <Chip c={C.lh2}>03 · PREFERENCE LOG</Chip>
+            <div className="sans" style={{ fontSize:12, color:C.ink2, marginTop:4 }}>
+              Best/Worst 선택 시 localStorage에 자동 저장됩니다 — 미래 파인튜닝 데이터로 활용.
             </div>
           </div>
-          <Btn variant="risk" onClick={onRetrain} disabled={retraining||prefsAdded<2}>
-            {retraining?'◐ training':`retrain → v${parseInt(active.version.replace(/\D/g,''))+1}`}
-          </Btn>
+          <Btn size="sm" variant="warn" onClick={() => {
+            const prefs = JSON.parse(localStorage.getItem('bp_prefs') || '[]');
+            const blob  = new Blob([JSON.stringify(prefs, null, 2)], { type:'application/json' });
+            const url   = URL.createObjectURL(blob);
+            const a     = document.createElement('a'); a.href = url;
+            a.download  = `bp_prefs_${new Date().toISOString().slice(0,10)}.jsonl`;
+            a.click(); URL.revokeObjectURL(url);
+          }}>↓ export .json</Btn>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginTop:12}}>
-          <KV k="session prefs" v={`+${prefsAdded}`} c={prefsAdded>=2?C.inter:C.ink3}/>
-          <KV k="lineage total" v={active.prefs+prefsAdded} c={C.halo}/>
-          <KV k="failures bucketed" v="14 rows" c={C.risk}/>
-          <KV k="est. time (Arc A770)" v="~18 min" c={C.lh2}/>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginTop:12 }}>
+          <KV k="세션 prefs" v={`+${prefsAdded}`} c={prefsAdded>0?C.inter:C.ink3}/>
+          <KV k="전체 저장" v={totalPrefs + prefsAdded} c={C.halo}/>
+          <KV k="active model" v={activeModel || '—'} c={C.lox}/>
         </div>
       </div>
 
       {/* 04 terminal */}
-      <Terminal lines={term} running={generating||retraining}/>
+      <Terminal lines={term} running={generating} />
 
-      <div style={{borderTop:`1px solid ${C.frame}`,paddingTop:12,marginTop:16,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
-        <span>minimal runner · flow: pick model → brief → pick best/worst → retrain → hot-swap</span>
-        <span>full vision → <a href="SelfLoop.html" style={{color:C.lox}}>SelfLoop.html</a> · deep workbench → <a href="ui_kits/gradio_workbench/index.html" style={{color:C.lox}}>gradio_workbench</a></span>
+      <div style={{ borderTop:`1px solid ${C.frame}`, paddingTop:12, marginTop:16,
+                    fontFamily:C.mono, fontSize:10, color:C.ink3, letterSpacing:'.06em',
+                    display:'flex', justifyContent:'space-between' }}>
+        <span>minimal runner · brief → 3 ollama variants → pick best/worst → export prefs</span>
+        <span>full vision → <a href="SelfLoop.html" style={{ color:C.lox }}>SelfLoop.html</a></span>
       </div>
     </div>
   );

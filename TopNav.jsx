@@ -43,33 +43,41 @@ const BP_C = {
 
 function BPHealth(){
   const [state,setState] = React.useState('checking'); // checking | online | offline
-  const [model,setModel] = React.useState(null);
+  const [info,setInfo] = React.useState('');
 
   React.useEffect(()=>{
     let dead=false;
     const ping = ()=>{
       const ctrl = new AbortController();
-      const t = setTimeout(()=>ctrl.abort(), 1500);
-      fetch('http://127.0.0.1:7860/', { mode:'no-cors', signal:ctrl.signal })
-        .then(()=>{ if(!dead){ setState('online'); setModel('qwen2.5-3b-int4'); } })
-        .catch(()=>{ if(!dead) setState('offline'); })
+      const t = setTimeout(()=>ctrl.abort(), 2000);
+      fetch('http://127.0.0.1:11434/api/tags', { signal:ctrl.signal })
+        .then(r=>r.json())
+        .then(data=>{
+          if(dead) return;
+          const models = (data.models||[]);
+          const count = models.length;
+          const first = count>0 ? models[0].name : 'no models';
+          setState('online');
+          setInfo(count===1 ? first : count>1 ? `${first} +${count-1}` : 'no models pulled');
+        })
+        .catch(()=>{ if(!dead){ setState('offline'); setInfo(''); } })
         .finally(()=>clearTimeout(t));
     };
     ping();
-    const id = setInterval(ping, 5000);
+    const id = setInterval(ping, 6000);
     return ()=>{ dead=true; clearInterval(id); };
   },[]);
 
   const map = {
     checking: { c:BP_C.ink3,  dot:BP_C.ink3,  t:'connecting…' },
-    online:   { c:BP_C.inter, dot:BP_C.inter, t:`server online · ${model||''}` },
-    offline:  { c:BP_C.risk,  dot:BP_C.risk,  t:'server offline · DEMO MODE' },
+    online:   { c:BP_C.inter, dot:BP_C.inter, t:`ollama online · ${info}` },
+    offline:  { c:BP_C.risk,  dot:BP_C.risk,  t:'ollama offline · start C:\\Ollama-IPEX\\start-ollama.bat' },
   }[state];
 
   return (
     <a href="Errors.html" style={{display:'inline-flex',alignItems:'center',gap:8,textDecoration:'none',padding:'5px 10px',border:`1px solid ${map.c}`,fontFamily:BP_C.mono,fontSize:10.5,color:map.c,letterSpacing:'.06em'}}>
       <span style={{width:6,height:6,borderRadius:'50%',background:map.dot,boxShadow:`0 0 8px ${map.dot}`,animation:state==='checking'?'bp-pulse 1s infinite':'none'}}/>
-      <span>127.0.0.1:7860 · {map.t}</span>
+      <span>127.0.0.1:11434 · {map.t}</span>
     </a>
   );
 }
