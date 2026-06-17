@@ -1,0 +1,220 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "cubesat",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "propulsion_mock",
+    "discipline": "actuation",
+    "function": "Cold gas thruster bracket dummies and plumbing manifold mock (display-only, non-functional)",
+    "evidence_features": [
+      "thruster_bracket",
+      "cold_gas_nozzle_dummy",
+      "plumbing_manifold",
+      "cross_pattern_mount"
+    ],
+    "criteria_refs": [
+      "geometry_grounding",
+      "small_launch_vehicle_mock_boundary",
+      "datum_tolerance"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "title": "P0 to Geometry Grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "weight": 14,
+          "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+          "bad": "P0 lists features but geometry_ops are generic boxes at the origin.",
+          "signals": [
+            "_subsystem_plan.internal_feature_targets",
+            "geometry_ops.id",
+            "geometry_ops.target"
+          ],
+          "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "weight": 12,
+          "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+          "bad": "Geometry is stacked at [0,0,0] or lacks coordinates.",
+          "signals": [
+            "args.at",
+            "coordinate_spread_score"
+          ],
+          "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "weight": 10,
+          "good": "Uses drill, pocket, boss, channel, cylinder, chamfer, fillet, pattern, and engrave where appropriate.",
+          "bad": "Primary output is a rectangular box with shallow labels.",
+          "signals": [
+            "drill",
+            "pocket",
+            "boss",
+            "channel",
+            "pattern_linear",
+            "pattern_polar",
+            "fillet",
+            "chamfer"
+          ],
+          "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+        },
+        {
+          "criterion": "mechanism_named_not_implied",
+          "weight": 9,
+          "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "signals": [
+            "four_bar",
+            "cam",
+            "rack_pinion",
+            "lead_screw",
+            "pivot_hole",
+            "linkage_bar"
+          ],
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "source_refs": [
+            "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "datum_tolerance",
+      "title": "Datum, Interface, and Tolerance Judgment",
+      "criteria": [
+        {
+          "criterion": "datum_visibility",
+          "weight": 11,
+          "good": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+          "bad": "Interfaces exist only as abstract neighbor references.",
+          "signals": [
+            "datum",
+            "axis_ring",
+            "rail",
+            "socket",
+            "mounting_pad",
+            "interface_zone"
+          ],
+          "loop_feedback": "Add visible datum pads or axis/rail/socket features and label their mating function."
+        },
+        {
+          "criterion": "clearance_named",
+          "weight": 8,
+          "good": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+          "bad": "Moving/removable joints have no clearance or fit language.",
+          "signals": [
+            "clearance_mm",
+            "tol_mm",
+            "fit",
+            "slip",
+            "snap",
+            "pin"
+          ],
+          "loop_feedback": "Add clearance_mm or tolerance notes for hinge pins, slide rails, sockets, and removable cartridges."
+        },
+        {
+          "criterion": "interface_count",
+          "weight": 8,
+          "good": "Each subsystem has at least three adjacent interfaces or datums.",
+          "bad": "Subsystem is isolated and does not show assembly neighbors.",
+          "signals": [
+            "adjacent_interfaces",
+            "target_part",
+            "interface_type"
+          ],
+          "loop_feedback": "Add at least three adjacent interfaces: mount, service, electrical/data, flow, or inspection datum."
+        },
+        {
+          "criterion": "standard_fit_vocabulary",
+          "weight": 8,
+          "good": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+          "bad": "All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance.",
+          "signals": [
+            "clearance_fit",
+            "transition_fit",
+            "press_fit",
+            "allowance_mm",
+            "H7",
+            "shaft_basis"
+          ],
+          "loop_feedback": "Classify each mating diameter as clearance/transition/press fit and add a numeric allowance instead of line-to-line nominals.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        },
+        {
+          "criterion": "standard_hardware_dimensioning",
+          "weight": 7,
+          "good": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+          "bad": "Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin.",
+          "signals": [
+            "M3",
+            "M4",
+            "bearing_od",
+            "dowel_pin",
+            "catalog_size"
+          ],
+          "loop_feedback": "Snap hole, pin, and bearing dimensions to standard catalog sizes and name the intended hardware in callouts.",
+          "source_refs": [
+            "sources/public/McMaster-Carr Catalog 123.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    },
+    {
+      "title": "NASA Fastener Design Manual (RP-1228)",
+      "target_topics": [
+        "fastener selection",
+        "torque/preload",
+        "locking features",
+        "washers",
+        "inserts"
+      ]
+    },
+    {
+      "title": "1800 Mechanical Movements, Devices and Appliances (Hiscox, 1899, public domain)",
+      "target_topics": [
+        "linkages",
+        "cams",
+        "gears",
+        "mechanism vocabulary"
+      ]
+    },
+    {
+      "title": "Machinery's Handbook (early edition scan, archive.org)",
+      "target_topics": [
+        "fits",
+        "threads",
+        "machining allowances",
+        "shop vocabulary"
+      ]
+    }
+  ]
+}

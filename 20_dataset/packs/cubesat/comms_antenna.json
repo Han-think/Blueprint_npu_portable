@@ -1,0 +1,185 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "cubesat",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "comms_antenna",
+    "discipline": "comms",
+    "function": "Antenna deployer (tape-spring dummy ok), radio board slot, RF connector path",
+    "evidence_features": [
+      "antenna_slot",
+      "antenna_deployer",
+      "tape_spring",
+      "deploy_hinge",
+      "radio_board",
+      "rf_connector"
+    ],
+    "criteria_refs": [
+      "electronics_routing",
+      "service_access"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "service_access",
+      "title": "Service Access and Maintainability",
+      "criteria": [
+        {
+          "criterion": "replaceable_module_path",
+          "weight": 13,
+          "good": "Battery, sensor, actuator, cartridge, payload, cable, or joint modules remain removable without full teardown.",
+          "bad": "Functional modules are fused into a closed body.",
+          "signals": [
+            "removable",
+            "slide-in",
+            "snap-in",
+            "single-pin",
+            "tool-less",
+            "service_access"
+          ],
+          "loop_feedback": "Separate the critical service module and add a visible removal path, latch, pin, or slide rail."
+        },
+        {
+          "criterion": "cable_harness_visibility",
+          "weight": 8,
+          "good": "Harnesses, tubes, or service channels are routed through visible raceways or protected channels.",
+          "bad": "Cables are buried inside closed links or shells with no inspection feature.",
+          "signals": [
+            "harness_channel",
+            "cable_raceway",
+            "channel",
+            "inspection_window"
+          ],
+          "loop_feedback": "Add external or inspectable harness channels with strain relief and access covers."
+        },
+        {
+          "criterion": "access_not_just_text",
+          "weight": 9,
+          "good": "Access is represented by geometry: hatch, pocket, channel, fastener pattern, slot, window, or removable cover.",
+          "bad": "Access is claimed only in prose.",
+          "signals": [
+            "pocket",
+            "channel",
+            "drill",
+            "slot",
+            "hatch",
+            "cover",
+            "window"
+          ],
+          "loop_feedback": "Convert service-access text into physical geometry_ops: cover, pocket, slot, window, and fastener pattern."
+        },
+        {
+          "criterion": "harness_strain_relief_and_bend_radius",
+          "weight": 9,
+          "good": "Every cable exit shows strain relief geometry (clamp, grommet, tie point) and routing respects a stated minimum bend radius away from moving joints and sharp edges.",
+          "bad": "Cables exit bare holes, cross hinge lines unsupported, or bend around sharp printed edges with no relief feature.",
+          "signals": [
+            "strain_relief",
+            "grommet",
+            "cable_clamp",
+            "bend_radius",
+            "tie_point",
+            "edge_protection"
+          ],
+          "loop_feedback": "Add strain-relief clamps or grommets at every cable exit, state a minimum bend radius, and reroute harnesses away from hinge lines and sharp edges.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        },
+        {
+          "criterion": "connector_accessibility_and_keying",
+          "weight": 8,
+          "good": "Connectors are reachable without disassembling structure, have finger/tool clearance, and mention keying or labeling to prevent mis-mating.",
+          "bad": "Connectors face closed walls, sit in unreachable pockets, or identical adjacent connectors have no keying or label.",
+          "signals": [
+            "connector_clearance",
+            "keying",
+            "label",
+            "mate_demate",
+            "access_pocket"
+          ],
+          "loop_feedback": "Reorient connectors toward access openings, add finger clearance pockets, and engrave keying/ID labels next to each connector.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "electronics_routing",
+      "title": "Electronics, Signal, and Motor Wiring Judgment",
+      "criteria": [
+        {
+          "criterion": "power_signal_separation",
+          "weight": 9,
+          "good": "Motor power lines and sensor/encoder signal lines run in separate channels or are spaced/crossed at right angles, with the separation visible in routing geometry.",
+          "bad": "Power and signal wires share one tight bundle along the whole route with no separation or shielding note.",
+          "signals": [
+            "power_channel",
+            "signal_channel",
+            "separation",
+            "shield",
+            "twisted_pair"
+          ],
+          "loop_feedback": "Split power and signal into separate raceways or add spacing/shielding notes where they must share a channel."
+        },
+        {
+          "criterion": "return_path_and_grounding_intent",
+          "weight": 8,
+          "good": "Each electronics module states its grounding scheme (star point, chassis bond, isolated) and signal returns route alongside their signals.",
+          "bad": "Grounding is unmentioned; returns are implied through structure with no bond feature or note.",
+          "signals": [
+            "ground_point",
+            "chassis_bond",
+            "star_ground",
+            "return_path"
+          ],
+          "loop_feedback": "Add a named ground/bond feature per module and state how each signal's return path is routed."
+        },
+        {
+          "criterion": "board_mounting_and_clearance",
+          "weight": 8,
+          "good": "PCBs mount on standoffs with keep-out clearance to walls and moving parts, connector edges face access openings, and mounting holes match standard board patterns.",
+          "bad": "Boards are floated or glued in cavities with no standoffs, clearance, or connector orientation logic.",
+          "signals": [
+            "standoff",
+            "keep_out",
+            "mounting_hole",
+            "connector_edge",
+            "board_clearance"
+          ],
+          "loop_feedback": "Mount each board on standoffs with stated keep-out clearance and orient connector edges toward access openings."
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    },
+    {
+      "title": "McMaster-Carr Catalog 123",
+      "target_topics": [
+        "standard fastener/bearing/hardware dimensions",
+        "part naming vocabulary"
+      ]
+    }
+  ]
+}

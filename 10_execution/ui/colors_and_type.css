@@ -1,0 +1,255 @@
+/* Blueprint NPU — colors_and_type.css
+ * Include on every surface. Values sourced from docs/media/*.svg
+ * and the Gradio UI conventions.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&display=swap');
+
+:root {
+  /* ---------- CANVAS ---------- */
+  --bp-canvas:        #0c1e35;  /* blueprint navy — default bg */
+  --bp-canvas-2:      #0a1a2e;  /* one notch darker (nested panels) */
+  --bp-frame:         #274a79;  /* outer 2px frame */
+  --bp-rule:          #cfd6e6;  /* 1px horizontal dividers */
+
+  /* ---------- INK ---------- */
+  --bp-ink:           #ffffff;  /* primary stroke / titles */
+  --bp-ink-2:         #e6ecf5;  /* body text */
+  --bp-ink-3:         #9aa8bd;  /* captions, meta */
+  --bp-ink-disabled:  rgba(255,255,255,0.40);
+
+  /* ---------- ACCENTS (semantic lane colors) ---------- */
+  --bp-lox:           #9fd3ff;  /* LOX / oxidizer / cooling / primary accent */
+  --bp-lox-2:         #9cd0ff;  /* engine stroke variant */
+  --bp-lh2:           #ffd39f;  /* LH2 / fuel / hot paths */
+  --bp-rp1:           #ffd39f;  /* RP-1 (shares amber) */
+  --bp-intertank:     #89ffa8;  /* intertank / separator / attention */
+  --bp-intertank-2:   #b6ffb6;  /* filled LH2 companion in overview */
+  --bp-halo:          #caa9ff;  /* instrument unit / meta */
+  --bp-engine-fill:   #1f6aa8;  /* engine bell solid */
+  --bp-engine-stroke: #9cd0ff;
+
+  /* ---------- SEMANTIC ---------- */
+  --bp-success:       #89ffa8;
+  --bp-warning:       #ffd39f;
+  --bp-danger:        #ff9fb5;  /* derived — flag for risks */
+  --bp-info:          #9fd3ff;
+
+  /* ---------- TYPE ---------- */
+  --bp-font-sans:  'Inter', 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  --bp-font-mono:  'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --bp-font-kr:    'Noto Sans KR', 'Inter', system-ui, sans-serif;
+
+  /* type scale */
+  --bp-text-xs:   11px;   /* diagram labels, meta */
+  --bp-text-sm:   12px;   /* diagram titles, chips */
+  --bp-text-base: 14px;   /* ui chrome title (matches saturn_stack header) */
+  --bp-text-md:   16px;
+  --bp-text-lg:   18px;
+  --bp-text-xl:   22px;
+  --bp-text-2xl:  28px;
+  --bp-text-3xl:  36px;
+  --bp-text-4xl:  48px;
+
+  /* line heights */
+  --bp-lh-tight:  1.15;
+  --bp-lh-base:   1.45;
+  --bp-lh-loose:  1.6;
+
+  /* ---------- SPACING ---------- */
+  --bp-gutter:        16px;   /* inner margin between viewport and outer frame */
+  --bp-pad-card:      20px;
+  --bp-stroke-thin:   1px;
+  --bp-stroke:        1.3px;  /* tank walls */
+  --bp-stroke-bold:   1.6px;  /* stage bodies */
+  --bp-stroke-frame:  2px;    /* outer frame */
+
+  /* radii — keep sharp */
+  --bp-radius-0:      0px;
+  --bp-radius-1:      2px;
+  --bp-radius-2:      4px;
+
+  /* dash patterns (use as stroke-dasharray) */
+  --bp-dash-separator:  '6 4';
+  --bp-dash-interstage: '8 4';
+
+  /* motion */
+  --bp-dur-fast:  150ms;
+  --bp-dur-base:  200ms;
+  --bp-ease:      cubic-bezier(.2,.6,.2,1);
+}
+
+/* ================================================================
+ * SEMANTIC ELEMENT STYLES — opt-in by applying .bp to a root element
+ * or by using the CSS vars directly.
+ * ================================================================ */
+
+.bp,
+.bp * {
+  box-sizing: border-box;
+}
+
+.bp {
+  background: var(--bp-canvas);
+  color: var(--bp-ink-2);
+  font-family: var(--bp-font-sans);
+  font-size: var(--bp-text-md);
+  line-height: var(--bp-lh-base);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+.bp h1, .bp .h1 {
+  font-family: var(--bp-font-sans);
+  font-weight: 600;
+  font-size: var(--bp-text-3xl);
+  line-height: var(--bp-lh-tight);
+  color: var(--bp-ink);
+  letter-spacing: -0.01em;
+  margin: 0 0 12px;
+}
+.bp h2, .bp .h2 {
+  font-family: var(--bp-font-sans);
+  font-weight: 600;
+  font-size: var(--bp-text-2xl);
+  line-height: var(--bp-lh-tight);
+  color: var(--bp-ink);
+  margin: 0 0 10px;
+}
+.bp h3, .bp .h3 {
+  font-family: var(--bp-font-sans);
+  font-weight: 600;
+  font-size: var(--bp-text-xl);
+  line-height: var(--bp-lh-tight);
+  color: var(--bp-ink);
+  margin: 0 0 8px;
+}
+.bp h4, .bp .h4 {
+  font-family: var(--bp-font-mono);
+  font-weight: 600;
+  font-size: var(--bp-text-sm);
+  line-height: var(--bp-lh-tight);
+  color: var(--bp-lox);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 6px;
+}
+
+.bp p, .bp .p {
+  margin: 0 0 10px;
+  color: var(--bp-ink-2);
+}
+
+.bp .caption,
+.bp small {
+  font-family: var(--bp-font-mono);
+  font-size: var(--bp-text-xs);
+  color: var(--bp-ink-3);
+  letter-spacing: 0.04em;
+}
+
+.bp code, .bp pre, .bp .mono {
+  font-family: var(--bp-font-mono);
+  font-size: 0.95em;
+}
+
+.bp pre {
+  background: var(--bp-canvas-2);
+  border: var(--bp-stroke-thin) solid var(--bp-frame);
+  padding: 12px 14px;
+  color: var(--bp-ink-2);
+  overflow-x: auto;
+}
+
+.bp .num {            /* number-with-unit inline */
+  font-family: var(--bp-font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--bp-ink);
+}
+
+.bp .label-lox        { color: var(--bp-lox); }
+.bp .label-lh2        { color: var(--bp-lh2); }
+.bp .label-intertank  { color: var(--bp-intertank); }
+.bp .label-halo       { color: var(--bp-halo); }
+
+.bp .chip {            /* ALL-CAPS pastel caption chip */
+  display: inline-block;
+  font-family: var(--bp-font-mono);
+  font-size: var(--bp-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 2px 0;
+  border: 0;
+  color: var(--bp-lox);
+}
+
+.bp .frame {           /* the canonical outer frame */
+  border: var(--bp-stroke-frame) solid var(--bp-frame);
+  padding: var(--bp-gutter);
+  background: var(--bp-canvas);
+}
+
+.bp .card {
+  background: var(--bp-canvas);
+  border: var(--bp-stroke-thin) solid var(--bp-frame);
+  padding: var(--bp-pad-card);
+  border-radius: var(--bp-radius-1);
+}
+
+.bp .rule {
+  border: 0;
+  border-top: var(--bp-stroke-thin) solid var(--bp-rule);
+  margin: 16px 0;
+}
+
+/* buttons */
+.bp .btn {
+  font-family: var(--bp-font-mono);
+  font-size: var(--bp-text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 8px 14px;
+  background: transparent;
+  color: var(--bp-ink);
+  border: var(--bp-stroke-thin) solid var(--bp-ink);
+  border-radius: var(--bp-radius-1);
+  cursor: pointer;
+  transition: border-color var(--bp-dur-fast) var(--bp-ease),
+              color var(--bp-dur-fast) var(--bp-ease);
+}
+.bp .btn:hover         { border-color: var(--bp-lox); color: var(--bp-lox); }
+.bp .btn:active        { border-width: 2px; }
+.bp .btn:focus-visible { outline: 2px solid var(--bp-lox); outline-offset: 2px; }
+.bp .btn[disabled]     { opacity: 0.4; cursor: not-allowed; }
+
+.bp .btn--primary      { border-color: var(--bp-lox); color: var(--bp-lox); }
+.bp .btn--primary:hover{ border-color: var(--bp-ink); color: var(--bp-ink); }
+.bp .btn--warn         { border-color: var(--bp-lh2); color: var(--bp-lh2); }
+.bp .btn--go           { border-color: var(--bp-intertank); color: var(--bp-intertank); }
+
+/* inputs */
+.bp .input,
+.bp input[type="text"],
+.bp input[type="number"],
+.bp textarea,
+.bp select {
+  font-family: var(--bp-font-mono);
+  font-size: var(--bp-text-sm);
+  background: var(--bp-canvas-2);
+  color: var(--bp-ink);
+  border: var(--bp-stroke-thin) solid var(--bp-frame);
+  padding: 8px 10px;
+  border-radius: var(--bp-radius-1);
+  outline: none;
+}
+.bp .input:focus,
+.bp input:focus,
+.bp textarea:focus,
+.bp select:focus { border-color: var(--bp-lox); }
+
+/* links */
+.bp a { color: var(--bp-lox); text-decoration: none; border-bottom: 1px dashed var(--bp-frame); }
+.bp a:hover { color: var(--bp-ink); border-bottom-color: var(--bp-lox); }
+
+/* selection */
+.bp ::selection { background: var(--bp-lox); color: var(--bp-canvas); }

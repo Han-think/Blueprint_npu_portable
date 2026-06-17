@@ -1,0 +1,41 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "small_launch_vehicle_mock_boundary",
+  "title": "Small Launch Vehicle Educational Mock Boundary",
+  "applies_to": ["small_launch_vehicle"],
+  "criteria": [
+    {
+      "criterion": "display_only_flowpath",
+      "weight": 14,
+      "good": "Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only.",
+      "bad": "Output drifts into actionable propulsion, ignition, or flight-performance instructions.",
+      "signals": ["display-only", "non-functional", "cutaway", "educational mock"],
+      "loop_feedback": "Use display-only cutaway modules and avoid operational propulsion, ignition, or flight-performance details."
+    },
+    {
+      "criterion": "cutaway_internal_readability",
+      "weight": 12,
+      "good": "Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge.",
+      "bad": "Vehicle is a smooth cylinder with no internal evidence.",
+      "signals": ["cutaway", "tank module", "interstage", "avionics bay", "engine display cartridge"],
+      "loop_feedback": "Add cutaway windows, slide-in tank dummies, interstage datum, avionics bay, and removable engine display cartridge."
+    },
+    {
+      "criterion": "safe_risk_language",
+      "weight": 10,
+      "good": "Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming.",
+      "bad": "Risk/verification implies real launch readiness or manufacturing assurance.",
+      "signals": ["mockup", "inspection", "overclaim", "not flight-ready"],
+      "loop_feedback": "Frame verification around mock assembly inspection and explicitly avoid launch/propulsion readiness claims."
+    },
+    {
+      "criterion": "stage_interface_datum_evidence",
+      "weight": 9,
+      "good": "Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review.",
+      "bad": "Stages stack as butted cylinders with no locating feature, making the mock unassemblable and uninspectable.",
+      "signals": ["interstage_datum", "bolt_circle", "alignment_key", "stacking_feature"],
+      "loop_feedback": "Add locating datums, dummy bolt circles, and alignment keys at every stage and module joint of the mock stack.",
+      "source_refs": ["sources/public/nasa_systems_engineering_handbook_0.pdf"]
+    }
+  ]
+}

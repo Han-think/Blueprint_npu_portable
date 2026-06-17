@@ -1,0 +1,198 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "small_launch_vehicle",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "separation_display",
+    "discipline": "mechanisms",
+    "function": "Stage separation plane shown as datum + dummy clamp band (no energetic device)",
+    "evidence_features": [
+      "separation_plane_datum",
+      "clamp_band_dummy"
+    ],
+    "criteria_refs": [
+      "small_launch_vehicle_mock_boundary",
+      "datum_tolerance"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "datum_tolerance",
+      "title": "Datum, Interface, and Tolerance Judgment",
+      "criteria": [
+        {
+          "criterion": "datum_visibility",
+          "weight": 11,
+          "good": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+          "bad": "Interfaces exist only as abstract neighbor references.",
+          "signals": [
+            "datum",
+            "axis_ring",
+            "rail",
+            "socket",
+            "mounting_pad",
+            "interface_zone"
+          ],
+          "loop_feedback": "Add visible datum pads or axis/rail/socket features and label their mating function."
+        },
+        {
+          "criterion": "clearance_named",
+          "weight": 8,
+          "good": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+          "bad": "Moving/removable joints have no clearance or fit language.",
+          "signals": [
+            "clearance_mm",
+            "tol_mm",
+            "fit",
+            "slip",
+            "snap",
+            "pin"
+          ],
+          "loop_feedback": "Add clearance_mm or tolerance notes for hinge pins, slide rails, sockets, and removable cartridges."
+        },
+        {
+          "criterion": "interface_count",
+          "weight": 8,
+          "good": "Each subsystem has at least three adjacent interfaces or datums.",
+          "bad": "Subsystem is isolated and does not show assembly neighbors.",
+          "signals": [
+            "adjacent_interfaces",
+            "target_part",
+            "interface_type"
+          ],
+          "loop_feedback": "Add at least three adjacent interfaces: mount, service, electrical/data, flow, or inspection datum."
+        },
+        {
+          "criterion": "standard_fit_vocabulary",
+          "weight": 8,
+          "good": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+          "bad": "All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance.",
+          "signals": [
+            "clearance_fit",
+            "transition_fit",
+            "press_fit",
+            "allowance_mm",
+            "H7",
+            "shaft_basis"
+          ],
+          "loop_feedback": "Classify each mating diameter as clearance/transition/press fit and add a numeric allowance instead of line-to-line nominals.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        },
+        {
+          "criterion": "standard_hardware_dimensioning",
+          "weight": 7,
+          "good": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+          "bad": "Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin.",
+          "signals": [
+            "M3",
+            "M4",
+            "bearing_od",
+            "dowel_pin",
+            "catalog_size"
+          ],
+          "loop_feedback": "Snap hole, pin, and bearing dimensions to standard catalog sizes and name the intended hardware in callouts.",
+          "source_refs": [
+            "sources/public/McMaster-Carr Catalog 123.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "small_launch_vehicle_mock_boundary",
+      "title": "Small Launch Vehicle Educational Mock Boundary",
+      "criteria": [
+        {
+          "criterion": "display_only_flowpath",
+          "weight": 14,
+          "good": "Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only.",
+          "bad": "Output drifts into actionable propulsion, ignition, or flight-performance instructions.",
+          "signals": [
+            "display-only",
+            "non-functional",
+            "cutaway",
+            "educational mock"
+          ],
+          "loop_feedback": "Use display-only cutaway modules and avoid operational propulsion, ignition, or flight-performance details."
+        },
+        {
+          "criterion": "cutaway_internal_readability",
+          "weight": 12,
+          "good": "Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge.",
+          "bad": "Vehicle is a smooth cylinder with no internal evidence.",
+          "signals": [
+            "cutaway",
+            "tank module",
+            "interstage",
+            "avionics bay",
+            "engine display cartridge"
+          ],
+          "loop_feedback": "Add cutaway windows, slide-in tank dummies, interstage datum, avionics bay, and removable engine display cartridge."
+        },
+        {
+          "criterion": "safe_risk_language",
+          "weight": 10,
+          "good": "Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming.",
+          "bad": "Risk/verification implies real launch readiness or manufacturing assurance.",
+          "signals": [
+            "mockup",
+            "inspection",
+            "overclaim",
+            "not flight-ready"
+          ],
+          "loop_feedback": "Frame verification around mock assembly inspection and explicitly avoid launch/propulsion readiness claims."
+        },
+        {
+          "criterion": "stage_interface_datum_evidence",
+          "weight": 9,
+          "good": "Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review.",
+          "bad": "Stages stack as butted cylinders with no locating feature, making the mock unassemblable and uninspectable.",
+          "signals": [
+            "interstage_datum",
+            "bolt_circle",
+            "alignment_key",
+            "stacking_feature"
+          ],
+          "loop_feedback": "Add locating datums, dummy bolt circles, and alignment keys at every stage and module joint of the mock stack.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA Fastener Design Manual (RP-1228)",
+      "target_topics": [
+        "fastener selection",
+        "torque/preload",
+        "locking features",
+        "washers",
+        "inserts"
+      ]
+    },
+    {
+      "title": "Machinery's Handbook (early edition scan, archive.org)",
+      "target_topics": [
+        "fits",
+        "threads",
+        "machining allowances",
+        "shop vocabulary"
+      ]
+    }
+  ],
+  "boundary_note": "All subsystems are educational display mockups; no propulsion, ignition, or flight-performance design."
+}

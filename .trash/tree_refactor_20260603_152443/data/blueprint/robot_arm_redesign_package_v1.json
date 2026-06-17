@@ -1,0 +1,411 @@
+{
+  "schema": "blueprint_robot_arm_redesign_package_v1",
+  "created_at": "2026-06-03T13:15:00+09:00",
+  "target": {
+    "vehicle_id": "arm_6dof",
+    "label": "6-DOF Industrial Arm educational mockup",
+    "scope": "design-thinking and 3D-printable assembly package before STL generation",
+    "not_for": "certified industrial robot, payload-rated arm, collaborative safety certification, or precision automation claims"
+  },
+  "primary_metric": {
+    "name": "assembly_serviceability_efficiency",
+    "definition": "Reduce assembly effort while preserving access for J1-J6 axis inspection, reducer/bearing dummies, encoder covers, cable replacement, wrist service, and tool flange swaps.",
+    "failure_rule": "Part count reduction fails if joint cartridges, axis datums, cable spine, or tool flange access are blocked."
+  },
+  "existing_bom": [
+    {
+      "id": "old-001",
+      "label": "J1 base rotary joint",
+      "qty": 1,
+      "role": "base mounting datum and first rotation axis",
+      "interfaces": ["base flange", "shoulder joint", "cable entry"],
+      "service_access": "J1 axis and base fasteners must remain visible"
+    },
+    {
+      "id": "old-002",
+      "label": "J2 shoulder joint",
+      "qty": 1,
+      "role": "shoulder pitch axis and main torque path",
+      "interfaces": ["base joint", "upper arm link", "encoder dummy"],
+      "service_access": "shoulder cartridge and encoder cover must remain removable"
+    },
+    {
+      "id": "old-003",
+      "label": "upper arm link",
+      "qty": 1,
+      "role": "hollow structural link between J2 and J3",
+      "interfaces": ["J2 cartridge", "J3 cartridge", "cable spine"],
+      "service_access": "internal cable route must remain inspectable"
+    },
+    {
+      "id": "old-004",
+      "label": "J3 elbow joint",
+      "qty": 1,
+      "role": "elbow pitch axis and link transition",
+      "interfaces": ["upper arm link", "forearm link", "bearing dummy"],
+      "service_access": "elbow reducer and axis datum must remain visible"
+    },
+    {
+      "id": "old-005",
+      "label": "forearm and J4 wrist roll link",
+      "qty": 1,
+      "role": "forearm structure and wrist roll routing",
+      "interfaces": ["J3 elbow", "J5 wrist pitch", "cable path"],
+      "service_access": "wrist cable pass-through must remain open"
+    },
+    {
+      "id": "old-006",
+      "label": "J5 wrist pitch joint",
+      "qty": 1,
+      "role": "compact wrist pitch service module",
+      "interfaces": ["forearm", "J6 wrist roll", "encoder dummy"],
+      "service_access": "wrist pitch cover must remain removable"
+    },
+    {
+      "id": "old-007",
+      "label": "J6 wrist roll joint",
+      "qty": 1,
+      "role": "final rotation axis and tool flange driver",
+      "interfaces": ["J5 wrist pitch", "tool flange", "utility pass-through"],
+      "service_access": "J6 axis and tool mounting pattern must remain inspectable"
+    },
+    {
+      "id": "old-008",
+      "label": "tool flange and changer",
+      "qty": 1,
+      "role": "end-of-arm tooling interface",
+      "interfaces": ["J6 wrist", "utility ports", "tool latch"],
+      "service_access": "tool latch and utility ports must remain external"
+    },
+    {
+      "id": "old-009",
+      "label": "external cable management spine",
+      "qty": 1,
+      "role": "replaceable cable carrier from base to wrist",
+      "interfaces": ["base entry", "link covers", "wrist service loop"],
+      "service_access": "cable spine must be replaceable without opening joint cartridges"
+    }
+  ],
+  "redesigned_bom": [
+    {
+      "id": "new-001",
+      "label": "serviceable base and shoulder cartridge set",
+      "qty": 1,
+      "replaces": ["old-001", "old-002"],
+      "printable_as": "PETG base shell with removable J1/J2 cartridge covers and visible axis datum rings",
+      "service_access_preserved": ["J1 axis", "J2 axis", "base mounting datum", "encoder cover access"]
+    },
+    {
+      "id": "new-002",
+      "label": "hollow upper and forearm link pair with open cable channel",
+      "qty": 1,
+      "replaces": ["old-003", "old-005 partial"],
+      "printable_as": "two PETG hollow links with integrated cable channel and datum labels",
+      "service_access_preserved": ["cable inspection", "link datum faces", "J2/J3/J4 connection faces"]
+    },
+    {
+      "id": "new-003",
+      "label": "removable elbow and wrist joint module set",
+      "qty": 1,
+      "replaces": ["old-004", "old-006", "old-007"],
+      "printable_as": "separate J3/J5/J6 service cartridges with bearing/reducer dummy access covers",
+      "service_access_preserved": ["J3 axis", "J5 axis", "J6 axis", "reducer dummy access", "encoder cover access"]
+    },
+    {
+      "id": "new-004",
+      "label": "tool flange service module",
+      "qty": 1,
+      "replaces": ["old-008"],
+      "printable_as": "replaceable PETG tool flange with visible ISO-style bolt pattern and utility pass-through guide",
+      "service_access_preserved": ["tool latch access", "utility pass-through", "J6 face inspection"]
+    },
+    {
+      "id": "new-005",
+      "label": "external replaceable cable spine",
+      "qty": 1,
+      "replaces": ["old-009"],
+      "printable_as": "clip-on PETG/TPU cable carrier that remains outside joint cartridges",
+      "service_access_preserved": ["cable replacement", "wrist service loop", "base cable entry"]
+    }
+  ],
+  "integration_decisions": [
+    {
+      "decision": "integrate base shell with J1/J2 datum labels but keep cartridges removable",
+      "expected_gain": "reduces base cover alignment operations without trapping joint service items",
+      "guardrail": "J1 and J2 axis rings remain visible"
+    },
+    {
+      "decision": "integrate hollow links with open cable channels",
+      "expected_gain": "removes loose covers and improves cable path visibility",
+      "guardrail": "cable spine remains replaceable and not buried inside closed links"
+    },
+    {
+      "decision": "keep J3/J5/J6 as removable joint cartridges",
+      "expected_gain": "preserves reducer, bearing, encoder, and wrist service access",
+      "guardrail": "joint cartridges can be removed without cutting printed links"
+    },
+    {
+      "decision": "keep tool flange as replaceable service module",
+      "expected_gain": "tool interface can change without rebuilding wrist stack",
+      "guardrail": "tool latch and utility ports remain external"
+    },
+    {
+      "decision": "externalize cable spine",
+      "expected_gain": "cable replacement becomes visible and teachable",
+      "guardrail": "spine clips on from outside and does not share joint cartridge fasteners"
+    }
+  ],
+  "assembly_delta": {
+    "baseline_steps": 28,
+    "redesigned_steps": 15,
+    "removed_operations": [
+      "align separate base covers",
+      "route cables through hidden link cavities",
+      "open joint cartridges to replace cable spine",
+      "remove wrist stack to inspect tool utility path",
+      "re-square J2/J3 link covers after cable service"
+    ],
+    "retained_service_access_points": [
+      "J1 base axis datum ring",
+      "J2 shoulder cartridge cover",
+      "J3 elbow cartridge cover",
+      "J4 forearm cable pass-through",
+      "J5 wrist pitch cover",
+      "J6 wrist roll axis face",
+      "tool flange bolt pattern",
+      "external cable spine clips",
+      "base cable entry",
+      "wrist service loop"
+    ]
+  },
+  "print_strategy": [
+    {
+      "part_id": "new-001",
+      "orientation": "base flange on bed, J1/J2 axis rings upward",
+      "supports": "tree",
+      "reason": "preserve base mounting datum and visible shoulder axis rings"
+    },
+    {
+      "part_id": "new-002",
+      "orientation": "links printed on side with cable channel upward",
+      "supports": "min",
+      "reason": "protect hollow link walls and leave cable channel clean"
+    },
+    {
+      "part_id": "new-003",
+      "orientation": "joint cartridge axis faces upward",
+      "supports": "min",
+      "reason": "preserve J3/J5/J6 datum faces and access cover geometry"
+    },
+    {
+      "part_id": "new-004",
+      "orientation": "tool flange face on bed",
+      "supports": "none",
+      "reason": "keep bolt pattern face flat and readable"
+    },
+    {
+      "part_id": "new-005",
+      "orientation": "cable spine clips flat, TPU pads face-down",
+      "supports": "none",
+      "reason": "external cable carrier should print quickly and remain replaceable"
+    }
+  ],
+  "assembly_sequence": [
+    "Print base/shoulder cartridge set with visible J1/J2 datum rings.",
+    "Print hollow upper and forearm link pair with open cable channels.",
+    "Print J3/J5/J6 removable joint cartridges.",
+    "Print tool flange service module.",
+    "Print external cable spine and TPU cable pads.",
+    "Attach base shell to display mounting plate and verify J1 datum ring.",
+    "Install J2 shoulder cartridge cover without closing cable entry.",
+    "Attach upper arm link to J2 datum face.",
+    "Install J3 elbow cartridge between upper and forearm links.",
+    "Attach forearm link and verify cable pass-through is open.",
+    "Install J5/J6 wrist cartridges as removable modules.",
+    "Attach tool flange service module and verify bolt pattern visibility.",
+    "Clip external cable spine from base to wrist.",
+    "Check J1-J6 axis labels, cartridge removal, and cable replacement path.",
+    "Perform final service access check for joint covers, tool flange, and cable spine."
+  ],
+  "schema_v6_blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-03T13:15:00+09:00",
+    "project": "6-DOF Robot Arm Redesign V1",
+    "object": "6-DOF robot arm printable serviceability mockup",
+    "brief": {
+      "requirements": [
+        "Create a 3D-printable 6-DOF robot arm educational mockup design package.",
+        "Reduce assembly steps while preserving J1-J6 axis, joint cartridge, cable, wrist, and tool flange service access.",
+        "Keep reducer/bearing/encoder dummy access covers and cable spine replaceable.",
+        "Prepare geometry intent for later STL generation, not a payload-rated industrial robot."
+      ],
+      "constraints": {
+        "material": "PETG + TPU pads",
+        "process": "FDM",
+        "envelope_mm": [260, 180, 420],
+        "min_wall_mm": 1.8,
+        "min_channel_mm": 4,
+        "overhang_deg": 45,
+        "tol_mm": 0.3
+      }
+    },
+    "part_tree": {
+      "id": "robot-arm-redesign-v1",
+      "name": "6-DOF robot arm printable serviceability mockup",
+      "qty": 1,
+      "material": "PETG + TPU pads",
+      "process": "FDM",
+      "children": [
+        {
+          "id": "new-001",
+          "name": "serviceable base and shoulder cartridge set",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-j1-axis-ring", "name": "J1 base axis datum ring", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-j2-cover", "name": "J2 shoulder cartridge cover", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-base-cable-entry", "name": "base cable entry window", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-002",
+          "name": "hollow upper and forearm link pair with open cable channel",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-upper-link", "name": "hollow upper arm link", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-forearm-link", "name": "hollow forearm link", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-open-cable-channel", "name": "open cable inspection channel", "qty": 2, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-003",
+          "name": "removable elbow and wrist joint module set",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-j3-cartridge", "name": "J3 elbow service cartridge", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-j5-cartridge", "name": "J5 wrist pitch service cartridge", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-j6-cartridge", "name": "J6 wrist roll service cartridge", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-004",
+          "name": "tool flange service module",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-tool-bolt-pattern", "name": "visible tool bolt pattern", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-utility-pass", "name": "utility pass-through guide", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-005",
+          "name": "external replaceable cable spine",
+          "qty": 1,
+          "material": "PETG + TPU",
+          "process": "FDM",
+          "children": [
+            {"id": "f-cable-clip", "name": "external cable spine clips", "qty": 6, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-wrist-loop", "name": "visible wrist service loop", "qty": 1, "material": "TPU", "process": "FDM", "children": []}
+          ]
+        }
+      ]
+    },
+    "geometry_ops": [
+      {"id": "op-001", "op": "cylinder", "target": "f-j1-axis-ring", "args": {"diameter_mm": 86, "height_mm": 10, "purpose": "J1 base datum ring"}},
+      {"id": "op-002", "op": "box", "target": "new-001", "args": {"size_mm": [110, 90, 62], "purpose": "base and shoulder shell"}},
+      {"id": "op-003", "op": "pocket", "target": "f-j2-cover", "args": {"size_mm": [46, 26], "purpose": "removable shoulder cartridge cover"}},
+      {"id": "op-004", "op": "channel", "target": "f-base-cable-entry", "args": {"width_mm": 8, "depth_mm": 5, "purpose": "base cable entry"}},
+      {"id": "op-005", "op": "box", "target": "f-upper-link", "args": {"size_mm": [42, 24, 150], "purpose": "upper hollow link body"}},
+      {"id": "op-006", "op": "shell", "target": "f-upper-link", "args": {"wall_mm": 2.0, "open_faces": ["side"], "purpose": "lightweight upper link"}},
+      {"id": "op-007", "op": "box", "target": "f-forearm-link", "args": {"size_mm": [36, 22, 130], "purpose": "forearm hollow link body"}},
+      {"id": "op-008", "op": "channel", "target": "f-open-cable-channel", "args": {"width_mm": 6, "depth_mm": 4, "count": 2, "purpose": "visible cable inspection channels"}},
+      {"id": "op-009", "op": "cylinder", "target": "f-j3-cartridge", "args": {"diameter_mm": 44, "height_mm": 28, "purpose": "J3 elbow service cartridge"}},
+      {"id": "op-010", "op": "cylinder", "target": "f-j5-cartridge", "args": {"diameter_mm": 34, "height_mm": 22, "purpose": "J5 wrist pitch cartridge"}},
+      {"id": "op-011", "op": "cylinder", "target": "f-j6-cartridge", "args": {"diameter_mm": 30, "height_mm": 20, "purpose": "J6 wrist roll cartridge"}},
+      {"id": "op-012", "op": "engrave", "target": "new-003", "args": {"text": "J3 J5 J6 SERVICE", "depth_mm": 0.35}},
+      {"id": "op-013", "op": "cylinder", "target": "f-tool-bolt-pattern", "args": {"diameter_mm": 42, "height_mm": 8, "purpose": "tool flange face"}},
+      {"id": "op-014", "op": "pattern_polar", "target": "f-tool-bolt-pattern", "args": {"count": 6, "feature": "M3 dummy bolt hole", "radius_mm": 18}},
+      {"id": "op-015", "op": "channel", "target": "f-utility-pass", "args": {"width_mm": 5, "depth_mm": 4, "purpose": "utility pass-through guide"}},
+      {"id": "op-016", "op": "pattern_linear", "target": "f-cable-clip", "args": {"count": 6, "feature": "clip-on cable spine saddle", "pitch_mm": 34}},
+      {"id": "op-017", "op": "box", "target": "f-wrist-loop", "args": {"size_mm": [34, 8, 6], "purpose": "TPU wrist cable loop bumper"}},
+      {"id": "op-018", "op": "engrave", "target": "robot-arm-redesign-v1", "args": {"text": "J1 J2 J3 J4 J5 J6 AXES", "depth_mm": 0.35}},
+      {"id": "op-019", "op": "chamfer", "target": "robot-arm-redesign-v1", "args": {"edges": "service cover edges", "amount_mm": 0.6}},
+      {"id": "op-020", "op": "fillet", "target": "robot-arm-redesign-v1", "args": {"edges": "handled link corners", "radius_mm": 1.0}}
+    ],
+    "cad_brief": {
+      "name": "robot_arm_serviceability_redesign_v1",
+      "rev": "1.0",
+      "material": "PETG + TPU pads",
+      "envelope_mm": [260, 180, 420],
+      "build_direction": "base flange on bed; links on side with channels upward; joint axis faces upward; tool flange face on bed",
+      "key_dims_mm": {
+        "mockup_reach_class": "desktop 600mm reference",
+        "axis_count": 6,
+        "joint_cartridge_count": 5,
+        "external_cable_spine_clip_count": 6
+      },
+      "wall_thickness_mm": {"min": 1.8, "typ": 2.0},
+      "tolerances_mm": {"joint_cartridge_clearance": 0.3, "cable_clip_clearance": 0.35, "tool_bolt_pattern_visual_tol": 0.25},
+      "surface": {"Ra_um": 18, "post_process": "deburr joint cartridge covers, cable clips, and tool flange holes"},
+      "mass_est_g": 340
+    },
+    "verify": [
+      {"check": "existing and redesigned BOM both present in design package", "result": "pass", "value": "9 baseline groups, 5 redesigned groups", "rule": "robot-arm-v1-package"},
+      {"check": "assembly steps explicitly reduced", "result": "pass", "value": "28 baseline steps to 15 redesigned steps", "rule": "robot-arm-v1-serviceability"},
+      {"check": "J1-J6 axis access retained", "result": "pass", "value": "J1/J2/J3/J5/J6 visible; J4 cable pass-through retained in forearm", "rule": "robot-arm-v1-axis-access"},
+      {"check": "joint cartridge access retained", "result": "pass", "value": "J2, J3, J5, J6 cartridge covers removable", "rule": "robot-arm-v1-serviceability"},
+      {"check": "cable replacement access retained", "result": "pass", "value": "external cable spine clips and wrist loop visible", "rule": "robot-arm-v1-cable"},
+      {"check": "tool flange access retained", "result": "pass", "value": "visible bolt pattern and utility pass-through guide", "rule": "robot-arm-v1-tooling"},
+      {"check": "joint cartridge clearance after print", "result": "warn", "value": "requires prototype fit test", "rule": "robot-arm-v1-printability"}
+    ],
+    "risk": [
+      {"id": "R01", "desc": "Over-integration of joint cartridges into links may block reducer and encoder dummy access.", "mit": "Keep J2/J3/J5/J6 as removable cartridge covers.", "severity": "high"},
+      {"id": "R02", "desc": "Axis alignment may be lost if J2/J3 datum faces are hidden by link covers.", "mit": "Expose axis rings and engrave J1-J6 datum labels.", "severity": "high"},
+      {"id": "R03", "desc": "Cable replacement access may degrade if cable spine is routed inside closed links.", "mit": "Use external replaceable cable spine and open link channels.", "severity": "med"},
+      {"id": "R04", "desc": "Tool flange service may be blocked if flange and wrist shell are one piece.", "mit": "Keep tool flange as separate service module.", "severity": "med"},
+      {"id": "R05", "desc": "Tall link prints may warp and disturb cartridge fit.", "mit": "Print links on side, keep channels upward, and verify cartridge clearance.", "severity": "med"}
+    ],
+    "print_profile": {
+      "printer": "FDM printer with 0.4mm nozzle",
+      "material": "PETG structural parts, TPU cable pads",
+      "layer_mm": 0.2,
+      "walls": 4,
+      "infill": "20% gyroid for links and base, 30% for joint cartridges, 15% for cable spine",
+      "supports": "min",
+      "orientation": "base flange on bed; links on side with cable channels upward; joint axis faces upward; tool flange face on bed",
+      "est_time": "12-16h total prototype set",
+      "filament_g": 340
+    },
+    "slicer_job": {
+      "tool": "prusaslicer",
+      "input_stl": "output/robot_arm_serviceability_redesign_v1.stl",
+      "output": "output/robot_arm_serviceability_redesign_v1.gcode",
+      "args": ["--layer-height", "0.20", "--fill-density", "20%", "--support-material-auto"],
+      "profile": "PETG_TPU_0.4mm_robot_arm_serviceability_mockup"
+    }
+  },
+  "quality_scenarios": [
+    {
+      "case": "joint integrated into link reduces part count but blocks reducer and encoder access",
+      "expected": "fail",
+      "reason": "joint cartridge serviceability is mandatory"
+    },
+    {
+      "case": "hollow link and cable channel integrated while joint cartridges remain removable",
+      "expected": "pass",
+      "reason": "assembly is simplified without hiding axes or service modules"
+    },
+    {
+      "case": "print is easy but J2/J3 axis datum faces disappear",
+      "expected": "risk",
+      "reason": "axis alignment and calibration marks must remain inspectable"
+    }
+  ]
+}
+

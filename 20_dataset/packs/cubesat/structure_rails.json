@@ -1,0 +1,234 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "cubesat",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "structure_rails",
+    "discipline": "structures",
+    "function": "3U frame, deployer rails, board stack support",
+    "evidence_features": [
+      "rail",
+      "standoff",
+      "PC/104 stack",
+      "corner_post"
+    ],
+    "criteria_refs": [
+      "cubesat",
+      "geometry_grounding",
+      "datum_tolerance"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "title": "P0 to Geometry Grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "weight": 14,
+          "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+          "bad": "P0 lists features but geometry_ops are generic boxes at the origin.",
+          "signals": [
+            "_subsystem_plan.internal_feature_targets",
+            "geometry_ops.id",
+            "geometry_ops.target"
+          ],
+          "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "weight": 12,
+          "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+          "bad": "Geometry is stacked at [0,0,0] or lacks coordinates.",
+          "signals": [
+            "args.at",
+            "coordinate_spread_score"
+          ],
+          "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "weight": 10,
+          "good": "Uses drill, pocket, boss, channel, cylinder, chamfer, fillet, pattern, and engrave where appropriate.",
+          "bad": "Primary output is a rectangular box with shallow labels.",
+          "signals": [
+            "drill",
+            "pocket",
+            "boss",
+            "channel",
+            "pattern_linear",
+            "pattern_polar",
+            "fillet",
+            "chamfer"
+          ],
+          "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+        },
+        {
+          "criterion": "mechanism_named_not_implied",
+          "weight": 9,
+          "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "signals": [
+            "four_bar",
+            "cam",
+            "rack_pinion",
+            "lead_screw",
+            "pivot_hole",
+            "linkage_bar"
+          ],
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "source_refs": [
+            "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "datum_tolerance",
+      "title": "Datum, Interface, and Tolerance Judgment",
+      "criteria": [
+        {
+          "criterion": "datum_visibility",
+          "weight": 11,
+          "good": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+          "bad": "Interfaces exist only as abstract neighbor references.",
+          "signals": [
+            "datum",
+            "axis_ring",
+            "rail",
+            "socket",
+            "mounting_pad",
+            "interface_zone"
+          ],
+          "loop_feedback": "Add visible datum pads or axis/rail/socket features and label their mating function."
+        },
+        {
+          "criterion": "clearance_named",
+          "weight": 8,
+          "good": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+          "bad": "Moving/removable joints have no clearance or fit language.",
+          "signals": [
+            "clearance_mm",
+            "tol_mm",
+            "fit",
+            "slip",
+            "snap",
+            "pin"
+          ],
+          "loop_feedback": "Add clearance_mm or tolerance notes for hinge pins, slide rails, sockets, and removable cartridges."
+        },
+        {
+          "criterion": "interface_count",
+          "weight": 8,
+          "good": "Each subsystem has at least three adjacent interfaces or datums.",
+          "bad": "Subsystem is isolated and does not show assembly neighbors.",
+          "signals": [
+            "adjacent_interfaces",
+            "target_part",
+            "interface_type"
+          ],
+          "loop_feedback": "Add at least three adjacent interfaces: mount, service, electrical/data, flow, or inspection datum."
+        },
+        {
+          "criterion": "standard_fit_vocabulary",
+          "weight": 8,
+          "good": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+          "bad": "All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance.",
+          "signals": [
+            "clearance_fit",
+            "transition_fit",
+            "press_fit",
+            "allowance_mm",
+            "H7",
+            "shaft_basis"
+          ],
+          "loop_feedback": "Classify each mating diameter as clearance/transition/press fit and add a numeric allowance instead of line-to-line nominals.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        },
+        {
+          "criterion": "standard_hardware_dimensioning",
+          "weight": 7,
+          "good": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+          "bad": "Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin.",
+          "signals": [
+            "M3",
+            "M4",
+            "bearing_od",
+            "dowel_pin",
+            "catalog_size"
+          ],
+          "loop_feedback": "Snap hole, pin, and bearing dimensions to standard catalog sizes and name the intended hardware in callouts.",
+          "source_refs": [
+            "sources/public/McMaster-Carr Catalog 123.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cubesat",
+      "title": "3U CubeSat Mock Assembly Criteria",
+      "criteria": [
+        {
+          "criterion": "rail_standoff_visibility",
+          "weight": 14,
+          "good": "Rails, PC/104 standoffs, payload bay, and board stack clearances are visible.",
+          "bad": "CubeSat is a closed rectangular box with no internal assembly evidence.",
+          "signals": [
+            "rail",
+            "PC/104",
+            "standoff",
+            "board stack",
+            "payload bay"
+          ],
+          "loop_feedback": "Add deployer rail guides, PC/104 standoffs, board stack slots, and payload bay inspection window."
+        },
+        {
+          "criterion": "serviceable_avionics_stack",
+          "weight": 10,
+          "good": "Avionics, battery, antenna, and payload modules have removable trays or access panels.",
+          "bad": "Electronics are hidden with no service path.",
+          "signals": [
+            "avionics",
+            "battery",
+            "antenna",
+            "tray",
+            "access panel"
+          ],
+          "loop_feedback": "Add removable avionics/battery trays, antenna slot, and labeled service cover geometry."
+        },
+        {
+          "criterion": "space_mock_boundary",
+          "weight": 9,
+          "good": "Design is an educational structural/electrical mockup and avoids flight qualification claims.",
+          "bad": "Output claims deployer compliance, orbital readiness, or mission certification.",
+          "signals": [
+            "mockup",
+            "design review",
+            "not flight qualified"
+          ],
+          "loop_feedback": "State CubeSat as educational mock assembly; include inspection/readiness evidence, not flight certification claims."
+        },
+        {
+          "criterion": "subsystem_budget_decomposition",
+          "weight": 9,
+          "good": "Structure, power, avionics, comms, and payload are decomposed with simple mass/volume/power budget notes per module that sum consistently.",
+          "bad": "Modules exist as shapes only, with no budget notes, or stated budgets contradict the geometry volumes.",
+          "signals": [
+            "mass_budget",
+            "power_budget",
+            "volume_budget",
+            "subsystem",
+            "margin"
+          ],
+          "loop_feedback": "Attach mass/volume/power budget notes to each module and check the totals against the 3U envelope with stated margin.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        }
+      ]
+    }
+  ]
+}

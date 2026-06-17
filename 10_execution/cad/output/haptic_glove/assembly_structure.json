@@ -1,0 +1,135 @@
+{
+  "schema": "blueprint_step_assembly_structure_v1",
+  "seed": "haptic_glove",
+  "assembly_step": "haptic_glove_assembly.step",
+  "note": "Educational mock assembly geometry — CFD/FEA on this model is for shape comparison and trend review, not absolute performance.",
+  "parts": [
+    {
+      "part_id": "new-001",
+      "label": "dorsal control module",
+      "step_file": "step/new-001_dorsal_control_module.step",
+      "qty": 2,
+      "bbox_mm": [
+        86.0,
+        70.0,
+        14.0
+      ],
+      "placement_translation_mm": [
+        -12.44,
+        -11.85,
+        -2.95
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-002",
+      "label": "per-finger exo linkage cartridge",
+      "step_file": "step/new-002_per_finger_exo_linkage_cartridge.step",
+      "qty": 10,
+      "bbox_mm": [
+        13.0,
+        60.0,
+        6.0
+      ],
+      "placement_translation_mm": [
+        37.31,
+        -11.85,
+        -2.95
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-003",
+      "label": "flexion-resistance actuator module",
+      "step_file": "step/new-003_flexion_resistance_actuator_module.step",
+      "qty": 10,
+      "bbox_mm": [
+        11.0,
+        11.0,
+        9.0
+      ],
+      "placement_translation_mm": [
+        -12.44,
+        -11.85,
+        8.85
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-004",
+      "label": "adjustable wrist band",
+      "step_file": "step/new-004_adjustable_wrist_band.step",
+      "qty": 2,
+      "bbox_mm": [
+        72.0,
+        24.0,
+        24.0
+      ],
+      "placement_translation_mm": [
+        -12.44,
+        35.55,
+        -2.95
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "mates": [
+    {
+      "id": "j-linkage-slide",
+      "kind": "rigid",
+      "part_a": "new-002",
+      "part_b": "new-001",
+      "mate": "slot",
+      "clearance_mm": 0.25,
+      "containment": false,
+      "note": ""
+    },
+    {
+      "id": "j-band-buckle",
+      "kind": "rigid",
+      "part_a": "new-004",
+      "part_b": "new-001",
+      "mate": "snap",
+      "clearance_mm": 0.4,
+      "containment": false,
+      "note": "wrist band quick-release buckle snaps onto dorsal control module"
+    },
+    {
+      "id": "J4",
+      "kind": "rigid",
+      "part_a": "new-003",
+      "part_b": "new-001",
+      "mate": "snap",
+      "clearance_mm": 0.3,
+      "containment": false,
+      "note": "flexion-resistance actuator snaps into dorsal knuckle-row mount"
+    }
+  ],
+  "consistency": {
+    "parts_exported": 4,
+    "part_tree_roots": 4,
+    "mates_recorded": 3
+  },
+  "layout": {
+    "method": "joint_directional_tree",
+    "datum": "new-001",
+    "unsatisfied_mates": [],
+    "note": "Children placed adjacent to BFS-tree parent on distinct faces; collision-free is re-verified by assembly_interference_audit, not assumed. Secondary mates of multi-mate parts are reported as unsatisfied residuals (no constraint solver)."
+  }
+}

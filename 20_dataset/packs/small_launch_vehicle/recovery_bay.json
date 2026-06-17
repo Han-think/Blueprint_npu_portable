@@ -1,0 +1,170 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "small_launch_vehicle",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "recovery_bay",
+    "discipline": "recovery_deployment",
+    "function": "Parachute bay dummy with deployment door hinge (display-level)",
+    "evidence_features": [
+      "recovery_bay",
+      "deploy_door",
+      "hinge"
+    ],
+    "criteria_refs": [
+      "small_launch_vehicle_mock_boundary",
+      "geometry_grounding"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "title": "P0 to Geometry Grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "weight": 14,
+          "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+          "bad": "P0 lists features but geometry_ops are generic boxes at the origin.",
+          "signals": [
+            "_subsystem_plan.internal_feature_targets",
+            "geometry_ops.id",
+            "geometry_ops.target"
+          ],
+          "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "weight": 12,
+          "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+          "bad": "Geometry is stacked at [0,0,0] or lacks coordinates.",
+          "signals": [
+            "args.at",
+            "coordinate_spread_score"
+          ],
+          "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "weight": 10,
+          "good": "Uses drill, pocket, boss, channel, cylinder, chamfer, fillet, pattern, and engrave where appropriate.",
+          "bad": "Primary output is a rectangular box with shallow labels.",
+          "signals": [
+            "drill",
+            "pocket",
+            "boss",
+            "channel",
+            "pattern_linear",
+            "pattern_polar",
+            "fillet",
+            "chamfer"
+          ],
+          "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+        },
+        {
+          "criterion": "mechanism_named_not_implied",
+          "weight": 9,
+          "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "signals": [
+            "four_bar",
+            "cam",
+            "rack_pinion",
+            "lead_screw",
+            "pivot_hole",
+            "linkage_bar"
+          ],
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "source_refs": [
+            "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "small_launch_vehicle_mock_boundary",
+      "title": "Small Launch Vehicle Educational Mock Boundary",
+      "criteria": [
+        {
+          "criterion": "display_only_flowpath",
+          "weight": 14,
+          "good": "Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only.",
+          "bad": "Output drifts into actionable propulsion, ignition, or flight-performance instructions.",
+          "signals": [
+            "display-only",
+            "non-functional",
+            "cutaway",
+            "educational mock"
+          ],
+          "loop_feedback": "Use display-only cutaway modules and avoid operational propulsion, ignition, or flight-performance details."
+        },
+        {
+          "criterion": "cutaway_internal_readability",
+          "weight": 12,
+          "good": "Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge.",
+          "bad": "Vehicle is a smooth cylinder with no internal evidence.",
+          "signals": [
+            "cutaway",
+            "tank module",
+            "interstage",
+            "avionics bay",
+            "engine display cartridge"
+          ],
+          "loop_feedback": "Add cutaway windows, slide-in tank dummies, interstage datum, avionics bay, and removable engine display cartridge."
+        },
+        {
+          "criterion": "safe_risk_language",
+          "weight": 10,
+          "good": "Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming.",
+          "bad": "Risk/verification implies real launch readiness or manufacturing assurance.",
+          "signals": [
+            "mockup",
+            "inspection",
+            "overclaim",
+            "not flight-ready"
+          ],
+          "loop_feedback": "Frame verification around mock assembly inspection and explicitly avoid launch/propulsion readiness claims."
+        },
+        {
+          "criterion": "stage_interface_datum_evidence",
+          "weight": 9,
+          "good": "Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review.",
+          "bad": "Stages stack as butted cylinders with no locating feature, making the mock unassemblable and uninspectable.",
+          "signals": [
+            "interstage_datum",
+            "bolt_circle",
+            "alignment_key",
+            "stacking_feature"
+          ],
+          "loop_feedback": "Add locating datums, dummy bolt circles, and alignment keys at every stage and module joint of the mock stack.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "1800 Mechanical Movements, Devices and Appliances (Hiscox, 1899, public domain)",
+      "target_topics": [
+        "linkages",
+        "cams",
+        "gears",
+        "mechanism vocabulary"
+      ]
+    }
+  ],
+  "boundary_note": "All subsystems are educational display mockups; no propulsion, ignition, or flight-performance design."
+}

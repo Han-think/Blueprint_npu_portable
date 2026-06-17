@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Gradio Workbench v6 — Blueprint NPU</title>
+  <link rel="stylesheet" href="../../colors_and_type.css">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>body{margin:0;background:#0c1e35;}</style>
+</head>
+<body class="bp">
+  <div id="root"></div>
+  <script type="text/babel" src="Controls.jsx"></script>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // ============ shared ============
+    function PanelHead({ chip, title, right }) {
+      return (
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:12,borderBottom:`1px solid ${GW.frame}`,paddingBottom:8}}>
+          <div>
+            <Chip>{chip}</Chip>
+            <h3 style={{margin:'4px 0 0',color:GW.ink,fontWeight:600,fontSize:16}}>{title}</h3>
+          </div>
+          {right}
+        </div>
+      );
+    }
+    function KV({ k, v, color=GW.lox }) {
+      return (
+        <div style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:`1px dashed ${GW.frame}`,fontFamily:GW.mono,fontSize:12}}>
+          <span style={{color:GW.ink3,letterSpacing:'0.06em',textTransform:'uppercase'}}>{k}</span>
+          <span style={{color}}>{v}</span>
+        </div>
+      );
+    }
+
+    // ============ RUNNER (existing) ============
+    function Runner(){
+      const [prompts,setPrompts]=useState('Rocket stage-1 efficiency…\nLEAF71 combustion stability…\nLow-noise drone prop…\nRamjet inlet M2–4…\nPencil-engine transition…');
+      const [runCount,setRunCount]=useState(10);
+      const [wrap,setWrap]=useState(true);
+      const [bp,setBp]=useState(true);
+      const [running,setRunning]=useState(false);
+      const [out,setOut]=useState('');
+      const sample = '### 1. Rocket stage-1 efficiency…\n\n**NPU(OpenVINO — qwen2.5-3b INT4)**\n1) Design Brief\n- Booster class, LOX/RP-1, Pc 10–12 MPa, OF 2.3–2.5, T/W ≥ 120.\n- Channel-cooled chamber, AM Inconel 718, HIP + machined datums.\n\n2) Part Tree\n```part_tree\n{ "id":"S-IC","qty":1,"children":[\n  {"id":"F1","name":"engine_F1","qty":5,"material":"Inconel 718"}\n]}\n```\n3) verify[]\n- dim: Ø10.10 m ±20 mm · overhang ≤ 45° · min_wall ≥ 1.2 mm\n';
+      function go(){ setRunning(true); setOut(''); let i=0; const t=sample.length;
+        const step=()=>{ i=Math.min(i+20,t); setOut(sample.slice(0,i)); if(i<t) setTimeout(step,10); else setRunning(false); };
+        setTimeout(step,200);
+      }
+      return (
+        <div>
+          <div style={{display:'grid',gridTemplateColumns:'1.7fr 1fr',gap:16,marginBottom:14}}>
+            <Field label="Prompts (1 line = 1 task)">
+              <textarea value={prompts} onChange={e=>setPrompts(e.target.value)} rows={10}
+                style={{width:'100%',fontFamily:GW.mono,fontSize:12,background:GW.canvas2,color:GW.ink,border:`1px solid ${GW.frame}`,padding:'10px 12px',borderRadius:2,outline:'none',resize:'vertical'}}/>
+            </Field>
+            <div>
+              <Slider min={1} max={50} step={1} value={runCount} onChange={setRunCount} label="Run count (max 50)"/>
+              <div style={{marginTop:14}}><Check checked={wrap} onChange={setWrap}>Apply engineering wrapper</Check></div>
+              <div style={{marginTop:10}}><Check checked={bp} onChange={setBp}>Emit BLUEPRINT schema v6</Check></div>
+              <div style={{marginTop:10}}><Check checked={true} onChange={()=>{}}>Save to ./save/sessions</Check></div>
+              <div style={{marginTop:10}}><Check checked={true} onChange={()=>{}}>Offline mode (no HF hub)</Check></div>
+            </div>
+          </div>
+          <Accordion title="NPU (OpenVINO runner — INT4)" open>
+            <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr',gap:12,marginBottom:10}}>
+              <Field label="OV model dir"><TextInput value="models/ov_npu_ready/qwen25_3b_int4_npu_ov" onChange={()=>{}}/></Field>
+              <Field label="Device"><Select value="NPU" onChange={()=>{}} options={['NPU','CPU','AUTO']}/></Field>
+              <Field label="max_new_tokens"><TextInput value="384" onChange={()=>{}}/></Field>
+            </div>
+          </Accordion>
+          <Accordion title="XPU (HF merged LoRA)">
+            <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr',gap:12,marginBottom:10}}>
+              <Field label="Merged dir"><TextInput value="models/hf_finetuned/xpu_run3/merged" onChange={()=>{}}/></Field>
+              <Field label="dtype"><Select value="bf16" onChange={()=>{}} options={['fp32','bf16','f16']}/></Field>
+              <Field label="device"><Select value="xpu" onChange={()=>{}} options={['cpu','xpu']}/></Field>
+            </div>
+          </Accordion>
+          <div style={{display:'flex',gap:10,margin:'18px 0'}}>
+            <Btn onClick={go}>Run NPU only</Btn>
+            <Btn onClick={go}>Run XPU only</Btn>
+            <Btn variant="primary" onClick={go}>Run Both</Btn>
+            {running && <Chip color={GW.intertank}>◐ RUNNING…</Chip>}
+          </div>
+          <div style={{border:`1px solid ${GW.frame}`,padding:16,minHeight:220}}>
+            <Chip>OUTPUT · MARKDOWN</Chip>
+            <pre style={{margin:'8px 0 0',fontFamily:GW.mono,fontSize:12,color:GW.ink2,whiteSpace:'pre-wrap'}}>
+{out || '(no output yet — click "Run Both" to simulate a batch)'}
+            </pre>
+          </div>
+        </div>
+      );
+    }
+
+    // ============ TRAIN ============
+    function Train(){
+      const [base,setBase]=useState('qwen2.5-3b-instruct');
+      const [dataset,setDataset]=useState('data/sft/briefs_parttree_v6.jsonl');
+      const [nRows,setNRows]=useState(4820);
+      const [lr,setLr]=useState(0.00015);
+      const [rank,setRank]=useState(16);
+      const [epochs,setEpochs]=useState(3);
+      const [step,setStep]=useState(428);
+      const [loss,setLoss]=useState(0.64);
+      const [running,setRunning]=useState(true);
+      useEffect(()=>{
+        if(!running) return;
+        const id=setInterval(()=>{
+          setStep(s=>s+Math.floor(4+Math.random()*6));
+          setLoss(l=>Math.max(0.18,l - 0.003 - Math.random()*0.004));
+        },500);
+        return ()=>clearInterval(id);
+      },[running]);
+      const pct = Math.min(100, (step/(epochs*Math.ceil(nRows/8)))*100);
+      return (
+        <div style={{display:'grid',gridTemplateColumns:'1.1fr 1fr',gap:18}}>
+          <div>
+            <PanelHead chip="TRAIN · SFT + LORA" title="Fine-tune adapter on XPU → merge → export OV INT4 for NPU"/>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+              <Field label="Base model (HF)"><Select value={base} onChange={setBase} options={['qwen2.5-3b-instruct','qwen2.5-7b-instruct','qwen2.5-coder-7b','llama-3.2-3b-instruct','phi-3.5-mini-instruct','phi-4-14b','mistral-nemo-12b']}/></Field>
+              <Field label="Dataset (JSONL)"><TextInput value={dataset} onChange={setDataset}/></Field>
+              <Field label="rows"><TextInput value={String(nRows)} onChange={v=>setNRows(+v||0)}/></Field>
+              <Field label="learning_rate"><TextInput value={String(lr)} onChange={v=>setLr(+v||0)}/></Field>
+              <Field label="LoRA rank"><Select value={String(rank)} onChange={v=>setRank(+v)} options={['8','16','32','64']}/></Field>
+              <Field label="epochs"><Select value={String(epochs)} onChange={v=>setEpochs(+v)} options={['1','2','3','5']}/></Field>
+            </div>
+            <div style={{marginTop:12}}>
+              <Check checked={true}>QLoRA 4-bit · NF4 · bf16 compute</Check>
+              <div style={{height:6}}/>
+              <Check checked={true}>DPO stage on prefs.jsonl (best vs worst)</Check>
+              <div style={{height:6}}/>
+              <Check checked={true}>Export OV INT4 to models/ov_npu_ready/</Check>
+            </div>
+            <div style={{display:'flex',gap:10,marginTop:16}}>
+              <Btn variant="primary" onClick={()=>setRunning(true)}>Start / resume</Btn>
+              <Btn onClick={()=>setRunning(false)}>Pause</Btn>
+              <Btn variant="warn">Export OV INT4</Btn>
+              <Btn variant="go">Push to ov_npu_ready/</Btn>
+            </div>
+          </div>
+          <div>
+            <PanelHead chip="LIVE · STEP" title={`step ${step} · loss ${loss.toFixed(3)}`} right={<Chip color={running?GW.intertank:GW.ink3}>{running?'◐ RUNNING':'◯ PAUSED'}</Chip>}/>
+            <div style={{border:`1px solid ${GW.frame}`,padding:14}}>
+              <KV k="base" v={base}/>
+              <KV k="adapter" v={`lora_r${rank}_a${rank*2}_dropout0.05`} color={GW.halo}/>
+              <KV k="dataset_rows" v={nRows.toLocaleString()}/>
+              <KV k="optimizer" v="paged_adamw_8bit" color={GW.lh2}/>
+              <KV k="ckpt" v={`ckpt-${String(step).padStart(5,'0')}`} color={GW.intertank}/>
+              <KV k="eta_remaining" v={`${Math.max(0,Math.round(90-pct*0.9))}m`}/>
+              <div style={{marginTop:14}}>
+                <div style={{fontFamily:GW.mono,fontSize:11,color:GW.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>progress · {pct.toFixed(1)}%</div>
+                <div style={{border:`1px solid ${GW.frame}`,height:10,position:'relative'}}>
+                  <div style={{position:'absolute',left:0,top:0,bottom:0,width:`${pct}%`,background:GW.lox}}/>
+                </div>
+              </div>
+              <div style={{marginTop:14}}>
+                <div style={{fontFamily:GW.mono,fontSize:11,color:GW.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>loss curve</div>
+                <svg viewBox="0 0 400 80" style={{width:'100%',border:`1px solid ${GW.frame}`,background:GW.canvas2}}>
+                  <polyline fill="none" stroke={GW.lox} strokeWidth="1.3"
+                    points={Array.from({length:40}).map((_,i)=>`${i*10},${78 - Math.max(2, 70*Math.exp(-i/12) + (Math.random()*3))}`).join(' ')}/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============ DESIGN ============
+    function Design(){
+      const [brief,setBrief]=useState('Saturn V S-IC booster · LOX/RP-1 · 5× F-1 engines · reusable 10 cycles · printable on LPBF Inconel 718 · min wall 1.2 mm · overhang ≤ 45° · HIP + machined datum-A');
+      const tree = [
+        {id:'S-IC',name:'stage_1',qty:1,mat:'Al-Li 2195',proc:'Friction-stir + LPBF mounts',depth:0},
+        {id:'F1',name:'engine_F1',qty:5,mat:'Inconel 718',proc:'LPBF + HIP + 5-axis',depth:1},
+        {id:'F1.chamber',name:'chamber',qty:1,mat:'Inconel 718',proc:'LPBF · layer 40 µm',depth:2},
+        {id:'F1.nozzle',name:'nozzle_extension',qty:1,mat:'Inconel 718',proc:'LPBF · orientation 22°Z',depth:2},
+        {id:'F1.turbo',name:'turbopump',qty:1,mat:'Inconel 718 / Ti-6Al-4V',proc:'Assembly',depth:2},
+        {id:'LOX',name:'lox_tank',qty:1,mat:'Al-Li 2195',proc:'FSW',depth:1},
+        {id:'RP1',name:'rp1_tank',qty:1,mat:'Al-Li 2195',proc:'FSW',depth:1},
+      ];
+      return (
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:18}}>
+          <div>
+            <PanelHead chip="DESIGN · BRIEF → part_tree" title="Structured Design Brief Builder"/>
+            <Field label="Brief (free-form, KR/EN)">
+              <textarea value={brief} onChange={e=>setBrief(e.target.value)} rows={6}
+                style={{width:'100%',fontFamily:GW.mono,fontSize:12,background:GW.canvas2,color:GW.ink,border:`1px solid ${GW.frame}`,padding:'10px 12px',borderRadius:2,outline:'none',resize:'vertical'}}/>
+            </Field>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginTop:12}}>
+              <Field label="Domain"><Select value="propulsion" onChange={()=>{}} options={['propulsion','cfd','structures','drone','hvac']}/></Field>
+              <Field label="Process"><Select value="LPBF" onChange={()=>{}} options={['LPBF','FDM','FDM-metal','SLA','DED']}/></Field>
+              <Field label="Material"><Select value="Inconel 718" onChange={()=>{}} options={['Inconel 718','Ti-6Al-4V','AlSi10Mg','PLA','PETG','Ultrafuse 316L']}/></Field>
+            </div>
+            <div style={{marginTop:12}}>
+              <Check checked={true}>RAG: attach criteria/00_design_checklist.md + FDM guidelines</Check>
+              <div style={{height:6}}/>
+              <Check checked={true}>Include geometry_ops[] (OpenSCAD + CadQuery)</Check>
+              <div style={{height:6}}/>
+              <Check checked={true}>Include verify[] + risk[] sections</Check>
+            </div>
+            <div style={{display:'flex',gap:10,marginTop:16}}>
+              <Btn variant="primary">Generate part_tree</Btn>
+              <Btn>Add to Batch</Btn>
+              <Btn variant="warn">Re-run with seed+1</Btn>
+            </div>
+          </div>
+          <div>
+            <PanelHead chip="PART TREE · v6" title="saturn_v · booster · 5× F-1" right={<Chip color={GW.intertank}>✓ schema v6 valid</Chip>}/>
+            <div style={{border:`1px solid ${GW.frame}`,padding:14,background:GW.canvas2}}>
+              {tree.map(n=>(
+                <div key={n.id} style={{display:'flex',padding:'6px 0',borderBottom:`1px dashed ${GW.frame}`,fontFamily:GW.mono,fontSize:12,gap:10,alignItems:'baseline'}}>
+                  <span style={{width:n.depth*14}}/>
+                  <span style={{color:GW.lox,minWidth:110}}>{n.id}</span>
+                  <span style={{color:GW.ink,flex:1}}>{n.name}</span>
+                  <span style={{color:GW.intertank,minWidth:30,textAlign:'right'}}>×{n.qty}</span>
+                  <span style={{color:GW.lh2,minWidth:150,textAlign:'right',fontSize:11}}>{n.mat}</span>
+                  <span style={{color:GW.halo,minWidth:180,textAlign:'right',fontSize:11}}>{n.proc}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display:'flex',gap:10,marginTop:12,flexWrap:'wrap'}}>
+              <Chip color={GW.lox}>7 NODES</Chip>
+              <Chip color={GW.intertank}>DEDUP ✓</Chip>
+              <Chip color={GW.lh2}>4 MATERIALS</Chip>
+              <Chip color={GW.halo}>DfAM PASS</Chip>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============ INSPECT ============
+    function Inspect(){
+      const checks = [
+        {k:'dim.Ø10.10 m', target:'10.10 ±0.02 m', got:'10.099 m', pass:true},
+        {k:'min_wall', target:'≥ 1.2 mm', got:'1.28 mm', pass:true},
+        {k:'overhang_max', target:'≤ 45°', got:'43.2°', pass:true},
+        {k:'channel_radius', target:'≥ 1.5 mm', got:'1.42 mm', pass:false},
+        {k:'interference · F1.chamber ∩ F1.nozzle', target:'0 mm³', got:'12.4 mm³', pass:false},
+        {k:'bbox_fits_plate (420×420×500)', target:'fits', got:'fits', pass:true},
+        {k:'self_support_angle', target:'≥ 30°', got:'31°', pass:true},
+        {k:'orientation_from_Z', target:'20–30°', got:'22°', pass:true},
+      ];
+      return (
+        <div style={{display:'grid',gridTemplateColumns:'1.2fr 1fr',gap:18}}>
+          <div>
+            <PanelHead chip="INSPECT · 3D VIEWER" title="F-1 engine · chamber assembly · schematic"/>
+            <div style={{border:`1px solid ${GW.frame}`,background:GW.canvas2,padding:14}}>
+              <svg viewBox="0 0 440 320" style={{width:'100%',display:'block'}}>
+                {/* dim ladder */}
+                <line x1="30" y1="30" x2="30" y2="290" stroke={GW.ink} strokeWidth="1"/>
+                <line x1="24" y1="30" x2="36" y2="30" stroke={GW.ink} strokeWidth="1"/>
+                <line x1="24" y1="290" x2="36" y2="290" stroke={GW.ink} strokeWidth="1"/>
+                <text x="24" y="164" fill={GW.ink} fontSize="10" fontFamily={GW.mono} textAnchor="end">5.6 m</text>
+                {/* chamber */}
+                <path d="M 120 40 A 40 40 0 0 1 160 0 L 260 0 A 40 40 0 0 1 300 40 L 300 140 L 120 140 Z" transform="translate(0,40)" fill="none" stroke={GW.lox} strokeWidth="1.6"/>
+                {/* throat */}
+                <path d="M 140 180 L 160 220 L 260 220 L 280 180 Z" fill="none" stroke={GW.intertank} strokeWidth="1.3" strokeDasharray="6 4"/>
+                {/* nozzle */}
+                <path d="M 160 220 L 90 300 L 330 300 L 260 220 Z" fill="#1f6aa8" stroke={GW.lox} strokeWidth="1" opacity="0.9"/>
+                <text x="210" y="30" fill={GW.ink} fontSize="11" fontFamily={GW.mono} textAnchor="middle">F-1 CHAMBER + NOZZLE</text>
+                {/* highlighted fail region */}
+                <circle cx="300" cy="220" r="16" fill="none" stroke="#ff9fb5" strokeWidth="1.6"/>
+                <text x="322" y="222" fill="#ff9fb5" fontSize="10" fontFamily={GW.mono}>channel Ø 1.42 mm</text>
+                {/* legend */}
+                <g transform="translate(340,40)">
+                  <rect width="90" height="68" fill="none" stroke={GW.frame}/>
+                  <rect x="6" y="8" width="14" height="8" fill="none" stroke={GW.lox} strokeWidth="1.6"/><text x="26" y="16" fill={GW.lox} fontSize="10" fontFamily={GW.mono}>wall</text>
+                  <rect x="6" y="22" width="14" height="8" fill="none" stroke={GW.intertank} strokeWidth="1.3"/><text x="26" y="30" fill={GW.intertank} fontSize="10" fontFamily={GW.mono}>throat</text>
+                  <rect x="6" y="36" width="14" height="8" fill="#1f6aa8" stroke={GW.lox}/><text x="26" y="44" fill={GW.lox} fontSize="10" fontFamily={GW.mono}>nozzle</text>
+                  <rect x="6" y="50" width="14" height="8" fill="none" stroke="#ff9fb5" strokeWidth="1.6"/><text x="26" y="58" fill="#ff9fb5" fontSize="10" fontFamily={GW.mono}>fail</text>
+                </g>
+              </svg>
+            </div>
+            <div style={{display:'flex',gap:10,marginTop:12,flexWrap:'wrap'}}>
+              <Btn>Front</Btn><Btn>Side</Btn><Btn>Top</Btn><Btn variant="primary">Iso</Btn>
+              <Btn variant="warn">Explode</Btn>
+              <Btn variant="go">Run verify[]</Btn>
+            </div>
+          </div>
+          <div>
+            <PanelHead chip="VERIFY[] · 8 CHECKS" title="2 FAILING · block slicer_job" right={<Chip color="#ff9fb5">✗ 2 FAIL</Chip>}/>
+            <div style={{border:`1px solid ${GW.frame}`}}>
+              {checks.map((c,i)=>(
+                <div key={i} style={{padding:'10px 14px',borderBottom:i<checks.length-1?`1px dashed ${GW.frame}`:'none',display:'grid',gridTemplateColumns:'16px 1fr auto auto',gap:10,alignItems:'baseline',fontFamily:GW.mono,fontSize:12}}>
+                  <span style={{color:c.pass?GW.intertank:'#ff9fb5'}}>{c.pass?'✓':'✗'}</span>
+                  <span style={{color:GW.ink}}>{c.k}</span>
+                  <span style={{color:GW.ink3,fontSize:11}}>target {c.target}</span>
+                  <span style={{color:c.pass?GW.intertank:'#ff9fb5',fontSize:11}}>got {c.got}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display:'flex',gap:10,marginTop:12}}>
+              <Btn variant="warn">Re-generate failing parts</Btn>
+              <Btn>Open risk[]</Btn>
+              <Btn variant="primary" disabled>→ Slicer (blocked)</Btn>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============ ARTIFACTS ============
+    function Artifacts(){
+      return (
+        <div>
+          <PanelHead chip="ARTIFACTS · BLUEPRINT & PRINT-PACK" title="Per-model blueprints → BOM → PRINT_QUEUE → zip"/>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16}}>
+            <div style={{border:`1px solid ${GW.frame}`,padding:14}}>
+              <Chip color={GW.halo}>SESSION</Chip>
+              <div style={{fontFamily:GW.mono,fontSize:12,color:GW.ink,marginTop:6}}>2026-04-24_142311_npu_xpu_batch</div>
+              <div style={{marginTop:10}}>
+                <KV k="prompts" v="10"/>
+                <KV k="blueprints" v="18" color={GW.intertank}/>
+                <KV k="bom_rows" v="142" color={GW.lh2}/>
+                <KV k="print_queue" v="7 jobs · 46h est" color={GW.halo}/>
+              </div>
+              <div style={{display:'flex',gap:10,marginTop:14}}>
+                <Btn variant="primary">Build Print-Pack (zip)</Btn>
+                <Btn variant="warn">Download</Btn>
+              </div>
+            </div>
+            <div style={{border:`1px solid ${GW.frame}`,padding:14}}>
+              <Chip>PRINT_QUEUE.csv · preview</Chip>
+              <pre style={{margin:'6px 0 0',fontFamily:GW.mono,fontSize:11,color:GW.ink2,whiteSpace:'pre',overflow:'auto'}}>{`idx  part             qty  mat          proc    plate     time
+01   F1.chamber       5    Inconel718   LPBF    420×420   18.4h
+02   F1.nozzle_ext    5    Inconel718   LPBF    420×420   11.2h
+03   lox_tank_dome    2    AlSi10Mg     LPBF    420×420   6.8h
+04   thrust_puck      1    Ti-6Al-4V    LPBF    420×420   4.1h
+05   mount_bracket_A  12   PETG         FDM     220×220   2.6h
+06   harness_clip     40   PLA          FDM     220×220   1.4h
+07   intertank_ring   1    AlSi10Mg     LPBF    420×420   1.6h`}</pre>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ============ ROOT ============
+    function App(){
+      const [tab,setTab]=useState('Runner');
+      return (
+        <div style={{maxWidth:1220,margin:'0 auto',padding:24,fontFamily:GW.sans,color:GW.ink2}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',borderBottom:`2px solid ${GW.frame}`,paddingBottom:12,marginBottom:16}}>
+            <div>
+              <div style={{fontFamily:GW.mono,letterSpacing:'0.12em',color:GW.ink,fontSize:18}}>BLUEPRINT_NPU</div>
+              <div style={{fontFamily:GW.mono,fontSize:11,color:GW.lox,marginTop:4}}>
+                v6 · Train → Design → Inspect → Slice → Queue · NPU(OV-INT4) + XPU(HF-LoRA) · offline
+              </div>
+            </div>
+            <div style={{fontFamily:GW.mono,fontSize:11,color:GW.ink3}}>Core Ultra · NPU active · :7860</div>
+          </div>
+          <Tabs tabs={['Runner','Train','Design','Inspect','Artifacts']} active={tab} onChange={setTab}/>
+          {tab==='Runner' && <Runner/>}
+          {tab==='Train' && <Train/>}
+          {tab==='Design' && <Design/>}
+          {tab==='Inspect' && <Inspect/>}
+          {tab==='Artifacts' && <Artifacts/>}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>

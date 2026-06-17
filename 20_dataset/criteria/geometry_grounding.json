@@ -1,0 +1,41 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "geometry_grounding",
+  "title": "P0 to Geometry Grounding",
+  "applies_to": ["all"],
+  "criteria": [
+    {
+      "criterion": "p0_feature_mapping",
+      "weight": 14,
+      "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+      "bad": "P0 lists features but geometry_ops are generic boxes at the origin.",
+      "signals": ["_subsystem_plan.internal_feature_targets", "geometry_ops.id", "geometry_ops.target"],
+      "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+    },
+    {
+      "criterion": "coordinate_distribution",
+      "weight": 12,
+      "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+      "bad": "Geometry is stacked at [0,0,0] or lacks coordinates.",
+      "signals": ["args.at", "coordinate_spread_score"],
+      "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+    },
+    {
+      "criterion": "non_box_feature_variety",
+      "weight": 10,
+      "good": "Uses drill, pocket, boss, channel, cylinder, chamfer, fillet, pattern, and engrave where appropriate.",
+      "bad": "Primary output is a rectangular box with shallow labels.",
+      "signals": ["drill", "pocket", "boss", "channel", "pattern_linear", "pattern_polar", "fillet", "chamfer"],
+      "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+    },
+    {
+      "criterion": "mechanism_named_not_implied",
+      "weight": 9,
+      "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
+      "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+      "signals": ["four_bar", "cam", "rack_pinion", "lead_screw", "pivot_hole", "linkage_bar"],
+      "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+      "source_refs": ["sources/public/1800.mechanical.movements.devices.and.appliances.pdf"]
+    }
+  ]
+}

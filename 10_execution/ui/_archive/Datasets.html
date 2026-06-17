@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Datasets</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>body{margin:0;background:#0c1e35;min-height:100vh;font-family:'Inter','Noto Sans KR',system-ui,sans-serif;color:#e6ecf5;}</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">
+const { useState } = React;
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', canvas3:'#08152a', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+};
+
+// CFD PACK — 3-stage strategy
+const CFD_BOOKS = [
+  ['Anderson',     'Modern Compressible Flow',         '3rd', 'isentropic · normal shock · method of characteristics'],
+  ['Anderson',     'Computational Fluid Dynamics',     '3rd', 'finite-volume · Euler · NS basics'],
+  ['Shapiro',      'Dynamics & Thermo of Compressible Fluid Flow', 'I-II', 'gas dynamics canon — nozzle/diffuser tables'],
+  ['Versteeg',     'Intro to CFD: FV Method',          '2nd', 'OpenFOAM-aligned theory'],
+  ['Pope',         'Turbulent Flows',                  '1st', 'k-ε · k-ω · LES — closure models'],
+  ['Hirsch',       'Numerical Computation of Internal & External Flows', 'I-II', 'industrial CFD reference'],
+];
+const CFD_STAGES = [
+  ['STAGE 1', '1D / quasi-1D', 'symbolic (LLM)',  'instant',     'A_t · A_e/A_t · Pc/Pe · Mach · isentropic relations',  C.lox],
+  ['STAGE 2', 'Neural surrogate', 'small NN (NPU)','< 1 sec',    'FNO · DeepONet · PointNet — pressure/velocity fields from geometry', C.lh2],
+  ['STAGE 3', 'Full solver',     'OpenFOAM/SU2',    '5-30 min',  'LLM writes case files · CPU/GPU runs · LLM interprets results', C.inter],
+];
+const CFD_VIZ = [
+  ['Mach contour',     'SVG colored bands',     '1D + Stage 2'],
+  ['Streamlines',      'particle traces',        'Stage 2-3'],
+  ['Pressure heatmap', 'oklch gradient',         'Stage 2-3'],
+  ['BL profile',       '2D plot · y+ check',     'Stage 3'],
+  ['Residuals',        'log-y convergence',      'Stage 3'],
+];
+
+// LEGACY → DfAM EVOLUTION
+const DFAM_BRIDGE = [
+  ['Combustion chamber', 'Brazed channel-wall (Huzel & Huang Ch.4)',  'Monolithic LPBF · GRCop-42 · conformal channels',  '40% mass cut · 10× fewer joints'],
+  ['Injector face',      'Drilled showerhead · pintle (Sutton Ch.8)', 'Lattice + integrated swirler · single print',       'tunable mixing · no braze risk'],
+  ['Turbopump impeller', '5-axis machined Inconel',                    'LPBF + post-HIP · integral shroud',                 'higher stage loading'],
+  ['Nozzle extension',   'Spun + welded segments',                     'EBM Ti or LPBF Inconel · 1-piece',                  'no weld inspection'],
+  ['Manifold / plumbing','Welded tube assemblies',                     'Topology-optimized monolithic block',                '70% part count cut'],
+  ['Mounting / structure','Bolted truss',                              'Generative bracket · lattice infill',                'mass-critical wins'],
+];
+
+// DESIGN PHILOSOPHY
+const PHILOSOPHY = [
+  ['FOUNDATION',  'Sutton · Huzel · Hill — first principles', "Why does it work? Pc, A_t, mdot, Isp.",                C.lox],
+  ['HERITAGE',    'F-1 · J-2 · RS-25 — what was actually built',"What worked, what broke, why redesigns happened.",     C.lh2],
+  ['IMPROVEMENT', 'Modern: Merlin · Raptor · BE-4',            'Channel cooling, full-flow staged, methalox lessons.', C.inter],
+  ['LEAP',        '3D metal printing — what was IMPOSSIBLE',   'Conformal cooling · lattices · 1-piece chambers · topology opt.', C.halo],
+  ['VERIFY',      'Symbolic + CFD checks every iteration',      'No bold idea ships unverified.',                       C.risk],
+];
+const ROCKET_BOOKS = [
+  ['Sutton & Biblarz · Rocket Propulsion Elements', '9th ed · Wiley',     'THE textbook · all chemical propulsion',     'gold standard'],
+  ['Huzel & Huang · Modern Eng. for Liquid-Propellant', 'NASA SP-125 1992','Pump-fed engine design end-to-end',          'liquid bible'],
+  ['Hill & Peterson · Mechanics & Thermo of Propulsion','2nd ed · Addison','Rockets + airbreathing · gas dyn foundation','academic'],
+  ['Barrère et al · Rocket Propulsion',              'Elsevier 1960',     'European classical treatment',               'historical'],
+  ['Turner · Rocket and Spacecraft Propulsion',      '3rd ed · Springer', 'Mission design + propulsion integration',    'modern'],
+  ['Yang · Liquid Rocket Thrust Chambers',           'AIAA Prog. Series', 'Thrust chamber thermal/structural detail',   'specialist'],
+  ['Humble et al · Space Propulsion Analysis',       'McGraw-Hill 1995',  'Trajectory + propulsion sizing',             'systems view'],
+];
+
+// ROCKET TEXTBOOKS (canonical references)
+const ENGINE_CATALOG = [
+  ['F-1',         'Saturn V S-IC',     'kerolox · GG · 1.5 MN class', 'NASA TM-X-58044, Rocketdyne reports', '✓ digitized'],
+  ['F-1A',        'uprated F-1',       'kerolox · GG · 1.8 MN',       'NASA SP-4221',                       '✓ digitized'],
+  ['J-2',         'Saturn V S-II/IVB', 'hydrolox · GG',               'NASA SP-4012',                       '✓ digitized'],
+  ['RS-25 (SSME)','Shuttle / SLS',     'hydrolox · staged comb',      'NASA RPS-D-104',                     '✓ digitized'],
+  ['Merlin 1D',   'Falcon 9',          'kerolox · GG · regen',        'public press kit · FCC filings',     '⚠ partial'],
+  ['Raptor 2',    'Starship',          'methalox · full-flow',        'public talks · scraped specs',       '⚠ partial'],
+  ['BE-4',        'Vulcan / New Glenn','methalox · ox-rich SC',       'public press · BO whitepaper',       '⚠ partial'],
+  ['RD-180',      'Atlas V',           'kerolox · ox-rich SC',        'NPO Energomash docs',                '✓ digitized'],
+  ['Vulcain 2.1', 'Ariane 6',          'hydrolox · GG',               'ESA technical reports',              '✓ digitized'],
+  ['Aerospike',   'X-33 / future',     'linear / annular',            'NASA TM-2000-209984',                '⚠ partial'],
+];
+
+const ENGINE_RULES = [
+  ['Throat-area Mach 1', 'Always check that A_t corresponds to choked flow at design chamber pressure'],
+  ['Channel hydraulic dia', '≥ 1.5 mm for cooling channels (DfAM minimum)'],
+  ['Regen jacket ΔT', 'Cooling-channel coolant rise stays under 60% of fuel critical temp'],
+  ['Combustion stability', 'Chamber L* in 0.8–1.5 m range for storables, 0.6–1.2 m for cryo'],
+  ['Throat heat flux', 'Max 80 MW/m² for film+regen; 120 MW/m² with transpiration only'],
+  ['Mixture ratio bias', 'Fuel-rich at chamber wall (boundary layer cooling)'],
+];
+
+// AIRCRAFT DESIGN PACK
+const AIRCRAFT_CATALOG = [
+  ['Roskam · Airplane Design',          'I–VIII (1985-90)',  'Preliminary sizing · weight · stability', 'classical reference'],
+  ['Raymer · A.D. A Conceptual Approach', 'AIAA 1989+',      'Sizing, configuration, all phases',       'modern textbook'],
+  ['Torenbeek · Synthesis of Subsonic',  '1976',              'Weight estimation, structures',           'European method'],
+  ['Anderson · A/C Performance & Design','McGraw-Hill',       'Performance, drag polar',                 'textbook'],
+  ['Stinton · The Design of the Aeroplane','1983',            'Practical design, ops view',              'practitioner'],
+  ['NACA / NASA airfoils',                'public domain',     '4/5/6-series + Selig UIUC database',     '~1500 sections'],
+  ['DATCOM',                              'USAF 1978',         'Stability & control derivatives',         'engineering method'],
+  ['Concorde · 707 · 747 · A380',         'public specs',     'Reference configurations',                '~40 aircraft'],
+];
+
+const AIRCRAFT_RULES = [
+  ['Wing loading W/S',  '350–700 N/m² for GA, 5000–7000 N/m² for transport jets'],
+  ['Aspect ratio',      '6–10 for transport, 3–4 for fighters, 25–30 for sailplanes'],
+  ['Tail volume Vh',    '0.5–0.8 (horizontal) and 0.04–0.06 (vertical) for transports'],
+  ['Static margin',     'CG 5–25% MAC ahead of neutral point, positive for stable flight'],
+  ['Cruise L/D',        '15–18 for transports, 8–12 for fighters, 30+ for sailplanes'],
+  ['Drag polar',        'CD = CD0 + k·CL² · CD0 typically 0.020–0.035'],
+];
+
+// SCHEMA OF prefs
+const SAMPLE_PAIR = `{
+  "schema":"3",
+  "topic":"Pencil-engine LOX/CH4 transition stage",
+  "domain":"rocket_engine",          // tag for retrieval
+  "chosen": {
+    "blueprint": "...",
+    "verify": [{"check":"throat_choked","pass":true}, ...],
+    "novelty": 0.61,
+    "verifier_score": 0.87
+  },
+  "rejected": {
+    "blueprint": "...",
+    "verify": [{"check":"channel_min_radius","pass":false,"observed":"1.1 mm"}, ...],
+    "novelty": 0.42,
+    "verifier_score": 0.51
+  }
+}`;
+
+function Sec({tag,title,sub,children,accent=C.lox}){
+  return (
+    <section style={{marginBottom:32}}>
+      <div style={{borderLeft:`2px solid ${accent}`,paddingLeft:14,marginBottom:14}}>
+        <div className="mono" style={{fontSize:10,color:accent,letterSpacing:'.16em'}}>{tag}</div>
+        <h2 style={{color:C.ink,fontSize:22,margin:'4px 0 4px',fontWeight:600}}>{title}</h2>
+        {sub && <p style={{color:C.ink3,fontSize:13,margin:0,maxWidth:780,lineHeight:1.55}}>{sub}</p>}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function Tbl({head, rows, accentCol=null}){
+  const cols = head.length;
+  const tmpl = `${'1fr '.repeat(cols-1)} 0.7fr`;
+  return (
+    <div style={{border:`1px solid ${C.frame}`,background:C.canvas2}}>
+      <div style={{display:'grid',gridTemplateColumns:tmpl,gap:0,padding:'10px 14px',background:C.canvas3,borderBottom:`1px solid ${C.frame}`}}>
+        {head.map(h=><div key={h} className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.1em'}}>{h}</div>)}
+      </div>
+      {rows.map((r,i)=>(
+        <div key={i} style={{display:'grid',gridTemplateColumns:tmpl,gap:0,padding:'9px 14px',borderBottom:i<rows.length-1?`1px dashed ${C.frame}`:'none',alignItems:'center'}}>
+          {r.map((c,j)=>(
+            <span key={j} className={j===0?'mono':''} style={{fontSize:j===0?11.5:11.5,color:j===0?C.ink:C.ink2}}>{c}</span>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function App(){
+  return (
+    <div style={{maxWidth:1100,margin:'0 auto',padding:'28px 24px 60px'}}>
+
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:14,marginBottom:24}}>
+        <div className="mono" style={{fontSize:11,color:C.halo,letterSpacing:'.14em'}}>DATASETS · BASE PACKS</div>
+        <h1 style={{color:C.ink,fontSize:32,margin:'4px 0 6px',fontWeight:600}}>The seed knowledge that ships with the model</h1>
+        <p style={{color:C.ink3,fontSize:14,margin:0,maxWidth:780,lineHeight:1.55}}>
+          Two curated reference packs: <span style={{color:C.lox}}>Rocket Engines</span> (10 archetypes + DfAM rules) and <span style={{color:C.inter}}>Aircraft Design</span> (Roskam/Raymer/Torenbeek classics + NACA airfoils). The model retrieves from these, judges against these, learns from these.
+        </p>
+      </div>
+
+      {/* PACKS OVERVIEW */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:32}}>
+        <div style={{border:`1px solid ${C.lox}`,padding:16,background:C.canvas2}}>
+          <div className="mono" style={{fontSize:10,color:C.lox,letterSpacing:'.14em',marginBottom:6}}>PACK · ROCKET ENGINES</div>
+          <div style={{fontSize:18,color:C.ink,fontWeight:500,marginBottom:8}}>10 archetypes + 6 DfAM rules</div>
+          <div style={{display:'flex',gap:14,fontFamily:C.mono,fontSize:11,color:C.ink3,letterSpacing:'.04em'}}>
+            <span>~ 380 MB</span><span>·</span><span>14k pairs</span><span>·</span><span>v1.0 ready</span>
+          </div>
+        </div>
+        <div style={{border:`1px solid ${C.inter}`,padding:16,background:C.canvas2}}>
+          <div className="mono" style={{fontSize:10,color:C.inter,letterSpacing:'.14em',marginBottom:6}}>PACK · AIRCRAFT DESIGN</div>
+          <div style={{fontSize:18,color:C.ink,fontWeight:500,marginBottom:8}}>5 textbooks + 1500 airfoils + DATCOM</div>
+          <div style={{display:'flex',gap:14,fontFamily:C.mono,fontSize:11,color:C.ink3,letterSpacing:'.04em'}}>
+            <span>~ 1.2 GB</span><span>·</span><span>22k pairs</span><span>·</span><span>v1.0 ready</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ROCKET */}
+      <Sec tag="01 · ROCKET REFERENCES" title="Canonical textbooks" accent={C.lox}
+           sub="The same way the aircraft pack rests on Roskam/Raymer/Torenbeek, the rocket pack rests on Sutton, Huzel & Huang, and Hill & Peterson. These provide first-principles equations the verifier checks against.">
+        <Tbl head={['SOURCE','EDITION','TOPICS','NOTE']} rows={ROCKET_BOOKS}/>
+      </Sec>
+
+      <Sec tag="01b · ROCKET ENGINES" title="Catalog · 10 reference engines" accent={C.lox}
+           sub="Each entry contributes ~1k synthetic (brief, blueprint) pairs covering geometry, materials, performance points, failure modes.">
+        <Tbl head={['ENGINE','VEHICLE','TYPE','SOURCE','STATUS']} rows={ENGINE_CATALOG}/>
+      </Sec>
+
+      <Sec tag="01d · DESIGN PHILOSOPHY" title="Foundation → Leap · why we read the old books" accent={C.halo}
+           sub="Bold modern designs need first-principles grounding. Read the canon to understand what's load-bearing, then break the manufacturing constraints the old books had to live with.">
+        <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:8,marginBottom:14}}>
+          {PHILOSOPHY.map(([k,t,d,col],i)=>(
+            <div key={i} style={{border:`1px solid ${col}`,padding:12,background:C.canvas2}}>
+              <div className="mono" style={{fontSize:9.5,color:col,letterSpacing:'.14em',marginBottom:4}}>0{i+1} · {k}</div>
+              <div style={{fontSize:12,color:C.ink,fontWeight:500,marginBottom:6,lineHeight:1.35}}>{t}</div>
+              <div style={{fontSize:11,color:C.ink2,lineHeight:1.5}}>{d}</div>
+            </div>
+          ))}
+        </div>
+      </Sec>
+
+      <Sec tag="01e · LEGACY → DfAM" title="What changes when LPBF replaces brazing" accent={C.halo}
+           sub="The book's channel-wall chamber was a manufacturing compromise. Metal printing collapses 200+ brazed parts into single monoliths with conformal cooling and lattice infill — the verifier learns both worlds.">
+        <Tbl head={['COMPONENT','LEGACY (book)','MODERN (LPBF/EBM)','IMPACT']} rows={DFAM_BRIDGE}/>
+      </Sec>
+
+      {/* CFD PACK */}
+      <Sec tag="01f · CFD PACK" title="3-stage strategy — LLM reasons, surrogate predicts, solver verifies" accent={C.halo}
+           sub="A 3B model can't run CFD directly. But it can write 1D analyses symbolically, call neural surrogates for fast field estimates, and generate OpenFOAM/SU2 cases for ground-truth runs. The visualizer reads all three.">
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:14}}>
+          {CFD_STAGES.map(([s,k,how,t,desc,col],i)=>(
+            <div key={i} style={{border:`1px solid ${col}`,padding:14,background:C.canvas2}}>
+              <div className="mono" style={{fontSize:9.5,color:col,letterSpacing:'.14em',marginBottom:4}}>{s} · {t}</div>
+              <div style={{fontSize:13,color:C.ink,fontWeight:500,marginBottom:3}}>{k}</div>
+              <div className="mono" style={{fontSize:10,color:C.ink3,marginBottom:8}}>{how}</div>
+              <div style={{fontSize:11,color:C.ink2,lineHeight:1.5}}>{desc}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{fontSize:11,color:C.ink2,marginTop:10,marginBottom:6,letterSpacing:'.05em'}}>REFERENCE TEXTS</div>
+        <Tbl head={['AUTHOR','TITLE','EDITION','TOPICS']} rows={CFD_BOOKS}/>
+        <div style={{fontSize:11,color:C.ink2,marginTop:14,marginBottom:6,letterSpacing:'.05em'}}>VISUALIZATION OUTPUTS</div>
+        <Tbl head={['VIEW','RENDER','SOURCE']} rows={CFD_VIZ}/>
+      </Sec>
+
+      {/* AIRCRAFT */}
+      <Sec tag="02 · AIRCRAFT DESIGN" title="Reference textbooks + airfoils" accent={C.inter}
+           sub="Classical aircraft design texts → preliminary sizing, weight, stability, performance. Plus the public airfoil corpus.">
+        <Tbl head={['SOURCE','EDITION','TOPICS','NOTE']} rows={AIRCRAFT_CATALOG}/>
+      </Sec>
+
+      <Sec tag="02b · AIRCRAFT RULES" title="Design rules of thumb" accent={C.inter}
+           sub="Roskam/Raymer-derived heuristics. Used both for prompt context and for symbolic checking of generated designs.">
+        <Tbl head={['QUANTITY','TYPICAL RANGE']} rows={AIRCRAFT_RULES}/>
+      </Sec>
+
+      {/* SCHEMA */}
+      <Sec tag="03 · DATA FORMAT" title="prefs.jsonl entry shape" accent={C.halo}
+           sub="Every (chosen, rejected) pair is tagged with a domain so retrain can target a single pack or the union.">
+        <pre className="mono" style={{fontSize:11.5,color:C.ink2,padding:14,background:C.canvas2,border:`1px solid ${C.frame}`,whiteSpace:'pre-wrap',lineHeight:1.6,margin:0}}>{SAMPLE_PAIR}</pre>
+      </Sec>
+
+      {/* ROADMAP */}
+      <Sec tag="04 · ROADMAP" title="Future packs" accent={C.lh2}
+           sub="Each pack ships independently — DLC-style. The base model + one pack stays under 4 GB, manageable on NPU.">
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+          {[
+            ['v1.0', 'Rocket Engines',  '✓ shipping', C.inter],
+            ['v1.0', 'Aircraft Design', '✓ shipping', C.inter],
+            ['v1.1', 'CFD addon',       '3-stage spec', C.lh2],
+            ['v1.2', 'Drone / UAV',     'planned',     C.ink3],
+            ['v1.3', 'Marine props',    'planned',     C.ink3],
+            ['v1.4', 'Turbomachinery',  'planned',     C.ink3],
+            ['v1.5', 'Heat exchangers', 'planned',     C.ink3],
+            ['v1.6', 'Structural',      'planned',     C.ink3],
+          ].map((r,i)=>(
+            <div key={i} style={{border:`1px solid ${r[3]}`,padding:12,background:C.canvas2}}>
+              <div className="mono" style={{fontSize:9.5,color:r[3],letterSpacing:'.12em'}}>{r[0]}</div>
+              <div style={{fontSize:13,color:C.ink,marginTop:4,fontWeight:500}}>{r[1]}</div>
+              <div className="mono" style={{fontSize:10,color:r[3],marginTop:4,letterSpacing:'.06em'}}>{r[2]}</div>
+            </div>
+          ))}
+        </div>
+      </Sec>
+
+      <div style={{borderTop:`1px solid ${C.frame}`,paddingTop:14,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>packs land in models/data_packs/&lt;name&gt;/ · loaded on demand by RAG retriever</span>
+        <span><a href="Methods.html" style={{color:C.lox}}>Methods</a> · <a href="CFD.html" style={{color:C.lox}}>CFD addon</a> · <a href="SelfLoop.html" style={{color:C.lox}}>SelfLoop</a></span>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Datasets'),100);
+</script>
+</body>
+</html>

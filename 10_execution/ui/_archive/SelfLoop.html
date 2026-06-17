@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Self-Reinforcing Loop — Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>
+  body{margin:0;background:#0c1e35;min-height:100vh;}
+  .col{color:#fff;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+  .sans{font-family:'Inter','Noto Sans KR',system-ui,sans-serif;}
+</style>
+</head>
+<body class="bp">
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('SelfLoop'),100);</script>
+
+<script type="text/babel">
+const { useState, useMemo } = React;
+
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', engine:'#1f6aa8', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+  sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
+};
+
+function Chip({c=C.lox, children}){return <span className="mono" style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:c}}>{children}</span>;}
+function Btn({children, variant='default', onClick, disabled, style}){
+  const col = variant==='primary'?C.lox:variant==='go'?C.inter:variant==='warn'?C.lh2:variant==='risk'?C.risk:C.ink;
+  return <button onClick={onClick} disabled={disabled} style={{fontFamily:C.mono,fontSize:12,textTransform:'uppercase',letterSpacing:'.08em',padding:'8px 14px',background:'transparent',color:col,border:`1px solid ${col}`,borderRadius:2,cursor:disabled?'not-allowed':'pointer',opacity:disabled?.4:1,...style}}>{children}</button>;
+}
+
+// ============ LOOP DIAGRAM (circular) ============
+function LoopDiagram({ cursor }){
+  // 5 nodes around a circle
+  const nodes = [
+    { id:'train',   label:'TRAIN',    sub:'QLoRA + DPO',      color:C.lox },
+    { id:'gen',     label:'GENERATE', sub:'NPU · OV INT4',    color:C.inter },
+    { id:'eval',    label:'EVALUATE', sub:'rubric · verify',  color:C.halo },
+    { id:'prefs',   label:'prefs.jsonl', sub:'chosen / rejected', color:C.lh2 },
+    { id:'export',  label:'RE-EXPORT', sub:'OV INT4 → NPU',   color:C.risk },
+  ];
+  const cx=480, cy=170, r=125;
+  const pos = nodes.map((n,i)=>{
+    const a = (-Math.PI/2) + i*(2*Math.PI/nodes.length);
+    return { ...n, x: cx + r*Math.cos(a), y: cy + r*Math.sin(a), a };
+  });
+  return (
+    <svg viewBox="0 0 960 340" style={{width:'100%',display:'block',background:C.canvas}}>
+      <text x={24} y={28} fill={C.ink} fontSize="14" fontFamily={C.mono}>SELF-REINFORCING LOOP — DESIGN ↺ EVALUATE ↺ RETRAIN</text>
+      <text x={24} y={46} fill={C.lox} fontSize="11" fontFamily={C.mono}>Every human pick becomes tomorrow's training data · offline · Core Ultra NPU</text>
+
+      {/* arrows between nodes (arcs) */}
+      {pos.map((p,i)=>{
+        const q = pos[(i+1)%pos.length];
+        const active = cursor===p.id || cursor===q.id;
+        return (
+          <g key={i}>
+            <path d={`M ${p.x} ${p.y} Q ${cx} ${cy} ${q.x} ${q.y}`} fill="none"
+              stroke={active?C.ink:C.frame} strokeWidth={active?1.6:1}
+              strokeDasharray={active?'':'6 4'} markerEnd="url(#arrow)"/>
+          </g>
+        );
+      })}
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill={C.ink3}/>
+        </marker>
+      </defs>
+
+      {/* center label */}
+      <text x={cx} y={cy-6} fill={C.ink3} fontSize="10" fontFamily={C.mono} textAnchor="middle">SESSION</text>
+      <text x={cx} y={cy+10} fill={C.ink} fontSize="13" fontFamily={C.mono} textAnchor="middle">2026-04-24_142311</text>
+
+      {/* nodes */}
+      {pos.map(n=>{
+        const active = cursor===n.id;
+        return (
+          <g key={n.id} transform={`translate(${n.x-70},${n.y-26})`}>
+            <rect width="140" height="52" fill={C.canvas} stroke={active?n.color:C.frame} strokeWidth={active?1.6:1}/>
+            <rect x="0" y="0" width="4" height="52" fill={n.color}/>
+            <text x="14" y="20" fill={n.color} fontSize="11" fontFamily={C.mono} letterSpacing="1.2">{n.label}</text>
+            <text x="14" y="38" fill={C.ink3} fontSize="10" fontFamily={C.mono}>{n.sub}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ============ VARIANT DATA ============
+const VARIANTS = [
+  { id:'A', name:'Regen · channel-cooled · 5× F-1 baseline',
+    model:'qwen2.5-3b-int4', seed:7,
+    metrics:{ mass:'38.2 t', print_time:'46.8 h', parts:142, cost:'$21.4k', verify_pass:6, verify_fail:2 },
+    rubric:{ dfam:72, efficiency:81, manufacturability:65, risk:68 },
+    note:'channel Ø 1.42 mm FAIL · F1.chamber ∩ F1.nozzle 12.4 mm³',
+    tree:[
+      ['S-IC','stage_1','×1','Al-Li 2195'],
+      ['F1','engine_F1','×5','Inconel 718'],
+      ['F1.chamber','chamber','×1','Inconel 718'],
+      ['F1.nozzle','nozzle_extension','×1','Inconel 718'],
+      ['LOX','lox_tank','×1','Al-Li 2195'],
+      ['RP1','rp1_tank','×1','Al-Li 2195'],
+    ]},
+  { id:'B', name:'Film-cooled · 4× F-1A uprated',
+    model:'qwen2.5-3b-int4', seed:8,
+    metrics:{ mass:'34.9 t', print_time:'41.0 h', parts:118, cost:'$19.1k', verify_pass:8, verify_fail:0 },
+    rubric:{ dfam:84, efficiency:86, manufacturability:78, risk:74 },
+    note:'all checks pass · orientation 24° · margin on min_wall 1.31 mm',
+    tree:[
+      ['S-IC','stage_1','×1','Al-Li 2195'],
+      ['F1A','engine_F1A','×4','Inconel 718'],
+      ['F1A.chamber','chamber_film','×1','Inconel 718'],
+      ['F1A.injector','pintle_injector','×1','Inconel 718'],
+      ['LOX','lox_tank','×1','Al-Li 2195'],
+      ['RP1','rp1_tank','×1','Al-Li 2195'],
+    ]},
+  { id:'C', name:'Hybrid · aerospike + methalox staged combustion',
+    model:'qwen2.5-7b-int4', seed:11,
+    metrics:{ mass:'31.2 t', print_time:'62.4 h', parts:186, cost:'$28.7k', verify_pass:5, verify_fail:3 },
+    rubric:{ dfam:58, efficiency:92, manufacturability:48, risk:54 },
+    note:'aerospike spikes LPBF time · bbox 420 mm NEAR LIMIT · novel but risky',
+    tree:[
+      ['S-IC','stage_1','×1','Al-Li 2195'],
+      ['AS','aerospike_ring','×1','Inconel 718'],
+      ['AS.spikes','truncated_spikes','×24','Inconel 718'],
+      ['TP','turbopump_sc','×2','Inconel 718 / Ti-6Al-4V'],
+      ['LOX','lox_tank','×1','Al-Li 2195'],
+      ['CH4','methane_tank','×1','Al-Li 2195'],
+    ]},
+];
+
+// ============ VARIANT CARD ============
+function VariantCard({ v, chosen, rejected, onChoose, onReject, focused, onFocus }){
+  const state = chosen?'chosen':rejected?'rejected':focused?'focused':'idle';
+  const borderCol = chosen?C.inter:rejected?C.risk:focused?C.lox:C.frame;
+  return (
+    <div onClick={()=>onFocus(v.id)} style={{border:`${focused||chosen||rejected?1.6:1}px solid ${borderCol}`,padding:16,background:C.canvas,cursor:'pointer',position:'relative'}}>
+      {state!=='idle' && <div style={{position:'absolute',top:-10,left:12,background:C.canvas,padding:'0 8px'}}><Chip c={borderCol}>{state}</Chip></div>}
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+        <div>
+          <div className="mono" style={{fontSize:22,color:C.ink,letterSpacing:'.08em'}}>VARIANT {v.id}</div>
+          <div className="sans" style={{fontSize:13,color:C.ink2,marginTop:4,textWrap:'pretty'}}>{v.name}</div>
+        </div>
+        <Chip c={C.halo}>{v.model} · seed {v.seed}</Chip>
+      </div>
+
+      {/* metrics strip */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:6,marginTop:14,borderTop:`1px solid ${C.frame}`,borderBottom:`1px solid ${C.frame}`,padding:'10px 0'}}>
+        <Metric k="MASS" v={v.metrics.mass} c={C.lox}/>
+        <Metric k="PRINT" v={v.metrics.print_time} c={C.lh2}/>
+        <Metric k="PARTS" v={v.metrics.parts} c={C.inter}/>
+        <Metric k="COST" v={v.metrics.cost} c={C.halo}/>
+      </div>
+
+      {/* rubric bars */}
+      <div style={{marginTop:14}}>
+        <RubricBar label="DfAM" value={v.rubric.dfam} color={C.lox}/>
+        <RubricBar label="Efficiency" value={v.rubric.efficiency} color={C.inter}/>
+        <RubricBar label="Manufacturability" value={v.rubric.manufacturability} color={C.lh2}/>
+        <RubricBar label="Risk (inv.)" value={v.rubric.risk} color={C.halo}/>
+      </div>
+
+      {/* verify summary */}
+      <div style={{marginTop:12,display:'flex',gap:10,alignItems:'center'}}>
+        <Chip c={C.inter}>✓ {v.metrics.verify_pass} PASS</Chip>
+        {v.metrics.verify_fail>0 && <Chip c={C.risk}>✗ {v.metrics.verify_fail} FAIL</Chip>}
+      </div>
+      <div className="mono" style={{fontSize:11,color:C.ink3,marginTop:8,textWrap:'pretty'}}>{v.note}</div>
+
+      {/* part tree */}
+      <details style={{marginTop:12}}>
+        <summary style={{cursor:'pointer',color:C.ink3,fontFamily:C.mono,fontSize:11,letterSpacing:'.08em',textTransform:'uppercase'}}>part_tree ({v.tree.length})</summary>
+        <div style={{marginTop:6,background:C.canvas2,border:`1px solid ${C.frame}`,padding:8}}>
+          {v.tree.map((r,i)=>(
+            <div key={i} style={{display:'grid',gridTemplateColumns:'90px 1fr 36px 1fr',gap:8,fontFamily:C.mono,fontSize:11,padding:'3px 0',color:C.ink2}}>
+              <span style={{color:C.lox}}>{r[0]}</span>
+              <span>{r[1]}</span>
+              <span style={{color:C.inter,textAlign:'right'}}>{r[2]}</span>
+              <span style={{color:C.lh2,textAlign:'right'}}>{r[3]}</span>
+            </div>
+          ))}
+        </div>
+      </details>
+
+      {/* actions */}
+      <div style={{display:'flex',gap:8,marginTop:14}} onClick={e=>e.stopPropagation()}>
+        <Btn variant="go" onClick={()=>onChoose(v.id)} disabled={chosen}>✓ Choose</Btn>
+        <Btn variant="risk" onClick={()=>onReject(v.id)} disabled={rejected}>✗ Reject</Btn>
+      </div>
+    </div>
+  );
+}
+
+function Metric({ k, v, c }){
+  return (
+    <div style={{textAlign:'center'}}>
+      <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.1em'}}>{k}</div>
+      <div className="mono" style={{fontSize:15,color:c,marginTop:2}}>{v}</div>
+    </div>
+  );
+}
+function RubricBar({ label, value, color }){
+  return (
+    <div style={{margin:'4px 0'}}>
+      <div style={{display:'flex',justifyContent:'space-between',fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase'}}>
+        <span>{label}</span><span style={{color}}>{value}</span>
+      </div>
+      <div style={{height:3,background:C.canvas2,marginTop:2}}><div style={{height:'100%',width:`${value}%`,background:color}}/></div>
+    </div>
+  );
+}
+
+// ============ DATASET LEDGER (prefs.jsonl) ============
+function DatasetLedger({ rows, rowsTotal, onClear, onExport }){
+  return (
+    <div style={{border:`1px solid ${C.frame}`,background:C.canvas,padding:16}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+        <div>
+          <Chip c={C.halo}>PREFS.JSONL · LIVE APPEND</Chip>
+          <h3 style={{margin:'4px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>Self-built preference dataset</h3>
+        </div>
+        <div style={{display:'flex',gap:16,alignItems:'baseline'}}>
+          <div><span className="mono" style={{color:C.ink3,fontSize:10,letterSpacing:'.08em'}}>TOTAL ROWS</span> <span className="mono" style={{color:C.lox,fontSize:18,marginLeft:8}}>{rowsTotal.toLocaleString()}</span></div>
+          <div><span className="mono" style={{color:C.ink3,fontSize:10,letterSpacing:'.08em'}}>THIS SESSION</span> <span className="mono" style={{color:C.inter,fontSize:18,marginLeft:8}}>+{rows.length}</span></div>
+        </div>
+      </div>
+
+      <div style={{marginTop:12,border:`1px solid ${C.frame}`,background:C.canvas2}}>
+        <div style={{display:'grid',gridTemplateColumns:'80px 1.4fr 80px 80px 1fr 110px',gap:0,padding:'8px 12px',borderBottom:`1px solid ${C.frame}`,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase'}}>
+          <span>idx</span><span>brief</span><span style={{color:C.inter}}>chosen</span><span style={{color:C.risk}}>rejected</span><span>delta</span><span>ts</span>
+        </div>
+        {rows.length===0 && (
+          <div style={{padding:'20px 12px',fontFamily:C.mono,fontSize:11,color:C.ink3,fontStyle:'italic'}}>
+            (empty — choose a variant below to append the first pair)
+          </div>
+        )}
+        {rows.map((r,i)=>(
+          <div key={i} style={{display:'grid',gridTemplateColumns:'80px 1.4fr 80px 80px 1fr 110px',gap:0,padding:'8px 12px',borderBottom:i<rows.length-1?`1px dashed ${C.frame}`:'none',fontFamily:C.mono,fontSize:11,color:C.ink2}}>
+            <span style={{color:C.halo}}>{String(i+1).padStart(4,'0')}</span>
+            <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:C.ink2}}>{r.brief}</span>
+            <span style={{color:C.inter}}>VAR {r.chosen}</span>
+            <span style={{color:C.risk}}>VAR {r.rejected}</span>
+            <span style={{color:C.ink3,fontSize:10}}>{r.delta}</span>
+            <span style={{color:C.ink3,fontSize:10}}>{r.ts}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{display:'flex',gap:10,marginTop:14,alignItems:'center',flexWrap:'wrap'}}>
+        <Btn variant="primary" onClick={onExport} disabled={rows.length===0}>Export JSONL → Train queue</Btn>
+        <Btn onClick={onClear} disabled={rows.length===0}>Clear session</Btn>
+        <span className="mono" style={{fontSize:11,color:C.ink3,marginLeft:'auto'}}>→ save/prefs/2026-04-24_142311.jsonl</span>
+      </div>
+    </div>
+  );
+}
+
+// ============ MINIMAL HEADER (single-brief input) ============
+function BriefBar({ brief, setBrief, onGenerate, generating }){
+  return (
+    <div style={{border:`1px solid ${C.frame}`,padding:18,background:C.canvas}}>
+      <Chip c={C.lox}>01 · GENERATE</Chip>
+      <div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:12,marginTop:8,alignItems:'flex-start'}}>
+        <textarea value={brief} onChange={e=>setBrief(e.target.value)} rows={2}
+          style={{fontFamily:C.mono,fontSize:13,background:C.canvas2,color:C.ink,border:`1px solid ${C.frame}`,padding:'12px 14px',borderRadius:2,outline:'none',resize:'vertical'}}/>
+        <div style={{display:'flex',flexDirection:'column',gap:6,minWidth:180}}>
+          <Btn variant="primary" onClick={onGenerate}>{generating?'◐ Generating…':'Generate 3 variants'}</Btn>
+          <span className="mono" style={{fontSize:10,color:C.ink3,textAlign:'right'}}>NPU · qwen2.5-3b-int4 · 3B × 3 seeds</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============ FAILURE BUCKET ============
+const FAIL_BUCKET = [
+  { id:'F-0412', brief:'Saturn V stage-1 · channel-cooled', check:'channel_radius', target:'≥ 1.5 mm', got:'1.42 mm', count:14, cat:'geom' },
+  { id:'F-0388', brief:'F-1 chamber + nozzle assembly',    check:'interference', target:'0 mm³',  got:'12.4 mm³', count:9, cat:'geom' },
+  { id:'F-0377', brief:'Aerospike truncated spikes',        check:'overhang_max', target:'≤ 45°', got:'52°', count:22, cat:'dfam' },
+  { id:'F-0361', brief:'Methalox turbopump volute',         check:'min_wall',     target:'≥ 1.2 mm', got:'0.94 mm', count:11, cat:'dfam' },
+  { id:'F-0342', brief:'Thrust puck bolt pattern',          check:'bbox_fits_plate', target:'420×420', got:'438×422', count:6, cat:'fit' },
+  { id:'F-0308', brief:'Intertank ring weld path',          check:'self_support_angle', target:'≥ 30°', got:'27°', count:8, cat:'dfam' },
+];
+const CAT_META = {
+  geom:{ label:'GEOMETRY',  color:C.risk },
+  dfam:{ label:'DfAM',      color:C.lh2 },
+  fit: { label:'FIT/BBOX',  color:C.halo },
+};
+function FailureBucket({ selected, setSelected, targetedSFT, setTargetedSFT }){
+  const total = FAIL_BUCKET.reduce((s,f)=>s+f.count,0);
+  const byCat = FAIL_BUCKET.reduce((m,f)=>{m[f.cat]=(m[f.cat]||0)+f.count;return m;},{});
+  const selectedRows = FAIL_BUCKET.filter(f=>selected.includes(f.id));
+  const selectedCount = selectedRows.reduce((s,f)=>s+f.count,0);
+  function toggle(id){ setSelected(s=>s.includes(id)?s.filter(x=>x!==id):[...s,id]); }
+  return (
+    <div style={{border:`1px solid ${C.frame}`,padding:18,background:C.canvas}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+        <div>
+          <Chip c={C.risk}>FAILURE BUCKET · VERIFY FAILS → TARGETED SFT</Chip>
+          <h3 style={{margin:'4px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>Teach the model where it keeps breaking</h3>
+        </div>
+        <div style={{display:'flex',gap:14,alignItems:'baseline'}}>
+          <div><span className="mono" style={{color:C.ink3,fontSize:10,letterSpacing:'.08em'}}>TOTAL FAILS</span> <span className="mono" style={{color:C.risk,fontSize:18,marginLeft:8}}>{total}</span></div>
+          <div><span className="mono" style={{color:C.ink3,fontSize:10,letterSpacing:'.08em'}}>SELECTED</span> <span className="mono" style={{color:C.lox,fontSize:18,marginLeft:8}}>{selectedCount}</span></div>
+        </div>
+      </div>
+
+      {/* category strip */}
+      <div style={{display:'flex',gap:8,marginTop:12}}>
+        {Object.entries(byCat).map(([k,n])=>{
+          const meta = CAT_META[k];
+          const w = (n/total)*100;
+          return (
+            <div key={k} style={{flex:w,minWidth:70,border:`1px solid ${meta.color}`,padding:'6px 8px'}}>
+              <div className="mono" style={{fontSize:10,color:meta.color,letterSpacing:'.08em'}}>{meta.label}</div>
+              <div className="mono" style={{fontSize:13,color:C.ink,marginTop:2}}>{n} <span style={{color:C.ink3,fontSize:10}}>({w.toFixed(0)}%)</span></div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* rows */}
+      <div style={{marginTop:14,border:`1px solid ${C.frame}`,background:C.canvas2}}>
+        <div style={{display:'grid',gridTemplateColumns:'22px 90px 1.4fr 110px 120px 110px 50px',padding:'8px 12px',borderBottom:`1px solid ${C.frame}`,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase'}}>
+          <span></span><span>id</span><span>brief · check</span><span>target</span><span>observed</span><span>category</span><span style={{textAlign:'right'}}>n</span>
+        </div>
+        {FAIL_BUCKET.map((f,i)=>{
+          const on = selected.includes(f.id);
+          const meta = CAT_META[f.cat];
+          return (
+            <div key={f.id} onClick={()=>toggle(f.id)} style={{display:'grid',gridTemplateColumns:'22px 90px 1.4fr 110px 120px 110px 50px',padding:'10px 12px',borderBottom:i<FAIL_BUCKET.length-1?`1px dashed ${C.frame}`:'none',fontFamily:C.mono,fontSize:11,color:C.ink2,cursor:'pointer',background:on?'rgba(159,211,255,0.06)':'transparent'}}>
+              <span style={{color:on?C.lox:C.ink3}}>{on?'■':'□'}</span>
+              <span style={{color:C.halo}}>{f.id}</span>
+              <span style={{color:C.ink}}>{f.brief} <span style={{color:C.ink3}}>· {f.check}</span></span>
+              <span style={{color:C.ink3}}>{f.target}</span>
+              <span style={{color:C.risk}}>{f.got}</span>
+              <span style={{color:meta.color}}>{meta.label}</span>
+              <span style={{color:C.ink,textAlign:'right'}}>{f.count}×</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{display:'flex',gap:10,marginTop:14,alignItems:'center',flexWrap:'wrap'}}>
+        <Btn variant="risk" onClick={()=>setTargetedSFT(t=>!t)} disabled={selectedRows.length===0}>
+          {targetedSFT?'✓ Targeted SFT queued':'Queue selected → Targeted SFT'}
+        </Btn>
+        <Btn onClick={()=>setSelected(FAIL_BUCKET.map(f=>f.id))}>Select all</Btn>
+        <Btn onClick={()=>setSelected([])}>Clear</Btn>
+        <span className="mono" style={{fontSize:11,color:C.ink3,marginLeft:'auto'}}>
+          → data/sft/failures_{new Date().toISOString().slice(0,10)}.jsonl · {selectedCount} rows
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ============ DIVERSITY PRESSURE ============
+const DIVERSITY_AXES = [
+  { id:'cooling',     label:'Cooling',       options:['regenerative','film','transpiration','ablative','radiative'] },
+  { id:'cycle',       label:'Cycle',         options:['gas-generator','staged-combustion','expander','pressure-fed','full-flow'] },
+  { id:'propellant',  label:'Propellant',    options:['LOX/RP-1','LOX/CH4','LOX/LH2','H2O2/kerosene','N2O4/UDMH'] },
+  { id:'nozzle',      label:'Nozzle',        options:['bell','aerospike','plug','extendible','dual-bell'] },
+  { id:'process',     label:'Mfg process',   options:['LPBF','DED','FDM-metal','SLA','hybrid-LPBF+5axis'] },
+];
+// mock embedding scatter — past session clusters
+const EMB_CLUSTERS = [
+  { cx:120, cy:110, r:46, n:84, label:'bell · GG · LOX/RP-1',  color:C.lox,   stale:true },
+  { cx:175, cy:170, r:32, n:41, label:'film · SC · LOX/CH4',   color:C.inter, stale:false },
+  { cx:280, cy:140, r:24, n:18, label:'aerospike · FF · CH4',  color:C.halo,  stale:false },
+  { cx:340, cy:210, r:14, n:6,  label:'expander · LH2',         color:C.lh2,   stale:false },
+];
+function DiversityPressure({ locked, setLocked, temp, setTemp, minNovelty, setMinNovelty, penaltyStale, setPenaltyStale }){
+  const lockedCount = Object.values(locked).filter(Boolean).length;
+  // compute “novelty budget” from controls
+  const budget = Math.min(100, Math.round(temp*55 + minNovelty*0.4 + (penaltyStale?12:0) + (5-lockedCount)*4));
+  return (
+    <div style={{border:`1px solid ${C.frame}`,padding:18,background:C.canvas}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+        <div>
+          <Chip c={C.inter}>DIVERSITY PRESSURE · INFERENCE-TIME STEERING</Chip>
+          <h3 style={{margin:'4px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>Force new directions — don’t let the model collapse</h3>
+        </div>
+        <Chip c={budget>60?C.inter:budget>30?C.lh2:C.risk}>NOVELTY BUDGET · {budget}</Chip>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1.1fr',gap:18,marginTop:14}}>
+
+        {/* LEFT: embedding scatter */}
+        <div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:6}}>past designs — UMAP(part_tree, brief) · stale clusters penalized</div>
+          <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:6}}>
+            <svg viewBox="0 0 440 280" style={{width:'100%',display:'block'}}>
+              {/* axes grid */}
+              {[0,1,2,3,4].map(i=>(
+                <g key={i}>
+                  <line x1={20} y1={20+i*56} x2={420} y2={20+i*56} stroke={C.frame} strokeDasharray="2 6" opacity="0.5"/>
+                  <line x1={20+i*100} y1={20} x2={20+i*100} y2={252} stroke={C.frame} strokeDasharray="2 6" opacity="0.5"/>
+                </g>
+              ))}
+              {/* clusters */}
+              {EMB_CLUSTERS.map((cl,i)=>(
+                <g key={i}>
+                  <circle cx={cl.cx} cy={cl.cy} r={cl.r} fill={cl.color} opacity={cl.stale?0.15:0.25} stroke={cl.color} strokeDasharray={cl.stale?'4 4':''}/>
+                  <text x={cl.cx} y={cl.cy-cl.r-4} fontSize="10" fontFamily={C.mono} fill={cl.color} textAnchor="middle">{cl.label}</text>
+                  <text x={cl.cx} y={cl.cy+3} fontSize="11" fontFamily={C.mono} fill={C.ink} textAnchor="middle">{cl.n}</text>
+                  {cl.stale && <text x={cl.cx} y={cl.cy+cl.r+14} fontSize="9" fontFamily={C.mono} fill={C.risk} textAnchor="middle">STALE −{penaltyStale?'0.35':'0.10'}</text>}
+                </g>
+              ))}
+              {/* target novel region */}
+              <circle cx={395} cy={65} r={28} fill="none" stroke={C.lox} strokeDasharray="4 3"/>
+              <text x={395} y={40} fontSize="10" fontFamily={C.mono} fill={C.lox} textAnchor="middle">TARGET</text>
+              <text x={395} y={110} fontSize="9" fontFamily={C.mono} fill={C.lox} textAnchor="middle">novelty ≥ {minNovelty}</text>
+              {/* 3 proposal points jittered into target region */}
+              {[[380,55],[410,70],[395,85]].map((p,i)=>(
+                <circle key={i} cx={p[0]} cy={p[1]} r={4} fill={C.ink} stroke={C.lox} strokeWidth="1.2"/>
+              ))}
+              <text x={20} y={270} fontSize="9" fontFamily={C.mono} fill={C.ink3}>cluster size ∝ past variants · dashed = stale (≥ 30 picks)</text>
+            </svg>
+          </div>
+        </div>
+
+        {/* RIGHT: controls */}
+        <div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:6}}>axis lock — 🔓 means model is free to pick; 🔒 means you fix it</div>
+          <div style={{border:`1px solid ${C.frame}`,background:C.canvas2}}>
+            {DIVERSITY_AXES.map((ax,i)=>{
+              const on = !!locked[ax.id];
+              const current = locked[ax.id] || '— free —';
+              return (
+                <div key={ax.id} style={{display:'grid',gridTemplateColumns:'22px 110px 1fr',padding:'10px 12px',borderBottom:i<DIVERSITY_AXES.length-1?`1px dashed ${C.frame}`:'none',alignItems:'center',gap:10}}>
+                  <span style={{color:on?C.lh2:C.inter,fontFamily:C.mono}}>{on?'🔒':'🔓'}</span>
+                  <span className="mono" style={{fontSize:11,color:C.ink,letterSpacing:'.06em',textTransform:'uppercase'}}>{ax.label}</span>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+                    <span onClick={()=>setLocked(l=>({...l,[ax.id]:null}))}
+                      style={{fontFamily:C.mono,fontSize:10,padding:'3px 6px',border:`1px solid ${!on?C.inter:C.frame}`,color:!on?C.inter:C.ink3,cursor:'pointer'}}>free</span>
+                    {ax.options.map(opt=>(
+                      <span key={opt} onClick={()=>setLocked(l=>({...l,[ax.id]:opt}))}
+                        style={{fontFamily:C.mono,fontSize:10,padding:'3px 6px',border:`1px solid ${locked[ax.id]===opt?C.lh2:C.frame}`,color:locked[ax.id]===opt?C.lh2:C.ink3,cursor:'pointer'}}>{opt}</span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* sliders */}
+          <div style={{marginTop:12,display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+            <ParamSlider label="temperature" value={temp} min={0.2} max={1.4} step={0.05} onChange={setTemp} color={C.lox}/>
+            <ParamSlider label="min novelty (cosine dist to bank)" value={minNovelty} min={0} max={100} step={1} onChange={setMinNovelty} color={C.halo} suffix=""/>
+          </div>
+          <div style={{marginTop:10}}>
+            <label style={{display:'flex',gap:8,alignItems:'center',fontFamily:C.mono,fontSize:12,color:C.ink2,cursor:'pointer'}}>
+              <input type="checkbox" checked={penaltyStale} onChange={e=>setPenaltyStale(e.target.checked)}/>
+              Penalize stale clusters (bell · GG · LOX/RP-1) by −0.35 logit
+            </label>
+          </div>
+
+          <div style={{marginTop:14,border:`1px dashed ${C.frame}`,padding:10,background:C.canvas2}}>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:6}}>inference command — next batch</div>
+            <pre className="mono" style={{margin:0,fontSize:11,color:C.ink,whiteSpace:'pre-wrap',lineHeight:1.5}}>{`npu_generate --n 3 \\
+  --temp ${temp.toFixed(2)} --min_novelty ${minNovelty} \\
+  --stale_penalty ${penaltyStale?0.35:0} \\
+${DIVERSITY_AXES.filter(a=>locked[a.id]).map(a=>`  --lock ${a.id}=${locked[a.id]}`).join(' \\\n') || '  (all axes free)'}`}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+function ParamSlider({ label, value, min, max, step, onChange, color, suffix='' }){
+  return (
+    <div>
+      <div style={{display:'flex',justifyContent:'space-between',fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.08em',textTransform:'uppercase'}}>
+        <span>{label}</span><span style={{color}}>{value}{suffix}</span>
+      </div>
+      <input type="range" min={min} max={max} step={step} value={value} onChange={e=>onChange(+e.target.value)}
+        style={{width:'100%',accentColor:color}}/>
+    </div>
+  );
+}
+
+// ============ RETRAIN PANEL ============
+function RetrainPanel({ queueSize, onRetrain, retraining, runNumber, failSelected, targetedSFT, noveltyBudget }){
+  const ready = queueSize >= 8;
+  // compose training recipe from three signals
+  const stages = [
+    { on: targetedSFT && failSelected>0, label:`SFT · failure bucket (${failSelected} rows)`, color:C.risk },
+    { on: ready, label:`DPO · prefs.jsonl (${queueSize} pairs · β 0.1)`, color:C.lh2 },
+    { on: true,  label:`Diversity reg · novelty budget ${noveltyBudget}`, color:C.inter },
+  ];
+  return (
+    <div style={{border:`1px solid ${C.frame}`,padding:18,background:C.canvas}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
+        <div>
+          <Chip c={C.risk}>05 · RE-TRAIN · COMPOSED RECIPE</Chip>
+          <h3 style={{margin:'4px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>Close the loop — failures + prefs + diversity in one run</h3>
+        </div>
+        <Chip c={ready?C.inter:C.ink3}>{ready?'● READY':'○ need ≥ 8 pairs'}</Chip>
+      </div>
+
+      {/* stage pipeline */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginTop:14}}>
+        {stages.map((s,i)=>(
+          <div key={i} style={{border:`1px solid ${s.on?s.color:C.frame}`,padding:'10px 12px',opacity:s.on?1:0.45,background:s.on?'rgba(255,255,255,0.02)':'transparent'}}>
+            <div className="mono" style={{fontSize:10,color:s.color,letterSpacing:'.08em'}}>{s.on?'■ STAGE':'□ STAGE'} {i+1}</div>
+            <div className="mono" style={{fontSize:12,color:C.ink,marginTop:4}}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginTop:14}}>
+        <KV k="base" v="qwen2.5-3b-instruct" c={C.lox}/>
+        <KV k="adapter" v={`lora_r16_a32 · run ${runNumber}`} c={C.halo}/>
+        <KV k="regularizer" v={`max-entropy ³ 0.${Math.min(99,noveltyBudget).toString().padStart(2,'0')}`} c={C.inter}/>
+        <KV k="fail rows" v={targetedSFT?`${failSelected} selected`:'none'} c={targetedSFT?C.risk:C.ink3}/>
+      </div>
+
+      <div style={{display:'flex',gap:10,marginTop:16,alignItems:'center'}}>
+        <Btn variant="risk" onClick={onRetrain} disabled={!ready||retraining}>
+          {retraining?'◐ Training…':'Run composed recipe → export OV INT4 → hot-swap NPU'}
+        </Btn>
+        <span className="mono" style={{fontSize:11,color:C.ink3}}>models/ov_npu_ready/qwen25_3b_int4_npu_ov → v{runNumber+1}</span>
+      </div>
+    </div>
+  );
+}
+function KV({ k, v, c=C.ink }){
+  return (
+    <div style={{border:`1px dashed ${C.frame}`,padding:'8px 10px'}}>
+      <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em'}}>{k.toUpperCase()}</div>
+      <div className="mono" style={{fontSize:13,color:c,marginTop:2}}>{v}</div>
+    </div>
+  );
+}
+
+// ============ ROOT ============
+function App(){
+  const [brief,setBrief] = useState('Saturn V S-IC booster · LOX/RP-1 · reusable 10 cycles · LPBF Inconel 718 · min_wall ≥ 1.2 mm · overhang ≤ 45°');
+  const [variantsShown,setVariantsShown] = useState(false);
+  const [generating,setGenerating] = useState(false);
+  const [chosen,setChosen] = useState(null);
+  const [rejected,setRejected] = useState(null);
+  const [focused,setFocused] = useState(null);
+  const [prefs,setPrefs] = useState([]);
+  const [queueSize,setQueueSize] = useState(6);     // carried from previous sessions
+  const [runNumber,setRunNumber] = useState(3);
+  const [retraining,setRetraining] = useState(false);
+  const [cursor,setCursor] = useState('gen');
+
+  // new: failure bucket + diversity pressure
+  const [failSelected,setFailSelected] = useState(['F-0412','F-0377']);
+  const [targetedSFT,setTargetedSFT] = useState(true);
+  const [locked,setLocked] = useState({ cooling:null, cycle:null, propellant:'LOX/CH4', nozzle:null, process:null });
+  const [temp,setTemp] = useState(0.9);
+  const [minNovelty,setMinNovelty] = useState(62);
+  const [penaltyStale,setPenaltyStale] = useState(true);
+  const noveltyBudget = Math.min(100, Math.round(temp*55 + minNovelty*0.4 + (penaltyStale?12:0) + (5-Object.values(locked).filter(Boolean).length)*4));
+  const failSelectedCount = FAIL_BUCKET.filter(f=>failSelected.includes(f.id)).reduce((s,f)=>s+f.count,0);
+
+  const PREFS_BASE = 248;
+
+  function onGenerate(){
+    setGenerating(true); setCursor('gen');
+    setTimeout(()=>{ setVariantsShown(true); setGenerating(false); setCursor('eval'); setFocused('B'); },900);
+  }
+  function onChoose(id){
+    if(!rejected){ setChosen(id); return; }
+    commitPair(id, rejected);
+  }
+  function onReject(id){
+    if(!chosen){ setRejected(id); return; }
+    commitPair(chosen, id);
+  }
+  // auto-commit when both picked
+  useMemo(()=>{ if(chosen && rejected){ commitPair(chosen, rejected); } },[chosen,rejected]);
+
+  function commitPair(ch, rj){
+    if(ch===rj) return;
+    const deltaDfam = VARIANTS.find(v=>v.id===ch).rubric.dfam - VARIANTS.find(v=>v.id===rj).rubric.dfam;
+    const deltaEff  = VARIANTS.find(v=>v.id===ch).rubric.efficiency - VARIANTS.find(v=>v.id===rj).rubric.efficiency;
+    setPrefs(p=>[...p, {
+      brief: brief.length>58?brief.slice(0,58)+'…':brief,
+      chosen: ch, rejected: rj,
+      delta: `ΔDfAM ${deltaDfam>0?'+':''}${deltaDfam} · ΔEff ${deltaEff>0?'+':''}${deltaEff}`,
+      ts: new Date().toISOString().slice(11,19)+'Z',
+    }]);
+    setQueueSize(q=>q+1);
+    setCursor('prefs');
+    // reset for next round
+    setTimeout(()=>{
+      setChosen(null); setRejected(null); setFocused(null); setVariantsShown(false);
+    }, 800);
+  }
+
+  function onClear(){ setPrefs([]); }
+  function onExport(){ setCursor('train'); }
+  function onRetrain(){
+    setRetraining(true); setCursor('train');
+    setTimeout(()=>{
+      setRetraining(false);
+      setRunNumber(n=>n+1);
+      setQueueSize(0);
+      setPrefs([]);
+      setCursor('export');
+      setTimeout(()=>setCursor('gen'), 1200);
+    }, 2400);
+  }
+
+  return (
+    <div style={{maxWidth:1280,margin:'0 auto',padding:24,fontFamily:C.sans,color:C.ink2}}>
+
+      {/* DEMO badge */}
+      <div style={{border:`1px solid ${C.lh2}`,background:'rgba(255,211,159,0.06)',padding:'10px 14px',marginBottom:16,display:'flex',justifyContent:'space-between',alignItems:'center',gap:14}}>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <span style={{fontFamily:C.mono,fontSize:10,letterSpacing:'.14em',color:'#0c1e35',background:C.lh2,padding:'3px 8px'}}>VISION · MOCK</span>
+          <span className="mono" style={{fontSize:11,color:C.ink2}}>Full self-reinforcing loop — design vision. Not all buttons are wired. See <a href="Setup.html" style={{color:C.lox}}>Setup</a> + <a href="Minimal.html" style={{color:C.lox}}>Minimal</a> for the working subset.</span>
+        </div>
+        <a href="Setup.html" style={{fontFamily:C.mono,fontSize:11,color:C.lh2,letterSpacing:'.08em',textTransform:'uppercase',border:`1px solid ${C.lh2}`,padding:'5px 10px',textDecoration:'none'}}>setup →</a>
+      </div>
+
+      {/* title */}
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',borderBottom:`2px solid ${C.frame}`,paddingBottom:12,marginBottom:20}}>
+        <div>
+          <div className="mono" style={{letterSpacing:'.14em',color:C.ink,fontSize:20}}>BLUEPRINT_NPU · LOOP</div>
+          <div className="mono" style={{fontSize:11,color:C.lox,marginTop:4}}>
+            minimal · one brief → three variants → one human pick → one more row of training data
+          </div>
+        </div>
+        <Chip c={C.halo}>NPU ACTIVE · run {runNumber} · offline</Chip>
+      </div>
+
+      {/* loop diagram */}
+      <div style={{border:`1px solid ${C.frame}`,padding:0,marginBottom:20}}>
+        <LoopDiagram cursor={cursor}/>
+      </div>
+
+      {/* 01 generate */}
+      <BriefBar brief={brief} setBrief={setBrief} onGenerate={onGenerate} generating={generating}/>
+
+      {/* 02 evaluate */}
+      <div style={{marginTop:20}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10}}>
+          <div>
+            <Chip c={C.halo}>02 · EVALUATE</Chip>
+            <div className="sans" style={{fontSize:13,color:C.ink2,marginTop:4}}>Side-by-side — rubric + verify + part_tree. Pick one best, one worst.</div>
+          </div>
+          {variantsShown && <Chip c={chosen&&rejected?C.inter:C.ink3}>{chosen?`✓ ${chosen}`:'—'} · {rejected?`✗ ${rejected}`:'—'}</Chip>}
+        </div>
+        {!variantsShown ? (
+          <div style={{border:`1px dashed ${C.frame}`,padding:'48px 16px',textAlign:'center',fontFamily:C.mono,fontSize:12,color:C.ink3}}>
+            {generating?'◐ Generating 3 variants on NPU…':'(generate variants above to evaluate)'}
+          </div>
+        ) : (
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:14}}>
+            {VARIANTS.map(v=>(
+              <VariantCard key={v.id} v={v}
+                chosen={chosen===v.id} rejected={rejected===v.id}
+                focused={focused===v.id}
+                onChoose={onChoose} onReject={onReject}
+                onFocus={setFocused}/>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 03 ledger */}
+      <div style={{marginTop:20}}>
+        <div style={{marginBottom:10}}>
+          <Chip c={C.halo}>03 · ACCUMULATE</Chip>
+          <div className="sans" style={{fontSize:13,color:C.ink2,marginTop:4}}>Every pick appends a (chosen, rejected) pair — this is the preference dataset that retrains the model.</div>
+        </div>
+        <DatasetLedger rows={prefs} rowsTotal={PREFS_BASE+queueSize} onClear={onClear} onExport={onExport}/>
+      </div>
+
+      {/* 04a failure bucket */}
+      <div style={{marginTop:20}}>
+        <div style={{marginBottom:10}}>
+          <Chip c={C.risk}>04A · FAILURES</Chip>
+          <div className="sans" style={{fontSize:13,color:C.ink2,marginTop:4}}>Every verify[] FAIL is a teachable moment — curated into a targeted SFT set.</div>
+        </div>
+        <FailureBucket selected={failSelected} setSelected={setFailSelected} targetedSFT={targetedSFT} setTargetedSFT={setTargetedSFT}/>
+      </div>
+
+      {/* 04b diversity pressure */}
+      <div style={{marginTop:20}}>
+        <div style={{marginBottom:10}}>
+          <Chip c={C.inter}>04B · DIVERSITY</Chip>
+          <div className="sans" style={{fontSize:13,color:C.ink2,marginTop:4}}>Steer the next batch into unexplored design space — embedding novelty + axis locks + stale penalty.</div>
+        </div>
+        <DiversityPressure locked={locked} setLocked={setLocked} temp={temp} setTemp={setTemp}
+          minNovelty={minNovelty} setMinNovelty={setMinNovelty}
+          penaltyStale={penaltyStale} setPenaltyStale={setPenaltyStale}/>
+      </div>
+
+      {/* 05 retrain */}
+      <div style={{marginTop:20,marginBottom:40}}>
+        <RetrainPanel queueSize={queueSize} onRetrain={onRetrain} retraining={retraining}
+          runNumber={runNumber} failSelected={failSelectedCount} targetedSFT={targetedSFT}
+          noveltyBudget={noveltyBudget}/>
+      </div>
+
+      {/* BEYOND DPO */}
+      <div style={{marginTop:24,marginBottom:18,padding:'18px 18px',border:`1px dashed ${C.halo}`,background:'rgba(202,169,255,0.04)'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10,gap:14,flexWrap:'wrap'}}>
+          <div>
+            <Chip c={C.halo}>06 · BEYOND DPO</Chip>
+            <div className="sans" style={{fontSize:13,color:C.ink2,marginTop:4}}>This page = today's loop. There are bigger levers — most of them aren't training.</div>
+          </div>
+          <a href="Methods.html" className="mono" style={{fontSize:11,letterSpacing:'.1em',color:C.halo,border:`1px solid ${C.halo}`,padding:'6px 12px',textDecoration:'none'}}>FULL METHODS REFERENCE →</a>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+          {[
+            ['RAG',                  'embed NASA TM / DfAM PDFs · retrieve at brief time',         'no training · biggest win/$', C.inter],
+            ['Constrained decoding', '`outlines` lib · enforce part_tree.json schema',             'kills parse failures',         C.inter],
+            ['Tool-use',             'LLM calls Python for mass / TWR / Reynolds — no guessing',   'real numbers',                 C.lox],
+            ['Distill 0.5B',         'GPT-4o teacher → 50K pairs → train tiny model on Arc',       'truly bespoke · ~$200 + 1 wk', C.halo],
+          ].map(([k,v,why,col],i)=>(
+            <div key={i} style={{padding:'10px 12px',border:`1px solid ${C.frame}`,background:C.canvas2}}>
+              <div className="mono" style={{fontSize:11,color:col,letterSpacing:'.04em',marginBottom:4}}>{k}</div>
+              <div className="sans" style={{fontSize:11.5,color:C.ink2,lineHeight:1.5,marginBottom:4}}>{v}</div>
+              <div className="mono" style={{fontSize:9.5,color:C.ink3,letterSpacing:'.06em'}}>→ {why}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{borderTop:`1px solid ${C.frame}`,paddingTop:14,fontFamily:C.mono,fontSize:11,color:C.ink3}}>
+        flow: BRIEF → 3× NPU generate → human pick → prefs.jsonl append → (≥ 8 pairs) → DPO on XPU → merge LoRA → OV INT4 export → hot-swap NPU → next round uses the updated model
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

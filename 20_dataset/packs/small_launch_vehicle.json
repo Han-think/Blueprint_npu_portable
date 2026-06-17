@@ -1,0 +1,942 @@
+{
+  "schema": "blueprint_context_pack_v1",
+  "seed": "small_launch_vehicle",
+  "subsystem_taxonomy": {
+    "disciplines": {
+      "structures": "Load-bearing geometry, frames, spars, skins, joints, stiffness",
+      "mechanisms": "Linkages, hinges, gears, cams, deployment, tilt/rotation devices",
+      "power": "Battery, solar generation, charging, distribution, connectors",
+      "electronics": "Boards, drivers, wiring, signal routing, grounding",
+      "recovery_deployment": "Parachutes, deployables, release mechanisms (display-level)",
+      "integration": "Datums, interfaces, harness routing, service access, assembly order"
+    },
+    "boundary_note": "All subsystems are educational display mockups; no propulsion, ignition, or flight-performance design.",
+    "required_subsystems": [
+      {
+        "id": "primary_structure",
+        "discipline": "structures",
+        "function": "Propellant tank dummy barrels (LOX/fuel), interstage, payload fairing, fin set, skirts; stacking datums and alignment keys",
+        "evidence_features": [
+          "tank_dummy",
+          "propellant_tank_dummy",
+          "payload_fairing",
+          "nose_cone",
+          "fin_set",
+          "interstage_datum",
+          "alignment_key",
+          "bolt_circle_dummy"
+        ],
+        "criteria_refs": [
+          "small_launch_vehicle_mock_boundary",
+          "datum_tolerance"
+        ]
+      },
+      {
+        "id": "engine_display",
+        "discipline": "mechanisms",
+        "function": "Removable engine display cartridge: combustion chamber dummy, bell nozzle shell, turbopump dummy in cutaway bay (non-functional)",
+        "evidence_features": [
+          "engine_display_cartridge",
+          "combustion_chamber_dummy",
+          "bell_nozzle_shell",
+          "turbopump_assembly_dummy",
+          "impeller_dummy",
+          "stage_engine_mock",
+          "cutaway_window",
+          "slide_rail"
+        ],
+        "criteria_refs": [
+          "small_launch_vehicle_mock_boundary",
+          "service_access"
+        ]
+      },
+      {
+        "id": "avionics_bay",
+        "discipline": "electronics",
+        "function": "Avionics ring/tray with board mounts and harness pass-throughs",
+        "evidence_features": [
+          "avionics_tray",
+          "harness_passthrough",
+          "board_standoff"
+        ],
+        "criteria_refs": [
+          "electronics_routing",
+          "service_access"
+        ]
+      },
+      {
+        "id": "power_display",
+        "discipline": "power",
+        "function": "Battery module dummy with access panel",
+        "evidence_features": [
+          "battery_module",
+          "access_panel"
+        ],
+        "criteria_refs": [
+          "service_access"
+        ]
+      },
+      {
+        "id": "recovery_bay",
+        "discipline": "recovery_deployment",
+        "function": "Parachute bay dummy with deployment door hinge (display-level)",
+        "evidence_features": [
+          "recovery_bay",
+          "deploy_door",
+          "hinge"
+        ],
+        "criteria_refs": [
+          "small_launch_vehicle_mock_boundary",
+          "geometry_grounding"
+        ]
+      },
+      {
+        "id": "separation_display",
+        "discipline": "mechanisms",
+        "function": "Stage separation plane shown as datum + dummy clamp band (no energetic device)",
+        "evidence_features": [
+          "separation_plane_datum",
+          "clamp_band_dummy"
+        ],
+        "criteria_refs": [
+          "small_launch_vehicle_mock_boundary",
+          "datum_tolerance"
+        ]
+      },
+      {
+        "id": "integration_inspection",
+        "discipline": "integration",
+        "function": "Assembly order evidence, inspection windows, readiness checklist hooks, connection types and load-path closure",
+        "evidence_features": [
+          "inspection_window",
+          "assembly_datum",
+          "checklist_callout"
+        ],
+        "criteria_refs": [
+          "mrl05_readiness",
+          "small_launch_vehicle_mock_boundary",
+          "assembly_integration"
+        ]
+      }
+    ],
+    "completeness_rule": "Every required_subsystem must appear in part_tree with at least one evidence_feature in geometry_ops; a missing subsystem is a scorecard failure, not a style issue."
+  },
+  "policy": {
+    "citable_sources_only_in_outputs": true,
+    "local_reading_only_must_not_be_cited_or_exported": true
+  },
+  "criteria": [
+    {
+      "schema": "blueprint_criteria_v1",
+      "id": "common_dfm",
+      "title": "Common DFM/DFA Judgment",
+      "applies_to": [
+        "all"
+      ],
+      "criteria": [
+        {
+          "criterion": "part_consolidation_with_guardrails",
+          "weight": 10,
+          "good": "Parts are integrated only when service access, inspection, and interface clarity remain visible.",
+          "bad": "Monolithic body hides removable modules, datums, or inspection paths.",
+          "signals": [
+            "integrate_with_guardrail",
+            "partial_integrate",
+            "defer_integration"
+          ],
+          "loop_feedback": "Consolidate only low-risk covers or labels; keep service modules, datums, and inspection windows visible."
+        },
+        {
+          "criterion": "fastener_joint_sanity",
+          "weight": 10,
+          "good": "Fastener patterns, pin joints, slots, bosses, and mating clearances are explicitly represented.",
+          "bad": "Joints are described in prose but not represented as holes, bosses, pins, slots, or datums.",
+          "signals": [
+            "drill",
+            "boss",
+            "slot",
+            "clearance_mm",
+            "fastener_pattern"
+          ],
+          "loop_feedback": "Add visible fastener holes, bosses, joint pins, and clearance notes for each critical interface."
+        },
+        {
+          "criterion": "inspection_readability",
+          "weight": 9,
+          "good": "A reviewer can see what to inspect and why without opening raw JSON.",
+          "bad": "Design has no callouts, access windows, labels, datum pads, or verification focus.",
+          "signals": [
+            "inspection_window",
+            "engrave",
+            "callout",
+            "verification_focus"
+          ],
+          "loop_feedback": "Add inspection callouts, datum labels, visible windows, and verification checks tied to geometry features."
+        },
+        {
+          "criterion": "fastener_locking_and_preload_evidence",
+          "weight": 9,
+          "good": "Critical joints state locking method (locknut, insert, washer, adhesive note) and torque/preload intent; bolt patterns match load direction.",
+          "bad": "Fasteners appear as bare holes with no locking, washer, engagement-length, or preload language anywhere.",
+          "signals": [
+            "locknut",
+            "insert",
+            "washer",
+            "torque",
+            "preload",
+            "thread_engagement"
+          ],
+          "loop_feedback": "For each critical joint, name the locking feature, add washer/insert geometry, and state a torque or preload intent note.",
+          "source_refs": [
+            "sources/public/Fastener Design Manual (NASA).pdf"
+          ]
+        },
+        {
+          "criterion": "thread_and_insert_engagement_sanity",
+          "weight": 8,
+          "good": "Threaded connections into printed or soft material use inserts or bosses with adequate engagement depth (~1.5x diameter) and wall around the hole.",
+          "bad": "Screws thread directly into thin printed walls or blind features with no boss, insert, or depth note.",
+          "signals": [
+            "heat_set_insert",
+            "boss",
+            "engagement_depth",
+            "pilot_hole",
+            "min_wall_mm"
+          ],
+          "loop_feedback": "Add insert bosses with engagement depth >= 1.5x screw diameter and surrounding wall thickness for every threaded joint.",
+          "source_refs": [
+            "sources/public/Fastener Design Manual (NASA).pdf",
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "schema": "blueprint_criteria_v1",
+      "id": "geometry_grounding",
+      "title": "P0 to Geometry Grounding",
+      "applies_to": [
+        "all"
+      ],
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "weight": 14,
+          "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+          "bad": "P0 lists features but geometry_ops are generic boxes at the origin.",
+          "signals": [
+            "_subsystem_plan.internal_feature_targets",
+            "geometry_ops.id",
+            "geometry_ops.target"
+          ],
+          "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "weight": 12,
+          "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+          "bad": "Geometry is stacked at [0,0,0] or lacks coordinates.",
+          "signals": [
+            "args.at",
+            "coordinate_spread_score"
+          ],
+          "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "weight": 10,
+          "good": "Uses drill, pocket, boss, channel, cylinder, chamfer, fillet, pattern, and engrave where appropriate.",
+          "bad": "Primary output is a rectangular box with shallow labels.",
+          "signals": [
+            "drill",
+            "pocket",
+            "boss",
+            "channel",
+            "pattern_linear",
+            "pattern_polar",
+            "fillet",
+            "chamfer"
+          ],
+          "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+        },
+        {
+          "criterion": "mechanism_named_not_implied",
+          "weight": 9,
+          "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "signals": [
+            "four_bar",
+            "cam",
+            "rack_pinion",
+            "lead_screw",
+            "pivot_hole",
+            "linkage_bar"
+          ],
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "source_refs": [
+            "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "schema": "blueprint_criteria_v1",
+      "id": "service_access",
+      "title": "Service Access and Maintainability",
+      "applies_to": [
+        "all"
+      ],
+      "criteria": [
+        {
+          "criterion": "replaceable_module_path",
+          "weight": 13,
+          "good": "Battery, sensor, actuator, cartridge, payload, cable, or joint modules remain removable without full teardown.",
+          "bad": "Functional modules are fused into a closed body.",
+          "signals": [
+            "removable",
+            "slide-in",
+            "snap-in",
+            "single-pin",
+            "tool-less",
+            "service_access"
+          ],
+          "loop_feedback": "Separate the critical service module and add a visible removal path, latch, pin, or slide rail."
+        },
+        {
+          "criterion": "cable_harness_visibility",
+          "weight": 8,
+          "good": "Harnesses, tubes, or service channels are routed through visible raceways or protected channels.",
+          "bad": "Cables are buried inside closed links or shells with no inspection feature.",
+          "signals": [
+            "harness_channel",
+            "cable_raceway",
+            "channel",
+            "inspection_window"
+          ],
+          "loop_feedback": "Add external or inspectable harness channels with strain relief and access covers."
+        },
+        {
+          "criterion": "access_not_just_text",
+          "weight": 9,
+          "good": "Access is represented by geometry: hatch, pocket, channel, fastener pattern, slot, window, or removable cover.",
+          "bad": "Access is claimed only in prose.",
+          "signals": [
+            "pocket",
+            "channel",
+            "drill",
+            "slot",
+            "hatch",
+            "cover",
+            "window"
+          ],
+          "loop_feedback": "Convert service-access text into physical geometry_ops: cover, pocket, slot, window, and fastener pattern."
+        },
+        {
+          "criterion": "harness_strain_relief_and_bend_radius",
+          "weight": 9,
+          "good": "Every cable exit shows strain relief geometry (clamp, grommet, tie point) and routing respects a stated minimum bend radius away from moving joints and sharp edges.",
+          "bad": "Cables exit bare holes, cross hinge lines unsupported, or bend around sharp printed edges with no relief feature.",
+          "signals": [
+            "strain_relief",
+            "grommet",
+            "cable_clamp",
+            "bend_radius",
+            "tie_point",
+            "edge_protection"
+          ],
+          "loop_feedback": "Add strain-relief clamps or grommets at every cable exit, state a minimum bend radius, and reroute harnesses away from hinge lines and sharp edges.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        },
+        {
+          "criterion": "connector_accessibility_and_keying",
+          "weight": 8,
+          "good": "Connectors are reachable without disassembling structure, have finger/tool clearance, and mention keying or labeling to prevent mis-mating.",
+          "bad": "Connectors face closed walls, sit in unreachable pockets, or identical adjacent connectors have no keying or label.",
+          "signals": [
+            "connector_clearance",
+            "keying",
+            "label",
+            "mate_demate",
+            "access_pocket"
+          ],
+          "loop_feedback": "Reorient connectors toward access openings, add finger clearance pockets, and engrave keying/ID labels next to each connector.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "schema": "blueprint_criteria_v1",
+      "id": "datum_tolerance",
+      "title": "Datum, Interface, and Tolerance Judgment",
+      "applies_to": [
+        "all"
+      ],
+      "criteria": [
+        {
+          "criterion": "datum_visibility",
+          "weight": 11,
+          "good": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+          "bad": "Interfaces exist only as abstract neighbor references.",
+          "signals": [
+            "datum",
+            "axis_ring",
+            "rail",
+            "socket",
+            "mounting_pad",
+            "interface_zone"
+          ],
+          "loop_feedback": "Add visible datum pads or axis/rail/socket features and label their mating function."
+        },
+        {
+          "criterion": "clearance_named",
+          "weight": 8,
+          "good": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+          "bad": "Moving/removable joints have no clearance or fit language.",
+          "signals": [
+            "clearance_mm",
+            "tol_mm",
+            "fit",
+            "slip",
+            "snap",
+            "pin"
+          ],
+          "loop_feedback": "Add clearance_mm or tolerance notes for hinge pins, slide rails, sockets, and removable cartridges."
+        },
+        {
+          "criterion": "interface_count",
+          "weight": 8,
+          "good": "Each subsystem has at least three adjacent interfaces or datums.",
+          "bad": "Subsystem is isolated and does not show assembly neighbors.",
+          "signals": [
+            "adjacent_interfaces",
+            "target_part",
+            "interface_type"
+          ],
+          "loop_feedback": "Add at least three adjacent interfaces: mount, service, electrical/data, flow, or inspection datum."
+        },
+        {
+          "criterion": "standard_fit_vocabulary",
+          "weight": 8,
+          "good": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+          "bad": "All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance.",
+          "signals": [
+            "clearance_fit",
+            "transition_fit",
+            "press_fit",
+            "allowance_mm",
+            "H7",
+            "shaft_basis"
+          ],
+          "loop_feedback": "Classify each mating diameter as clearance/transition/press fit and add a numeric allowance instead of line-to-line nominals.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        },
+        {
+          "criterion": "standard_hardware_dimensioning",
+          "weight": 7,
+          "good": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+          "bad": "Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin.",
+          "signals": [
+            "M3",
+            "M4",
+            "bearing_od",
+            "dowel_pin",
+            "catalog_size"
+          ],
+          "loop_feedback": "Snap hole, pin, and bearing dimensions to standard catalog sizes and name the intended hardware in callouts.",
+          "source_refs": [
+            "sources/public/McMaster-Carr Catalog 123.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "schema": "blueprint_criteria_v1",
+      "id": "structural_sizing",
+      "title": "First-Order Structural Sizing Judgment",
+      "applies_to": [
+        "all"
+      ],
+      "purpose": "Dimensions must be defended by a load path and a first-order margin, not chosen by appearance. Taught here, measured by analysis_estimate.sizing (computed bending stress / Factor of Safety vs material allowable). Educational first-order check, NOT a certified structural analysis.",
+      "criteria": [
+        {
+          "criterion": "load_path_declared",
+          "weight": 10,
+          "good": "Each primary structural member states what load it carries and how it reacts into the datum (cantilever root, simply supported, axial, shear pin).",
+          "bad": "Members exist with no stated load, support condition, or reaction path.",
+          "signals": [
+            "load_path",
+            "reaction",
+            "cantilever",
+            "support",
+            "axial_load",
+            "bending",
+            "shear",
+            "preload_N",
+            "load_case"
+          ],
+          "loop_feedback": "Declare each primary member's load case (force/moment), support condition, and reaction into the datum so its cross-section can be sized."
+        },
+        {
+          "criterion": "factor_of_safety",
+          "weight": 10,
+          "good": "Cross-sections give a stated or derivable Factor of Safety >= 1.5 against the declared load using the part material allowable.",
+          "bad": "No margin stated; cross-sections appear arbitrary relative to load.",
+          "signals": [
+            "factor_of_safety",
+            "FoS",
+            "margin_of_safety",
+            "MoS",
+            "safety_factor",
+            "allowable_stress",
+            "yield_mpa"
+          ],
+          "loop_feedback": "Size primary members to a Factor of Safety >= 1.5: increase section depth, add ribs/bracing, or raise wall thickness where the computed bending stress approaches the material allowable."
+        },
+        {
+          "criterion": "section_sizing",
+          "weight": 8,
+          "good": "Long members use depth/section modulus (ribs, I/box section, tube) appropriate to bending, not flat slender bars.",
+          "bad": "Long members are thin slender bars with low section modulus that buckle or deflect.",
+          "signals": [
+            "section_modulus",
+            "moment_of_inertia",
+            "rib",
+            "box_section",
+            "I_section",
+            "tube",
+            "wall_thickness_mm",
+            "second_moment"
+          ],
+          "loop_feedback": "Raise section modulus on long members: add depth, ribs, a box/tube section, or bracing instead of a flat slender bar."
+        },
+        {
+          "criterion": "material_allowable_named",
+          "weight": 7,
+          "good": "Material and its allowable (yield/tensile, with FDM layer-adhesion knockdown for printed parts) are named and used to justify wall and section.",
+          "bad": "Material is unnamed or allowable stress is never referenced when sizing.",
+          "signals": [
+            "material",
+            "yield_mpa",
+            "tensile_mpa",
+            "allowable",
+            "knockdown",
+            "layer_adhesion",
+            "PETG",
+            "PLA",
+            "aluminum"
+          ],
+          "loop_feedback": "Name the material allowable (and FDM knockdown for printed parts) and use it when justifying wall thickness and section size."
+        },
+        {
+          "criterion": "fastener_joint_sizing",
+          "weight": 6,
+          "good": "Bolted/pinned joints state fastener size, count, and a shear/preload rationale matched to the joint load.",
+          "bad": "Joints show holes with no fastener size, count, or shear/preload justification.",
+          "signals": [
+            "fastener_shear",
+            "bolt_shear",
+            "preload_N",
+            "torque_Nm",
+            "pin_shear",
+            "bearing_stress",
+            "fastener_count"
+          ],
+          "loop_feedback": "For each loaded joint state fastener size, count, and shear/preload capacity vs the joint load."
+        }
+      ]
+    },
+    {
+      "schema": "blueprint_criteria_v1",
+      "id": "mrl05_readiness",
+      "title": "MRL-0.5 Readiness Evidence",
+      "applies_to": [
+        "all"
+      ],
+      "criteria": [
+        {
+          "criterion": "wall_process_readiness",
+          "weight": 10,
+          "good": "Material/process, wall assumptions, build direction, and supports are explicit enough for design review.",
+          "bad": "Manufacturing process is absent or contradicts geometry.",
+          "signals": [
+            "material",
+            "process",
+            "min_wall_mm",
+            "build_direction",
+            "supports"
+          ],
+          "loop_feedback": "State material/process, min wall, build direction, and support implications in cad_brief and print_profile."
+        },
+        {
+          "criterion": "inspection_traceability",
+          "weight": 10,
+          "good": "Verify/risk items reference real features or interfaces from part_tree/geometry_ops.",
+          "bad": "Verification is generic pass/warn text not tied to features.",
+          "signals": [
+            "verify.check",
+            "risk.mit",
+            "geometry_ops.id"
+          ],
+          "loop_feedback": "Tie each verification check to a named geometry feature, datum, interface, or service access path."
+        },
+        {
+          "criterion": "risk_coverage",
+          "weight": 9,
+          "good": "Risks cover blocked access, weak interfaces, tolerance mismatch, process limitations, and unsafe overclaiming.",
+          "bad": "Risks are missing or only mention vague quality concerns.",
+          "signals": [
+            "risk",
+            "blocked",
+            "clearance",
+            "support",
+            "inspection",
+            "not_for"
+          ],
+          "loop_feedback": "Add concrete risks for blocked service, datum loss, clearance conflict, unsupported geometry, and unsafe overclaiming."
+        },
+        {
+          "criterion": "requirement_to_verification_matrix",
+          "weight": 9,
+          "good": "Each stated requirement maps to a verification method (inspection, demonstration, analysis, test) tied to a named feature or interface.",
+          "bad": "Requirements and verification lists exist independently with no traceable pairing.",
+          "signals": [
+            "requirement_id",
+            "verify.method",
+            "inspection",
+            "demonstration",
+            "analysis",
+            "test"
+          ],
+          "loop_feedback": "Pair every requirement with one verification method and the geometry feature or interface that provides the evidence.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        },
+        {
+          "criterion": "interface_control_evidence",
+          "weight": 8,
+          "good": "Cross-subsystem interfaces state owner, mating geometry, and what is exchanged (load, power, data, fluid), like a miniature interface control entry.",
+          "bad": "Subsystems reference each other by name only, with no statement of what crosses the interface.",
+          "signals": [
+            "interface_owner",
+            "exchange_type",
+            "load",
+            "power",
+            "data",
+            "mating_feature"
+          ],
+          "loop_feedback": "For each interface, state both sides, the mating feature, and the exchanged quantity (load/power/data/fluid).",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "schema": "blueprint_criteria_v1",
+      "id": "small_launch_vehicle_mock_boundary",
+      "title": "Small Launch Vehicle Educational Mock Boundary",
+      "applies_to": [
+        "small_launch_vehicle"
+      ],
+      "criteria": [
+        {
+          "criterion": "display_only_flowpath",
+          "weight": 14,
+          "good": "Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only.",
+          "bad": "Output drifts into actionable propulsion, ignition, or flight-performance instructions.",
+          "signals": [
+            "display-only",
+            "non-functional",
+            "cutaway",
+            "educational mock"
+          ],
+          "loop_feedback": "Use display-only cutaway modules and avoid operational propulsion, ignition, or flight-performance details."
+        },
+        {
+          "criterion": "cutaway_internal_readability",
+          "weight": 12,
+          "good": "Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge.",
+          "bad": "Vehicle is a smooth cylinder with no internal evidence.",
+          "signals": [
+            "cutaway",
+            "tank module",
+            "interstage",
+            "avionics bay",
+            "engine display cartridge"
+          ],
+          "loop_feedback": "Add cutaway windows, slide-in tank dummies, interstage datum, avionics bay, and removable engine display cartridge."
+        },
+        {
+          "criterion": "safe_risk_language",
+          "weight": 10,
+          "good": "Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming.",
+          "bad": "Risk/verification implies real launch readiness or manufacturing assurance.",
+          "signals": [
+            "mockup",
+            "inspection",
+            "overclaim",
+            "not flight-ready"
+          ],
+          "loop_feedback": "Frame verification around mock assembly inspection and explicitly avoid launch/propulsion readiness claims."
+        },
+        {
+          "criterion": "stage_interface_datum_evidence",
+          "weight": 9,
+          "good": "Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review.",
+          "bad": "Stages stack as butted cylinders with no locating feature, making the mock unassemblable and uninspectable.",
+          "signals": [
+            "interstage_datum",
+            "bolt_circle",
+            "alignment_key",
+            "stacking_feature"
+          ],
+          "loop_feedback": "Add locating datums, dummy bolt circles, and alignment keys at every stage and module joint of the mock stack.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "schema": "blueprint_criteria_v1",
+      "id": "assembly_integration",
+      "title": "Part-to-Assembly Integration and Structural Development",
+      "applies_to": [
+        "all"
+      ],
+      "reference": "connection_types.json",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "weight": 12,
+          "good": "Every inter-part interface names a specific connection type (bolted, threaded_insert, snap_fit, press_fit, dovetail_slide, clevis_pin, revolute_bearing, band_clamp, adhesive_lap, o_ring, connector_mate, harness_passthrough) with its DOF and a numeric clearance.",
+          "bad": "Interfaces are labeled only 'mount' or 'attach' with no connection type, DOF, or clearance.",
+          "signals": [
+            "connection_type",
+            "dof",
+            "clearance_mm",
+            "bolt_circle",
+            "snap_fit",
+            "press_fit",
+            "band_clamp"
+          ],
+          "loop_feedback": "For each interface pick a connection type from the taxonomy, state its DOF (0/1R/1T/1R1T/3R), and add a numeric clearance and the matching geometry feature.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf",
+            "sources/public/Fastener Design Manual (NASA).pdf"
+          ]
+        },
+        {
+          "criterion": "assembly_sequence_feasible",
+          "weight": 10,
+          "good": "Parts can be installed in a stated order where every fastener, connector, and mating feature stays reachable; no installed part blocks access to a later one; last-installed and captive parts are identified.",
+          "bad": "Assembly order is unstated or impossible — a part traps another, or a fastener ends up behind a wall with no access.",
+          "signals": [
+            "assembly_order",
+            "install_first",
+            "install_last",
+            "captive",
+            "tool_access",
+            "access_clearance"
+          ],
+          "loop_feedback": "State an installation order and verify each joint is reachable when it is made; reorder or add access openings where a part would trap another.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        },
+        {
+          "criterion": "datum_chain_continuity",
+          "weight": 10,
+          "good": "One primary datum part anchors the assembly; each other part locates off a named parent datum using a 3-2-1 scheme, so tolerance does not accumulate uncontrolled across the stack.",
+          "bad": "Parts float with no shared datum, or each part references a different feature so stack-up grows part-to-part.",
+          "signals": [
+            "primary_datum",
+            "datum_parent",
+            "locating_scheme",
+            "3-2-1",
+            "tolerance_stack"
+          ],
+          "loop_feedback": "Name one primary datum part, route each part's location back to it through one parent datum, and keep critical fits off the primary datum to limit stack-up.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        },
+        {
+          "criterion": "load_path_closure",
+          "weight": 11,
+          "good": "Every part's primary load traces through named interfaces to the base/ground; the load path closes for all parts and high-load joints use load-appropriate connection types.",
+          "bad": "One or more parts carry load with no continuous path to ground, or a high-load joint uses a low-load connection (e.g. snap-fit holding a structural member).",
+          "signals": [
+            "load_path",
+            "to_base",
+            "carry_through",
+            "reaction",
+            "fitting",
+            "load_closure"
+          ],
+          "loop_feedback": "Trace each part's main load to the base through named interfaces; upgrade any load-bearing joint from snap/adhesive to bolted/pinned/clamped and add the fitting where the path breaks."
+        },
+        {
+          "criterion": "structural_development_direction",
+          "weight": 9,
+          "good": "Compared to the previous version the design moves the right direction: fewer interfaces, parts consolidated where service is preserved, open load paths closed, and redundancy added only at critical joints.",
+          "bad": "Iteration adds interfaces or loose parts without justification, or consolidates in a way that buries service access.",
+          "signals": [
+            "interface_count",
+            "part_consolidation",
+            "load_path_closed",
+            "redundancy",
+            "delta_vs_parent"
+          ],
+          "loop_feedback": "Drive the next version toward fewer justified interfaces, consolidated printable parts that keep service access, and closed load paths; add redundancy only at safety-critical joints."
+        },
+        {
+          "criterion": "interface_minimization",
+          "weight": 8,
+          "good": "The assembly uses the fewest interfaces that still allow service and manufacture; each remaining interface is justified by service, motion, manufacture split, or load transfer.",
+          "bad": "Many redundant or unexplained interfaces, or arbitrary part splits that add joints without a service/manufacture reason.",
+          "signals": [
+            "interface_count",
+            "justified_split",
+            "service_split",
+            "manufacture_split"
+          ],
+          "loop_feedback": "Merge interfaces that exist for no service/motion/manufacture/load reason; keep a split only when it earns its joint."
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "path": "public/nasa_systems_engineering_handbook_0.pdf",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "path": "public/nasa-std-87394a_w_change_4_0.pdf",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    },
+    {
+      "title": "NASA Fastener Design Manual (RP-1228)",
+      "path": "public/Fastener Design Manual (NASA).pdf",
+      "target_topics": [
+        "fastener selection",
+        "torque/preload",
+        "locking features",
+        "washers",
+        "inserts"
+      ]
+    },
+    {
+      "title": "1800 Mechanical Movements, Devices and Appliances (Hiscox, 1899, public domain)",
+      "path": "public/1800.mechanical.movements.devices.and.appliances.pdf",
+      "target_topics": [
+        "linkages",
+        "cams",
+        "gears",
+        "mechanism vocabulary"
+      ]
+    },
+    {
+      "title": "Machinery's Handbook (early edition scan, archive.org)",
+      "path": "public/machineryshandbo00indu.pdf",
+      "target_topics": [
+        "fits",
+        "threads",
+        "machining allowances",
+        "shop vocabulary"
+      ]
+    },
+    {
+      "title": "CNC Programming Basics",
+      "path": "public/1787-jos-CNC Programmig Basics.pdf",
+      "target_topics": [
+        "machining setup",
+        "datum/work offset vocabulary"
+      ]
+    },
+    {
+      "title": "McMaster-Carr Catalog 123",
+      "path": "public/McMaster-Carr Catalog 123.pdf",
+      "target_topics": [
+        "standard fastener/bearing/hardware dimensions",
+        "part naming vocabulary"
+      ]
+    }
+  ],
+  "local_reading_only": [
+    {
+      "title": "Shigley's Mechanical Engineering Design 9e",
+      "target_topics": [
+        "shafts",
+        "bearings",
+        "gears",
+        "bolted joints",
+        "fatigue concepts"
+      ]
+    },
+    {
+      "title": "Marks' Standard Handbook for Mechanical Engineers",
+      "target_topics": [
+        "machine elements",
+        "materials",
+        "general mechanical criteria"
+      ]
+    },
+    {
+      "title": "Bruhn - Analysis and Design of Flight Vehicle Structures",
+      "target_topics": [
+        "load paths",
+        "structural arrangement vocabulary",
+        "joints/fittings"
+      ]
+    },
+    {
+      "title": "Rocket Propulsion Elements",
+      "target_topics": [
+        "component naming and interface vocabulary for educational mock assembly only"
+      ]
+    },
+    {
+      "title": "SMAD - Space Mission Analysis and Design",
+      "target_topics": [
+        "subsystem decomposition",
+        "interface/budget vocabulary",
+        "verification matrices"
+      ]
+    },
+    {
+      "title": "Gibilisco - Geometry Demystified",
+      "target_topics": [
+        "geometry vocabulary",
+        "coordinate reasoning"
+      ]
+    }
+  ],
+  "extracts": [
+    {
+      "book": "Fastener Design Manual (NASA)",
+      "label": "toc_intro",
+      "text": "--- page 1 ---\n\n\n--- page 2 ---\n\n\n--- page 3 ---\n\n\n--- page 4 ---\n\n\n--- page 5 ---\n\n\n--- page 6 ---\n\n\n--- page 7 ---\n\n\n--- page 8 ---\n\n\n--- page 9 ---\n\n\n--- page 10 ---\n\n\n--- page 11 ---\n\n\n--- page 12 ---\n\n\n--- page 13 ---\n\n\n--- page 14 ---\n\n\n--- page 15 ---\n\n\n--- page 16 ---\n\n\n--- page 17 ---\n\n\n--- page 18 ---\n\n\n--- page 19 ---\n\n\n--- page 20 ---\n"
+    }
+  ]
+}

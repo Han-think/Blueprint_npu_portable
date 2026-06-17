@@ -1,0 +1,185 @@
+{
+  "schema": "blueprint_long_range_recon_wing_redesign_package_v1",
+  "created_at": "2026-06-03T15:00:00+09:00",
+  "target": {
+    "vehicle_id": "wing_long_range",
+    "label": "Long-range recon and mission-payload wing educational mockup",
+    "scope": "design-thinking and 3D-printable assembly package before STL generation",
+    "not_for": "real military aircraft, weapon design, release mechanisms, stealth performance, operational mission planning, high-speed thermal design, or flight-ready manufacturing"
+  },
+  "primary_metric": {
+    "name": "assembly_serviceability_mission_readability",
+    "definition": "Reduce assembly effort while preserving access to sensor bay, mission payload bay, battery CG rail, spar datum, elevon hinges, propulsion-display module, and replaceable skid pads.",
+    "failure_rule": "Part count reduction fails if mission payload service, CG adjustment, spar datum, or control-surface service access is blocked."
+  },
+  "existing_bom": [
+    {"id": "old-001", "label": "center body pod", "qty": 1, "role": "main equipment bay and wing-body center volume", "interfaces": ["spar joint", "sensor bay", "battery bay", "propulsion mount"], "service_access": "equipment bay door and centerline datum must remain visible"},
+    {"id": "old-002", "label": "two-piece long wing spar", "qty": 1, "role": "primary spanwise datum and wing load teaching structure", "interfaces": ["center pod", "wing ribs", "anti-rotation key"], "service_access": "spar center joint and anti-rotation key must remain inspectable"},
+    {"id": "old-003", "label": "wing panel and rib set", "qty": 1, "role": "long-range wing shape and rib hierarchy", "interfaces": ["spar", "leading edge", "trailing edge", "elevons"], "service_access": "rib pockets and wing-root keys must remain readable"},
+    {"id": "old-004", "label": "elevon servo pocket pair", "qty": 2, "role": "control-surface hinge and actuator teaching module", "interfaces": ["wing panel", "elevon hinge", "servo cover"], "service_access": "elevon hinge and servo cover must remain removable"},
+    {"id": "old-005", "label": "motor and pusher prop mount dummy", "qty": 1, "role": "rear propulsion-display and thrust-line teaching placeholder", "interfaces": ["center pod tail", "cable route", "display stand"], "service_access": "propulsion-display module must remain replaceable"},
+    {"id": "old-006", "label": "GPS and pitot boom", "qty": 1, "role": "long-range navigation and air-data layout cue", "interfaces": ["nose module", "sensor bay", "cable guide"], "service_access": "boom must remain removable after handling damage"},
+    {"id": "old-007", "label": "camera and sensor bay", "qty": 1, "role": "reconnaissance sensor teaching bay", "interfaces": ["nose window", "mission payload bay", "center pod"], "service_access": "clear sensor window and service cover must remain openable"},
+    {"id": "old-008", "label": "battery bay and CG slide", "qty": 1, "role": "long-range energy placement and center-of-gravity teaching module", "interfaces": ["center pod", "payload bay", "cable guide"], "service_access": "CG rail must remain adjustable and visible"},
+    {"id": "old-009", "label": "mission payload bay insert", "qty": 1, "role": "non-weapon payload volume for interchangeable mission modules", "interfaces": ["center spine", "sensor bay", "service hatch"], "service_access": "payload insert must slide out without opening wing panels"},
+    {"id": "old-010", "label": "landing skid and display feet", "qty": 1, "role": "replaceable ground/display contact module", "interfaces": ["center pod underside", "wing root pads"], "service_access": "skid pads must be replaceable after wear"}
+  ],
+  "redesigned_bom": [
+    {"id": "new-001", "label": "integrated center spine and spar socket core", "qty": 1, "replaces": ["old-001 partial", "old-002 partial", "old-003 partial"], "printable_as": "PETG long center spine with keyed spar sockets, chine-like wing-body fairing, and visible datum marks", "service_access_preserved": ["spar center datum", "wing-root keys", "equipment bay opening", "mission layout labels"]},
+    {"id": "new-002", "label": "removable sensor nose and pitot boom module", "qty": 1, "replaces": ["old-006", "old-007 partial"], "printable_as": "PETG nose service module with clear PETG sensor window and removable boom socket", "service_access_preserved": ["sensor bay cover", "clear sensor window", "GPS/pitot boom replacement", "front cable inspection"]},
+    {"id": "new-003", "label": "slide-in mission payload and battery CG rail module", "qty": 1, "replaces": ["old-008", "old-009"], "printable_as": "PETG slide tray with mission payload insert, battery dummy rail, CG marks, and cable guide", "service_access_preserved": ["payload insert removal", "battery dummy removal", "CG rail adjustment", "cable guide inspection"]},
+    {"id": "new-004", "label": "serviceable propulsion-display and rear cable module", "qty": 1, "replaces": ["old-005"], "printable_as": "PETG non-functional rear propulsion display with removable mount and cable path labels", "service_access_preserved": ["propulsion display swap", "rear cable guide", "thrust-line label", "tail service access"]},
+    {"id": "new-005", "label": "replaceable wing, elevon, and skid service modules", "qty": 1, "replaces": ["old-003 partial", "old-004", "old-010"], "printable_as": "PETG wing-root/elevon modules with removable hinge covers and TPU skid pads", "service_access_preserved": ["elevon hinge covers", "servo pocket access", "wing rib readability", "replaceable skid pads"]}
+  ],
+  "integration_decisions": [
+    {"decision": "integrate center spine with spar sockets and wing-root keys", "expected_gain": "reduces spar alignment operations and makes the long-range wing datum easier to inspect", "guardrail": "spar center datum and anti-rotation keys remain visible"},
+    {"decision": "keep sensor nose as a removable service module", "expected_gain": "sensor bay and boom can be inspected or replaced after handling damage", "guardrail": "clear sensor window and boom socket remain external"},
+    {"decision": "combine mission payload tray with battery CG rail but keep both slide-in", "expected_gain": "teaches mission payload and energy placement relationship with fewer loose trays", "guardrail": "payload insert and battery dummy can be removed independently"},
+    {"decision": "keep rear propulsion display as a separate non-functional module", "expected_gain": "rear service and cable routing remain teachable without creating flight hardware", "guardrail": "module is labeled display-only"},
+    {"decision": "keep elevon hinges and skid pads replaceable", "expected_gain": "fragile control and ground-contact features remain serviceable", "guardrail": "hinge covers and skid sockets stay accessible"}
+  ],
+  "assembly_delta": {
+    "baseline_steps": 29,
+    "redesigned_steps": 15,
+    "removed_operations": ["align separate spar center brackets", "install loose mission bay labels", "remove wing panels to access payload tray", "open center pod to adjust CG rail", "replace full wing section after elevon hinge damage", "remove rear pod to inspect cable route"],
+    "retained_service_access_points": ["sensor bay cover", "clear sensor window", "removable GPS/pitot boom", "mission payload insert", "battery CG rail marks", "spar center datum", "wing-root alignment keys", "elevon hinge covers", "servo pocket covers", "propulsion-display module", "rear cable guide", "replaceable skid pads"]
+  },
+  "print_strategy": [
+    {"part_id": "new-001", "orientation": "center spine flat with spar sockets upward", "supports": "tree", "reason": "preserve long spar datum, wing-root keys, and chine-like fairing edges"},
+    {"part_id": "new-002", "orientation": "sensor nose on side with window frame upward", "supports": "min", "reason": "keep clear window frame and boom socket clean"},
+    {"part_id": "new-003", "orientation": "payload and CG tray flat with labels upward", "supports": "none", "reason": "protect slide rails, CG marks, and cable guide"},
+    {"part_id": "new-004", "orientation": "rear propulsion-display mount flat, cable channel upward", "supports": "min", "reason": "preserve rear service labels and replaceable mount features"},
+    {"part_id": "new-005", "orientation": "wing/elevon modules flat; TPU skid pads face-down", "supports": "min", "reason": "protect elevon hinge line, rib pockets, and replaceable skid geometry"}
+  ],
+  "assembly_sequence": [
+    "Print integrated center spine and spar socket core.",
+    "Print removable sensor nose and pitot boom module.",
+    "Print slide-in mission payload and battery CG rail module.",
+    "Print serviceable rear propulsion-display module.",
+    "Print replaceable wing/elevon modules and TPU skid pads.",
+    "Install spar dummy through center spine and verify datum labels.",
+    "Attach wing-root/elevon service modules to keyed spar sockets.",
+    "Insert mission payload tray and verify it slides out independently.",
+    "Insert battery dummy on CG rail and check CG marks remain visible.",
+    "Attach sensor nose module and clear sensor window.",
+    "Install GPS/pitot boom into removable nose socket.",
+    "Attach rear propulsion-display module and verify display-only label.",
+    "Clip TPU skid pads to underside sockets.",
+    "Check long-range layout readability from nose sensor to payload, battery, spar, elevon, and rear display.",
+    "Perform final service access check for sensor, payload, CG rail, spar, elevon, propulsion display, and skid pads."
+  ],
+  "schema_v6_blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-03T15:00:00+09:00",
+    "project": "Long-Range Recon Wing Redesign V1",
+    "object": "Long-range recon wing printable serviceability mockup",
+    "brief": {
+      "requirements": [
+        "Create a 3D-printable long-range recon wing educational mockup design package.",
+        "Reduce assembly steps while preserving sensor, payload, CG rail, spar, elevon, propulsion-display, and skid service access.",
+        "Preserve SR-71-like long-range mission layout readability without copying or weaponizing a real aircraft.",
+        "Prepare geometry intent for later STL generation, not flight hardware."
+      ],
+      "constraints": {"material": "PETG + clear PETG windows + TPU pads", "process": "FDM", "envelope_mm": [520, 260, 90], "min_wall_mm": 1.8, "min_channel_mm": 4, "overhang_deg": 45, "tol_mm": 0.3}
+    },
+    "part_tree": {
+      "id": "long-range-recon-wing-redesign-v1",
+      "name": "Long-range recon wing printable serviceability mockup",
+      "qty": 1,
+      "material": "PETG + clear PETG windows + TPU pads",
+      "process": "FDM",
+      "children": [
+        {"id": "new-001", "name": "integrated center spine and spar socket core", "qty": 1, "material": "PETG", "process": "FDM", "children": [
+          {"id": "f-center-spine", "name": "slender center spine", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+          {"id": "f-spar-socket", "name": "visible spar socket datum", "qty": 2, "material": "PETG", "process": "FDM", "children": []},
+          {"id": "f-chine-fairing", "name": "chine-like wing-body fairing", "qty": 2, "material": "PETG", "process": "FDM", "children": []}
+        ]},
+        {"id": "new-002", "name": "removable sensor nose and pitot boom module", "qty": 1, "material": "PETG + clear PETG", "process": "FDM", "children": [
+          {"id": "f-sensor-window", "name": "clear sensor window", "qty": 1, "material": "clear PETG", "process": "FDM", "children": []},
+          {"id": "f-boom-socket", "name": "removable GPS and pitot boom socket", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+        ]},
+        {"id": "new-003", "name": "slide-in mission payload and battery CG rail module", "qty": 1, "material": "PETG", "process": "FDM", "children": [
+          {"id": "f-payload-insert", "name": "non-weapon mission payload insert", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+          {"id": "f-cg-rail", "name": "battery CG rail with marks", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+          {"id": "f-cable-guide", "name": "visible cable guide", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+        ]},
+        {"id": "new-004", "name": "serviceable propulsion-display and rear cable module", "qty": 1, "material": "PETG", "process": "FDM", "children": [
+          {"id": "f-rear-display", "name": "non-functional rear propulsion display", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+          {"id": "f-rear-cable-channel", "name": "rear cable inspection channel", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+        ]},
+        {"id": "new-005", "name": "replaceable wing, elevon, and skid service modules", "qty": 1, "material": "PETG + TPU", "process": "FDM", "children": [
+          {"id": "f-wing-root-key", "name": "replaceable wing-root keys", "qty": 2, "material": "PETG", "process": "FDM", "children": []},
+          {"id": "f-elevon-hinge", "name": "elevon hinge service covers", "qty": 2, "material": "PETG", "process": "FDM", "children": []},
+          {"id": "f-skid-pad", "name": "replaceable TPU skid pads", "qty": 3, "material": "TPU", "process": "FDM", "children": []}
+        ]}
+      ]
+    },
+    "geometry_ops": [
+      {"id": "op-001", "op": "loft", "target": "f-center-spine", "args": {"sections": ["narrow_nose", "wide_center", "tapered_tail"], "length_mm": 310, "purpose": "slender long-range center body"}},
+      {"id": "op-002", "op": "shell", "target": "f-center-spine", "args": {"wall_mm": 1.8, "open_faces": ["top_service"], "purpose": "serviceable center spine"}},
+      {"id": "op-003", "op": "channel", "target": "f-spar-socket", "args": {"width_mm": 16, "depth_mm": 8, "count": 2, "purpose": "spar datum sockets"}},
+      {"id": "op-004", "op": "loft", "target": "f-chine-fairing", "args": {"sections": ["spine_side", "wing_root"], "count": 2, "purpose": "chine-like wing-body fairing"}},
+      {"id": "op-005", "op": "pocket", "target": "f-sensor-window", "args": {"size_mm": [34, 18], "purpose": "clear sensor window opening"}},
+      {"id": "op-006", "op": "cylinder", "target": "f-boom-socket", "args": {"diameter_mm": 8, "height_mm": 18, "purpose": "removable boom socket"}},
+      {"id": "op-007", "op": "box", "target": "f-payload-insert", "args": {"size_mm": [72, 32, 18], "purpose": "non-weapon slide-in mission payload insert"}},
+      {"id": "op-008", "op": "channel", "target": "f-cg-rail", "args": {"width_mm": 7, "depth_mm": 4, "purpose": "battery CG slide rail"}},
+      {"id": "op-009", "op": "engrave", "target": "f-cg-rail", "args": {"text": "CG 25 30 35", "depth_mm": 0.35}},
+      {"id": "op-010", "op": "channel", "target": "f-cable-guide", "args": {"width_mm": 5, "depth_mm": 3, "purpose": "visible payload and battery cable guide"}},
+      {"id": "op-011", "op": "box", "target": "f-rear-display", "args": {"size_mm": [48, 26, 22], "purpose": "non-functional propulsion-display module"}},
+      {"id": "op-012", "op": "channel", "target": "f-rear-cable-channel", "args": {"width_mm": 5, "depth_mm": 3, "purpose": "rear cable inspection"}},
+      {"id": "op-013", "op": "boss", "target": "f-wing-root-key", "args": {"size_mm": [30, 10, 6], "count": 2, "purpose": "wing-root alignment keys"}},
+      {"id": "op-014", "op": "box", "target": "f-elevon-hinge", "args": {"size_mm": [85, 8, 5], "qty": 2, "purpose": "elevon hinge service covers"}},
+      {"id": "op-015", "op": "pocket", "target": "f-elevon-hinge", "args": {"size_mm": [18, 5], "count": 4, "purpose": "servo pocket access marks"}},
+      {"id": "op-016", "op": "box", "target": "f-skid-pad", "args": {"size_mm": [28, 10, 7], "qty": 3, "purpose": "TPU skid pads"}},
+      {"id": "op-017", "op": "engrave", "target": "long-range-recon-wing-redesign-v1", "args": {"text": "RECON PAYLOAD MOCKUP - NON WEAPON", "depth_mm": 0.35}},
+      {"id": "op-018", "op": "chamfer", "target": "long-range-recon-wing-redesign-v1", "args": {"edges": "service module edges", "amount_mm": 0.6}},
+      {"id": "op-019", "op": "fillet", "target": "long-range-recon-wing-redesign-v1", "args": {"edges": "handled nose and wing-root corners", "radius_mm": 1.0}}
+    ],
+    "cad_brief": {
+      "name": "long_range_recon_wing_serviceability_redesign_v1",
+      "rev": "1.0",
+      "material": "PETG + clear PETG windows + TPU pads",
+      "envelope_mm": [520, 260, 90],
+      "build_direction": "center spine flat with spar sockets upward; payload tray flat; wing/elevon modules flat; sensor window upward",
+      "key_dims_mm": {"mockup_span": 520, "center_spine_length": 310, "payload_insert_count": 1, "elevon_hinge_cover_count": 2},
+      "wall_thickness_mm": {"min": 1.8, "typ": 2.0},
+      "tolerances_mm": {"payload_slide_clearance": 0.35, "cg_rail_clearance": 0.35, "boom_socket_clearance": 0.3},
+      "surface": {"Ra_um": 18, "post_process": "deburr spar sockets, payload slide, sensor window frame, and elevon hinge covers"},
+      "mass_est_g": 360
+    },
+    "verify": [
+      {"check": "existing and redesigned BOM both present in design package", "result": "pass", "value": "10 baseline groups, 5 redesigned groups", "rule": "long-range-recon-v1-package"},
+      {"check": "assembly steps explicitly reduced", "result": "pass", "value": "29 baseline steps to 15 redesigned steps", "rule": "long-range-recon-v1-serviceability"},
+      {"check": "sensor bay access retained", "result": "pass", "value": "removable nose module and clear sensor window", "rule": "long-range-recon-v1-sensor"},
+      {"check": "mission payload bay replacement retained", "result": "pass", "value": "non-weapon slide-in payload insert remains removable", "rule": "long-range-recon-v1-payload"},
+      {"check": "spar datum and wing-root alignment retained", "result": "pass", "value": "visible spar sockets and wing-root keys", "rule": "long-range-recon-v1-spar"},
+      {"check": "CG rail adjustment retained", "result": "pass", "value": "battery CG rail marks remain visible", "rule": "long-range-recon-v1-cg"},
+      {"check": "elevon hinge and propulsion module access retained", "result": "pass", "value": "elevon covers and rear display module remain replaceable", "rule": "long-range-recon-v1-controls"},
+      {"check": "long-range mission structure readability retained", "result": "pass", "value": "sensor, payload, battery, spar, elevon, and rear display layout is visible", "rule": "long-range-recon-v1-readability"}
+    ],
+    "risk": [
+      {"id": "R01", "desc": "Over-integration of payload, battery, or sensor modules into the center spine may block mission service access.", "mit": "Keep sensor nose, payload insert, and battery CG rail as removable service modules.", "severity": "high"},
+      {"id": "R02", "desc": "CG adjustment may be lost if the battery rail is closed inside the body.", "mit": "Use visible CG marks and a slide-in rail with clearance test.", "severity": "high"},
+      {"id": "R03", "desc": "Spar datum may be hidden if wing-root keys are merged into closed fairings.", "mit": "Expose spar socket datum and anti-rotation keys.", "severity": "high"},
+      {"id": "R04", "desc": "Elevon or propulsion-display service may be blocked if tail-edge modules are printed as one piece.", "mit": "Keep elevon hinge covers and rear display module replaceable.", "severity": "med"},
+      {"id": "R05", "desc": "Military or weaponized drift may occur if the payload bay is described as a release or weapon system.", "mit": "Label the bay as non-weapon mission payload and exclude operational or weapon details.", "severity": "high"}
+    ],
+    "print_profile": {
+      "printer": "FDM printer with 0.4mm nozzle",
+      "material": "PETG structural parts, clear PETG sensor window, TPU skid pads",
+      "layer_mm": 0.2,
+      "walls": 4,
+      "infill": "15% gyroid for spine and wing modules, 25% for spar socket core, 20% for payload tray",
+      "supports": "tree",
+      "orientation": "center spine flat with spar sockets upward; sensor window upward; payload tray flat; wing/elevon modules flat",
+      "est_time": "12-16h total prototype set",
+      "filament_g": 360
+    },
+    "slicer_job": {"tool": "prusaslicer", "input_stl": "output/long_range_recon_wing_serviceability_redesign_v1.stl", "output": "output/long_range_recon_wing_serviceability_redesign_v1.gcode", "args": ["--layer-height", "0.20", "--fill-density", "15%", "--support-material-auto"], "profile": "PETG_CLEARPETG_TPU_0.4mm_long_range_recon_mockup"}
+  },
+  "quality_scenarios": [
+    {"case": "payload bay fully integrated into center body reduces part count but mission module cannot be swapped", "expected": "fail", "reason": "mission payload serviceability is mandatory"},
+    {"case": "center spine and spar socket integrated while sensor, payload, and battery remain slide-in service modules", "expected": "pass", "reason": "assembly is simplified without hiding mission-service modules"},
+    {"case": "print is easy but CG rail and spar datum disappear", "expected": "risk", "reason": "long-range mission layout and structural datum readability must remain inspectable"}
+  ]
+}

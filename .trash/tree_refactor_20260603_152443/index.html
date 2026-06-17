@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>
+  body{margin:0;background:#0c1e35;min-height:100vh;font-family:'Inter','Noto Sans KR',system-ui,sans-serif;color:#e6ecf5;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .fadein{animation:fadein .35s ease}
+</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Home'),100);</script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+const OLLAMA = 'http://127.0.0.1:11434';
+
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79',
+  ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+  sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
+};
+
+function App() {
+  const [ollama, setOllama]   = useState('checking'); // checking | online | offline
+  const [models, setModels]   = useState([]);
+
+  useEffect(() => {
+    let alive = true;
+    const check = async () => {
+      try {
+        const r    = await fetch(`${OLLAMA}/api/tags`, { signal: AbortSignal.timeout(2500) });
+        const data = await r.json();
+        if (!alive) return;
+        setOllama('online');
+        setModels(data.models || []);
+      } catch {
+        if (alive) setOllama('offline');
+      }
+    };
+    check();
+    return () => { alive = false; };
+  }, []);
+
+  const ready = ollama === 'online' && models.length > 0;
+
+  return (
+    <div style={{ maxWidth:900, margin:'0 auto', padding:'52px 24px 80px' }}>
+
+      {/* ── 헤더 ── */}
+      <div style={{ marginBottom:40 }}>
+        <div className="mono" style={{ fontSize:11, color:C.halo, letterSpacing:'.16em', marginBottom:10 }}>
+          BLUEPRINT · NPU · v0.4
+        </div>
+        <h1 style={{ color:C.ink, fontSize:38, margin:'0 0 14px', fontWeight:700,
+                     letterSpacing:'-0.02em', lineHeight:1.15 }}>
+          로컬 AI 설계 어시스턴트<br/>
+          <span style={{ color:C.lox }}>3D 프린팅</span> 부품 설계·검토
+        </h1>
+        <p style={{ color:C.ink3, fontSize:15, margin:0, lineHeight:1.65, maxWidth:600 }}>
+          Brief 입력 → 3가지 설계안 생성 → 선택 → 선호도 저장.<br/>
+          Ollama 로컬 모델 사용 · 인터넷 불필요 · 데이터 외부 전송 없음.
+        </p>
+      </div>
+
+      {/* ── Ollama 상태 카드 ── */}
+      <div className="fadein" style={{ border:`1px solid ${ollama==='online'?C.inter:ollama==='offline'?C.risk:C.frame}`,
+                   padding:'18px 22px', marginBottom:28, background:C.canvas2,
+                   display:'flex', justifyContent:'space-between', alignItems:'center', gap:20 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          <span style={{ width:10, height:10, borderRadius:'50%',
+                         background: ollama==='online'?C.inter:ollama==='offline'?C.risk:C.ink3,
+                         boxShadow: ollama==='online'?`0 0 10px ${C.inter}`:
+                                    ollama==='offline'?`0 0 8px ${C.risk}`:'none',
+                         flexShrink:0 }}/>
+          <div>
+            <div className="mono" style={{ fontSize:11, color:C.ink3, letterSpacing:'.08em', marginBottom:3 }}>
+              OLLAMA · 127.0.0.1:11434
+            </div>
+            <div style={{ fontSize:14, color:C.ink, fontWeight:500 }}>
+              {ollama==='checking' && '연결 확인 중…'}
+              {ollama==='online'   && models.length === 0 && (
+                <span>온라인 · <span style={{color:C.lh2}}>모델 없음 — ollama pull qwen2.5:7b</span></span>
+              )}
+              {ollama==='online'   && models.length > 0 && (
+                <span>온라인 · <span style={{color:C.inter}}>{models.length}개 모델</span>
+                  <span style={{color:C.ink3, fontSize:12, marginLeft:10}}>
+                    {models.slice(0,3).map(m=>m.name).join(' · ')}{models.length>3?` +${models.length-3}`:''}
+                  </span>
+                </span>
+              )}
+              {ollama==='offline'  && (
+                <span style={{color:C.risk}}>오프라인 · start.bat 실행 후 새로고침</span>
+              )}
+            </div>
+          </div>
+        </div>
+        {ollama==='offline' && (
+          <div className="mono" style={{fontSize:10, color:C.risk, textAlign:'right', lineHeight:1.6}}>
+            C:\Ollama-IPEX\start-ollama.bat<br/>또는 start.bat
+          </div>
+        )}
+      </div>
+
+      {/* ── 생산 항목 버튼 3개 ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:12, marginBottom:40 }}>
+
+        {/* 설계·생성 — 메인 */}
+        <a href="Minimal.html"
+          style={{ display:'flex', flexDirection:'column', justifyContent:'space-between',
+                   textDecoration:'none', padding:'22px 24px',
+                   background: ready ? 'rgba(159,211,255,0.07)' : C.canvas2,
+                   border:`1.5px solid ${ready ? C.lox : C.frame}`,
+                   transition:'border-color .15s', position:'relative' }}
+          onMouseEnter={e=>e.currentTarget.style.borderColor=C.lox}
+          onMouseLeave={e=>e.currentTarget.style.borderColor=ready?C.lox:C.frame}>
+          <div>
+            <div className="mono" style={{fontSize:10,color:C.lox,letterSpacing:'.14em',marginBottom:10}}>
+              ◈ 설계·생성
+            </div>
+            <div style={{color:C.ink,fontSize:20,fontWeight:700,marginBottom:8}}>
+              Brief → 생성 → 선택
+            </div>
+            <div style={{color:C.ink3,fontSize:13,lineHeight:1.55}}>
+              설계 요청 입력 → Ollama가 3가지 변형안 생성 → 최적안 선택 → 선호도 저장
+            </div>
+          </div>
+          <div style={{marginTop:16,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <span className="mono"
+              style={{fontSize:11,padding:'6px 14px',
+                      background: ready ? C.lox : C.frame,
+                      color: ready ? C.canvas : C.ink3,
+                      fontWeight:700}}>
+              {ready ? '▶ 바로 시작' : '모델 필요'}
+            </span>
+            <span className="mono" style={{fontSize:10,color:C.ink3}}>Minimal.html</span>
+          </div>
+        </a>
+
+        {/* 모델 */}
+        <a href="Setup.html"
+          style={{display:'flex',flexDirection:'column',textDecoration:'none',padding:'22px 20px',
+                  background:C.canvas2,border:`1px solid ${C.frame}`,transition:'border-color .15s'}}
+          onMouseEnter={e=>e.currentTarget.style.borderColor=C.inter}
+          onMouseLeave={e=>e.currentTarget.style.borderColor=C.frame}>
+          <div className="mono" style={{fontSize:10,color:C.inter,letterSpacing:'.14em',marginBottom:10}}>◉ 모델</div>
+          <div style={{color:C.ink,fontSize:16,fontWeight:600,marginBottom:6}}>모델 관리</div>
+          <div style={{color:C.ink3,fontSize:12,lineHeight:1.5,flex:1}}>
+            Ollama 상태 확인·설치된 모델 목록·스모크 테스트
+          </div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:14}}>
+            {ollama==='online' ? `${models.length}개 설치됨` : '—'}
+          </div>
+        </a>
+
+        {/* 학습 */}
+        <a href="Learning.html"
+          style={{display:'flex',flexDirection:'column',textDecoration:'none',padding:'22px 20px',
+                  background:C.canvas2,border:`1px solid ${C.frame}`,transition:'border-color .15s'}}
+          onMouseEnter={e=>e.currentTarget.style.borderColor=C.halo}
+          onMouseLeave={e=>e.currentTarget.style.borderColor=C.frame}>
+          <div className="mono" style={{fontSize:10,color:C.halo,letterSpacing:'.14em',marginBottom:10}}>◎ 학습</div>
+          <div style={{color:C.ink,fontSize:16,fontWeight:600,marginBottom:6}}>학습·파인튜닝</div>
+          <div style={{color:C.ink3,fontSize:12,lineHeight:1.5,flex:1}}>
+            모델 동작 원리·파인튜닝 가이드·Modelfile 작성법
+          </div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:14}}>Learning.html</div>
+        </a>
+
+      </div>
+
+      {/* ── 참고 문서 (접힌 형태) ── */}
+      <details style={{border:`1px solid ${C.frame}`,background:C.canvas2}}>
+        <summary style={{padding:'14px 20px',cursor:'pointer',display:'flex',
+                         alignItems:'center',justifyContent:'space-between',listStyle:'none'}}>
+          <div>
+            <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em'}}>
+              ≡ 참고 문서
+            </span>
+            <span style={{fontSize:12,color:C.ink3,marginLeft:12}}>
+              Assembly · Materials · FMEA · CFD · Loads · Risk 등 18개 페이지
+            </span>
+          </div>
+          <span className="mono" style={{fontSize:10,color:C.ink3}}>▼</span>
+        </summary>
+        <div style={{padding:'16px 20px',borderTop:`1px solid ${C.frame}`}}>
+          {[
+            { group:'STRUCTURE', color:C.lox,   pages:[['Assembly','Assembly.html'],['Joints','Joints.html'],['Mass','Mass.html']] },
+            { group:'MATERIAL',  color:C.inter,  pages:[['Materials','Materials.html'],['Queue','PrintQueue.html'],['Inspect','Inspection.html'],['Supply','Supply.html']] },
+            { group:'ANALYSIS',  color:C.lh2,   pages:[['Loads','Loads.html'],['Thermal','Thermal.html'],['CFD','CFD.html'],['Test','Test.html'],['FMEA','FMEA.html']] },
+            { group:'OPS',       color:C.halo,  pages:[['Lineage','Lineage.html'],['Ops','Ops.html'],['ECN','ECN.html'],['ICD','ICD.html']] },
+            { group:'PROGRAM',   color:C.risk,  pages:[['Schedule','Schedule.html'],['Risk','Risk.html']] },
+          ].map(g=>(
+            <div key={g.group} style={{marginBottom:14}}>
+              <div className="mono" style={{fontSize:9,color:g.color,letterSpacing:'.14em',marginBottom:6}}>
+                {g.group}
+              </div>
+              <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+                {g.pages.map(([label,href])=>(
+                  <a key={href} href={href}
+                    style={{fontFamily:C.mono,fontSize:11,color:C.ink2,textDecoration:'none',
+                            padding:'4px 10px',border:`1px solid ${C.frame}`,background:C.canvas,
+                            letterSpacing:'.04em'}}
+                    onMouseEnter={e=>{e.currentTarget.style.borderColor=g.color;e.currentTarget.style.color=g.color;}}
+                    onMouseLeave={e=>{e.currentTarget.style.borderColor=C.frame;e.currentTarget.style.color=C.ink2;}}>
+                    {label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </details>
+
+      {/* ── 푸터 ── */}
+      <div style={{borderTop:`1px solid ${C.frame}`,marginTop:40,paddingTop:14,
+                   fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',
+                   display:'flex',justifyContent:'space-between'}}>
+        <span>github.com/Han-think/Blueprint_npu_portable</span>
+        <span>ollama · 127.0.0.1:11434 · local · offline</span>
+      </div>
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

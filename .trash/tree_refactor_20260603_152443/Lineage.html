@@ -1,0 +1,197 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Lineage · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Lineage'),100);</script>
+<script type="text/babel">
+const {useState}=React;
+const C={canvas:'#0c1e35',canvas2:'#0a1a2f',canvas3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#ff9fc6',risk:'#ff8c8c'};
+
+const REVS = [
+  {id:'V1.0',  parent:null,    x:80,  y:60,  status:'archived',  date:'2026-01-12', author:'NPU-base',
+   changes:['Initial decomposition · 15 parts','LOX/CH4 tanks PA-CF','Combustion chamber GRCop-42'],
+   fai:{passed:13, total:15, reject:['P7 witness line','P10 flatness 0.08>0.05']}, hot:false},
+  {id:'V1.1',  parent:'V1.0',  x:240, y:60,  status:'archived',  date:'2026-02-03', author:'NPU-ft-1',
+   changes:['P7 reprinted on M5 (Velo3D)','P10 added CNC finish stage','Datum B re-defined'],
+   fai:{passed:15, total:15, reject:[]}, hot:false},
+  {id:'V1.2',  parent:'V1.1',  x:400, y:60,  status:'active',    date:'2026-04-18', author:'NPU-ft-2',
+   changes:['Nozzle P9 redesigned: bell → aerospike','Throat diameter 24→22 mm','Cooling channel rev'],
+   fai:{passed:15, total:15, reject:[]}, hot:true},
+  {id:'V1.1-b',parent:'V1.1',  x:240, y:200, status:'branch',    date:'2026-03-09', author:'NPU-ft-1',
+   changes:['Methalox → LH2/LOX swap','LOX dome thicker (40→48 mm)','Materials unchanged'],
+   fai:{passed:14, total:15, reject:['P5 leak @ 12 bar']}, hot:false},
+  {id:'V2.0',  parent:'V1.2',  x:580, y:60,  status:'proposed',  date:'2026-05-?',  author:'NPU-ft-2',
+   changes:['Scale 1/8 → 1/4','Migrate to staged combustion','TBD: turbopump integration'],
+   fai:null, hot:false},
+];
+
+const SERIALS = [
+  {sn:'BP-V1.2-P7-A0042', part:'P7 Combustion chamber',  rev:'V1.2', machine:'M5 Velo3D',  build:'2026-04-22', lot:'GRCop42-LOT-2604', hip:'HIP-2026-058', coc:true, fai:true},
+  {sn:'BP-V1.2-P7-A0043', part:'P7 Combustion chamber',  rev:'V1.2', machine:'M5 Velo3D',  build:'2026-04-23', lot:'GRCop42-LOT-2604', hip:'HIP-2026-059', coc:true, fai:true},
+  {sn:'BP-V1.2-P8-A0011', part:'P8 Injector head',       rev:'V1.2', machine:'M4 EOS M290',build:'2026-04-24', lot:'IN718-LOT-2611',   hip:'HIP-2026-060', coc:true, fai:true},
+  {sn:'BP-V1.2-P9-A0007', part:'P9 Nozzle (aerospike)',  rev:'V1.2', machine:'M4 EOS M290',build:'2026-04-25', lot:'IN625-LOT-2615',   hip:'HIP-2026-061', coc:true, fai:false},
+  {sn:'BP-V1.2-P10-A0019',part:'P10 Gimbal ring',        rev:'V1.2', machine:'M4 EOS M290',build:'2026-04-26', lot:'Ti64-LOT-2620',    hip:'HIP-2026-062', coc:true, fai:true},
+  {sn:'BP-V1.1-P7-A0038', part:'P7 Combustion chamber',  rev:'V1.1', machine:'M5 Velo3D',  build:'2026-02-12', lot:'GRCop42-LOT-2511', hip:'HIP-2026-031', coc:true, fai:true},
+];
+
+function colorOf(s){return s==='active'?C.inter:s==='proposed'?C.lh2:s==='branch'?C.halo:C.ink3;}
+
+function App(){
+  const [sel,setSel]=useState('V1.2');
+  const [filter,setFilter]=useState('all');
+  const node = REVS.find(r=>r.id===sel);
+  const shown = filter==='all' ? SERIALS : SERIALS.filter(s=>s.rev===filter);
+
+  return (
+    <div style={{maxWidth:1300,margin:'0 auto',padding:'24px 28px 80px'}}>
+      <div style={{borderBottom:`1px solid ${C.frame}`,paddingBottom:18,marginBottom:22}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.2em',marginBottom:6}}>BLUEPRINT NPU · DESIGN LINEAGE & TRACEABILITY · v0.5</div>
+        <div style={{fontSize:34,fontWeight:500,letterSpacing:'-.02em',marginBottom:8}}>What version flew · who signed off</div>
+        <div style={{fontSize:13,color:C.ink2,maxWidth:880,lineHeight:1.55}}>
+          Each design revision branches from a parent; each physical part has a serial number tied to its rev, material lot, HIP cycle,
+          and AS9100 sign-off. If something fails, the trace is one query: <span className="mono" style={{color:C.lox}}>serial → rev → lot → machine → operator</span>.
+        </div>
+      </div>
+
+      {/* TREE */}
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18,marginBottom:14}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:14}}>REVISION TREE</div>
+        <svg viewBox="0 0 720 280" style={{width:'100%',display:'block'}}>
+          {/* edges */}
+          {REVS.filter(r=>r.parent).map(r=>{
+            const p = REVS.find(x=>x.id===r.parent);
+            return <path key={r.id} d={`M${p.x+60} ${p.y+18} C ${(p.x+r.x)/2+30} ${p.y+18}, ${(p.x+r.x)/2+30} ${r.y+18}, ${r.x} ${r.y+18}`}
+              stroke={C.frame} strokeWidth="1.2" fill="none"/>;
+          })}
+          {/* nodes */}
+          {REVS.map(r=>{
+            const col = colorOf(r.status);
+            const isSel = r.id===sel;
+            return (
+              <g key={r.id} transform={`translate(${r.x},${r.y})`} onClick={()=>setSel(r.id)} style={{cursor:'pointer'}}>
+                <rect x="0" y="0" width="130" height="56" fill={isSel?col:C.canvas3} fillOpacity={isSel?0.25:1}
+                      stroke={col} strokeWidth={isSel?1.8:1}/>
+                <text x="10" y="20" fill={col} fontSize="13" fontFamily="JetBrains Mono" fontWeight="600">{r.id}</text>
+                <text x="10" y="36" fill={C.ink2} fontSize="9.5" fontFamily="JetBrains Mono">{r.date}</text>
+                <text x="10" y="50" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" letterSpacing=".06em">{r.status.toUpperCase()}</text>
+                {r.hot && <circle cx="120" cy="12" r="4" fill={C.inter}/>}
+              </g>
+            );
+          })}
+          {/* legend */}
+          <g transform="translate(80,250)" fontFamily="JetBrains Mono" fontSize="9">
+            {[['active',C.inter],['archived',C.ink3],['branch',C.halo],['proposed',C.lh2]].map(([t,col],i)=>(
+              <g key={t} transform={`translate(${i*110},0)`}>
+                <rect x="0" y="-9" width="10" height="10" fill={col}/>
+                <text x="16" y="0" fill={C.ink2}>{t}</text>
+              </g>
+            ))}
+          </g>
+        </svg>
+      </div>
+
+      {/* DETAIL + FAI */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:14}}>
+        <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+          <div className="mono" style={{fontSize:10,color:colorOf(node.status),letterSpacing:'.16em',marginBottom:10}}>{node.id} · {node.status.toUpperCase()}</div>
+          <div style={{fontSize:22,fontWeight:500,marginBottom:12}}>{node.author} · {node.date}</div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>CHANGES FROM PARENT</div>
+          <ul style={{margin:0,paddingLeft:18,fontSize:12,color:C.ink2,lineHeight:1.7}}>
+            {node.changes.map((c,i)=><li key={i}>{c}</li>)}
+          </ul>
+          {node.parent && (
+            <div style={{marginTop:14,fontSize:11,color:C.ink3,fontFamily:"'JetBrains Mono',monospace"}}>
+              parent: <span style={{color:C.lox,cursor:'pointer'}} onClick={()=>setSel(node.parent)}>{node.parent}</span>
+            </div>
+          )}
+        </div>
+
+        <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:10}}>FIRST ARTICLE INSPECTION · AS9102</div>
+          {node.fai ? (
+            <>
+              <div style={{display:'flex',gap:16,alignItems:'baseline',marginBottom:14}}>
+                <div style={{fontSize:42,fontWeight:500,color:node.fai.reject.length?C.risk:C.inter,lineHeight:1}}>
+                  {node.fai.passed}<span style={{color:C.ink3,fontSize:22}}>/{node.fai.total}</span>
+                </div>
+                <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.1em'}}>PARTS PASSED FAI</div>
+              </div>
+              {node.fai.reject.length ? (
+                <>
+                  <div className="mono" style={{fontSize:10,color:C.risk,letterSpacing:'.08em',marginBottom:6}}>REJECTS</div>
+                  <ul style={{margin:0,paddingLeft:18,fontSize:11.5,color:C.ink2,lineHeight:1.7}}>
+                    {node.fai.reject.map((r,i)=><li key={i}>{r}</li>)}
+                  </ul>
+                </>
+              ) : (
+                <div className="mono" style={{fontSize:11.5,color:C.inter}}>✓ All parts conform to GD&T spec · CoC issued</div>
+              )}
+            </>
+          ) : (
+            <div className="mono" style={{fontSize:11.5,color:C.lh2}}>FAI pending · proposed rev not yet built</div>
+          )}
+        </div>
+      </div>
+
+      {/* SERIAL LEDGER */}
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em'}}>SERIAL LEDGER · {shown.length}/{SERIALS.length} parts</div>
+          <div style={{display:'flex',gap:6}}>
+            {['all','V1.2','V1.1'].map(k=>(
+              <button key={k} onClick={()=>setFilter(k)} style={{
+                cursor:'pointer',background:filter===k?C.lox:'transparent',color:filter===k?C.canvas:C.ink,
+                border:`1px solid ${filter===k?C.lox:C.frame}`,padding:'5px 10px',fontFamily:"'JetBrains Mono',monospace",fontSize:10,letterSpacing:'.06em'}}>
+                {k}
+              </button>
+            ))}
+          </div>
+        </div>
+        <table style={{width:'100%',borderCollapse:'collapse',fontSize:11}}>
+          <thead><tr style={{color:C.ink3}} className="mono">
+            {['SERIAL','PART','REV','MACHINE','BUILD DATE','MATERIAL LOT','HIP CYCLE','CoC','FAI'].map(h=>(
+              <th key={h} style={{textAlign:'left',padding:'6px 8px',borderBottom:`1px solid ${C.frame}`,letterSpacing:'.06em'}}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody className="mono">
+            {shown.map(s=>(
+              <tr key={s.sn} style={{color:C.ink2,borderBottom:`1px dashed #1a3458`}}>
+                <td style={{padding:'7px 8px',color:C.lox}}>{s.sn}</td>
+                <td style={{padding:'7px 8px'}}>{s.part}</td>
+                <td style={{padding:'7px 8px',color:colorOf(REVS.find(r=>r.id===s.rev)?.status||'archived')}}>{s.rev}</td>
+                <td style={{padding:'7px 8px'}}>{s.machine}</td>
+                <td style={{padding:'7px 8px'}}>{s.build}</td>
+                <td style={{padding:'7px 8px',fontSize:10}}>{s.lot}</td>
+                <td style={{padding:'7px 8px',fontSize:10}}>{s.hip}</td>
+                <td style={{padding:'7px 8px',color:s.coc?C.inter:C.risk}}>{s.coc?'✓':'✗'}</td>
+                <td style={{padding:'7px 8px',color:s.fai?C.inter:C.risk}}>{s.fai?'✓':'✗ hold'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18,marginTop:14}}>
+        <div className="mono" style={{fontSize:10,color:C.halo,letterSpacing:'.16em',marginBottom:12}}>SCHEMA · lineage.v0.5 · ledger entry</div>
+        <pre className="mono" style={{margin:0,fontSize:10.5,lineHeight:1.6,color:C.ink2,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{`{
+  "schema": "lineage.v0.5",
+  "serial": "BP-V1.2-P7-A0042",
+  "part": "P7",  "rev": "V1.2",  "parent_rev": "V1.1",
+  "build": { "machine": "M5", "date": "2026-04-22", "operator": "ej-park", "lot": "GRCop42-LOT-2604" },
+  "post": { "hip_cycle": "HIP-2026-058", "heat_treat": "aged-980C-1h", "cnc": "5ax-op-114" },
+  "qa":   { "coc": true, "fai": true, "cmm_report": "scans/V12-P7-A0042.csv" },
+  "traces_to": ["assembly.v0.5#V1.2", "joints.v0.5#J6"]
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script></body></html>

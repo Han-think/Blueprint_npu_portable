@@ -1,0 +1,100 @@
+{
+  "schema": "blueprint_print_assembly_manifest_v1",
+  "seed": "cubesat",
+  "process": "FDM",
+  "print_fit_defaults": {
+    "default_clearance_mm": 0.25,
+    "hole_compensation_mm": 0.15
+  },
+  "safety_note": "EDUCATIONAL DISPLAY MOCKUP — non-functional; do not treat as flight/operational hardware.",
+  "print_first": {
+    "file": "fit_test_coupon.stl",
+    "purpose": "pin Ø6 + holes at clearances [0.25] mm — confirm which clearance fits your printer before printing parts"
+  },
+  "parts": [
+    {
+      "part_id": "new-001_seg1",
+      "label": "Spine (seg1)",
+      "file": "new-001_seg1_spine.stl",
+      "print_count": 1,
+      "bbox_mm": [
+        95.8,
+        95.8,
+        150.0
+      ],
+      "volume_mm3": 1374580.0,
+      "applied_clearance_mm": 0.25,
+      "orientation": "bottom face on bed (as exported)",
+      "segment_of": "new-001"
+    },
+    {
+      "part_id": "new-001_seg2",
+      "label": "Spine (seg2)",
+      "file": "new-001_seg2_spine.stl",
+      "print_count": 1,
+      "bbox_mm": [
+        95.8,
+        95.8,
+        150.0
+      ],
+      "volume_mm3": 1374580.0,
+      "applied_clearance_mm": 0.25,
+      "orientation": "bottom face on bed (as exported)",
+      "segment_of": "new-001"
+    },
+    {
+      "part_id": "new-002",
+      "label": "Board",
+      "file": "new-002_board.stl",
+      "print_count": 1,
+      "bbox_mm": [
+        70.0,
+        18.0,
+        120.0
+      ],
+      "volume_mm3": 151200.0,
+      "applied_clearance_mm": 0.0,
+      "orientation": "bottom face on bed (as exported)"
+    }
+  ],
+  "joints": [
+    {
+      "id": "J1",
+      "male_part": "new-001",
+      "female_part": "new-002",
+      "mate": "slide",
+      "clearance_mm": 0.25,
+      "containment": false,
+      "note": "slide: shelf"
+    },
+    {
+      "id": "SEG-new-001-1",
+      "male_part": "new-001_seg1",
+      "female_part": "new-001_seg2",
+      "mate": "alignment_key",
+      "clearance_mm": 0.2,
+      "note": "print-segmentation coupler: 4× 6.0mm corner alignment keys join new-001 segments along axis Z"
+    }
+  ],
+  "fasteners": [],
+  "hardware_bom": [
+    {
+      "standard": "alignment key 6mm",
+      "qty": 4
+    }
+  ],
+  "segmentation": [
+    {
+      "part_id": "new-001",
+      "axis": "Z",
+      "segments": 2,
+      "segment_len_mm": 150.0,
+      "key_size_mm": 6.0
+    }
+  ],
+  "assembly_order": [
+    "J1: new-001 → new-002 (slide)",
+    "SEG-new-001-1: new-001_seg1 → new-001_seg2 (alignment_key)"
+  ],
+  "warnings": []
+}

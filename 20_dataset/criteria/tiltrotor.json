@@ -1,0 +1,40 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "tiltrotor",
+  "title": "Tiltrotor VTOL Criteria",
+  "applies_to": ["tiltrotor"],
+  "criteria": [
+    {
+      "criterion": "tilt_axis_readability",
+      "weight": 14,
+      "good": "Tilt axis, bearing seats, servo/linkage access, and nacelle rotation clearance are visible.",
+      "bad": "Nacelle is a generic motor pod without tilt-axis evidence.",
+      "signals": ["tilt axis", "bearing", "servo", "linkage", "nacelle"],
+      "loop_feedback": "Add tilt-axis bearing seats, servo linkage cover, rotation clearance arc, and nacelle interface datums."
+    },
+    {
+      "criterion": "wing_fuselage_interface",
+      "weight": 10,
+      "good": "Wing spar socket, fuselage spine, and payload/battery service paths are separate and inspectable.",
+      "bad": "Wing/fuselage is a blended block with no interface features.",
+      "signals": ["wing spar", "fuselage spine", "socket", "payload bay", "battery bay"],
+      "loop_feedback": "Expose wing spar sockets, fuselage spine datum, payload bay, and slide-in battery service feature."
+    },
+    {
+      "criterion": "safe_mock_vtol_boundary",
+      "weight": 9,
+      "good": "Output remains educational mockup, avoiding operational flight tuning or control-law details.",
+      "bad": "Design claims BVLOS capability, flight readiness, or actionable aircraft tuning.",
+      "signals": ["educational mock", "display-only", "design-review evidence"],
+      "loop_feedback": "Frame VTOL features as educational mock assembly evidence, not flight-qualified or operational design."
+    },
+    {
+      "criterion": "nacelle_load_and_service_path",
+      "weight": 10,
+      "good": "Tilt mechanism loads route through bearing seats into wing structure via named fittings, and motor/servo modules remain replaceable through access covers.",
+      "bad": "Nacelle attaches by an undefined blend; motor and servo are entombed with no removal path or load fitting.",
+      "signals": ["bearing_seat", "fitting", "access_cover", "replaceable_motor", "load_path"],
+      "loop_feedback": "Add named tilt-bearing fittings into the wing spar path and removable motor/servo covers on each nacelle."
+    }
+  ]
+}

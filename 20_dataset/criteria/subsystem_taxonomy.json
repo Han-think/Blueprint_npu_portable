@@ -1,0 +1,93 @@
+{
+  "schema": "blueprint_subsystem_taxonomy_v1",
+  "purpose": "Per-seed decomposition into engineering-discipline subsystems. A generated design is complete only when every required subsystem appears in part_tree with its evidence_features, and each subsystem is judged by its linked criteria.",
+  "disciplines": {
+    "structures": "Load-bearing geometry, frames, spars, skins, joints, stiffness",
+    "mechanisms": "Linkages, hinges, gears, cams, deployment, tilt/rotation devices",
+    "actuation": "Motors, servos, brakes, reducers and their mounting/replacement",
+    "power": "Battery, solar generation, charging, distribution, connectors",
+    "electronics": "Boards, drivers, wiring, signal routing, grounding",
+    "comms": "Antennas, radios, data links and their placement/clearance",
+    "gnc": "Attitude/position sensing and control hardware evidence (mock level)",
+    "thermal": "Heat paths, radiators, vents, thermal isolation notes",
+    "payload": "Mission equipment bay, sensor mounts, removable inserts",
+    "human_factors": "Wearability, ergonomics, don/doff, comfort, safety contact",
+    "recovery_deployment": "Parachutes, deployables, release mechanisms (display-level)",
+    "integration": "Datums, interfaces, harness routing, service access, assembly order"
+  },
+  "seeds": {
+    "cubesat": {
+      "required_subsystems": [
+        {"id": "structure_rails", "discipline": "structures", "function": "3U frame, deployer rails, board stack support", "evidence_features": ["rail", "standoff", "PC/104 stack", "corner_post"], "criteria_refs": ["cubesat", "geometry_grounding", "datum_tolerance"]},
+        {"id": "eps_solar_charging", "discipline": "power", "function": "Solar panel dummies, battery tray, charge/distribution board", "evidence_features": ["solar_panel_face", "battery_tray", "eps_board_slot", "power_connector"], "criteria_refs": ["service_access", "electronics_routing"]},
+        {"id": "comms_antenna", "discipline": "comms", "function": "Antenna deployer (tape-spring dummy ok), radio board slot, RF connector path", "evidence_features": ["antenna_slot", "antenna_deployer", "tape_spring", "deploy_hinge", "radio_board", "rf_connector"], "criteria_refs": ["electronics_routing", "service_access"]},
+        {"id": "adcs", "discipline": "gnc", "function": "Attitude control evidence: reaction wheel/magnetorquer dummies, star tracker mount, sun sensor windows", "evidence_features": ["reaction_wheel_dummy", "magnetorquer_rod", "sensor_window", "star_tracker_mount", "baffle_shield"], "criteria_refs": ["geometry_grounding", "mrl05_readiness"]},
+        {"id": "cdh_avionics", "discipline": "electronics", "function": "On-board computer stack, harness between boards", "evidence_features": ["obc_board", "stack_harness", "debug_port_access"], "criteria_refs": ["electronics_routing", "service_access"]},
+        {"id": "thermal_path", "discipline": "thermal", "function": "Radiator face or thermal strap note from battery/OBC to structure", "evidence_features": ["radiator_face", "thermal_strap_note", "vent_hole"], "criteria_refs": ["mrl05_readiness"]},
+        {"id": "payload_bay", "discipline": "payload", "function": "Removable payload module: optics bench, focal plane, thermal baffles, inspection window", "evidence_features": ["payload_tray", "inspection_window", "optics_bench", "focal_plane", "lens_mount"], "criteria_refs": ["cubesat", "service_access"]},
+        {"id": "deployment_mechs", "discipline": "recovery_deployment", "function": "Antenna/panel deployment hinges, separation spring plate, pod pusher contacts, release dummies (display-level)", "evidence_features": ["deploy_hinge", "release_pin_dummy", "burn_wire_note", "separation_spring_plate", "pusher_contact", "kill_switch_arm"], "criteria_refs": ["geometry_grounding", "small_launch_vehicle_mock_boundary"]},
+        {"id": "propulsion_mock", "discipline": "actuation", "function": "Cold gas thruster bracket dummies and plumbing manifold mock (display-only, non-functional)", "evidence_features": ["thruster_bracket", "cold_gas_nozzle_dummy", "plumbing_manifold", "cross_pattern_mount"], "criteria_refs": ["geometry_grounding", "small_launch_vehicle_mock_boundary", "datum_tolerance"]},
+        {"id": "integration_harness", "discipline": "integration", "function": "Inter-board harness routing, connectors, assembly datums, connection types and load-path closure", "evidence_features": ["harness_channel", "connector_keying", "assembly_datum"], "criteria_refs": ["service_access", "datum_tolerance", "mrl05_readiness", "assembly_integration"]}
+      ]
+    },
+    "long_range_recon_wing": {
+      "required_subsystems": [
+        {"id": "aero_surfaces", "discipline": "structures", "function": "Wing planform, airfoil section evidence, winglets, elevon/control surface cutouts with hinges", "evidence_features": ["airfoil_section", "control_surface_cutout", "hinge_line", "winglet", "elevon"], "criteria_refs": ["uav_wing", "geometry_grounding"]},
+        {"id": "primary_structure", "discipline": "structures", "function": "Main spar, ribs, carry-through, fuselage frames; continuous load path", "evidence_features": ["spar_socket", "main_spar", "anti_rotation_key", "rib", "carry_through", "frame"], "criteria_refs": ["uav_wing", "datum_tolerance"]},
+        {"id": "propulsion_mount", "discipline": "actuation", "function": "Motor pod / pusher prop mount dummy with bolt pattern and cooling path (non-operational)", "evidence_features": ["motor_mount", "bolt_circle", "cooling_inlet", "pusher_prop", "motor_pod"], "criteria_refs": ["common_dfm", "mrl05_readiness"]},
+        {"id": "power_battery", "discipline": "power", "function": "Slide-in li-ion battery pack bay on CG rail, BMS and connector access", "evidence_features": ["battery_bay", "li_ion_pack", "bms_access", "xt60_connector", "cg_rail_marks", "power_connector"], "criteria_refs": ["uav_wing", "service_access"]},
+        {"id": "avionics_comms", "discipline": "comms", "function": "GPS, pitot boom, receiver/telemetry boards, antenna routing away from power leads", "evidence_features": ["avionics_tray", "antenna_channel", "signal_separation", "gps_mount", "pitot_boom", "telemetry_board"], "criteria_refs": ["electronics_routing", "service_access"]},
+        {"id": "recon_payload", "discipline": "payload", "function": "Non-weapon camera/gimbal sensor pod bay with removable insert and window", "evidence_features": ["sensor_bay", "payload_insert", "window", "camera_pod", "gimbal_mount"], "criteria_refs": ["uav_wing"]},
+        {"id": "control_actuation", "discipline": "mechanisms", "function": "Servo pockets, control horns, pushrod/linkage channels", "evidence_features": ["servo_pocket", "control_horn", "pushrod_channel"], "criteria_refs": ["geometry_grounding", "service_access"]},
+        {"id": "integration_service", "discipline": "integration", "function": "Wing/fuselage datums, harness raceways, hatch access, connection types and load-path closure", "evidence_features": ["assembly_datum", "harness_raceway", "service_hatch"], "criteria_refs": ["datum_tolerance", "service_access", "mrl05_readiness", "assembly_integration"]}
+      ]
+    },
+    "tiltrotor": {
+      "required_subsystems": [
+        {"id": "tilt_mechanism", "discipline": "mechanisms", "function": "Tilt axis with bearing seats, servo linkage, rotation clearance arc", "evidence_features": ["tilt_axis", "bearing_seat", "servo_linkage", "clearance_arc"], "criteria_refs": ["tiltrotor", "geometry_grounding"]},
+        {"id": "nacelle_propulsion", "discipline": "actuation", "function": "Motor pod with replaceable motor module and access cover", "evidence_features": ["motor_module", "access_cover", "bolt_pattern"], "criteria_refs": ["tiltrotor", "service_access"]},
+        {"id": "wing_structure", "discipline": "structures", "function": "Wing spar carrying nacelle loads into fuselage spine; V-tail/ruddervator and landing gear attach structure", "evidence_features": ["wing_spar", "spar_socket", "fuselage_spine", "v_tail", "ruddervator", "stabilizer", "landing_gear_mount", "gear_leg"], "criteria_refs": ["tiltrotor", "uav_wing", "datum_tolerance"]},
+        {"id": "power_battery", "discipline": "power", "function": "Slide-in li-ion battery pack bay with CG adjustment, BMS and connector access", "evidence_features": ["battery_bay", "li_ion_pack", "bms_access", "cg_marks", "connector_access"], "criteria_refs": ["service_access"]},
+        {"id": "flight_electronics", "discipline": "electronics", "function": "Flight controller/autopilot tray, telemetry and VTX modules, motor power vs signal wire separation across tilt joint", "evidence_features": ["controller_tray", "flight_controller", "autopilot_board", "firmware_board", "gps_module", "barometer", "servo_rail", "telemetry_module", "vtx_mount", "receiver", "power_channel", "signal_channel", "tilt_joint_slack_loop"], "criteria_refs": ["electronics_routing", "robot_arm"]},
+        {"id": "gnc_sensors", "discipline": "gnc", "function": "IMU, pitot/airspeed sensor, GPS mount evidence near CG (mock level)", "evidence_features": ["imu_mount", "pitot_probe", "airspeed_sensor", "gps_mount", "sensor_window"], "criteria_refs": ["geometry_grounding", "mrl05_readiness"]},
+        {"id": "payload_nose_bay", "discipline": "payload", "function": "Nose payload/sensor bay with removable insert and service window", "evidence_features": ["payload_bay", "nose_bay", "sensor_insert", "service_window"], "criteria_refs": ["uav_wing", "service_access"]},
+        {"id": "integration_service", "discipline": "integration", "function": "Nacelle interface datums, harness routing through tilt axis, hatches, connection types and load-path closure", "evidence_features": ["interface_datum", "harness_channel", "service_hatch"], "criteria_refs": ["datum_tolerance", "service_access", "assembly_integration"]}
+      ]
+    },
+    "small_launch_vehicle": {
+      "boundary_note": "All subsystems are educational display mockups; no propulsion, ignition, or flight-performance design.",
+      "required_subsystems": [
+        {"id": "primary_structure", "discipline": "structures", "function": "Propellant tank dummy barrels (LOX/fuel), interstage, payload fairing, fin set, skirts; stacking datums and alignment keys", "evidence_features": ["tank_dummy", "propellant_tank_dummy", "payload_fairing", "nose_cone", "fin_set", "interstage_datum", "alignment_key", "bolt_circle_dummy"], "criteria_refs": ["small_launch_vehicle_mock_boundary", "datum_tolerance"]},
+        {"id": "engine_display", "discipline": "mechanisms", "function": "Removable engine display cartridge: combustion chamber dummy, bell nozzle shell, turbopump dummy in cutaway bay (non-functional)", "evidence_features": ["engine_display_cartridge", "combustion_chamber_dummy", "bell_nozzle_shell", "turbopump_assembly_dummy", "impeller_dummy", "stage_engine_mock", "cutaway_window", "slide_rail"], "criteria_refs": ["small_launch_vehicle_mock_boundary", "service_access"]},
+        {"id": "avionics_bay", "discipline": "electronics", "function": "Avionics ring/tray with board mounts and harness pass-throughs", "evidence_features": ["avionics_tray", "harness_passthrough", "board_standoff"], "criteria_refs": ["electronics_routing", "service_access"]},
+        {"id": "power_display", "discipline": "power", "function": "Battery module dummy with access panel", "evidence_features": ["battery_module", "access_panel"], "criteria_refs": ["service_access"]},
+        {"id": "recovery_bay", "discipline": "recovery_deployment", "function": "Parachute bay dummy with deployment door hinge (display-level)", "evidence_features": ["recovery_bay", "deploy_door", "hinge"], "criteria_refs": ["small_launch_vehicle_mock_boundary", "geometry_grounding"]},
+        {"id": "separation_display", "discipline": "mechanisms", "function": "Stage separation plane shown as datum + dummy clamp band (no energetic device)", "evidence_features": ["separation_plane_datum", "clamp_band_dummy"], "criteria_refs": ["small_launch_vehicle_mock_boundary", "datum_tolerance"]},
+        {"id": "integration_inspection", "discipline": "integration", "function": "Assembly order evidence, inspection windows, readiness checklist hooks, connection types and load-path closure", "evidence_features": ["inspection_window", "assembly_datum", "checklist_callout"], "criteria_refs": ["mrl05_readiness", "small_launch_vehicle_mock_boundary", "assembly_integration"]}
+      ]
+    },
+    "robot_arm": {
+      "required_subsystems": [
+        {"id": "link_structure", "discipline": "structures", "function": "Rigid links with load path from tool flange to base, ribs where needed", "evidence_features": ["link_body", "rib", "base_flange"], "criteria_refs": ["robot_arm", "common_dfm"]},
+        {"id": "joint_transmission", "discipline": "mechanisms", "function": "J1-J6 joint cartridges: bearing seats, reducer dummies, wrist pitch/roll axes, shaft location", "evidence_features": ["bearing_seat", "reducer_dummy", "shoulder", "wrist_pitch_axis", "wrist_roll_axis", "retaining_feature"], "criteria_refs": ["robot_arm", "datum_tolerance"]},
+        {"id": "actuation_motors", "discipline": "actuation", "function": "Replaceable motor modules per joint with fastener access", "evidence_features": ["motor_module", "fastener_access", "coupling_dummy"], "criteria_refs": ["robot_arm", "service_access"]},
+        {"id": "sensing_encoders", "discipline": "gnc", "function": "Encoder pockets and covers at each joint", "evidence_features": ["encoder_pocket", "encoder_cover"], "criteria_refs": ["robot_arm"]},
+        {"id": "drive_electronics", "discipline": "electronics", "function": "Driver board bay, power/signal separation along the arm", "evidence_features": ["driver_bay", "power_channel", "signal_channel", "ground_point"], "criteria_refs": ["electronics_routing"]},
+        {"id": "cable_spine", "discipline": "integration", "function": "External or inspectable harness spine with slack loops at every joint; connection types and load-path closure", "evidence_features": ["cable_spine", "slack_loop", "strain_relief", "clip"], "criteria_refs": ["robot_arm", "service_access", "assembly_integration"]},
+        {"id": "end_effector_interface", "discipline": "payload", "function": "Tool flange with standard bolt pattern and locating boss", "evidence_features": ["tool_flange", "bolt_pattern", "locating_boss"], "criteria_refs": ["datum_tolerance", "robot_arm"]},
+        {"id": "base_mounting", "discipline": "structures", "function": "Base plate with mounting holes, leveling, and cable entry", "evidence_features": ["base_plate", "mounting_hole_pattern", "cable_entry_grommet"], "criteria_refs": ["common_dfm", "service_access"]}
+      ]
+    },
+    "haptic_glove": {
+      "required_subsystems": [
+        {"id": "finger_linkages", "discipline": "mechanisms", "function": "Per-finger four-bar/tendon linkage cartridges, single-pin removable", "evidence_features": ["finger_cartridge", "hinge_pin", "thimble_socket", "linkage_bar"], "criteria_refs": ["haptic_glove", "geometry_grounding"]},
+        {"id": "actuation_brakes", "discipline": "actuation", "function": "Plug-in flexion-resistance actuator modules at knuckle row", "evidence_features": ["actuator_module", "plug_in_pocket", "knuckle_mount"], "criteria_refs": ["haptic_glove", "service_access"]},
+        {"id": "sensing", "discipline": "gnc", "function": "Flex/bend sensor channels per finger, IMU mount on hand plate", "evidence_features": ["sensor_channel", "imu_mount", "sensor_exit"], "criteria_refs": ["electronics_routing", "haptic_glove"]},
+        {"id": "electronics_hub", "discipline": "electronics", "function": "Controller board on back-of-hand with standoffs and connector orientation", "evidence_features": ["controller_board", "standoff", "connector_edge"], "criteria_refs": ["electronics_routing"]},
+        {"id": "power", "discipline": "power", "function": "Battery pocket at wrist with quick-swap access", "evidence_features": ["battery_pocket", "swap_door", "power_connector"], "criteria_refs": ["service_access"]},
+        {"id": "wearable_structure", "discipline": "human_factors", "function": "Hand plate, wrist band, quick release, soft-contact zones, finger clearance", "evidence_features": ["wrist_quick_release", "soft_liner_zone", "finger_clearance"], "criteria_refs": ["haptic_glove"]},
+        {"id": "flex_wiring", "discipline": "integration", "function": "Knuckle-crossing wiring with service loops and flex-rated bend radius; connection types and load-path closure", "evidence_features": ["service_loop", "strain_relief", "bend_radius_note"], "criteria_refs": ["haptic_glove", "service_access", "electronics_routing", "assembly_integration"]}
+      ]
+    }
+  }
+}

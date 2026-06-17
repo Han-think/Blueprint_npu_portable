@@ -1,0 +1,125 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "cubesat",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "thermal_path",
+    "discipline": "thermal",
+    "function": "Radiator face or thermal strap note from battery/OBC to structure",
+    "evidence_features": [
+      "radiator_face",
+      "thermal_strap_note",
+      "vent_hole"
+    ],
+    "criteria_refs": [
+      "mrl05_readiness"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "mrl05_readiness",
+      "title": "MRL-0.5 Readiness Evidence",
+      "criteria": [
+        {
+          "criterion": "wall_process_readiness",
+          "weight": 10,
+          "good": "Material/process, wall assumptions, build direction, and supports are explicit enough for design review.",
+          "bad": "Manufacturing process is absent or contradicts geometry.",
+          "signals": [
+            "material",
+            "process",
+            "min_wall_mm",
+            "build_direction",
+            "supports"
+          ],
+          "loop_feedback": "State material/process, min wall, build direction, and support implications in cad_brief and print_profile."
+        },
+        {
+          "criterion": "inspection_traceability",
+          "weight": 10,
+          "good": "Verify/risk items reference real features or interfaces from part_tree/geometry_ops.",
+          "bad": "Verification is generic pass/warn text not tied to features.",
+          "signals": [
+            "verify.check",
+            "risk.mit",
+            "geometry_ops.id"
+          ],
+          "loop_feedback": "Tie each verification check to a named geometry feature, datum, interface, or service access path."
+        },
+        {
+          "criterion": "risk_coverage",
+          "weight": 9,
+          "good": "Risks cover blocked access, weak interfaces, tolerance mismatch, process limitations, and unsafe overclaiming.",
+          "bad": "Risks are missing or only mention vague quality concerns.",
+          "signals": [
+            "risk",
+            "blocked",
+            "clearance",
+            "support",
+            "inspection",
+            "not_for"
+          ],
+          "loop_feedback": "Add concrete risks for blocked service, datum loss, clearance conflict, unsupported geometry, and unsafe overclaiming."
+        },
+        {
+          "criterion": "requirement_to_verification_matrix",
+          "weight": 9,
+          "good": "Each stated requirement maps to a verification method (inspection, demonstration, analysis, test) tied to a named feature or interface.",
+          "bad": "Requirements and verification lists exist independently with no traceable pairing.",
+          "signals": [
+            "requirement_id",
+            "verify.method",
+            "inspection",
+            "demonstration",
+            "analysis",
+            "test"
+          ],
+          "loop_feedback": "Pair every requirement with one verification method and the geometry feature or interface that provides the evidence.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        },
+        {
+          "criterion": "interface_control_evidence",
+          "weight": 8,
+          "good": "Cross-subsystem interfaces state owner, mating geometry, and what is exchanged (load, power, data, fluid), like a miniature interface control entry.",
+          "bad": "Subsystems reference each other by name only, with no statement of what crosses the interface.",
+          "signals": [
+            "interface_owner",
+            "exchange_type",
+            "load",
+            "power",
+            "data",
+            "mating_feature"
+          ],
+          "loop_feedback": "For each interface, state both sides, the mating feature, and the exchanged quantity (load/power/data/fluid).",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    }
+  ]
+}

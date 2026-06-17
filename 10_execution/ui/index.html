@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blueprint IPEX — Workspace</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/three.min.js"></script>
+<script src="vendor/three.OrbitControls.js"></script>
+<style>
+  :root{--bg:#0c1e35;--panel:#13294a;--panel2:#0f2240;--line:#274a79;
+    --ink:#e6ecf5;--mut:#8ba3c7;--acc:#9fd3ff;--ok:#89ffa8;--warn:#ffd39f;--dng:#ff9fb5;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter','Noto Sans KR',system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:1180px;margin:0 auto;padding:1.4rem 1.2rem 4rem}
+  h1{font-size:1.5rem;margin:.2rem 0}.sub{color:var(--mut);font-size:.85rem;margin:.2rem 0 1rem}
+  /* 파이프라인 띠 */
+  .flow{display:flex;align-items:stretch;gap:0;margin:1rem 0 1.3rem;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .stage{flex:1;padding:.7rem .9rem;position:relative}
+  .stage+.stage{border-left:1px solid var(--line)}
+  .stage .s{font-size:.72rem;color:var(--mut)}.stage .v{font-size:1.15rem;font-weight:700;color:var(--acc)}
+  .stage .d{font-size:.68rem;color:var(--ok)}
+  .stage.cur{background:var(--panel2)}
+  .arrow{color:var(--mut);align-self:center;font-size:.9rem;padding:0 .2rem}
+  .tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:0 0 1.3rem;border-bottom:1px solid var(--line);padding-bottom:.6rem}
+  .tab{font:inherit;font-size:.9rem;padding:.5rem .9rem;border-radius:9px 9px 0 0;cursor:pointer;background:transparent;border:1px solid transparent;color:var(--mut)}
+  .tab.on{background:var(--panel);border-color:var(--line);color:var(--acc);font-weight:700}
+  .pane{display:none;animation:fade .25s ease}.pane.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1rem;margin-top:1rem}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.1rem}
+  .card h3{margin:0 0 .1rem;font-size:1.05rem}.card .tgt{font-size:.72rem;color:var(--mut);font-family:ui-monospace,monospace;margin-bottom:.7rem}
+  .bar{margin:.4rem 0}.bar .lab{display:flex;justify-content:space-between;font-size:.74rem;color:var(--mut);margin-bottom:.2rem}
+  .bar .track{height:8px;background:var(--panel2);border-radius:6px;overflow:hidden}.bar .fill{height:100%;background:linear-gradient(90deg,#2f6fb0,var(--ok));border-radius:6px}
+  .chips{display:flex;gap:.35rem;flex-wrap:wrap;margin:.7rem 0}
+  .chip{font-size:.7rem;padding:.2rem .5rem;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--acc)}
+  .mrl{margin:.65rem 0 .25rem;padding:.55rem .65rem;border-radius:10px;background:var(--panel2);border:1px solid var(--line)}
+  .mrl .top{display:flex;justify-content:space-between;gap:.6rem;align-items:center;font-size:.76rem}
+  .mrl .score{font-family:ui-monospace,monospace;font-weight:800}
+  .mrl.ready{border-color:rgba(137,255,168,.65)}.mrl.ready .score{color:var(--ok)}
+  .mrl.watch{border-color:rgba(255,211,159,.7)}.mrl.watch .score{color:var(--warn)}
+  .mrl.weak{border-color:rgba(255,159,181,.7)}.mrl.weak .score{color:var(--dng)}
+  .mrl .issue{font-size:.68rem;color:var(--mut);margin-top:.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .btns{display:flex;gap:.4rem;margin-top:.8rem;flex-wrap:wrap}
+  button,a.btn,select,textarea{font:inherit;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink)}
+  button,a.btn{font-size:.78rem;padding:.45rem .7rem;cursor:pointer;text-decoration:none;transition:.12s}
+  button:hover,a.btn:hover{border-color:var(--acc);color:var(--acc)}
+  button.pri{background:var(--acc);color:#08182c;border-color:var(--acc);font-weight:700}
+  .gen{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.1rem;margin-bottom:1rem}
+  .gen .rowf{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem}
+  select{padding:.45rem .6rem;font-size:.82rem}
+  textarea{width:100%;min-height:70px;padding:.6rem;font-size:.88rem;resize:vertical}
+  pre{background:#000;color:#cce;padding:.8rem;border-radius:8px;font-size:.78rem;white-space:pre-wrap;max-height:340px;overflow:auto;margin-top:.7rem}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.1rem}
+  .box h4{margin:.1rem 0 .6rem;font-size:.95rem;color:var(--acc)}
+  .kv{display:flex;justify-content:space-between;font-size:.82rem;padding:.25rem 0;border-bottom:1px solid var(--panel2)}.kv b{color:var(--ok)}
+  code{background:var(--panel2);padding:.1rem .4rem;border-radius:5px;font-size:.8rem}
+  .cyc{font-size:.85rem;line-height:1.9}.hint{color:var(--mut);font-size:.75rem;margin-top:.5rem}
+  .modal{position:fixed;inset:0;background:rgba(4,12,24,.82);display:none;align-items:center;justify-content:center;z-index:50;padding:1rem}.modal.on{display:flex}
+  .sheet{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:900px;width:100%;max-height:92vh;overflow:auto;padding:1.2rem}
+  .sheet h2{margin:.1rem 0 .8rem;font-size:1.15rem}#viewer{width:100%;height:430px;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+  .svgbox{background:#f7f9fb;border-radius:10px;padding:.6rem;overflow:auto}.svgbox img{width:100%;display:block}
+  .x{float:right;cursor:pointer;color:var(--mut);font-size:1.3rem}.mtabs{display:flex;gap:.4rem;margin-bottom:.7rem}.mtabs button.act{background:var(--acc);color:#08182c;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Blueprint <span style="color:var(--acc)">IPEX</span></h1>
+  <p class="sub">5-seed 공학 설계 워크스페이스 · 생성 → 검증 → 학습 → 모델</p>
+
+  <!-- 진화 파이프라인 띠 -->
+  <div class="flow" id="flow"></div>
+
+  <div class="tabs">
+    <button class="tab on" data-t="design" onclick="tab('design')">🎨 생성+설계</button>
+    <button class="tab" data-t="model" onclick="tab('model')">🧠 모델</button>
+    <button class="tab" data-t="learn" onclick="tab('learn')">📚 학습</button>
+  </div>
+
+  <!-- 생성+설계 -->
+  <div class="pane on" id="pane-design">
+    <div class="gen">
+      <div class="rowf">
+        <label style="font-size:.8rem;color:var(--mut)">seed</label>
+        <select id="seedSel"></select>
+        <label style="font-size:.8rem;color:var(--mut)">모델</label>
+        <select id="modelSel"><option>로딩…</option></select>
+        <button class="pri" onclick="genDesign()">⚙️ 설계 판단 생성</button>
+        <a class="btn" href="Minimal.html">↗ self-loop 생성기</a>
+        <span class="hint" id="genHint">ollama(qwen3:8b 우선 · fallback qwen2.5:7b) 연결 시 작동</span>
+      </div>
+      <textarea id="brief" placeholder="설계 요구(brief) 입력 — 예: 코너 레일과 패널 6장을 통합하되 보드 교체 접근성 유지"></textarea>
+      <pre id="genOut" style="display:none"></pre>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- 모델 -->
+  <div class="pane" id="pane-model">
+    <div class="row2">
+      <div class="box"><h4>🔌 연결 모델</h4>
+        <div class="kv"><span>모델</span><b>qwen3:8b 우선</b></div>
+        <div class="kv"><span>런타임</span><span>IPEX-LLM portable Ollama</span></div>
+        <div class="kv"><span>호스트</span><code>127.0.0.1:11434</code></div>
+        <div class="kv"><span>상태</span><b id="ollStat">확인 중…</b></div>
+        <p class="hint">기동 <code>start.bat</code> · 모델 <code>ollama pull qwen3:8b</code> · fallback <code>qwen2.5:7b</code> · 점검 <code>check_ollama.py</code></p></div>
+      <div class="box"><h4>📦 학습셋 (모델 입력)</h4>
+        <div class="kv"><span>judgment SFT</span><b id="m-sft">–</b></div>
+        <div class="kv"><span>part_spec SFT</span><b id="m-ps">–</b></div>
+        <div class="kv"><span>preference DPO</span><b id="m-dpo">–</b></div>
+        <p class="hint">SFT=무엇을/어떻게 · DPO=왜 더 나은가. Modelfile <code>30_model/Modelfile.template</code></p></div>
+    </div>
+  </div>
+
+  <!-- 학습 -->
+  <div class="pane" id="pane-learn">
+    <div class="row2">
+      <div class="box"><h4>🗃️ 데이터 5종</h4>
+        <div class="kv"><span>thinking (판단)</span><b id="l-think">–</b></div>
+        <div class="kv"><span>judgment_causal (인과)</span><b id="l-causal">–</b></div>
+        <div class="kv"><span>part_spec (구체도안)</span><b id="l-ps">–</b></div>
+        <div class="kv"><span>preference (비교)</span><b id="l-pref">–</b></div>
+        <div class="kv"><span>eval (채점)</span><b id="l-eval">–</b></div></div>
+      <div class="box"><h4>🧭 공학적 사고 6단계</h4>
+        <div class="cyc">① 요구 <span style="color:var(--warn)">△</span><br>
+          ② 판단 <span style="color:var(--ok)">✅</span> · ③ 구현 <span style="color:var(--ok)">✅</span><br>
+          ④ 검증 <span style="color:var(--ok)">✅</span> · ⑤ 비교 <span style="color:var(--ok)">✅</span><br>
+          ⑥ 반복 <span style="color:var(--mut)">⬜ 모델 closed-loop (RAG 연결 후)</span></div>
+        <p class="hint">무결성 <code>check_integrity.py</code> · 재생성 <code>rebuild_all.py</code></p></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="sheet">
+  <span class="x" onclick="closeModal()">✕</span><h2 id="mtitle"></h2>
+  <div class="mtabs"><button id="tab3d" class="act" onclick="mtab('3d')">🧊 3D STL</button>
+    <button id="tab2d" onclick="mtab('2d')">📐 2D 도면</button><a class="btn" id="dl" download>⬇ STL</a></div>
+  <div id="pane3d"><div id="viewer"></div></div>
+  <div id="pane2d" style="display:none"><div class="svgbox"><img id="svgimg" alt="2D"></div></div>
+</div></div>
+
+<script>
+const OLLAMA='http://127.0.0.1:11434';
+let DATA=null,cur=null,anim=null;
+
+document.getElementById('grid').innerHTML='<p class="hint">불러오는 중…</p>';
+fetch('dashboard.json',{cache:'no-store'})
+  .then(r=>{if(!r.ok)throw new Error('dashboard.json HTTP '+r.status);return r.json();})
+  .then(d=>{DATA=d;render();})
+  .catch(e=>{
+    document.getElementById('grid').innerHTML='<p style="color:var(--dng)">데이터 로드 실패: '+e+'<br>서버(start.bat)로 열었는지 확인 · Ctrl+Shift+R</p>';
+    document.getElementById('flow').innerHTML='<div class="stage"><div class="s">오류</div><div class="d" style="color:var(--dng)">'+e+'</div></div>';
+  });
+checkOllama();
+
+function tab(t){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));document.getElementById('pane-'+t).classList.add('on');}
+
+function render(){
+ try{
+  const p=DATA.pipeline;
+  document.getElementById('flow').innerHTML=[
+    ['생성',p.seeds,'seed','cur'],['→'],['MRL-0.5',p.mrl05_average ?? '–',`ready ${p.mrl05_ready ?? 0}/${p.seeds}`,''],['→'],
+    ['배치간섭',p.placement_average ?? '–',`pass ${p.placement_pass ?? 0} · block ${p.placement_block ?? 0}`,''],['→'],
+    ['검증',p.eval_cases,'eval cases',''],['→'],['학습',p.sft_train,'SFT train',''],['→'],['모델','qwen3','8b','']
+  ].map(s=>s.length===1?`<div class="arrow">${s[0]}</div>`:
+    `<div class="stage ${s[3]}"><div class="s">${s[0]}</div><div class="v">${s[1]}</div><div class="d">${s[2]}</div></div>`).join('');
+  document.getElementById('grid').innerHTML=DATA.cards.map(card).join('');
+  const ss=document.getElementById('seedSel');ss.innerHTML=DATA.cards.map(c=>`<option value="${c.target}">${c.label}</option>`).join('');
+  document.getElementById('m-sft').textContent=`train ${p.sft_train} / eval ${p.sft_eval}`;
+  document.getElementById('m-ps').textContent=p.part_spec;document.getElementById('m-dpo').textContent=p.preference;
+  document.getElementById('l-think').textContent=p.thinking_total;document.getElementById('l-causal').textContent=p.causal_total;
+  document.getElementById('l-ps').textContent=p.part_spec;document.getElementById('l-pref').textContent=p.preference;document.getElementById('l-eval').textContent=p.eval_cases;
+ }catch(e){document.getElementById('grid').innerHTML='<p style="color:var(--dng)">렌더 오류: '+e+'</p>';console.error(e);}
+}
+function bar(l,o){return `<div class="bar"><div class="lab"><span>${l} ${o.from}→${o.to}</span><span style="color:var(--ok)">-${o.cut}%</span></div><div class="track"><div class="fill" style="width:${o.cut}%"></div></div></div>`;}
+function card(c){const hw=c.hardware_bom.map(h=>`<span class="chip">${h.standard}×${h.qty}</span>`).join('')||'<span class="chip">—</span>';
+  const m=c.mrl05||{score:0,status:'unknown',issues:[]};
+  const st=['ready','watch','weak'].includes(m.status)?m.status:'weak';
+  const issue=(m.issues&&m.issues[0])||'MRL-0.5 evidence ready: datum/tolerance/service/inspection basis present';
+  const pa=c.placement_audit||{score:0,status:'unknown',counts:{},findings:[]};
+  const pst=pa.status==='pass'?'ready':pa.status==='watch'?'watch':'weak';
+  const pc=pa.counts||{};
+  const pissue=(pa.findings&&pa.findings[0])||`pairs pass/watch/block ${pc.passed_pairs ?? 0}/${pc.warning_pairs ?? 0}/${pc.blocked_pairs ?? 0}`;
+  return `<div class="card"><h3>${c.label}</h3><div class="tgt">${c.target}</div>${bar('부품',c.parts)}${bar('조립',c.steps)}
+    <div class="mrl ${st}"><div class="top"><span>MRL-0.5 readiness · ${m.status}</span><span class="score">${m.score}/100</span></div><div class="issue">${issue}</div></div>
+    <div class="mrl ${pst}"><div class="top"><span>Placement audit · ${pa.status}</span><span class="score">${pa.score}/100</span></div><div class="issue">${pissue}</div></div>
+    <div class="chips">${hw}<span class="chip">서비스 ${c.service_access}</span><span class="chip">⚙ ${c.fasteners}f/${c.joints}j</span><span class="chip">pairs ${pc.passed_pairs ?? 0}/${pc.warning_pairs ?? 0}/${pc.blocked_pairs ?? 0}</span></div>
+    <div class="btns"><button class="pri" onclick='open3d(${JSON.stringify(c)})'>🧊 3D</button>
+      <button onclick='open2d(${JSON.stringify(c)})'>📐 2D</button>
+      <a class="btn" href="${c.stl}" download>⬇STL</a>
+      <a class="btn" href="${c.svg}" download>⬇2D</a>
+      <a class="btn" href="${pa.report || `/output/${c.seed}/assembly_interference_report.json`}" download>⬇Audit</a>
+      <a class="btn" href="/seeds/${c.seed}/package.json" download>⬇JSON</a></div></div>`;}
+
+// ── ollama 연결 + 생성 (RAG) ──
+async function checkOllama(){
+  try{const r=await fetch(`${OLLAMA}/api/tags`,{signal:AbortSignal.timeout(3000)});
+    const d=await r.json();const ms=(d.models||[]).map(m=>m.name);
+    const rank=n=>/^qwen3:8b$/i.test(n)?0:/qwen3.*8b/i.test(n)?1:/^qwen2\.5:7b/i.test(n)?2:/qwen2\.5.*7b/i.test(n)?3:/qwen3.*4b/i.test(n)?4:9;
+    const ordered=ms.slice().sort((a,b)=>rank(a)-rank(b));
+    document.getElementById('modelSel').innerHTML=ordered.length?ordered.map(m=>`<option>${m}</option>`).join(''):'<option>모델 없음</option>';
+    document.getElementById('ollStat').textContent=ms.length?`연결됨 (${ms.length} 모델)`:'연결됨 (모델 0 — pull 필요)';
+    document.getElementById('ollStat').style.color='var(--ok)';
+  }catch(e){document.getElementById('modelSel').innerHTML='<option>ollama 꺼짐</option>';
+    document.getElementById('ollStat').textContent='무응답 — start.bat 로 기동';document.getElementById('ollStat').style.color='var(--dng)';}
+}
+async function genDesign(){
+  const out=document.getElementById('genOut');out.style.display='block';
+  const model=document.getElementById('modelSel').value, seed=document.getElementById('seedSel').value, brief=document.getElementById('brief').value.trim();
+  if(!brief){out.textContent='brief 를 입력하세요.';return;}
+  const sys=`You are a Blueprint design-judgment assistant for ${seed}. `
+    +`Core actions: INTEGRATE, PARTIAL_INTEGRATE, REJECT, FAIL, DECOUPLE, RISK, GUARDRAIL, EXPOSE. `
+    +`Given the brief, output JSON: {"classification","core","rule","proposal","retained_access":[],"verification":[]}. `
+    +`Preserve service access and datum visibility. Keep advanced topics at educational mockup level.`;
+  out.textContent='⏳ 생성 중… (모델 로딩에 시간이 걸릴 수 있음)';
+  try{
+    const r=await fetch(`${OLLAMA}/api/generate`,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model,system:sys,prompt:brief,stream:false,format:'json'})});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();out.textContent=d.response||JSON.stringify(d,null,1);
+  }catch(e){out.textContent='✗ ollama 연결/생성 실패: '+e+'\n\nstart.bat 으로 ollama 기동 후, 모델: ollama pull qwen3:8b (fallback: qwen2.5:7b)';}
+}
+
+// ── 모달 3D/2D ──
+function openModal(c){cur=c;document.getElementById('mtitle').textContent=c.label+' · '+c.target;
+  document.getElementById('dl').href=c.stl;document.getElementById('svgimg').src=c.svg;document.getElementById('modal').classList.add('on');}
+function open3d(c){openModal(c);mtab('3d');}function open2d(c){openModal(c);mtab('2d');}
+function closeModal(){document.getElementById('modal').classList.remove('on');if(anim)cancelAnimationFrame(anim);}
+function mtab(t){document.getElementById('tab3d').classList.toggle('act',t==='3d');document.getElementById('tab2d').classList.toggle('act',t==='2d');
+  document.getElementById('pane3d').style.display=t==='3d'?'block':'none';document.getElementById('pane2d').style.display=t==='2d'?'block':'none';if(t==='3d'&&cur)view3d(cur.stl);}
+function parseSTL(buf){const dv=new DataView(buf),n=dv.getUint32(80,true),pos=new Float32Array(n*9);let o=84,k=0;
+  for(let i=0;i<n;i++){o+=12;for(let v=0;v<3;v++){pos[k++]=dv.getFloat32(o,true);pos[k++]=dv.getFloat32(o+4,true);pos[k++]=dv.getFloat32(o+8,true);o+=12;}o+=2;}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.computeVertexNormals();return g;}
+function view3d(url){const cv=document.getElementById('viewer');cv.innerHTML='';if(anim)cancelAnimationFrame(anim);
+  const w=cv.clientWidth||820,h=430;const scene=new THREE.Scene();scene.background=new THREE.Color(0x0c1e35);
+  const cam=new THREE.PerspectiveCamera(45,w/h,1,8000);const rnd=new THREE.WebGLRenderer({antialias:true});rnd.setSize(w,h);cv.appendChild(rnd.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff,.65));const dl=new THREE.DirectionalLight(0x9cd0ff,.9);dl.position.set(1,1,1);scene.add(dl);
+  fetch(url).then(r=>r.arrayBuffer()).then(buf=>{const g=parseSTL(buf);g.center();g.computeBoundingSphere();
+    const mat=new THREE.MeshPhongMaterial({color:0x4a90d9,specular:0x223344,shininess:36,flatShading:true,transparent:true,opacity:.48,side:THREE.DoubleSide});
+    const mesh=new THREE.Mesh(g,mat);scene.add(mesh);
+    const edges=new THREE.EdgesGeometry(g,25);
+    const edgeLines=new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0xcfefff,transparent:true,opacity:.72}));
+    scene.add(edgeLines);
+    const r0=(g.boundingSphere&&g.boundingSphere.radius)||100;cam.position.set(r0*1.8,r0*1.4,r0*2.2);cam.lookAt(0,0,0);
+    let ctr=THREE.OrbitControls?new THREE.OrbitControls(cam,rnd.domElement):null;if(ctr)ctr.enableDamping=true;
+    (function loop(){anim=requestAnimationFrame(loop);if(ctr)ctr.update();else{mesh.rotation.y+=.004;edgeLines.rotation.y+=.004;}rnd.render(scene,cam);})();
+  }).catch(e=>{cv.innerHTML='<p class="hint" style="padding:1rem">STL 로드 실패: '+e+'</p>';});}
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "robot_arm",
+  "title": "6-DOF Robot Arm Criteria",
+  "applies_to": ["robot_arm"],
+  "criteria": [
+    {
+      "criterion": "axis_datum_readability",
+      "weight": 14,
+      "good": "J1-J6 axis rings, reducer/bearing dummies, encoder covers, and tool flange datum are visible.",
+      "bad": "Arm links are generic cylinders with no joint service evidence.",
+      "signals": ["J1", "J2", "axis ring", "encoder cover", "tool flange", "bearing dummy"],
+      "loop_feedback": "Add J1-J6 axis datum labels, removable joint cartridge covers, encoder pockets, and tool flange bolt pattern."
+    },
+    {
+      "criterion": "cable_spine_serviceability",
+      "weight": 12,
+      "good": "Cable spine clips externally or remains inspectable through open channels.",
+      "bad": "Cable routing is buried inside closed links.",
+      "signals": ["cable spine", "open channel", "clip", "harness"],
+      "loop_feedback": "Externalize the cable spine or add open link channels with replaceable covers and strain relief."
+    },
+    {
+      "criterion": "joint_cartridge_replaceability",
+      "weight": 11,
+      "good": "Joint cartridges can be removed without cutting printed links.",
+      "bad": "Reducers/bearings are fused into structural links.",
+      "signals": ["removable cartridge", "joint cover", "fastener pattern", "clearance"],
+      "loop_feedback": "Separate removable joint cartridges from printed links and add fastener/clearance features."
+    },
+    {
+      "criterion": "bearing_shaft_mounting_sanity",
+      "weight": 10,
+      "good": "Each joint shows a bearing seat with shoulder or retaining feature, shaft locating geometry, and stated fit intent for inner/outer races.",
+      "bad": "Bearing dummies float in links with no seat, shoulder, retaining ring groove, or axial location scheme.",
+      "signals": ["bearing_seat", "shoulder", "retaining_ring", "axial_location", "race_fit"],
+      "loop_feedback": "Add bearing seats with shoulders or retaining features at each joint and state which race is fixed and how."
+    },
+    {
+      "criterion": "moving_joint_harness_workmanship",
+      "weight": 9,
+      "good": "Harness crossing each joint has slack loop, strain relief at both ends, and routing that avoids pinch points through the full motion range.",
+      "bad": "Cables cross joints taut, pass through pinch zones, or have no relief at link entry/exit.",
+      "signals": ["slack_loop", "strain_relief", "pinch_point", "motion_range", "cable_guide"],
+      "loop_feedback": "Add slack loops and dual-end strain relief at every joint crossing and verify no pinch through motion extremes.",
+      "source_refs": ["sources/public/nasa-std-87394a_w_change_4_0.pdf"]
+    }
+  ]
+}

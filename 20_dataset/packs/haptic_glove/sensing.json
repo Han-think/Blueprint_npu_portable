@@ -1,0 +1,164 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "haptic_glove",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "sensing",
+    "discipline": "gnc",
+    "function": "Flex/bend sensor channels per finger, IMU mount on hand plate",
+    "evidence_features": [
+      "sensor_channel",
+      "imu_mount",
+      "sensor_exit"
+    ],
+    "criteria_refs": [
+      "electronics_routing",
+      "haptic_glove"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "haptic_glove",
+      "title": "Haptic Glove Pair Criteria",
+      "criteria": [
+        {
+          "criterion": "finger_cartridge_service",
+          "weight": 14,
+          "good": "Per-finger linkage cartridges are removable by single pin or visible hinge access.",
+          "bad": "Finger linkages are glued, buried, or represented only as a glove shell.",
+          "signals": [
+            "finger cartridge",
+            "single-pin",
+            "hinge",
+            "linkage",
+            "thimble"
+          ],
+          "loop_feedback": "Model per-finger cartridges with hinge pin holes, thimble sockets, and visible single-pin removal path."
+        },
+        {
+          "criterion": "actuator_module_access",
+          "weight": 12,
+          "good": "Flexion-resistance actuator modules plug in and remain visible near knuckle row.",
+          "bad": "Actuators are bonded or hidden without connector/service geometry.",
+          "signals": [
+            "actuator module",
+            "plug-in",
+            "connector",
+            "knuckle row",
+            "brake"
+          ],
+          "loop_feedback": "Add plug-in actuator pockets, connector openings, knuckle-row mounts, and service labels."
+        },
+        {
+          "criterion": "wearable_comfort_boundary",
+          "weight": 9,
+          "good": "Rigid mock assembly preserves soft-contact cues, wrist quick release, and ergonomic clearance.",
+          "bad": "Rigid shell ignores don/doff, comfort, and finger clearance.",
+          "signals": [
+            "wrist band",
+            "quick release",
+            "soft liner",
+            "clearance",
+            "comfort"
+          ],
+          "loop_feedback": "Add wrist quick release, soft-contact interface zones, finger clearance, and cable raceway inspection."
+        },
+        {
+          "criterion": "flex_cycle_harness_durability",
+          "weight": 9,
+          "good": "Finger and wrist wiring uses service loops, strain relief at every flex boundary, and a stated bend radius sized for repeated flexion cycles.",
+          "bad": "Wires run taut across knuckles or terminate at rigid mounts with no relief, inviting fatigue failure.",
+          "signals": [
+            "service_loop",
+            "strain_relief",
+            "bend_radius",
+            "flex_cycle",
+            "knuckle_crossing"
+          ],
+          "loop_feedback": "Add service loops and strain relief at each knuckle and wrist crossing, and state a flex-rated bend radius.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "electronics_routing",
+      "title": "Electronics, Signal, and Motor Wiring Judgment",
+      "criteria": [
+        {
+          "criterion": "power_signal_separation",
+          "weight": 9,
+          "good": "Motor power lines and sensor/encoder signal lines run in separate channels or are spaced/crossed at right angles, with the separation visible in routing geometry.",
+          "bad": "Power and signal wires share one tight bundle along the whole route with no separation or shielding note.",
+          "signals": [
+            "power_channel",
+            "signal_channel",
+            "separation",
+            "shield",
+            "twisted_pair"
+          ],
+          "loop_feedback": "Split power and signal into separate raceways or add spacing/shielding notes where they must share a channel."
+        },
+        {
+          "criterion": "return_path_and_grounding_intent",
+          "weight": 8,
+          "good": "Each electronics module states its grounding scheme (star point, chassis bond, isolated) and signal returns route alongside their signals.",
+          "bad": "Grounding is unmentioned; returns are implied through structure with no bond feature or note.",
+          "signals": [
+            "ground_point",
+            "chassis_bond",
+            "star_ground",
+            "return_path"
+          ],
+          "loop_feedback": "Add a named ground/bond feature per module and state how each signal's return path is routed."
+        },
+        {
+          "criterion": "board_mounting_and_clearance",
+          "weight": 8,
+          "good": "PCBs mount on standoffs with keep-out clearance to walls and moving parts, connector edges face access openings, and mounting holes match standard board patterns.",
+          "bad": "Boards are floated or glued in cavities with no standoffs, clearance, or connector orientation logic.",
+          "signals": [
+            "standoff",
+            "keep_out",
+            "mounting_hole",
+            "connector_edge",
+            "board_clearance"
+          ],
+          "loop_feedback": "Mount each board on standoffs with stated keep-out clearance and orient connector edges toward access openings."
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    },
+    {
+      "title": "1800 Mechanical Movements, Devices and Appliances (Hiscox, 1899, public domain)",
+      "target_topics": [
+        "linkages",
+        "cams",
+        "gears",
+        "mechanism vocabulary"
+      ]
+    }
+  ]
+}

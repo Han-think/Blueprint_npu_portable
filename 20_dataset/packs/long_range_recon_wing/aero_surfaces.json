@@ -1,0 +1,169 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "long_range_recon_wing",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "aero_surfaces",
+    "discipline": "structures",
+    "function": "Wing planform, airfoil section evidence, winglets, elevon/control surface cutouts with hinges",
+    "evidence_features": [
+      "airfoil_section",
+      "control_surface_cutout",
+      "hinge_line",
+      "winglet",
+      "elevon"
+    ],
+    "criteria_refs": [
+      "uav_wing",
+      "geometry_grounding"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "title": "P0 to Geometry Grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "weight": 14,
+          "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+          "bad": "P0 lists features but geometry_ops are generic boxes at the origin.",
+          "signals": [
+            "_subsystem_plan.internal_feature_targets",
+            "geometry_ops.id",
+            "geometry_ops.target"
+          ],
+          "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "weight": 12,
+          "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+          "bad": "Geometry is stacked at [0,0,0] or lacks coordinates.",
+          "signals": [
+            "args.at",
+            "coordinate_spread_score"
+          ],
+          "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "weight": 10,
+          "good": "Uses drill, pocket, boss, channel, cylinder, chamfer, fillet, pattern, and engrave where appropriate.",
+          "bad": "Primary output is a rectangular box with shallow labels.",
+          "signals": [
+            "drill",
+            "pocket",
+            "boss",
+            "channel",
+            "pattern_linear",
+            "pattern_polar",
+            "fillet",
+            "chamfer"
+          ],
+          "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+        },
+        {
+          "criterion": "mechanism_named_not_implied",
+          "weight": 9,
+          "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "signals": [
+            "four_bar",
+            "cam",
+            "rack_pinion",
+            "lead_screw",
+            "pivot_hole",
+            "linkage_bar"
+          ],
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "source_refs": [
+            "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "uav_wing",
+      "title": "Long-Range Recon Wing Criteria",
+      "criteria": [
+        {
+          "criterion": "spar_datum_access",
+          "weight": 14,
+          "good": "Spar socket, anti-rotation keys, and center datum remain visible and inspectable.",
+          "bad": "Wing/fuselage integration hides spar alignment evidence.",
+          "signals": [
+            "spar",
+            "socket",
+            "anti-rotation",
+            "datum"
+          ],
+          "loop_feedback": "Expose spar sockets, anti-rotation keys, and center datum labels in geometry and callouts."
+        },
+        {
+          "criterion": "mission_payload_non_weapon_boundary",
+          "weight": 11,
+          "good": "Payload bay is labeled non-weapon/display-only with removable mission/sensor module.",
+          "bad": "Design drifts into weaponized or operational payload details.",
+          "signals": [
+            "non-weapon",
+            "display-only",
+            "sensor bay",
+            "payload insert"
+          ],
+          "loop_feedback": "Keep payload as non-weapon educational sensor bay and preserve removable insert/service window."
+        },
+        {
+          "criterion": "cg_battery_service",
+          "weight": 10,
+          "good": "Battery bay uses slide rail, CG marks, and independent payload/battery removal.",
+          "bad": "Battery is buried or coupled to payload in a way that blocks CG adjustment.",
+          "signals": [
+            "battery bay",
+            "CG",
+            "slide rail",
+            "removable"
+          ],
+          "loop_feedback": "Add visible CG rail marks and independent slide-in battery/payload service paths."
+        },
+        {
+          "criterion": "load_path_continuity",
+          "weight": 11,
+          "good": "Lift, landing, and payload loads trace through continuous structure: spar to carry-through to fuselage frames, with fittings at every load transfer.",
+          "bad": "Structural members end at skins or bays with no fitting, frame, or carry-through; load path breaks at the wing root.",
+          "signals": [
+            "carry_through",
+            "load_path",
+            "fitting",
+            "frame",
+            "rib",
+            "hardpoint"
+          ],
+          "loop_feedback": "Trace each major load to ground through named members and add fittings or frames wherever the path currently breaks."
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "1800 Mechanical Movements, Devices and Appliances (Hiscox, 1899, public domain)",
+      "target_topics": [
+        "linkages",
+        "cams",
+        "gears",
+        "mechanism vocabulary"
+      ]
+    }
+  ]
+}

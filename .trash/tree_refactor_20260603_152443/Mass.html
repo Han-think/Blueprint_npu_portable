@@ -1,0 +1,299 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Mass · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Mass'),100);</script>
+<script type="text/babel">
+const {useState,useMemo}=React;
+const C={canvas:'#0c1e35',canvas2:'#0a1a2f',canvas3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// MEL — Mass Equipment List for BP-V1.2
+// Coords: x=axial (nose→engine, mm), y=lateral, z=vertical
+// MOI given at part CG, kg·m² (rounded to 3 dec)
+const PARTS = [
+  {id:'P1',  name:'Nose cone bracket',     mat:'Ti-6Al-4V', m:0.420, x:120,  y:0,  z:0,    moi:0.001, tgt:0.45, status:'AS-BUILT'},
+  {id:'P2',  name:'Strut fitting',         mat:'Ti-6Al-4V', m:1.180, x:380,  y:0,  z:0,    moi:0.018, tgt:1.20, status:'AS-BUILT'},
+  {id:'P3',  name:'Turbine housing',       mat:'IN718',     m:6.840, x:1240, y:0,  z:-15,  moi:0.142, tgt:6.50, status:'AS-BUILT', flag:'+5.2% over target'},
+  {id:'P4',  name:'Hot-side manifold',     mat:'IN718',     m:3.260, x:1180, y:0,  z:90,   moi:0.084, tgt:3.30, status:'AS-BUILT'},
+  {id:'P5',  name:'LH2 feed line',         mat:'IN625',     m:0.890, x:820,  y:50, z:60,   moi:0.012, tgt:0.95, status:'AS-BUILT'},
+  {id:'P6',  name:'Heat exchanger core',   mat:'IN625',     m:4.150, x:780,  y:0,  z:0,    moi:0.098, tgt:4.20, status:'AS-BUILT'},
+  {id:'P7',  name:'Combustion chamber',    mat:'GRCop-42',  m:8.220, x:1380, y:0,  z:0,    moi:0.186, tgt:8.30, status:'CMM-HOLD', flag:'CH013 Ra rework'},
+  {id:'P8',  name:'Throat insert',         mat:'GRCop-42',  m:1.640, x:1480, y:0,  z:0,    moi:0.022, tgt:1.65, status:'AS-BUILT'},
+  {id:'P9',  name:'Nozzle skirt',          mat:'IN718',     m:5.480, x:1620, y:0,  z:0,    moi:0.218, tgt:5.20, status:'FAI-HOLD', flag:'+5.4% over target'},
+  {id:'P10', name:'Gimbal yoke',           mat:'Ti-6Al-4V', m:2.940, x:1300, y:0,  z:-110, moi:0.061, tgt:3.00, status:'AS-BUILT'},
+  {id:'P11', name:'Injector face',         mat:'IN718',     m:1.860, x:1280, y:0,  z:0,    moi:0.024, tgt:1.85, status:'AS-BUILT'},
+  {id:'P12', name:'Cable tray',            mat:'AlSi10Mg',  m:0.640, x:600,  y:0,  z:140,  moi:0.018, tgt:0.70, status:'AS-BUILT'},
+  {id:'P13', name:'Avionics housing',      mat:'AlSi10Mg',  m:0.520, x:280,  y:0,  z:120,  moi:0.008, tgt:0.55, status:'AS-BUILT'},
+  // joints (fasteners, gaskets, V-bands)
+  {id:'J1',  name:'V-band P3↔P4',          mat:'IN718',     m:0.180, x:1210, y:0,  z:40,   moi:0.002, tgt:0.20, status:'AS-BUILT', kind:'joint'},
+  {id:'J2',  name:'V-band P6↔P7',          mat:'IN718',     m:0.165, x:1100, y:0,  z:0,    moi:0.002, tgt:0.18, status:'AS-BUILT', kind:'joint'},
+  {id:'J3',  name:'Hi-Lok bolts × 32',     mat:'Ti-6Al-4V', m:0.092, x:1240, y:0,  z:0,    moi:0.001, tgt:0.10, status:'AS-BUILT', kind:'joint'},
+  {id:'J4',  name:'Gasket set',            mat:'Inconel mesh', m:0.045, x:1100, y:0, z:0,  moi:0.000, tgt:0.05, status:'AS-BUILT', kind:'joint'},
+];
+
+const MAT_COLOR = {
+  'Ti-6Al-4V':C.lox, 'IN718':C.lh2, 'IN625':C.lh2, 'GRCop-42':C.risk,
+  'AlSi10Mg':C.inter, 'Inconel mesh':C.halo,
+};
+const STATUS_COLOR = {
+  'AS-BUILT':C.inter, 'CMM-HOLD':C.lh2, 'FAI-HOLD':C.lh2, 'PLANNED':C.ink3,
+};
+
+// Roll-up math
+function rollup(parts){
+  const M = parts.reduce((s,p)=>s+p.m, 0);
+  const cgx = parts.reduce((s,p)=>s+p.m*p.x,0) / M;
+  const cgy = parts.reduce((s,p)=>s+p.m*p.y,0) / M;
+  const cgz = parts.reduce((s,p)=>s+p.m*p.z,0) / M;
+  // Parallel-axis MOI about overall CG (Iyy approx for pitch axis through y)
+  const Iyy = parts.reduce((s,p)=>{
+    const dx=p.x-cgx, dz=p.z-cgz;
+    return s + p.moi + p.m*(dx*dx+dz*dz)/1e6; // mm² → m² ÷ 1e6
+  }, 0);
+  const tgt = parts.reduce((s,p)=>s+p.tgt,0);
+  return {M, cgx, cgy, cgz, Iyy, tgt, delta:M-tgt};
+}
+
+function StatusPill({s}){
+  return <span className="mono" style={{color:STATUS_COLOR[s]||C.ink2,fontSize:9.5,letterSpacing:'.08em',border:`1px solid ${STATUS_COLOR[s]||C.frame}`,padding:'1px 6px'}}>{s}</span>;
+}
+
+// SVG side-view: x (axial, mm) along horizontal, z (vertical, mm) along vertical
+function SideView({parts, totals, sel, onSel}){
+  const W=900, H=320;
+  const minX=80, maxX=1700, minZ=-180, maxZ=180;
+  const sx = v => 40 + (v-minX)/(maxX-minX) * (W-80);
+  const sz = v => H/2 - (v/maxZ) * (H/2-30);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',height:'auto',background:C.canvas3,border:`1px solid ${C.frame}`}}>
+      {/* axis */}
+      <line x1={20} y1={H/2} x2={W-20} y2={H/2} stroke={C.frame} strokeDasharray="4 4"/>
+      <text x={W-20} y={H/2-6} fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="end">+X (axial, nose→engine)</text>
+      <text x={30} y={20} fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono">+Z</text>
+
+      {/* axial scale ticks every 200mm */}
+      {[200,400,600,800,1000,1200,1400,1600].map(t=>(
+        <g key={t}>
+          <line x1={sx(t)} y1={H/2-3} x2={sx(t)} y2={H/2+3} stroke={C.ink3}/>
+          <text x={sx(t)} y={H/2+14} fill={C.ink3} fontSize="8" fontFamily="JetBrains Mono" textAnchor="middle">{t}</text>
+        </g>
+      ))}
+
+      {/* rocket silhouette hint */}
+      <path d={`M ${sx(80)} ${sz(0)} L ${sx(140)} ${sz(80)} L ${sx(1620)} ${sz(80)} L ${sx(1700)} ${sz(0)} L ${sx(1620)} ${sz(-80)} L ${sx(140)} ${sz(-80)} Z`}
+            fill="none" stroke={C.frame} strokeDasharray="6 4" strokeWidth="0.8"/>
+
+      {/* parts as bubbles sized by mass */}
+      {parts.map(p=>{
+        const r = Math.max(4, Math.sqrt(p.m)*5);
+        const isSel = sel===p.id;
+        return (
+          <g key={p.id} style={{cursor:'pointer'}} onClick={()=>onSel(p.id)}>
+            <circle cx={sx(p.x)} cy={sz(p.z)} r={r}
+              fill={MAT_COLOR[p.mat]||C.lox} fillOpacity={isSel?0.5:0.22}
+              stroke={MAT_COLOR[p.mat]||C.lox} strokeWidth={isSel?2:1}/>
+            <text x={sx(p.x)} y={sz(p.z)-r-3} fill={C.ink} fontSize="8.5" fontFamily="JetBrains Mono" textAnchor="middle">{p.id}</text>
+          </g>
+        );
+      })}
+
+      {/* overall CG marker */}
+      <g>
+        <circle cx={sx(totals.cgx)} cy={sz(totals.cgz)} r="9" fill="none" stroke={C.inter} strokeWidth="1.5"/>
+        <line x1={sx(totals.cgx)-12} y1={sz(totals.cgz)} x2={sx(totals.cgx)+12} y2={sz(totals.cgz)} stroke={C.inter} strokeWidth="1"/>
+        <line x1={sx(totals.cgx)} y1={sz(totals.cgz)-12} x2={sx(totals.cgx)} y2={sz(totals.cgz)+12} stroke={C.inter} strokeWidth="1"/>
+        <text x={sx(totals.cgx)+14} y={sz(totals.cgz)-12} fill={C.inter} fontSize="10" fontFamily="JetBrains Mono">CG · x={totals.cgx.toFixed(0)}</text>
+      </g>
+
+      {/* legend */}
+      <g transform={`translate(${W-200},${H-78})`}>
+        {Object.entries(MAT_COLOR).map(([m,c],i)=>(
+          <g key={m} transform={`translate(0,${i*11})`}>
+            <circle cx="4" cy="0" r="3.5" fill={c} fillOpacity="0.35" stroke={c}/>
+            <text x="12" y="3" fill={C.ink2} fontSize="9" fontFamily="JetBrains Mono">{m}</text>
+          </g>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+// Vertical bar showing mass distribution along X axis (axial)
+function AxialBar({parts}){
+  // bin by 200mm
+  const bins={};
+  parts.forEach(p=>{
+    const k = Math.floor(p.x/200)*200;
+    bins[k] = (bins[k]||0) + p.m;
+  });
+  const keys = Object.keys(bins).map(Number).sort((a,b)=>a-b);
+  const maxM = Math.max(...Object.values(bins));
+  return (
+    <div style={{padding:'10px 14px',border:`1px solid ${C.frame}`,background:C.canvas2}}>
+      <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>MASS DISTRIBUTION (kg per 200mm bin)</div>
+      <div style={{display:'flex',alignItems:'flex-end',gap:3,height:80}}>
+        {keys.map(k=>(
+          <div key={k} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3}}>
+            <div className="mono" style={{fontSize:9,color:C.ink}}>{bins[k].toFixed(1)}</div>
+            <div style={{width:'100%',height:bins[k]/maxM*60,background:C.lox,opacity:0.6,border:`1px solid ${C.lox}`}}/>
+            <div className="mono" style={{fontSize:8.5,color:C.ink3}}>{k}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [sel,setSel]=useState(null);
+  const totals = useMemo(()=>rollup(PARTS),[]);
+  const selPart = PARTS.find(p=>p.id===sel);
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>Mass Properties</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>MEL · CG · MOI · target vs as-built · BP-V1.2</span>
+      </div>
+
+      {/* roll-up tiles */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'TOTAL MASS', v:`${totals.M.toFixed(2)} kg`, c:C.lox, s:`target ${totals.tgt.toFixed(2)} kg`},
+          {k:'Δ vs TARGET', v:`${totals.delta>0?'+':''}${totals.delta.toFixed(2)} kg`, c:totals.delta>0?C.risk:C.inter, s:`${(totals.delta/totals.tgt*100).toFixed(1)}%`},
+          {k:'CG · X', v:`${totals.cgx.toFixed(0)} mm`, c:C.inter, s:'from nose datum'},
+          {k:'CG · Z', v:`${totals.cgz.toFixed(1)} mm`, c:C.inter, s:'from centerline'},
+          {k:'Iyy (pitch)', v:`${totals.Iyy.toFixed(2)} kg·m²`, c:C.lh2, s:'about overall CG'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:'12px 14px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:20,marginTop:4}}>{t.v}</div>
+            <div className="mono" style={{color:C.ink3,fontSize:10}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* side view */}
+      <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:14,marginBottom:14}}>
+        <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em',marginBottom:8}}>SIDE VIEW · BUBBLE SIZE = MASS · CLICK A PART</div>
+        <SideView parts={PARTS} totals={totals} sel={sel} onSel={setSel}/>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:14,marginBottom:14}}>
+        <AxialBar parts={PARTS}/>
+        <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:14}}>
+          <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:8}}>BY MATERIAL</div>
+          {Object.keys(MAT_COLOR).map(mat=>{
+            const sub = PARTS.filter(p=>p.mat===mat);
+            const m = sub.reduce((s,p)=>s+p.m,0);
+            if(!m) return null;
+            return (
+              <div key={mat} style={{display:'flex',alignItems:'center',gap:8,marginBottom:5}}>
+                <span style={{width:8,height:8,background:MAT_COLOR[mat],borderRadius:0}}/>
+                <span className="mono" style={{fontSize:10.5,color:C.ink2,flex:1}}>{mat}</span>
+                <span className="mono" style={{fontSize:10.5,color:C.ink}}>{m.toFixed(2)} kg</span>
+                <span className="mono" style={{fontSize:9.5,color:C.ink3,minWidth:36,textAlign:'right'}}>{(m/totals.M*100|0)}%</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* MEL table */}
+      <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:14}}>
+        <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em',marginBottom:8}}>MASS EQUIPMENT LIST (MEL)</div>
+        <table className="mono" style={{width:'100%',borderCollapse:'collapse',fontSize:10.5}}>
+          <thead><tr style={{color:C.ink3,borderBottom:`1px solid ${C.frame}`}}>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>ID</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>PART</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>MAT</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>MASS</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>TARGET</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>Δ</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>x</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>y</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>z</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>I@CG</th>
+            <th style={{padding:'5px 6px'}}>STATUS</th>
+          </tr></thead>
+          <tbody>
+          {PARTS.map(p=>{
+            const dlt = p.m - p.tgt;
+            const over = dlt > 0.05;
+            return (
+              <tr key={p.id}
+                  onClick={()=>setSel(p.id)}
+                  style={{cursor:'pointer',background:sel===p.id?'rgba(159,211,255,0.08)':'transparent',borderBottom:`1px dashed ${C.frame}`}}>
+                <td style={{padding:'4px 6px',color:C.ink}}>{p.id}</td>
+                <td style={{padding:'4px 6px',color:C.ink2}}>
+                  {p.kind==='joint'?<span style={{color:C.halo,marginRight:6}}>◊</span>:null}
+                  {p.name} {p.flag && <span style={{color:C.lh2,fontSize:9.5}}> · {p.flag}</span>}
+                </td>
+                <td style={{padding:'4px 6px',color:MAT_COLOR[p.mat]||C.ink2}}>{p.mat}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink}}>{p.m.toFixed(3)}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink3}}>{p.tgt.toFixed(3)}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:over?C.risk:(dlt<-0.02?C.inter:C.ink2)}}>{dlt>0?'+':''}{dlt.toFixed(3)}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink2}}>{p.x}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink2}}>{p.y}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink2}}>{p.z}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.ink3}}>{p.moi.toFixed(3)}</td>
+                <td style={{padding:'4px 6px',textAlign:'center'}}><StatusPill s={p.status}/></td>
+              </tr>
+            );
+          })}
+          </tbody>
+          <tfoot>
+            <tr style={{borderTop:`1px solid ${C.frame}`}}>
+              <td colSpan={3} style={{padding:'6px',color:C.lox,fontWeight:600}} className="mono">ROLL-UP</td>
+              <td style={{padding:'6px',textAlign:'right',color:C.ink,fontWeight:600}} className="mono">{totals.M.toFixed(3)}</td>
+              <td style={{padding:'6px',textAlign:'right',color:C.ink3}} className="mono">{totals.tgt.toFixed(3)}</td>
+              <td style={{padding:'6px',textAlign:'right',color:totals.delta>0?C.risk:C.inter}} className="mono">{totals.delta>0?'+':''}{totals.delta.toFixed(3)}</td>
+              <td style={{padding:'6px',textAlign:'right',color:C.inter}} className="mono">{totals.cgx.toFixed(0)}</td>
+              <td style={{padding:'6px',textAlign:'right',color:C.inter}} className="mono">{totals.cgy.toFixed(1)}</td>
+              <td style={{padding:'6px',textAlign:'right',color:C.inter}} className="mono">{totals.cgz.toFixed(1)}</td>
+              <td style={{padding:'6px',textAlign:'right',color:C.lh2}} className="mono">{totals.Iyy.toFixed(2)}</td>
+              <td/>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {selPart && (
+        <div style={{marginTop:14,padding:14,border:`1px solid ${MAT_COLOR[selPart.mat]||C.lox}`,background:C.canvas2}}>
+          <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em'}}>{selPart.id} · {selPart.name}</div>
+          <div className="mono" style={{fontSize:10.5,color:C.ink2,marginTop:6,lineHeight:1.7}}>
+            material <span style={{color:MAT_COLOR[selPart.mat]}}>{selPart.mat}</span> ·
+            mass <span style={{color:C.ink}}>{selPart.m.toFixed(3)} kg</span> ·
+            position <span style={{color:C.ink}}>({selPart.x}, {selPart.y}, {selPart.z}) mm</span> ·
+            local Iyy <span style={{color:C.ink}}>{selPart.moi.toFixed(3)} kg·m²</span> ·
+            contribution to overall Iyy <span style={{color:C.lh2}}>
+              {(selPart.moi + selPart.m*((selPart.x-totals.cgx)**2+(selPart.z-totals.cgz)**2)/1e6).toFixed(3)} kg·m²
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* SCHEMA */}
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.canvas3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · mass.v0.3</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "assembly":"BP-V1.2",
+  "rollup":{ "mass_kg":`+totals.M.toFixed(3)+`, "cg_mm":[`+totals.cgx.toFixed(0)+`,`+totals.cgy.toFixed(1)+`,`+totals.cgz.toFixed(1)+`], "Iyy_kgm2":`+totals.Iyy.toFixed(2)+` },
+  "target":{ "mass_kg":`+totals.tgt.toFixed(3)+`, "delta_pct":`+(totals.delta/totals.tgt*100).toFixed(2)+` },
+  "policy":{ "growth_allowance_pct":3.0, "alert_if_delta_pct":">5.0" },
+  "feeds":["assembly.parts","materials.lots"]
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

@@ -1,0 +1,251 @@
+{
+  "schema": "blueprint_skeleton_pack_v1",
+  "seed": "cubesat",
+  "pass": "PASS-0",
+  "instruction": "Lay out the top-level part_tree with one node per required_subsystem, a global datum scheme, the overall envelope, and stub interfaces between subsystems. No detailed geometry.",
+  "disciplines": {
+    "structures": "Load-bearing geometry, frames, spars, skins, joints, stiffness",
+    "actuation": "Motors, servos, brakes, reducers and their mounting/replacement",
+    "power": "Battery, solar generation, charging, distribution, connectors",
+    "electronics": "Boards, drivers, wiring, signal routing, grounding",
+    "comms": "Antennas, radios, data links and their placement/clearance",
+    "gnc": "Attitude/position sensing and control hardware evidence (mock level)",
+    "thermal": "Heat paths, radiators, vents, thermal isolation notes",
+    "payload": "Mission equipment bay, sensor mounts, removable inserts",
+    "recovery_deployment": "Parachutes, deployables, release mechanisms (display-level)",
+    "integration": "Datums, interfaces, harness routing, service access, assembly order"
+  },
+  "required_subsystems": [
+    {
+      "id": "structure_rails",
+      "discipline": "structures",
+      "function": "3U frame, deployer rails, board stack support",
+      "evidence_features": [
+        "rail",
+        "standoff",
+        "PC/104 stack",
+        "corner_post"
+      ]
+    },
+    {
+      "id": "eps_solar_charging",
+      "discipline": "power",
+      "function": "Solar panel dummies, battery tray, charge/distribution board",
+      "evidence_features": [
+        "solar_panel_face",
+        "battery_tray",
+        "eps_board_slot",
+        "power_connector"
+      ]
+    },
+    {
+      "id": "comms_antenna",
+      "discipline": "comms",
+      "function": "Antenna deployer (tape-spring dummy ok), radio board slot, RF connector path",
+      "evidence_features": [
+        "antenna_slot",
+        "antenna_deployer",
+        "tape_spring",
+        "deploy_hinge",
+        "radio_board",
+        "rf_connector"
+      ]
+    },
+    {
+      "id": "adcs",
+      "discipline": "gnc",
+      "function": "Attitude control evidence: reaction wheel/magnetorquer dummies, star tracker mount, sun sensor windows",
+      "evidence_features": [
+        "reaction_wheel_dummy",
+        "magnetorquer_rod",
+        "sensor_window",
+        "star_tracker_mount",
+        "baffle_shield"
+      ]
+    },
+    {
+      "id": "cdh_avionics",
+      "discipline": "electronics",
+      "function": "On-board computer stack, harness between boards",
+      "evidence_features": [
+        "obc_board",
+        "stack_harness",
+        "debug_port_access"
+      ]
+    },
+    {
+      "id": "thermal_path",
+      "discipline": "thermal",
+      "function": "Radiator face or thermal strap note from battery/OBC to structure",
+      "evidence_features": [
+        "radiator_face",
+        "thermal_strap_note",
+        "vent_hole"
+      ]
+    },
+    {
+      "id": "payload_bay",
+      "discipline": "payload",
+      "function": "Removable payload module: optics bench, focal plane, thermal baffles, inspection window",
+      "evidence_features": [
+        "payload_tray",
+        "inspection_window",
+        "optics_bench",
+        "focal_plane",
+        "lens_mount"
+      ]
+    },
+    {
+      "id": "deployment_mechs",
+      "discipline": "recovery_deployment",
+      "function": "Antenna/panel deployment hinges, separation spring plate, pod pusher contacts, release dummies (display-level)",
+      "evidence_features": [
+        "deploy_hinge",
+        "release_pin_dummy",
+        "burn_wire_note",
+        "separation_spring_plate",
+        "pusher_contact",
+        "kill_switch_arm"
+      ]
+    },
+    {
+      "id": "propulsion_mock",
+      "discipline": "actuation",
+      "function": "Cold gas thruster bracket dummies and plumbing manifold mock (display-only, non-functional)",
+      "evidence_features": [
+        "thruster_bracket",
+        "cold_gas_nozzle_dummy",
+        "plumbing_manifold",
+        "cross_pattern_mount"
+      ]
+    },
+    {
+      "id": "integration_harness",
+      "discipline": "integration",
+      "function": "Inter-board harness routing, connectors, assembly datums, connection types and load-path closure",
+      "evidence_features": [
+        "harness_channel",
+        "connector_keying",
+        "assembly_datum"
+      ]
+    }
+  ],
+  "completeness_rule": "Every required_subsystem must appear in part_tree with at least one evidence_feature in geometry_ops; a missing subsystem is a scorecard failure, not a style issue.",
+  "global_judgment_summary": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+        },
+        {
+          "criterion": "mechanism_named_not_implied",
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry."
+        }
+      ]
+    },
+    {
+      "id": "datum_tolerance",
+      "criteria": [
+        {
+          "criterion": "datum_visibility",
+          "loop_feedback": "Add visible datum pads or axis/rail/socket features and label their mating function."
+        },
+        {
+          "criterion": "clearance_named",
+          "loop_feedback": "Add clearance_mm or tolerance notes for hinge pins, slide rails, sockets, and removable cartridges."
+        },
+        {
+          "criterion": "interface_count",
+          "loop_feedback": "Add at least three adjacent interfaces: mount, service, electrical/data, flow, or inspection datum."
+        },
+        {
+          "criterion": "standard_fit_vocabulary",
+          "loop_feedback": "Classify each mating diameter as clearance/transition/press fit and add a numeric allowance instead of line-to-line nominals."
+        },
+        {
+          "criterion": "standard_hardware_dimensioning",
+          "loop_feedback": "Snap hole, pin, and bearing dimensions to standard catalog sizes and name the intended hardware in callouts."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "loop_feedback": "For each interface pick a connection type from the taxonomy, state its DOF (0/1R/1T/1R1T/3R), and add a numeric clearance and the matching geometry feature."
+        },
+        {
+          "criterion": "assembly_sequence_feasible",
+          "loop_feedback": "State an installation order and verify each joint is reachable when it is made; reorder or add access openings where a part would trap another."
+        },
+        {
+          "criterion": "datum_chain_continuity",
+          "loop_feedback": "Name one primary datum part, route each part's location back to it through one parent datum, and keep critical fits off the primary datum to limit stack-up."
+        },
+        {
+          "criterion": "load_path_closure",
+          "loop_feedback": "Trace each part's main load to the base through named interfaces; upgrade any load-bearing joint from snap/adhesive to bolted/pinned/clamped and add the fitting where the path breaks."
+        },
+        {
+          "criterion": "structural_development_direction",
+          "loop_feedback": "Drive the next version toward fewer justified interfaces, consolidated printable parts that keep service access, and closed load paths; add redundancy only at safety-critical joints."
+        },
+        {
+          "criterion": "interface_minimization",
+          "loop_feedback": "Merge interfaces that exist for no service/motion/manufacture/load reason; keep a split only when it earns its joint."
+        }
+      ]
+    }
+  ],
+  "connection_taxonomy": {
+    "rule": "Name each inter-part interface with one of these connection types + its DOF + a numeric clearance, instead of a vague 'mount'.",
+    "dof_codes": "0=fixed, 1R=revolute, 1T=prismatic, 1R1T=cylindrical, 3R=spherical",
+    "families": {
+      "fastened": [
+        "bolted_through(0)",
+        "threaded_insert(0)",
+        "rivet(0)"
+      ],
+      "form_fit": [
+        "snap_fit(0)",
+        "press_fit(0)",
+        "dovetail_slide(1T)",
+        "keyed_spline(1T)",
+        "tongue_groove(0)"
+      ],
+      "pinned_hinged": [
+        "dowel_pin(0)",
+        "clevis_pin(1R)",
+        "revolute_bearing(1R)"
+      ],
+      "clamped": [
+        "band_clamp(0)",
+        "collar_setscrew(0)"
+      ],
+      "bonded": [
+        "adhesive_lap(0)",
+        "weld_seam(0)"
+      ],
+      "sealed": [
+        "o_ring(0)",
+        "face_gasket(0)"
+      ],
+      "routed": [
+        "connector_mate(0)",
+        "harness_passthrough(0)",
+        "fluid_manifold(0)"
+      ]
+    }
+  }
+}

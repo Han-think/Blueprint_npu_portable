@@ -1,0 +1,95 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "long_range_recon_wing",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "recon_payload",
+    "discipline": "payload",
+    "function": "Non-weapon camera/gimbal sensor pod bay with removable insert and window",
+    "evidence_features": [
+      "sensor_bay",
+      "payload_insert",
+      "window",
+      "camera_pod",
+      "gimbal_mount"
+    ],
+    "criteria_refs": [
+      "uav_wing"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "uav_wing",
+      "title": "Long-Range Recon Wing Criteria",
+      "criteria": [
+        {
+          "criterion": "spar_datum_access",
+          "weight": 14,
+          "good": "Spar socket, anti-rotation keys, and center datum remain visible and inspectable.",
+          "bad": "Wing/fuselage integration hides spar alignment evidence.",
+          "signals": [
+            "spar",
+            "socket",
+            "anti-rotation",
+            "datum"
+          ],
+          "loop_feedback": "Expose spar sockets, anti-rotation keys, and center datum labels in geometry and callouts."
+        },
+        {
+          "criterion": "mission_payload_non_weapon_boundary",
+          "weight": 11,
+          "good": "Payload bay is labeled non-weapon/display-only with removable mission/sensor module.",
+          "bad": "Design drifts into weaponized or operational payload details.",
+          "signals": [
+            "non-weapon",
+            "display-only",
+            "sensor bay",
+            "payload insert"
+          ],
+          "loop_feedback": "Keep payload as non-weapon educational sensor bay and preserve removable insert/service window."
+        },
+        {
+          "criterion": "cg_battery_service",
+          "weight": 10,
+          "good": "Battery bay uses slide rail, CG marks, and independent payload/battery removal.",
+          "bad": "Battery is buried or coupled to payload in a way that blocks CG adjustment.",
+          "signals": [
+            "battery bay",
+            "CG",
+            "slide rail",
+            "removable"
+          ],
+          "loop_feedback": "Add visible CG rail marks and independent slide-in battery/payload service paths."
+        },
+        {
+          "criterion": "load_path_continuity",
+          "weight": 11,
+          "good": "Lift, landing, and payload loads trace through continuous structure: spar to carry-through to fuselage frames, with fittings at every load transfer.",
+          "bad": "Structural members end at skins or bays with no fitting, frame, or carry-through; load path breaks at the wing root.",
+          "signals": [
+            "carry_through",
+            "load_path",
+            "fitting",
+            "frame",
+            "rib",
+            "hardpoint"
+          ],
+          "loop_feedback": "Trace each major load to ground through named members and add fittings or frames wherever the path currently breaks."
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Setup</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>
+  body{margin:0;background:#0c1e35;min-height:100vh;}
+  .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+  .sans{font-family:'Inter','Noto Sans KR',system-ui,sans-serif;}
+  pre{margin:0;}
+  details>summary{list-style:none;cursor:pointer;}
+  details>summary::-webkit-details-marker{display:none;}
+</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Setup'),100);</script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+const OLLAMA = 'http://127.0.0.1:11434';
+
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  term_bg:'#000', term_green:'#2ee66b', term_dim:'#177a3a', term_warn:'#ffd37a',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+  sans:"'Inter','Noto Sans KR',system-ui,sans-serif",
+};
+
+function Chip({c=C.lox, children, style}){
+  return <span className="mono" style={{fontSize:11,letterSpacing:'.12em',textTransform:'uppercase',color:c,...style}}>{children}</span>;
+}
+function Btn({children, variant='default', onClick, disabled, style, size='md'}){
+  const col = variant==='primary'?C.lox:variant==='go'?C.inter:variant==='risk'?C.risk:C.ink;
+  const pad = size==='sm'?'5px 10px':'8px 14px';
+  return (
+    <button onClick={onClick} disabled={disabled}
+      style={{fontFamily:C.mono,fontSize:size==='sm'?11:12,textTransform:'uppercase',letterSpacing:'.08em',
+              padding:pad,background:'transparent',color:col,border:`1px solid ${col}`,
+              borderRadius:2,cursor:disabled?'not-allowed':'pointer',opacity:disabled?.4:1,...style}}>
+      {children}
+    </button>
+  );
+}
+
+function Step({n, title, kicker, status, children, color=C.lox}){
+  const stateCol   = status==='ok'?C.inter:status==='fail'?C.risk:status==='running'?C.lh2:C.ink3;
+  const stateLabel = status==='ok'?'✓ READY':status==='fail'?'✗ NOT FOUND':status==='running'?'◐ CHECKING':'○ PENDING';
+  return (
+    <div style={{border:`1px solid ${status==='ok'?C.inter:status==='fail'?C.risk:C.frame}`,
+                 background:C.canvas,padding:16,marginBottom:12}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:6}}>
+        <div style={{display:'flex',alignItems:'baseline',gap:12}}>
+          <span className="mono" style={{fontSize:24,color,letterSpacing:'.06em'}}>{String(n).padStart(2,'0')}</span>
+          <div>
+            <Chip c={color}>{kicker}</Chip>
+            <h3 style={{margin:'2px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>{title}</h3>
+          </div>
+        </div>
+        <Chip c={stateCol}>{stateLabel}</Chip>
+      </div>
+      <div>{children}</div>
+    </div>
+  );
+}
+
+function Code({children, lang='powershell'}){
+  return (
+    <div style={{border:`1px solid ${C.frame}`,background:C.term_bg,padding:'10px 12px',marginTop:8,position:'relative'}}>
+      <span className="mono" style={{position:'absolute',top:6,right:10,fontSize:9,color:C.term_dim,letterSpacing:'.1em'}}>{lang.toUpperCase()}</span>
+      <pre className="mono" style={{fontSize:11.5,color:C.term_green,whiteSpace:'pre-wrap',lineHeight:1.55}}>{children}</pre>
+    </div>
+  );
+}
+
+function ModelList({models}){
+  if(!models.length) return (
+    <div className="mono" style={{fontSize:11,color:C.ink3,marginTop:8}}>모델 없음</div>
+  );
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:4,marginTop:8}}>
+      {models.map(m=>(
+        <div key={m.name} style={{display:'flex',justifyContent:'space-between',padding:'6px 10px',
+                                   border:`1px solid ${C.frame}`,background:C.canvas2,fontFamily:C.mono,fontSize:11}}>
+          <span style={{color:C.inter}}>● {m.name}</span>
+          <span style={{color:C.ink3}}>{m.size?(m.size/1e9).toFixed(1)+' GB':'—'}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function App(){
+  const [checks, setChecks] = useState({
+    ollama: 'pending',   // pending | running | ok | fail
+    models: 'pending',
+    server: 'pending',
+  });
+  const [models,    setModels]    = useState([]);
+  const [busy,      setBusy]      = useState(null);
+  const [serverLog, setServerLog] = useState('');
+
+  function setCheck(k, v){ setChecks(c=>({...c,[k]:v})); }
+
+  // ── 1. Ollama ping ──
+  async function checkOllama(){
+    setBusy('ollama'); setCheck('ollama','running');
+    try {
+      const r = await fetch(`${OLLAMA}/api/tags`, {signal: AbortSignal.timeout(3000)});
+      if(r.ok){ setCheck('ollama','ok'); } else { setCheck('ollama','fail'); }
+    } catch { setCheck('ollama','fail'); }
+    setBusy(null);
+  }
+
+  // ── 2. Model list ──
+  async function checkModels(){
+    setBusy('models'); setCheck('models','running');
+    try {
+      const r    = await fetch(`${OLLAMA}/api/tags`, {signal: AbortSignal.timeout(3000)});
+      const data = await r.json();
+      const list = data.models || [];
+      setModels(list);
+      setCheck('models', list.length>0 ? 'ok' : 'fail');
+    } catch { setCheck('models','fail'); }
+    setBusy(null);
+  }
+
+  // ── 3. Quick server smoke test ──
+  async function checkServer(){
+    setBusy('server'); setCheck('server','running');
+    try {
+      const r = await fetch(`${OLLAMA}/api/generate`, {
+        method:'POST', signal: AbortSignal.timeout(8000),
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ model: models[0]?.name || 'qwen2.5:7b',
+                               prompt:'Reply with exactly: OK', stream:false,
+                               options:{num_predict:5,temperature:0} }),
+      });
+      const data = await r.json();
+      const reply = (data.response||'').trim();
+      setServerLog(reply);
+      setCheck('server', reply ? 'ok' : 'fail');
+    } catch(e) {
+      setServerLog(e.message);
+      setCheck('server','fail');
+    }
+    setBusy(null);
+  }
+
+  const allOk = Object.values(checks).every(v=>v==='ok');
+
+  return (
+    <div style={{maxWidth:980,margin:'0 auto',padding:24,fontFamily:C.sans,color:C.ink2}}>
+
+      {/* title */}
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:14,marginBottom:18}}>
+        <Chip c={C.lh2}>SETUP · OLLAMA IPEX MODE</Chip>
+        <h1 style={{color:C.ink,fontSize:28,margin:'6px 0 4px',fontWeight:600,letterSpacing:'-0.01em'}}>
+          로컬 Ollama가 실행 중인지 확인합니다.
+        </h1>
+        <p className="sans" style={{color:C.ink3,fontSize:14,margin:0,maxWidth:720,textWrap:'pretty'}}>
+          Blueprint NPU는 <span style={{color:C.lox}}>C:\Ollama-IPEX\ollama.exe</span>를 백엔드로 사용합니다.
+          Python, npm, pip 설치 불필요. Ollama만 실행하면 됩니다.
+        </p>
+      </div>
+
+      {/* architecture ribbon */}
+      <div style={{border:`1px solid ${C.frame}`,padding:14,marginBottom:18,background:C.canvas}}>
+        <Chip c={C.halo} style={{display:'block',marginBottom:10}}>아키텍처</Chip>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 24px 1fr 24px 1fr',gap:6,alignItems:'center'}}>
+          {[
+            {k:'BROWSER',  v:'index.html\nMinimal.html',   c:C.lox},
+            {k:'OLLAMA',   v:'127.0.0.1:11434\n/api/generate', c:C.inter},
+            {k:'GPU/iGPU', v:'IPEX-LLM\nIntel Arc/iGPU',  c:C.lh2},
+          ].map((b,i,arr)=>(
+            <React.Fragment key={i}>
+              <div style={{border:`1px solid ${b.c}`,padding:10,textAlign:'center'}}>
+                <div className="mono" style={{fontSize:10,color:b.c,letterSpacing:'.08em'}}>{b.k}</div>
+                <div className="mono" style={{fontSize:11,color:C.ink,marginTop:3,whiteSpace:'pre-line'}}>{b.v}</div>
+              </div>
+              {i<arr.length-1 && <span className="mono" style={{color:C.ink3,textAlign:'center'}}>→</span>}
+            </React.Fragment>
+          ))}
+        </div>
+        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:10,letterSpacing:'.04em'}}>
+          브라우저 → Ollama API 직접 호출 · Python 서버 불필요 · 완전 오프라인
+        </div>
+      </div>
+
+      {/* STEP 1 — Ollama 실행 */}
+      <Step n={1} kicker="RUNTIME" title="Ollama IPEX 실행" status={checks.ollama} color={C.lox}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 8px'}}>
+          <span style={{color:C.lox}}>C:\Ollama-IPEX\</span>에 있는 Ollama를 시작합니다.
+          이미 실행 중이면 바로 Check를 누르세요.
+        </p>
+        <Code lang="batch">{`REM 방법 1: 전용 배치 파일 (권장)
+C:\\Ollama-IPEX\\start-ollama.bat
+
+REM 방법 2: 직접 실행
+C:\\Ollama-IPEX\\ollama-serve.bat
+
+REM 방법 3: PowerShell
+cd C:\\Ollama-IPEX
+.\\ollama.exe serve`}</Code>
+        <div style={{display:'flex',gap:8,marginTop:10}}>
+          <Btn variant="primary" onClick={checkOllama} disabled={busy==='ollama'}>
+            {busy==='ollama'?'◐ checking…':'check :11434'}
+          </Btn>
+          <span className="mono" style={{fontSize:10,color:C.ink3,alignSelf:'center'}}>
+            → <span style={{color:C.term_green}}>GET http://127.0.0.1:11434/api/tags</span>
+          </span>
+        </div>
+        {checks.ollama==='fail' && (
+          <div className="mono" style={{fontSize:11,color:C.risk,marginTop:8}}>
+            ✗ 연결 실패 — Ollama가 실행 중인지 확인하세요. start-ollama.bat을 먼저 실행하세요.
+          </div>
+        )}
+      </Step>
+
+      {/* STEP 2 — 모델 확인 */}
+      <Step n={2} kicker="MODELS" title="설치된 모델 확인" status={checks.models} color={C.inter}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 8px'}}>
+          Ollama에 최소 1개 모델이 필요합니다. 없으면 아래 명령으로 받으세요.
+        </p>
+        <Code lang="powershell">{`# 권장 — 빠르고 균형 잡힌 7B 모델
+C:\\Ollama-IPEX\\ollama.exe pull qwen2.5:7b
+
+# 소형 — 저사양 PC용
+C:\\Ollama-IPEX\\ollama.exe pull qwen2.5:3b
+
+# 설치된 모델 목록 확인
+C:\\Ollama-IPEX\\ollama.exe list`}</Code>
+        <div style={{display:'flex',gap:8,marginTop:10}}>
+          <Btn variant="primary" onClick={checkModels} disabled={busy==='models'}>
+            {busy==='models'?'◐ scanning…':'scan models'}
+          </Btn>
+        </div>
+        {models.length>0 && <ModelList models={models}/>}
+        {checks.models==='fail' && (
+          <div className="mono" style={{fontSize:11,color:C.risk,marginTop:8}}>
+            ✗ 모델 없음 — <span style={{color:C.lh2}}>ollama pull qwen2.5:7b</span> 실행 후 재스캔
+          </div>
+        )}
+      </Step>
+
+      {/* STEP 3 — 실제 생성 테스트 */}
+      <Step n={3} kicker="SMOKE TEST" title="실제 생성 테스트" status={checks.server} color={C.lh2}>
+        <p className="sans" style={{fontSize:13,color:C.ink2,margin:'4px 0 8px'}}>
+          모델에 짧은 프롬프트를 보내 실제 응답이 오는지 확인합니다. (~5초 소요)
+        </p>
+        <Code lang="json">{`POST http://127.0.0.1:11434/api/generate
+{ "model": "${models[0]?.name||'qwen2.5:7b'}", "prompt": "Reply with exactly: OK", "stream": false }`}</Code>
+        <div style={{display:'flex',gap:8,marginTop:10,alignItems:'center'}}>
+          <Btn variant="primary" onClick={checkServer} disabled={busy==='server'||checks.models!=='ok'}>
+            {busy==='server'?'◐ testing…':'run smoke test'}
+          </Btn>
+          {checks.models!=='ok' && <span className="mono" style={{fontSize:10,color:C.ink3}}>먼저 Step 2를 완료하세요</span>}
+        </div>
+        {serverLog && (
+          <div className="mono" style={{fontSize:11,marginTop:8,
+                                        color:checks.server==='ok'?C.inter:C.risk}}>
+            model replied: "{serverLog}"
+          </div>
+        )}
+      </Step>
+
+      {/* LAUNCH */}
+      <div style={{border:`1px solid ${allOk?C.inter:C.frame}`,padding:18,marginTop:18,
+                   background:allOk?'rgba(137,255,168,0.04)':C.canvas}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10}}>
+          <div>
+            <Chip c={allOk?C.inter:C.ink3}>{allOk?'✓ ALL GREEN · 준비 완료':'○ 위 단계를 먼저 완료하세요'}</Chip>
+            <h3 style={{margin:'4px 0 0',color:C.ink,fontSize:16,fontWeight:600}}>Minimal Runner 열기</h3>
+          </div>
+          {allOk && <Btn variant="go" onClick={()=>{ window.location.href='Minimal.html'; }}>open minimal →</Btn>}
+        </div>
+        <div className="mono" style={{fontSize:11,color:C.ink3,marginTop:6,letterSpacing:'.04em'}}>
+          Ollama가 실행 중인 상태에서 Minimal.html을 열면 자동으로 연결됩니다.<br/>
+          <span style={{color:C.lh2}}>CORS 오류 발생 시</span> — 브라우저에서 file:// 대신{' '}
+          <span style={{color:C.lox}}>http://127.0.0.1:8080</span>으로 열어야 합니다.{' '}
+          <a href="#cors-fix" style={{color:C.lox}}>아래 CORS 해결법 참조 ↓</a>
+        </div>
+      </div>
+
+      {/* CORS FIX */}
+      <details id="cors-fix" style={{border:`1px solid ${C.frame}`,marginTop:14,background:C.canvas}}>
+        <summary style={{padding:'12px 16px',color:C.ink2}}>
+          <Chip c={C.lh2}>▸ CORS / file:// 오류 해결법</Chip>
+          <span style={{marginLeft:10,fontFamily:C.mono,fontSize:11,color:C.ink3}}>
+            fetch 차단 시 로컬 HTTP 서버로 열기
+          </span>
+        </summary>
+        <div style={{padding:'4px 16px 16px'}}>
+          <p className="sans" style={{fontSize:13,color:C.ink2}}>
+            브라우저가 file:// 프로토콜에서 로컬 fetch를 막는 경우 serve.py로 HTTP로 서빙합니다.
+          </p>
+          <Code lang="powershell">{`# 방법 1: server/serve.py 사용 (포함됨)
+cd C:\\Ollama-IPEX\\Blueprint_npu_portable-main
+python server\\serve.py
+# → http://127.0.0.1:8080 으로 브라우저 열기
+
+# 방법 2: Python 내장 서버
+python -m http.server 8080
+# → http://127.0.0.1:8080
+
+# 방법 3: start.bat 더블클릭 (Ollama + HTTP 서버 동시 시작)
+C:\\Ollama-IPEX\\Blueprint_npu_portable-main\\start.bat`}</Code>
+          <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:8,letterSpacing:'.04em'}}>
+            Ollama는 기본적으로 localhost CORS를 허용합니다. HTTP 서버 origin은 통과됩니다.
+          </div>
+        </div>
+      </details>
+
+      {/* TROUBLESHOOT */}
+      <details style={{border:`1px solid ${C.frame}`,marginTop:14,background:C.canvas}}>
+        <summary style={{padding:'12px 16px',color:C.ink2}}>
+          <Chip c={C.ink3}>▸ TROUBLESHOOT</Chip>
+          <span style={{marginLeft:10,fontFamily:C.mono,fontSize:11,color:C.ink3}}>
+            Ollama 미응답 · 모델 없음 · 느린 속도
+          </span>
+        </summary>
+        <div style={{padding:'4px 16px 16px',fontFamily:C.mono,fontSize:11,color:C.ink2,lineHeight:1.7}}>
+          <div><span style={{color:C.risk}}>:11434 연결 거부 →</span> start-ollama.bat 실행. 방화벽이 11434 포트를 막지 않는지 확인.</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>모델 로딩 매우 느림 →</span> IPEX-LLM이 iGPU/Arc로 offload 중인지 확인. ollama.exe 로그에서 "sycl" 표시 확인.</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>fetch failed (CORS) →</span> file://로 열지 말고 serve.py 또는 python -m http.server 8080 사용.</div>
+          <div style={{marginTop:6}}><span style={{color:C.risk}}>모델 응답이 비어있음 →</span> num_predict가 너무 작거나 모델이 로드 중. 잠시 후 재시도.</div>
+        </div>
+      </details>
+
+      <div style={{borderTop:`1px solid ${C.frame}`,marginTop:24,paddingTop:14,fontFamily:C.mono,
+                   fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>blueprint_npu · setup · ollama ipex mode · no python server required</span>
+        <span>다음: <a href="Minimal.html" style={{color:C.lox}}>Minimal.html</a></span>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

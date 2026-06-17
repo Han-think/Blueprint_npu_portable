@@ -1,0 +1,61 @@
+{
+  "schema": "blueprint_classification_ontology_v1",
+  "note": "비파괴적 2층 온톨로지. 원본 라벨(thinking.jsonl)은 보존, 여기서 공통 core/polarity 부여.",
+  "cores": {
+    "INTEGRATE":         { "polarity": "approve",  "desc": "통합 승인 (정비/검사 보존 하에)" },
+    "PARTIAL_INTEGRATE": { "polarity": "approve",  "desc": "조건부/부분 통합, 접근성 일부 보존" },
+    "REJECT":            { "polarity": "reject",   "desc": "통합 거부 (사전 차단)" },
+    "FAIL":              { "polarity": "reject",   "desc": "실패 판정 (사후, 과통합/정비성 위반)" },
+    "DECOUPLE":          { "polarity": "neutral",  "desc": "분리/외부화로 정비 단위 보존" },
+    "RISK":              { "polarity": "caution",  "desc": "위험 식별 (datum/flow/cable/print 등)" },
+    "GUARDRAIL":         { "polarity": "neutral",  "desc": "설계 기준 보존 제약" },
+    "EXPOSE":            { "polarity": "approve",  "desc": "학습/한계 노출 (교육용 mockup 목적)" }
+  },
+  "labels": {
+    "integrate_with_guardrail":          { "core": "INTEGRATE",         "polarity": "approve" },
+    "integrate_low_risk_feature":        { "core": "INTEGRATE",         "polarity": "approve" },
+    "integrate_hollow_feature":          { "core": "INTEGRATE",         "polarity": "approve" },
+    "integrate_service_feature":         { "core": "INTEGRATE",         "polarity": "approve" },
+    "integrate_assembly_guidance":       { "core": "INTEGRATE",         "polarity": "approve" },
+    "add_assembly_path":                 { "core": "INTEGRATE",         "polarity": "approve" },
+    "add_service_feature":               { "core": "INTEGRATE",         "polarity": "approve" },
+
+    "partial_integration":               { "core": "PARTIAL_INTEGRATE", "polarity": "approve" },
+    "reduce_but_preserve_access":        { "core": "PARTIAL_INTEGRATE", "polarity": "approve" },
+    "fastener_reduction":                { "core": "PARTIAL_INTEGRATE", "polarity": "approve" },
+    "reduce_fasteners":                  { "core": "PARTIAL_INTEGRATE", "polarity": "approve" },
+
+    "do_not_integrate":                  { "core": "REJECT",            "polarity": "reject" },
+    "reject_closed_integration":         { "core": "REJECT",            "polarity": "reject" },
+    "reject_hidden_integration":         { "core": "REJECT",            "polarity": "reject" },
+    "reject_functional_drift":           { "core": "REJECT",            "polarity": "reject" },
+    "reject_weaponized_drift":           { "core": "REJECT",            "polarity": "reject" },
+
+    "fail_over_integration":             { "core": "FAIL",              "polarity": "reject" },
+    "fail_serviceability":               { "core": "FAIL",              "polarity": "reject" },
+    "fail_learning_goal":                { "core": "FAIL",              "polarity": "reject" },
+
+    "decouple_fragile_part":             { "core": "DECOUPLE",          "polarity": "neutral" },
+    "decouple_service_module":           { "core": "DECOUPLE",          "polarity": "neutral" },
+    "separate_fragile_and_service_parts":{ "core": "DECOUPLE",          "polarity": "neutral" },
+    "separate_service_paths":            { "core": "DECOUPLE",          "polarity": "neutral" },
+    "externalize_service_fasteners":     { "core": "DECOUPLE",          "polarity": "neutral" },
+    "externalize_service_feature":       { "core": "DECOUPLE",          "polarity": "neutral" },
+
+    "risk_datum_loss":                   { "core": "RISK",              "polarity": "caution" },
+    "risk_flow_hidden":                  { "core": "RISK",              "polarity": "caution" },
+    "risk_hidden_service":               { "core": "RISK",              "polarity": "caution" },
+    "risk_print_deformation":            { "core": "RISK",              "polarity": "caution" },
+    "risk_wire_motion":                  { "core": "RISK",              "polarity": "caution" },
+    "print_strategy_risk":               { "core": "RISK",              "polarity": "caution" },
+
+    "datum_guardrail":                   { "core": "GUARDRAIL",         "polarity": "neutral" },
+    "tolerance_guardrail":               { "core": "GUARDRAIL",         "polarity": "neutral" },
+
+    "expose_learning_feature":           { "core": "EXPOSE",            "polarity": "approve" },
+    "expose_mechanism_limit":            { "core": "EXPOSE",            "polarity": "approve" },
+    "printability_service_detail":       { "core": "EXPOSE",            "polarity": "approve" },
+    "print_strategy":                    { "core": "EXPOSE",            "polarity": "approve" },
+    "serviceability_redesign":           { "core": "EXPOSE",            "polarity": "approve" }
+  }
+}

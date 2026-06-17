@@ -1,0 +1,135 @@
+{
+  "schema": "blueprint_step_assembly_structure_v1",
+  "seed": "cubesat",
+  "assembly_step": "cubesat_assembly.step",
+  "note": "EDUCATIONAL DISPLAY MOCKUP geometry — analysis results are shape-trend level, not certified performance.",
+  "parts": [
+    {
+      "part_id": "new-001",
+      "label": "integrated rail-frame spine",
+      "step_file": "step/new-001_integrated_rail_frame_spine.step",
+      "qty": 1,
+      "bbox_mm": [
+        96.0,
+        96.0,
+        330.0
+      ],
+      "placement_translation_mm": [
+        -23.56,
+        -13.05,
+        0.0
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-002",
+      "label": "removable service panels",
+      "step_file": "step/new-002_removable_service_panels.step",
+      "qty": 2,
+      "bbox_mm": [
+        92.0,
+        1.8,
+        150.0
+      ],
+      "placement_translation_mm": [
+        70.69,
+        -13.05,
+        0.0
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-003",
+      "label": "board shelf and standoff ladder",
+      "step_file": "step/new-003_board_shelf_and_standoff_ladder.step",
+      "qty": 1,
+      "bbox_mm": [
+        74.0,
+        18.0,
+        260.0
+      ],
+      "placement_translation_mm": [
+        -23.56,
+        -13.05,
+        0.0
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-004",
+      "label": "replaceable antenna hinge dummy pair",
+      "step_file": "step/new-004_replaceable_antenna_hinge_dummy_pair.step",
+      "qty": 2,
+      "bbox_mm": [
+        8.0,
+        8.0,
+        18.0
+      ],
+      "placement_translation_mm": [
+        -23.56,
+        39.15,
+        0.0
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        30.0
+      ]
+    }
+  ],
+  "mates": [
+    {
+      "id": "J1",
+      "kind": "revolute",
+      "part_a": "new-002",
+      "part_b": "new-001",
+      "mate": "slot",
+      "clearance_mm": 0.25,
+      "containment": false,
+      "note": "service panel slide — cad_brief panel_slide_clearance"
+    },
+    {
+      "id": "J2",
+      "kind": "revolute",
+      "part_a": "new-003",
+      "part_b": "new-001",
+      "mate": "slot",
+      "clearance_mm": 0.35,
+      "containment": true,
+      "note": "board shelf ladder slides inside spine bay — board_dummy_clearance"
+    },
+    {
+      "id": "J3",
+      "kind": "revolute",
+      "part_a": "new-004",
+      "part_b": "new-001",
+      "mate": "pin",
+      "clearance_mm": 0.2,
+      "containment": false,
+      "note": "antenna hinge rotation"
+    }
+  ],
+  "consistency": {
+    "parts_exported": 4,
+    "part_tree_roots": 4,
+    "mates_recorded": 3
+  },
+  "layout": {
+    "method": "joint_directional_tree",
+    "datum": "new-001",
+    "unsatisfied_mates": [],
+    "note": "Children placed adjacent to BFS-tree parent on distinct faces; collision-free is re-verified by assembly_interference_audit, not assumed. Secondary mates of multi-mate parts are reported as unsatisfied residuals (no constraint solver)."
+  }
+}

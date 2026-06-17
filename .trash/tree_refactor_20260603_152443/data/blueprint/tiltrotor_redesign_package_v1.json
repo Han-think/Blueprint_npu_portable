@@ -1,0 +1,396 @@
+{
+  "schema": "blueprint_tiltrotor_redesign_package_v1",
+  "created_at": "2026-06-03T12:45:00+09:00",
+  "target": {
+    "vehicle_id": "tiltrotor_vtol",
+    "label": "Tiltrotor VTOL Hybrid educational mockup",
+    "scope": "design-thinking and 3D-printable assembly package before STL generation",
+    "not_for": "flight certification, autonomous flight, payload delivery, military use, or structural airworthiness claims"
+  },
+  "primary_metric": {
+    "name": "assembly_serviceability_efficiency",
+    "definition": "Reduce assembly effort while preserving access for nacelle service, tilt-axis alignment, servo linkage adjustment, battery CG tuning, ESC/motor wiring, and payload bay swaps.",
+    "failure_rule": "Part count reduction fails if tilt-axis datums, nacelle replacement, battery slide access, or wiring inspection are blocked."
+  },
+  "existing_bom": [
+    {
+      "id": "old-001",
+      "label": "center fuselage spine",
+      "qty": 1,
+      "role": "main body, avionics bay, wing spar socket, payload transition",
+      "interfaces": ["main wing halves", "battery bay", "payload nose", "landing gear", "FC stack"],
+      "service_access": "must expose avionics and battery path"
+    },
+    {
+      "id": "old-002",
+      "label": "main wing halves",
+      "qty": 2,
+      "role": "fixed-wing lift surface and spar carry-through",
+      "interfaces": ["center fuselage spine", "nacelle pylons", "servo wiring"],
+      "service_access": "wing roots must remain alignable and removable"
+    },
+    {
+      "id": "old-003",
+      "label": "tilting nacelle assemblies",
+      "qty": 2,
+      "role": "motor, ESC, bearing, and tilt-axis housing",
+      "interfaces": ["wing tip spar", "tilt servo linkage", "motor wiring"],
+      "service_access": "motors and ESCs must be replaceable without opening fuselage"
+    },
+    {
+      "id": "old-004",
+      "label": "tilt servo and linkage cartridges",
+      "qty": 2,
+      "role": "0-90 degree nacelle actuation demonstration",
+      "interfaces": ["nacelle horn", "wing root", "servo pocket"],
+      "service_access": "linkage length and servo horn must remain adjustable"
+    },
+    {
+      "id": "old-005",
+      "label": "V-tail ruddervator pair",
+      "qty": 2,
+      "role": "tail control surface mockup and aft reference geometry",
+      "interfaces": ["tail boom", "hinge line", "servo pocket"],
+      "service_access": "hinges and surfaces should remain replaceable"
+    },
+    {
+      "id": "old-006",
+      "label": "tricycle landing gear",
+      "qty": 1,
+      "role": "display stance and ground handling mockup",
+      "interfaces": ["fuselage belly", "battery bay clearance"],
+      "service_access": "gear should remain replaceable after hard handling"
+    },
+    {
+      "id": "old-007",
+      "label": "slide-in battery bay",
+      "qty": 1,
+      "role": "CG tuning and power pack demonstration",
+      "interfaces": ["fuselage belly", "cable guide", "strap slots"],
+      "service_access": "battery dummy must slide out for CG demonstration"
+    },
+    {
+      "id": "old-008",
+      "label": "payload nose bay",
+      "qty": 1,
+      "role": "interchangeable sensor/camera mockup",
+      "interfaces": ["fuselage front", "service latch", "cable pass-through"],
+      "service_access": "payload bay should swap without disturbing wing/nacelles"
+    }
+  ],
+  "redesigned_bom": [
+    {
+      "id": "new-001",
+      "label": "integrated fuselage spine and spar socket core",
+      "qty": 1,
+      "replaces": ["old-001", "old-002 partial"],
+      "printable_as": "single PETG core with wing-root keys, avionics shelf, and cable inspection windows",
+      "service_access_preserved": ["avionics access", "wing root alignment", "battery slide path", "cable inspection"]
+    },
+    {
+      "id": "new-002",
+      "label": "removable nacelle service pod pair",
+      "qty": 2,
+      "replaces": ["old-003"],
+      "printable_as": "separate PETG nacelle pod with motor/ESC access lid and visible tilt-axis datum pads",
+      "service_access_preserved": ["motor replacement", "ESC inspection", "tilt-axis datum check", "nacelle swap"]
+    },
+    {
+      "id": "new-003",
+      "label": "separate tilt linkage cartridge pair",
+      "qty": 2,
+      "replaces": ["old-004"],
+      "printable_as": "small replaceable linkage/servo cartridge with adjustable dummy rod",
+      "service_access_preserved": ["servo horn access", "linkage adjustment", "nacelle travel check"]
+    },
+    {
+      "id": "new-004",
+      "label": "slide-in battery and payload service module",
+      "qty": 1,
+      "replaces": ["old-007", "old-008 partial"],
+      "printable_as": "belly rail and nose payload shell with labeled CG slots and open cable path",
+      "service_access_preserved": ["battery CG adjustment", "payload swap", "front cable inspection"]
+    },
+    {
+      "id": "new-005",
+      "label": "replaceable V-tail and landing gear modules",
+      "qty": 1,
+      "replaces": ["old-005", "old-006"],
+      "printable_as": "separate tail hinge surfaces plus TPU/PETG gear pads",
+      "service_access_preserved": ["tail hinge replacement", "gear replacement", "aft inspection"]
+    }
+  ],
+  "integration_decisions": [
+    {
+      "decision": "integrate fuselage spine with wing-root spar sockets",
+      "expected_gain": "removes repeated wing-root alignment setup and improves visible datum control",
+      "guardrail": "wing keys and spar sockets remain externally inspectable"
+    },
+    {
+      "decision": "keep tilting nacelles as removable service pods",
+      "expected_gain": "protects motor/ESC and tilt-axis service access",
+      "guardrail": "nacelle can be removed without opening fuselage"
+    },
+    {
+      "decision": "keep tilt linkage as a separate cartridge",
+      "expected_gain": "allows servo horn and linkage adjustment demonstration",
+      "guardrail": "linkage cartridge can be replaced and adjusted after wing installation"
+    },
+    {
+      "decision": "integrate battery rail with visible cable guide and payload service label",
+      "expected_gain": "reduces loose trays and improves CG demonstration",
+      "guardrail": "battery dummy remains slide-in and CG positions remain visible"
+    },
+    {
+      "decision": "keep V-tail and landing gear replaceable",
+      "expected_gain": "fragile handled parts can be replaced without sacrificing main fuselage",
+      "guardrail": "tail hinge and gear mounts attach from outside"
+    }
+  ],
+  "assembly_delta": {
+    "baseline_steps": 24,
+    "redesigned_steps": 13,
+    "removed_operations": [
+      "square wing halves independently",
+      "align fuselage spine to separate spar socket blocks",
+      "route battery and payload wiring through hidden loose clips",
+      "open fuselage to service nacelle ESC",
+      "remove tail boom to replace landing gear"
+    ],
+    "retained_service_access_points": [
+      "left removable nacelle service pod",
+      "right removable nacelle service pod",
+      "tilt-axis datum pads",
+      "separate tilt linkage cartridges",
+      "slide-in battery CG rail",
+      "payload nose service shell",
+      "cable inspection windows",
+      "replaceable V-tail hinge module",
+      "replaceable landing gear pads"
+    ]
+  },
+  "print_strategy": [
+    {
+      "part_id": "new-001",
+      "orientation": "fuselage long axis along bed, wing-root sockets upward",
+      "supports": "tree",
+      "reason": "protect spar socket faces and keep cable inspection windows clean"
+    },
+    {
+      "part_id": "new-002",
+      "orientation": "tilt-axis datum pads facing upward",
+      "supports": "min",
+      "reason": "preserve nacelle datum geometry while keeping service lid face clean"
+    },
+    {
+      "part_id": "new-003",
+      "orientation": "servo cartridge side face on bed",
+      "supports": "none",
+      "reason": "small linkage cartridge should print flat and remain replaceable"
+    },
+    {
+      "part_id": "new-004",
+      "orientation": "battery rail face-up, payload nose split line horizontal",
+      "supports": "min",
+      "reason": "protect CG slots and visible cable path"
+    },
+    {
+      "part_id": "new-005",
+      "orientation": "tail surfaces flat; gear pads face-down",
+      "supports": "none",
+      "reason": "fragile external modules should print quickly and be replaceable"
+    }
+  ],
+  "assembly_sequence": [
+    "Print integrated fuselage spine and spar socket core.",
+    "Print nacelle service pods as separate left/right modules.",
+    "Print tilt linkage cartridges and verify rod travel by hand.",
+    "Print slide-in battery/payload service module.",
+    "Print V-tail and landing gear replacement modules.",
+    "Install wing-root mockup panels into keyed spar sockets.",
+    "Insert battery dummy into CG rail and verify slide positions.",
+    "Attach payload nose service shell and check front cable path.",
+    "Attach nacelle service pods to wing-tip datum pads.",
+    "Install tilt linkage cartridges without opening fuselage.",
+    "Check 0-90 degree nacelle travel and datum pad visibility.",
+    "Attach replaceable V-tail module and landing gear pads.",
+    "Perform final service access check for nacelles, battery, wiring, tail, and gear."
+  ],
+  "schema_v6_blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-03T12:45:00+09:00",
+    "project": "Tiltrotor Drone Redesign V1",
+    "object": "Tiltrotor VTOL printable serviceability mockup",
+    "brief": {
+      "requirements": [
+        "Create a 3D-printable tiltrotor VTOL educational mockup design package.",
+        "Reduce assembly steps while preserving nacelle, tilt linkage, battery, wiring, tail, and landing gear service access.",
+        "Keep moving and fragile modules replaceable instead of integrating them into the fuselage.",
+        "Prepare geometry intent for later STL generation, not flight hardware."
+      ],
+      "constraints": {
+        "material": "PETG + TPU pads",
+        "process": "FDM",
+        "envelope_mm": [360, 270, 80],
+        "min_wall_mm": 1.8,
+        "min_channel_mm": 4,
+        "overhang_deg": 45,
+        "tol_mm": 0.3
+      }
+    },
+    "part_tree": {
+      "id": "tiltrotor-redesign-v1",
+      "name": "Tiltrotor VTOL printable serviceability mockup",
+      "qty": 1,
+      "material": "PETG + TPU pads",
+      "process": "FDM",
+      "children": [
+        {
+          "id": "new-001",
+          "name": "integrated fuselage spine and spar socket core",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-spar-key", "name": "visible wing-root spar keys", "qty": 2, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-avionics-shelf", "name": "open avionics service shelf", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-cable-window", "name": "cable inspection windows", "qty": 4, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-002",
+          "name": "removable nacelle service pods",
+          "qty": 2,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-tilt-datum", "name": "tilt-axis datum pads", "qty": 4, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-esc-lid", "name": "motor and ESC service lids", "qty": 2, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-003",
+          "name": "separate tilt linkage cartridges",
+          "qty": 2,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-servo-pocket", "name": "servo horn access pockets", "qty": 2, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-link-rod", "name": "adjustable dummy linkage rods", "qty": 2, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-004",
+          "name": "slide-in battery and payload service module",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-battery-rail", "name": "labeled battery CG rail", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-payload-shell", "name": "replaceable payload nose shell", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-005",
+          "name": "replaceable V-tail and landing gear modules",
+          "qty": 1,
+          "material": "PETG + TPU",
+          "process": "FDM",
+          "children": [
+            {"id": "f-tail-hinge", "name": "replaceable V-tail hinge pair", "qty": 2, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-gear-pad", "name": "replaceable landing gear pads", "qty": 3, "material": "TPU", "process": "FDM", "children": []}
+          ]
+        }
+      ]
+    },
+    "geometry_ops": [
+      {"id": "op-001", "op": "box", "target": "new-001", "args": {"size_mm": [210, 42, 34], "purpose": "main fuselage spine bounding body"}},
+      {"id": "op-002", "op": "shell", "target": "new-001", "args": {"wall_mm": 1.8, "open_faces": ["+Z"], "purpose": "open avionics service shelf"}},
+      {"id": "op-003", "op": "boss", "target": "f-spar-key", "args": {"size_mm": [34, 12, 8], "count": 2, "purpose": "wing-root alignment keys"}},
+      {"id": "op-004", "op": "pocket", "target": "f-cable-window", "args": {"size_mm": [18, 8], "count": 4, "purpose": "wire inspection windows"}},
+      {"id": "op-005", "op": "box", "target": "new-002", "args": {"size_mm": [46, 34, 32], "qty": 2, "purpose": "removable nacelle service pod"}},
+      {"id": "op-006", "op": "cylinder", "target": "f-tilt-datum", "args": {"diameter_mm": 10, "height_mm": 6, "count": 4, "purpose": "tilt-axis datum pads"}},
+      {"id": "op-007", "op": "pocket", "target": "f-esc-lid", "args": {"size_mm": [26, 16], "count": 2, "purpose": "motor and ESC access lid"}},
+      {"id": "op-008", "op": "box", "target": "new-003", "args": {"size_mm": [34, 14, 10], "qty": 2, "purpose": "tilt linkage cartridge"}},
+      {"id": "op-009", "op": "drill", "target": "f-servo-pocket", "args": {"diameter_mm": 3, "count": 4, "purpose": "servo horn adjustment holes"}},
+      {"id": "op-010", "op": "cylinder", "target": "f-link-rod", "args": {"diameter_mm": 3, "height_mm": 42, "qty": 2, "purpose": "dummy linkage rods"}},
+      {"id": "op-011", "op": "box", "target": "f-battery-rail", "args": {"size_mm": [90, 28, 8], "purpose": "slide-in battery CG rail"}},
+      {"id": "op-012", "op": "channel", "target": "f-battery-rail", "args": {"width_mm": 5, "depth_mm": 3, "path": "visible cable channel"}},
+      {"id": "op-013", "op": "engrave", "target": "f-battery-rail", "args": {"text": "CG 25 30 35", "depth_mm": 0.35}},
+      {"id": "op-014", "op": "loft", "target": "f-payload-shell", "args": {"sections": ["nose_rect", "sensor_face"], "purpose": "replaceable payload nose shell"}},
+      {"id": "op-015", "op": "box", "target": "f-tail-hinge", "args": {"size_mm": [48, 6, 18], "qty": 2, "purpose": "replaceable V-tail hinge mockup"}},
+      {"id": "op-016", "op": "box", "target": "f-gear-pad", "args": {"size_mm": [20, 10, 6], "qty": 3, "purpose": "TPU landing gear pads"}},
+      {"id": "op-017", "op": "chamfer", "target": "tiltrotor-redesign-v1", "args": {"edges": "service module edges", "amount_mm": 0.6}},
+      {"id": "op-018", "op": "fillet", "target": "tiltrotor-redesign-v1", "args": {"edges": "handled nacelle and payload corners", "radius_mm": 1.0}}
+    ],
+    "cad_brief": {
+      "name": "tiltrotor_serviceability_redesign_v1",
+      "rev": "1.0",
+      "material": "PETG + TPU pads",
+      "envelope_mm": [360, 270, 80],
+      "build_direction": "fuselage long axis on bed; nacelle datum pads upward; cartridges flat",
+      "key_dims_mm": {
+        "mockup_scale_envelope": "360x270x80",
+        "nacelle_service_pod_count": 2,
+        "tilt_linkage_cartridge_count": 2,
+        "battery_cg_positions": 3
+      },
+      "wall_thickness_mm": {"min": 1.8, "typ": 2.0},
+      "tolerances_mm": {"nacelle_datum_clearance": 0.25, "battery_slide_clearance": 0.35, "linkage_pin_clearance": 0.25},
+      "surface": {"Ra_um": 18, "post_process": "deburr tilt datum pads, service lids, and battery rail"},
+      "mass_est_g": 280
+    },
+    "verify": [
+      {"check": "existing and redesigned BOM both present in design package", "result": "pass", "value": "8 baseline groups, 5 redesigned groups", "rule": "tiltrotor-v1-package"},
+      {"check": "assembly steps explicitly reduced", "result": "pass", "value": "24 baseline steps to 13 redesigned steps", "rule": "tiltrotor-v1-serviceability"},
+      {"check": "nacelle service access retained", "result": "pass", "value": "left/right nacelle pods removable", "rule": "tiltrotor-v1-serviceability"},
+      {"check": "tilt-axis datum access retained", "result": "pass", "value": "visible datum pads on nacelle pods", "rule": "tiltrotor-v1-alignment"},
+      {"check": "battery CG access retained", "result": "pass", "value": "slide-in rail with labeled CG positions", "rule": "tiltrotor-v1-serviceability"},
+      {"check": "wiring inspection retained", "result": "pass", "value": "open cable channel and fuselage windows", "rule": "tiltrotor-v1-serviceability"},
+      {"check": "linkage travel can be adjusted after assembly", "result": "warn", "value": "requires prototype clearance test", "rule": "tiltrotor-v1-linkage"}
+    ],
+    "risk": [
+      {"id": "R01", "desc": "Over-integration of nacelle into wing/fuselage may block motor and ESC service.", "mit": "Keep nacelles as removable service pods with access lids.", "severity": "high"},
+      {"id": "R02", "desc": "Tilt-axis alignment may be lost if datum pads are hidden or printed on unsupported faces.", "mit": "Expose datum pads and print nacelles with datum pads upward.", "severity": "high"},
+      {"id": "R03", "desc": "Battery CG adjustment may be blocked by a closed belly module.", "mit": "Use slide-in rail with visible CG marks and 0.35 mm clearance.", "severity": "med"},
+      {"id": "R04", "desc": "Wiring access may degrade if cable routing is hidden inside the fuselage spine.", "mit": "Use open channel and inspection windows.", "severity": "med"},
+      {"id": "R05", "desc": "Long fuselage spine may warp and disturb wing-root alignment.", "mit": "Print long axis on bed, keep spar socket faces upward, and test wing-key fit.", "severity": "med"}
+    ],
+    "print_profile": {
+      "printer": "FDM printer with 0.4mm nozzle",
+      "material": "PETG structural parts, TPU landing gear pads",
+      "layer_mm": 0.2,
+      "walls": 4,
+      "infill": "15% gyroid for fuselage, 20% for nacelle pods, 30% for linkage cartridges",
+      "supports": "tree",
+      "orientation": "fuselage long axis on bed; nacelle datum pads upward; cartridges flat; tail and gear modules flat",
+      "est_time": "10-14h total prototype set",
+      "filament_g": 280
+    },
+    "slicer_job": {
+      "tool": "prusaslicer",
+      "input_stl": "output/tiltrotor_serviceability_redesign_v1.stl",
+      "output": "output/tiltrotor_serviceability_redesign_v1.gcode",
+      "args": ["--layer-height", "0.20", "--fill-density", "15%", "--support-material-auto"],
+      "profile": "PETG_TPU_0.4mm_tiltrotor_serviceability_mockup"
+    }
+  },
+  "quality_scenarios": [
+    {
+      "case": "nacelle fully integrated into frame reduces parts but blocks motor and ESC service",
+      "expected": "fail",
+      "reason": "nacelle serviceability is mandatory"
+    },
+    {
+      "case": "fuselage spine and spar socket integrated while nacelle remains removable",
+      "expected": "pass",
+      "reason": "assembly is simplified without hiding moving/service modules"
+    },
+    {
+      "case": "print is easy but tilt-axis datum faces disappear",
+      "expected": "risk",
+      "reason": "tilt-axis alignment must remain inspectable"
+    }
+  ]
+}
+

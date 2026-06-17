@@ -1,0 +1,242 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "robot_arm",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "joint_transmission",
+    "discipline": "mechanisms",
+    "function": "J1-J6 joint cartridges: bearing seats, reducer dummies, wrist pitch/roll axes, shaft location",
+    "evidence_features": [
+      "bearing_seat",
+      "reducer_dummy",
+      "shoulder",
+      "wrist_pitch_axis",
+      "wrist_roll_axis",
+      "retaining_feature"
+    ],
+    "criteria_refs": [
+      "robot_arm",
+      "datum_tolerance"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "datum_tolerance",
+      "title": "Datum, Interface, and Tolerance Judgment",
+      "criteria": [
+        {
+          "criterion": "datum_visibility",
+          "weight": 11,
+          "good": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+          "bad": "Interfaces exist only as abstract neighbor references.",
+          "signals": [
+            "datum",
+            "axis_ring",
+            "rail",
+            "socket",
+            "mounting_pad",
+            "interface_zone"
+          ],
+          "loop_feedback": "Add visible datum pads or axis/rail/socket features and label their mating function."
+        },
+        {
+          "criterion": "clearance_named",
+          "weight": 8,
+          "good": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+          "bad": "Moving/removable joints have no clearance or fit language.",
+          "signals": [
+            "clearance_mm",
+            "tol_mm",
+            "fit",
+            "slip",
+            "snap",
+            "pin"
+          ],
+          "loop_feedback": "Add clearance_mm or tolerance notes for hinge pins, slide rails, sockets, and removable cartridges."
+        },
+        {
+          "criterion": "interface_count",
+          "weight": 8,
+          "good": "Each subsystem has at least three adjacent interfaces or datums.",
+          "bad": "Subsystem is isolated and does not show assembly neighbors.",
+          "signals": [
+            "adjacent_interfaces",
+            "target_part",
+            "interface_type"
+          ],
+          "loop_feedback": "Add at least three adjacent interfaces: mount, service, electrical/data, flow, or inspection datum."
+        },
+        {
+          "criterion": "standard_fit_vocabulary",
+          "weight": 8,
+          "good": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+          "bad": "All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance.",
+          "signals": [
+            "clearance_fit",
+            "transition_fit",
+            "press_fit",
+            "allowance_mm",
+            "H7",
+            "shaft_basis"
+          ],
+          "loop_feedback": "Classify each mating diameter as clearance/transition/press fit and add a numeric allowance instead of line-to-line nominals.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        },
+        {
+          "criterion": "standard_hardware_dimensioning",
+          "weight": 7,
+          "good": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+          "bad": "Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin.",
+          "signals": [
+            "M3",
+            "M4",
+            "bearing_od",
+            "dowel_pin",
+            "catalog_size"
+          ],
+          "loop_feedback": "Snap hole, pin, and bearing dimensions to standard catalog sizes and name the intended hardware in callouts.",
+          "source_refs": [
+            "sources/public/McMaster-Carr Catalog 123.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "robot_arm",
+      "title": "6-DOF Robot Arm Criteria",
+      "criteria": [
+        {
+          "criterion": "axis_datum_readability",
+          "weight": 14,
+          "good": "J1-J6 axis rings, reducer/bearing dummies, encoder covers, and tool flange datum are visible.",
+          "bad": "Arm links are generic cylinders with no joint service evidence.",
+          "signals": [
+            "J1",
+            "J2",
+            "axis ring",
+            "encoder cover",
+            "tool flange",
+            "bearing dummy"
+          ],
+          "loop_feedback": "Add J1-J6 axis datum labels, removable joint cartridge covers, encoder pockets, and tool flange bolt pattern."
+        },
+        {
+          "criterion": "cable_spine_serviceability",
+          "weight": 12,
+          "good": "Cable spine clips externally or remains inspectable through open channels.",
+          "bad": "Cable routing is buried inside closed links.",
+          "signals": [
+            "cable spine",
+            "open channel",
+            "clip",
+            "harness"
+          ],
+          "loop_feedback": "Externalize the cable spine or add open link channels with replaceable covers and strain relief."
+        },
+        {
+          "criterion": "joint_cartridge_replaceability",
+          "weight": 11,
+          "good": "Joint cartridges can be removed without cutting printed links.",
+          "bad": "Reducers/bearings are fused into structural links.",
+          "signals": [
+            "removable cartridge",
+            "joint cover",
+            "fastener pattern",
+            "clearance"
+          ],
+          "loop_feedback": "Separate removable joint cartridges from printed links and add fastener/clearance features."
+        },
+        {
+          "criterion": "bearing_shaft_mounting_sanity",
+          "weight": 10,
+          "good": "Each joint shows a bearing seat with shoulder or retaining feature, shaft locating geometry, and stated fit intent for inner/outer races.",
+          "bad": "Bearing dummies float in links with no seat, shoulder, retaining ring groove, or axial location scheme.",
+          "signals": [
+            "bearing_seat",
+            "shoulder",
+            "retaining_ring",
+            "axial_location",
+            "race_fit"
+          ],
+          "loop_feedback": "Add bearing seats with shoulders or retaining features at each joint and state which race is fixed and how."
+        },
+        {
+          "criterion": "moving_joint_harness_workmanship",
+          "weight": 9,
+          "good": "Harness crossing each joint has slack loop, strain relief at both ends, and routing that avoids pinch points through the full motion range.",
+          "bad": "Cables cross joints taut, pass through pinch zones, or have no relief at link entry/exit.",
+          "signals": [
+            "slack_loop",
+            "strain_relief",
+            "pinch_point",
+            "motion_range",
+            "cable_guide"
+          ],
+          "loop_feedback": "Add slack loops and dual-end strain relief at every joint crossing and verify no pinch through motion extremes.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    },
+    {
+      "title": "NASA Fastener Design Manual (RP-1228)",
+      "target_topics": [
+        "fastener selection",
+        "torque/preload",
+        "locking features",
+        "washers",
+        "inserts"
+      ]
+    },
+    {
+      "title": "1800 Mechanical Movements, Devices and Appliances (Hiscox, 1899, public domain)",
+      "target_topics": [
+        "linkages",
+        "cams",
+        "gears",
+        "mechanism vocabulary"
+      ]
+    },
+    {
+      "title": "Machinery's Handbook (early edition scan, archive.org)",
+      "target_topics": [
+        "fits",
+        "threads",
+        "machining allowances",
+        "shop vocabulary"
+      ]
+    },
+    {
+      "title": "McMaster-Carr Catalog 123",
+      "target_topics": [
+        "standard fastener/bearing/hardware dimensions",
+        "part naming vocabulary"
+      ]
+    }
+  ]
+}

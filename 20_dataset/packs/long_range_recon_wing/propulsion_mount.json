@@ -1,0 +1,233 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "long_range_recon_wing",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "propulsion_mount",
+    "discipline": "actuation",
+    "function": "Motor pod / pusher prop mount dummy with bolt pattern and cooling path (non-operational)",
+    "evidence_features": [
+      "motor_mount",
+      "bolt_circle",
+      "cooling_inlet",
+      "pusher_prop",
+      "motor_pod"
+    ],
+    "criteria_refs": [
+      "common_dfm",
+      "mrl05_readiness"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "common_dfm",
+      "title": "Common DFM/DFA Judgment",
+      "criteria": [
+        {
+          "criterion": "part_consolidation_with_guardrails",
+          "weight": 10,
+          "good": "Parts are integrated only when service access, inspection, and interface clarity remain visible.",
+          "bad": "Monolithic body hides removable modules, datums, or inspection paths.",
+          "signals": [
+            "integrate_with_guardrail",
+            "partial_integrate",
+            "defer_integration"
+          ],
+          "loop_feedback": "Consolidate only low-risk covers or labels; keep service modules, datums, and inspection windows visible."
+        },
+        {
+          "criterion": "fastener_joint_sanity",
+          "weight": 10,
+          "good": "Fastener patterns, pin joints, slots, bosses, and mating clearances are explicitly represented.",
+          "bad": "Joints are described in prose but not represented as holes, bosses, pins, slots, or datums.",
+          "signals": [
+            "drill",
+            "boss",
+            "slot",
+            "clearance_mm",
+            "fastener_pattern"
+          ],
+          "loop_feedback": "Add visible fastener holes, bosses, joint pins, and clearance notes for each critical interface."
+        },
+        {
+          "criterion": "inspection_readability",
+          "weight": 9,
+          "good": "A reviewer can see what to inspect and why without opening raw JSON.",
+          "bad": "Design has no callouts, access windows, labels, datum pads, or verification focus.",
+          "signals": [
+            "inspection_window",
+            "engrave",
+            "callout",
+            "verification_focus"
+          ],
+          "loop_feedback": "Add inspection callouts, datum labels, visible windows, and verification checks tied to geometry features."
+        },
+        {
+          "criterion": "fastener_locking_and_preload_evidence",
+          "weight": 9,
+          "good": "Critical joints state locking method (locknut, insert, washer, adhesive note) and torque/preload intent; bolt patterns match load direction.",
+          "bad": "Fasteners appear as bare holes with no locking, washer, engagement-length, or preload language anywhere.",
+          "signals": [
+            "locknut",
+            "insert",
+            "washer",
+            "torque",
+            "preload",
+            "thread_engagement"
+          ],
+          "loop_feedback": "For each critical joint, name the locking feature, add washer/insert geometry, and state a torque or preload intent note.",
+          "source_refs": [
+            "sources/public/Fastener Design Manual (NASA).pdf"
+          ]
+        },
+        {
+          "criterion": "thread_and_insert_engagement_sanity",
+          "weight": 8,
+          "good": "Threaded connections into printed or soft material use inserts or bosses with adequate engagement depth (~1.5x diameter) and wall around the hole.",
+          "bad": "Screws thread directly into thin printed walls or blind features with no boss, insert, or depth note.",
+          "signals": [
+            "heat_set_insert",
+            "boss",
+            "engagement_depth",
+            "pilot_hole",
+            "min_wall_mm"
+          ],
+          "loop_feedback": "Add insert bosses with engagement depth >= 1.5x screw diameter and surrounding wall thickness for every threaded joint.",
+          "source_refs": [
+            "sources/public/Fastener Design Manual (NASA).pdf",
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mrl05_readiness",
+      "title": "MRL-0.5 Readiness Evidence",
+      "criteria": [
+        {
+          "criterion": "wall_process_readiness",
+          "weight": 10,
+          "good": "Material/process, wall assumptions, build direction, and supports are explicit enough for design review.",
+          "bad": "Manufacturing process is absent or contradicts geometry.",
+          "signals": [
+            "material",
+            "process",
+            "min_wall_mm",
+            "build_direction",
+            "supports"
+          ],
+          "loop_feedback": "State material/process, min wall, build direction, and support implications in cad_brief and print_profile."
+        },
+        {
+          "criterion": "inspection_traceability",
+          "weight": 10,
+          "good": "Verify/risk items reference real features or interfaces from part_tree/geometry_ops.",
+          "bad": "Verification is generic pass/warn text not tied to features.",
+          "signals": [
+            "verify.check",
+            "risk.mit",
+            "geometry_ops.id"
+          ],
+          "loop_feedback": "Tie each verification check to a named geometry feature, datum, interface, or service access path."
+        },
+        {
+          "criterion": "risk_coverage",
+          "weight": 9,
+          "good": "Risks cover blocked access, weak interfaces, tolerance mismatch, process limitations, and unsafe overclaiming.",
+          "bad": "Risks are missing or only mention vague quality concerns.",
+          "signals": [
+            "risk",
+            "blocked",
+            "clearance",
+            "support",
+            "inspection",
+            "not_for"
+          ],
+          "loop_feedback": "Add concrete risks for blocked service, datum loss, clearance conflict, unsupported geometry, and unsafe overclaiming."
+        },
+        {
+          "criterion": "requirement_to_verification_matrix",
+          "weight": 9,
+          "good": "Each stated requirement maps to a verification method (inspection, demonstration, analysis, test) tied to a named feature or interface.",
+          "bad": "Requirements and verification lists exist independently with no traceable pairing.",
+          "signals": [
+            "requirement_id",
+            "verify.method",
+            "inspection",
+            "demonstration",
+            "analysis",
+            "test"
+          ],
+          "loop_feedback": "Pair every requirement with one verification method and the geometry feature or interface that provides the evidence.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        },
+        {
+          "criterion": "interface_control_evidence",
+          "weight": 8,
+          "good": "Cross-subsystem interfaces state owner, mating geometry, and what is exchanged (load, power, data, fluid), like a miniature interface control entry.",
+          "bad": "Subsystems reference each other by name only, with no statement of what crosses the interface.",
+          "signals": [
+            "interface_owner",
+            "exchange_type",
+            "load",
+            "power",
+            "data",
+            "mating_feature"
+          ],
+          "loop_feedback": "For each interface, state both sides, the mating feature, and the exchanged quantity (load/power/data/fluid).",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA Fastener Design Manual (RP-1228)",
+      "target_topics": [
+        "fastener selection",
+        "torque/preload",
+        "locking features",
+        "washers",
+        "inserts"
+      ]
+    },
+    {
+      "title": "Machinery's Handbook (early edition scan, archive.org)",
+      "target_topics": [
+        "fits",
+        "threads",
+        "machining allowances",
+        "shop vocabulary"
+      ]
+    },
+    {
+      "title": "CNC Programming Basics",
+      "target_topics": [
+        "machining setup",
+        "datum/work offset vocabulary"
+      ]
+    },
+    {
+      "title": "McMaster-Carr Catalog 123",
+      "target_topics": [
+        "standard fastener/bearing/hardware dimensions",
+        "part naming vocabulary"
+      ]
+    }
+  ]
+}

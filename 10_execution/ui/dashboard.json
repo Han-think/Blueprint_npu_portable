@@ -1,0 +1,681 @@
+{
+  "generated": "blueprint_dashboard_v1",
+  "axes": [
+    "00_contract",
+    "10_execution",
+    "20_dataset",
+    "30_model"
+  ],
+  "mrl05": {
+    "schema": "blueprint_mrl05_summary_v1",
+    "seeds": 6,
+    "average_score": 95,
+    "ready": 6,
+    "watch": 0,
+    "weak": 0,
+    "reports": [
+      {
+        "seed": "cubesat",
+        "score": 97,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for cubesat: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/cubesat/cubesat_mrl05.json"
+      },
+      {
+        "seed": "tiltrotor",
+        "score": 97,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for tiltrotor: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/tiltrotor/tiltrotor_mrl05.json"
+      },
+      {
+        "seed": "robot_arm",
+        "score": 97,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for robot_arm: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/robot_arm/robot_arm_mrl05.json"
+      },
+      {
+        "seed": "small_launch_vehicle",
+        "score": 92,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for small_launch_vehicle: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/small_launch_vehicle/small_launch_vehicle_mrl05.json"
+      },
+      {
+        "seed": "long_range_recon_wing",
+        "score": 96,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for long_range_recon_wing: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/long_range_recon_wing/long_range_recon_wing_mrl05.json"
+      },
+      {
+        "seed": "haptic_glove",
+        "score": 91,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for haptic_glove: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/haptic_glove/haptic_glove_mrl05.json"
+      }
+    ],
+    "disclaimer": "MRL-0.5 readiness evidence only; not manufacturing approval."
+  },
+  "interference": {
+    "schema": "blueprint_interference_summary_v1",
+    "seeds": 6,
+    "average_score": 43,
+    "pass": 0,
+    "watch": 3,
+    "block": 3,
+    "reports": [
+      {
+        "seed": "cubesat",
+        "score": 29,
+        "status": "block",
+        "counts": {
+          "parts": 4,
+          "declared_joints": 3,
+          "total_pairs": 6,
+          "passed_pairs": 4,
+          "warning_pairs": 2,
+          "blocked_pairs": 0,
+          "mate_warnings": 0,
+          "clearance_warnings": 3,
+          "blocked_print_parts": 3,
+          "fastener_issues": 0
+        },
+        "findings": [
+          "declared overlap new-001 <-> new-002 needs fit review",
+          "declared overlap new-001 <-> new-003 needs fit review",
+          "blocked print new-001_integrated_rail_frame_spine.stl: bed_fit",
+          "blocked print new-002_removable_service_panels.stl: watertight",
+          "blocked print new-003_board_shelf_and_standoff_ladder.stl: bed_fit",
+          "new-002: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for cubesat: status block, score 29/100.\n- Fix do_not_print parts before keep: new-001_integrated_rail_frame_spine.stl, new-002_removable_service_panels.stl, new-003_board_shelf_and_standoff_ladder.stl\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/cubesat/assembly_interference_report.json"
+      },
+      {
+        "seed": "tiltrotor",
+        "score": 56,
+        "status": "watch",
+        "counts": {
+          "parts": 5,
+          "declared_joints": 5,
+          "total_pairs": 10,
+          "passed_pairs": 10,
+          "warning_pairs": 0,
+          "blocked_pairs": 0,
+          "mate_warnings": 5,
+          "clearance_warnings": 5,
+          "blocked_print_parts": 0,
+          "fastener_issues": 0
+        },
+        "findings": [
+          "mate alignment new-001 <-> new-005: declared mate has 16.0mm display gap; verify final assembled position",
+          "mate alignment new-002 <-> new-001: declared mate gap 82.0mm exceeds exploded preview threshold",
+          "mate alignment new-004 <-> new-001: declared mate has 20.0mm display gap; verify final assembled position",
+          "mate alignment new-005 <-> new-001: declared mate has 16.0mm display gap; verify final assembled position",
+          "new-001: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-002: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for tiltrotor: status watch, score 56/100.\n- Align declared mates or label them as exploded preview: new-001<->new-005, new-002<->new-001, new-004<->new-001, new-005<->new-001, new-003<->new-002\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/tiltrotor/assembly_interference_report.json"
+      },
+      {
+        "seed": "robot_arm",
+        "score": 48,
+        "status": "watch",
+        "counts": {
+          "parts": 5,
+          "declared_joints": 4,
+          "total_pairs": 10,
+          "passed_pairs": 9,
+          "warning_pairs": 1,
+          "blocked_pairs": 0,
+          "mate_warnings": 3,
+          "clearance_warnings": 3,
+          "blocked_print_parts": 0,
+          "fastener_issues": 2
+        },
+        "findings": [
+          "declared overlap new-001 <-> new-002 needs fit review",
+          "mate alignment new-003 <-> new-002: declared mate has 11.045mm display gap; verify final assembled position",
+          "mate alignment new-005 <-> new-002: declared mate has 67.135mm display gap; verify final assembled position",
+          "mate alignment new-004 <-> new-003: declared mate has 59.008mm display gap; verify final assembled position",
+          "new-002: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "F1: fastener joins fewer than two parts",
+          "F3: fastener joins fewer than two parts"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for robot_arm: status watch, score 48/100.\n- Align declared mates or label them as exploded preview: new-003<->new-002, new-005<->new-002, new-004<->new-003\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Repair fastener join/anchor/hole evidence for: F1: fastener joins fewer than two parts; F3: fastener joins fewer than two parts\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/robot_arm/assembly_interference_report.json"
+      },
+      {
+        "seed": "small_launch_vehicle",
+        "score": 31,
+        "status": "block",
+        "counts": {
+          "parts": 5,
+          "declared_joints": 5,
+          "total_pairs": 10,
+          "passed_pairs": 7,
+          "warning_pairs": 3,
+          "blocked_pairs": 0,
+          "mate_warnings": 1,
+          "clearance_warnings": 5,
+          "blocked_print_parts": 1,
+          "fastener_issues": 1
+        },
+        "findings": [
+          "declared overlap new-001 <-> new-003 needs fit review",
+          "declared overlap new-001 <-> new-004 needs fit review",
+          "declared overlap new-001 <-> new-005 needs fit review",
+          "mate alignment new-001 <-> new-001: new-001 mates to itself",
+          "blocked print new-001_split_cutaway_core_with_alignment_keys.stl: bed_fit",
+          "new-001: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "new-002: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "F1: fastener joins fewer than two parts"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for small_launch_vehicle: status block, score 31/100.\n- Align declared mates or label them as exploded preview: new-001<->new-001\n- Fix do_not_print parts before keep: new-001_split_cutaway_core_with_alignment_keys.stl\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Repair fastener join/anchor/hole evidence for: F1: fastener joins fewer than two parts\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/small_launch_vehicle/assembly_interference_report.json"
+      },
+      {
+        "seed": "long_range_recon_wing",
+        "score": 46,
+        "status": "block",
+        "counts": {
+          "parts": 5,
+          "declared_joints": 5,
+          "total_pairs": 10,
+          "passed_pairs": 10,
+          "warning_pairs": 0,
+          "blocked_pairs": 0,
+          "mate_warnings": 2,
+          "clearance_warnings": 2,
+          "blocked_print_parts": 2,
+          "fastener_issues": 0
+        },
+        "findings": [
+          "mate alignment new-002 <-> new-001: declared mate has 43.1mm display gap; verify final assembled position",
+          "mate alignment new-004 <-> new-001: declared mate has 53.0mm display gap; verify final assembled position",
+          "blocked print new-001_integrated_center_spine_and_spar_socket_.stl: bed_fit",
+          "blocked print new-005_replaceable_wing__elevon__and_skid_servi.stl: bed_fit",
+          "new-003: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for long_range_recon_wing: status block, score 46/100.\n- Align declared mates or label them as exploded preview: new-002<->new-001, new-004<->new-001\n- Fix do_not_print parts before keep: new-001_integrated_center_spine_and_spar_socket_.stl, new-005_replaceable_wing__elevon__and_skid_servi.stl\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/long_range_recon_wing/assembly_interference_report.json"
+      },
+      {
+        "seed": "haptic_glove",
+        "score": 49,
+        "status": "watch",
+        "counts": {
+          "parts": 4,
+          "declared_joints": 4,
+          "total_pairs": 6,
+          "passed_pairs": 6,
+          "warning_pairs": 0,
+          "blocked_pairs": 0,
+          "mate_warnings": 4,
+          "clearance_warnings": 3,
+          "blocked_print_parts": 0,
+          "fastener_issues": 2
+        },
+        "findings": [
+          "mate alignment new-002 <-> new-001: declared mate has 15.833mm display gap; verify final assembled position",
+          "mate alignment new-002 <-> f-thimble: missing geometry for new-002 or f-thimble",
+          "mate alignment new-004 <-> f-quick-release: missing geometry for new-004 or f-quick-release",
+          "mate alignment new-003 <-> new-001: declared mate gap 110.882mm exceeds exploded preview threshold",
+          "new-002: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "f-lid-screw: fastener references missing part(s) f-control-lid",
+          "f-hinge-pin: fastener references missing part(s) f-hinge-pin"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for haptic_glove: status watch, score 49/100.\n- Align declared mates or label them as exploded preview: new-002<->new-001, new-002<->f-thimble, new-004<->f-quick-release, new-003<->new-001\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Repair fastener join/anchor/hole evidence for: f-lid-screw: fastener references missing part(s) f-control-lid; f-hinge-pin: fastener references missing part(s) f-hinge-pin\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/haptic_glove/assembly_interference_report.json"
+      }
+    ],
+    "disclaimer": "AABB placement/interference evidence only; not certified CAD/manufacturing approval."
+  },
+  "pipeline": {
+    "thinking_total": 220,
+    "causal_total": 27,
+    "sft_train": 203,
+    "sft_eval": 44,
+    "part_spec": 28,
+    "preference": 182,
+    "eval_cases": 66,
+    "seeds": 6,
+    "mrl05_average": 95,
+    "mrl05_ready": 6,
+    "mrl05_watch": 0,
+    "mrl05_weak": 0,
+    "placement_average": 43,
+    "placement_pass": 0,
+    "placement_watch": 3,
+    "placement_block": 3
+  },
+  "cards": [
+    {
+      "seed": "cubesat",
+      "label": "3U CubeSat educational mockup",
+      "target": "cubesat_3u",
+      "parts": {
+        "from": 5,
+        "to": 4,
+        "cut": 20
+      },
+      "steps": {
+        "from": 18,
+        "to": 9,
+        "cut": 50
+      },
+      "service_access": 5,
+      "hardware_bom": [
+        {
+          "standard": "M2",
+          "qty": 8
+        },
+        {
+          "standard": "PIN2",
+          "qty": 2
+        }
+      ],
+      "fasteners": 2,
+      "joints": 3,
+      "mass_g": 210,
+      "mrl05": {
+        "score": 97,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for cubesat: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/cubesat/cubesat_mrl05.json"
+      },
+      "placement_audit": {
+        "score": 29,
+        "status": "block",
+        "counts": {
+          "parts": 4,
+          "declared_joints": 3,
+          "total_pairs": 6,
+          "passed_pairs": 4,
+          "warning_pairs": 2,
+          "blocked_pairs": 0,
+          "mate_warnings": 0,
+          "clearance_warnings": 3,
+          "blocked_print_parts": 3,
+          "fastener_issues": 0
+        },
+        "findings": [
+          "declared overlap new-001 <-> new-002 needs fit review",
+          "declared overlap new-001 <-> new-003 needs fit review",
+          "blocked print new-001_integrated_rail_frame_spine.stl: bed_fit",
+          "blocked print new-002_removable_service_panels.stl: watertight",
+          "blocked print new-003_board_shelf_and_standoff_ladder.stl: bed_fit",
+          "new-002: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for cubesat: status block, score 29/100.\n- Fix do_not_print parts before keep: new-001_integrated_rail_frame_spine.stl, new-002_removable_service_panels.stl, new-003_board_shelf_and_standoff_ladder.stl\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/cubesat/assembly_interference_report.json"
+      },
+      "thinking": 40,
+      "causal": 4,
+      "stl": "/output/cubesat/cubesat.stl",
+      "svg": "/output/cubesat/cubesat_drawing.svg"
+    },
+    {
+      "seed": "tiltrotor",
+      "label": "Tiltrotor VTOL Hybrid educational mockup",
+      "target": "tiltrotor_vtol",
+      "parts": {
+        "from": 8,
+        "to": 5,
+        "cut": 38
+      },
+      "steps": {
+        "from": 24,
+        "to": 13,
+        "cut": 46
+      },
+      "service_access": 9,
+      "hardware_bom": [
+        {
+          "standard": "M3",
+          "qty": 8
+        },
+        {
+          "standard": "PIN3",
+          "qty": 2
+        }
+      ],
+      "fasteners": 3,
+      "joints": 5,
+      "mass_g": 280,
+      "mrl05": {
+        "score": 97,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for tiltrotor: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/tiltrotor/tiltrotor_mrl05.json"
+      },
+      "placement_audit": {
+        "score": 56,
+        "status": "watch",
+        "counts": {
+          "parts": 5,
+          "declared_joints": 5,
+          "total_pairs": 10,
+          "passed_pairs": 10,
+          "warning_pairs": 0,
+          "blocked_pairs": 0,
+          "mate_warnings": 5,
+          "clearance_warnings": 5,
+          "blocked_print_parts": 0,
+          "fastener_issues": 0
+        },
+        "findings": [
+          "mate alignment new-001 <-> new-005: declared mate has 16.0mm display gap; verify final assembled position",
+          "mate alignment new-002 <-> new-001: declared mate gap 82.0mm exceeds exploded preview threshold",
+          "mate alignment new-004 <-> new-001: declared mate has 20.0mm display gap; verify final assembled position",
+          "mate alignment new-005 <-> new-001: declared mate has 16.0mm display gap; verify final assembled position",
+          "new-001: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-002: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for tiltrotor: status watch, score 56/100.\n- Align declared mates or label them as exploded preview: new-001<->new-005, new-002<->new-001, new-004<->new-001, new-005<->new-001, new-003<->new-002\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/tiltrotor/assembly_interference_report.json"
+      },
+      "thinking": 40,
+      "causal": 5,
+      "stl": "/output/tiltrotor/tiltrotor.stl",
+      "svg": "/output/tiltrotor/tiltrotor_drawing.svg"
+    },
+    {
+      "seed": "robot_arm",
+      "label": "6-DOF Industrial Arm educational mockup",
+      "target": "arm_6dof",
+      "parts": {
+        "from": 9,
+        "to": 5,
+        "cut": 44
+      },
+      "steps": {
+        "from": 28,
+        "to": 15,
+        "cut": 46
+      },
+      "service_access": 10,
+      "hardware_bom": [
+        {
+          "standard": "M4",
+          "qty": 4
+        },
+        {
+          "standard": "M3",
+          "qty": 10
+        }
+      ],
+      "fasteners": 3,
+      "joints": 4,
+      "mass_g": 340,
+      "mrl05": {
+        "score": 97,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for robot_arm: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/robot_arm/robot_arm_mrl05.json"
+      },
+      "placement_audit": {
+        "score": 48,
+        "status": "watch",
+        "counts": {
+          "parts": 5,
+          "declared_joints": 4,
+          "total_pairs": 10,
+          "passed_pairs": 9,
+          "warning_pairs": 1,
+          "blocked_pairs": 0,
+          "mate_warnings": 3,
+          "clearance_warnings": 3,
+          "blocked_print_parts": 0,
+          "fastener_issues": 2
+        },
+        "findings": [
+          "declared overlap new-001 <-> new-002 needs fit review",
+          "mate alignment new-003 <-> new-002: declared mate has 11.045mm display gap; verify final assembled position",
+          "mate alignment new-005 <-> new-002: declared mate has 67.135mm display gap; verify final assembled position",
+          "mate alignment new-004 <-> new-003: declared mate has 59.008mm display gap; verify final assembled position",
+          "new-002: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "F1: fastener joins fewer than two parts",
+          "F3: fastener joins fewer than two parts"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for robot_arm: status watch, score 48/100.\n- Align declared mates or label them as exploded preview: new-003<->new-002, new-005<->new-002, new-004<->new-003\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Repair fastener join/anchor/hole evidence for: F1: fastener joins fewer than two parts; F3: fastener joins fewer than two parts\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/robot_arm/assembly_interference_report.json"
+      },
+      "thinking": 40,
+      "causal": 5,
+      "stl": "/output/robot_arm/robot_arm.stl",
+      "svg": "/output/robot_arm/robot_arm_drawing.svg"
+    },
+    {
+      "seed": "small_launch_vehicle",
+      "label": "Small launch vehicle educational cutaway mockup",
+      "target": "small_launch_vehicle",
+      "parts": {
+        "from": 10,
+        "to": 5,
+        "cut": 50
+      },
+      "steps": {
+        "from": 30,
+        "to": 16,
+        "cut": 47
+      },
+      "service_access": 11,
+      "hardware_bom": [
+        {
+          "standard": "M3",
+          "qty": 12
+        }
+      ],
+      "fasteners": 2,
+      "joints": 5,
+      "mass_g": 390,
+      "mrl05": {
+        "score": 92,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for small_launch_vehicle: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/small_launch_vehicle/small_launch_vehicle_mrl05.json"
+      },
+      "placement_audit": {
+        "score": 31,
+        "status": "block",
+        "counts": {
+          "parts": 5,
+          "declared_joints": 5,
+          "total_pairs": 10,
+          "passed_pairs": 7,
+          "warning_pairs": 3,
+          "blocked_pairs": 0,
+          "mate_warnings": 1,
+          "clearance_warnings": 5,
+          "blocked_print_parts": 1,
+          "fastener_issues": 1
+        },
+        "findings": [
+          "declared overlap new-001 <-> new-003 needs fit review",
+          "declared overlap new-001 <-> new-004 needs fit review",
+          "declared overlap new-001 <-> new-005 needs fit review",
+          "mate alignment new-001 <-> new-001: new-001 mates to itself",
+          "blocked print new-001_split_cutaway_core_with_alignment_keys.stl: bed_fit",
+          "new-001: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "new-002: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'cylinder' — joint clearance NOT auto-applied, verify fit manually",
+          "F1: fastener joins fewer than two parts"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for small_launch_vehicle: status block, score 31/100.\n- Align declared mates or label them as exploded preview: new-001<->new-001\n- Fix do_not_print parts before keep: new-001_split_cutaway_core_with_alignment_keys.stl\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Repair fastener join/anchor/hole evidence for: F1: fastener joins fewer than two parts\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/small_launch_vehicle/assembly_interference_report.json"
+      },
+      "thinking": 40,
+      "causal": 5,
+      "stl": "/output/small_launch_vehicle/small_launch_vehicle.stl",
+      "svg": "/output/small_launch_vehicle/small_launch_vehicle_drawing.svg"
+    },
+    {
+      "seed": "long_range_recon_wing",
+      "label": "Long-range recon and mission-payload wing educational mockup",
+      "target": "wing_long_range",
+      "parts": {
+        "from": 10,
+        "to": 5,
+        "cut": 50
+      },
+      "steps": {
+        "from": 29,
+        "to": 15,
+        "cut": 48
+      },
+      "service_access": 12,
+      "hardware_bom": [
+        {
+          "standard": "M3",
+          "qty": 6
+        },
+        {
+          "standard": "PIN2",
+          "qty": 2
+        }
+      ],
+      "fasteners": 3,
+      "joints": 5,
+      "mass_g": 360,
+      "mrl05": {
+        "score": 96,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for long_range_recon_wing: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/long_range_recon_wing/long_range_recon_wing_mrl05.json"
+      },
+      "placement_audit": {
+        "score": 46,
+        "status": "block",
+        "counts": {
+          "parts": 5,
+          "declared_joints": 5,
+          "total_pairs": 10,
+          "passed_pairs": 10,
+          "warning_pairs": 0,
+          "blocked_pairs": 0,
+          "mate_warnings": 2,
+          "clearance_warnings": 2,
+          "blocked_print_parts": 2,
+          "fastener_issues": 0
+        },
+        "findings": [
+          "mate alignment new-002 <-> new-001: declared mate has 43.1mm display gap; verify final assembled position",
+          "mate alignment new-004 <-> new-001: declared mate has 53.0mm display gap; verify final assembled position",
+          "blocked print new-001_integrated_center_spine_and_spar_socket_.stl: bed_fit",
+          "blocked print new-005_replaceable_wing__elevon__and_skid_servi.stl: bed_fit",
+          "new-003: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for long_range_recon_wing: status block, score 46/100.\n- Align declared mates or label them as exploded preview: new-002<->new-001, new-004<->new-001\n- Fix do_not_print parts before keep: new-001_integrated_center_spine_and_spar_socket_.stl, new-005_replaceable_wing__elevon__and_skid_servi.stl\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/long_range_recon_wing/assembly_interference_report.json"
+      },
+      "thinking": 40,
+      "causal": 5,
+      "stl": "/output/long_range_recon_wing/long_range_recon_wing.stl",
+      "svg": "/output/long_range_recon_wing/long_range_recon_wing_drawing.svg"
+    },
+    {
+      "seed": "haptic_glove",
+      "label": "Force-feedback exo-glove (pair)",
+      "target": "haptic_glove_pair",
+      "parts": {
+        "from": 5,
+        "to": 4,
+        "cut": 20
+      },
+      "steps": {
+        "from": 28,
+        "to": 14,
+        "cut": 50
+      },
+      "service_access": 4,
+      "hardware_bom": [
+        {
+          "standard": "M2 screw",
+          "qty": 26
+        },
+        {
+          "standard": "D3 pin",
+          "qty": 10
+        }
+      ],
+      "fasteners": 3,
+      "joints": 4,
+      "mass_g": 240,
+      "mrl05": {
+        "score": 91,
+        "status": "ready",
+        "issues": [],
+        "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for haptic_glove: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+        "report": "/output/haptic_glove/haptic_glove_mrl05.json"
+      },
+      "placement_audit": {
+        "score": 49,
+        "status": "watch",
+        "counts": {
+          "parts": 4,
+          "declared_joints": 4,
+          "total_pairs": 6,
+          "passed_pairs": 6,
+          "warning_pairs": 0,
+          "blocked_pairs": 0,
+          "mate_warnings": 4,
+          "clearance_warnings": 3,
+          "blocked_print_parts": 0,
+          "fastener_issues": 2
+        },
+        "findings": [
+          "mate alignment new-002 <-> new-001: declared mate has 15.833mm display gap; verify final assembled position",
+          "mate alignment new-002 <-> f-thimble: missing geometry for new-002 or f-thimble",
+          "mate alignment new-004 <-> f-quick-release: missing geometry for new-004 or f-quick-release",
+          "mate alignment new-003 <-> new-001: declared mate gap 110.882mm exceeds exploded preview threshold",
+          "new-002: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-003: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "new-004: base from explicit op 'box' — joint clearance NOT auto-applied, verify fit manually",
+          "f-lid-screw: fastener references missing part(s) f-control-lid",
+          "f-hinge-pin: fastener references missing part(s) f-hinge-pin"
+        ],
+        "loop_feedback": "Improve placement/interference evidence for haptic_glove: status watch, score 49/100.\n- Align declared mates or label them as exploded preview: new-002<->new-001, new-002<->f-thimble, new-004<->f-quick-release, new-003<->new-001\n- Replace explicit base ops or add per-feature clearance evidence so joint clearance is actually applied.\n- Repair fastener join/anchor/hole evidence for: f-lid-screw: fastener references missing part(s) f-control-lid; f-hinge-pin: fastener references missing part(s) f-hinge-pin\n- Keep this as educational mock assembly evidence; do not claim certified interference-free manufacturing.",
+        "report": "/output/haptic_glove/assembly_interference_report.json"
+      },
+      "thinking": 20,
+      "causal": 3,
+      "stl": "/output/haptic_glove/haptic_glove.stl",
+      "svg": "/output/haptic_glove/haptic_glove_drawing.svg"
+    }
+  ]
+}

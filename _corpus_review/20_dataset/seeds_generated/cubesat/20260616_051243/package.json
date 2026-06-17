@@ -1,0 +1,7423 @@
+{
+ "schema": "blueprint_generated_package_v1",
+ "seed": "cubesat",
+ "run_id": "20260616_051243",
+ "vehicle": {
+  "id": "cubesat_3u",
+  "label": "3U CubeSat",
+  "wikiTitle": "CubeSat",
+  "desc": "3U CubeSat (10x10x30cm) Earth-observation demonstrator",
+  "material": "Al 7075 + CFRP + FR4",
+  "process": "CNC + PCB",
+  "mass": "<4 kg",
+  "envelope": "100x100x340.5 mm",
+  "parts": [
+   {
+    "id": "p1",
+    "label": "Primary Structure (3U)",
+    "preset": [
+     "space",
+     "satellite",
+     "cubesat_frame"
+    ],
+    "spec": "3U CubeSat primary frame, Al 7075, PC/104 standoffs, deployable rail guide grooves (CDS spec)"
+   },
+   {
+    "id": "p2",
+    "label": "Solar Panel x 4 (deploy)",
+    "preset": [
+     "space",
+     "satellite",
+     "solar_hinge"
+    ],
+    "spec": "Deployable solar panel wing, 3U size, spring-loaded hinge, burn-wire release, deployment damper"
+   },
+   {
+    "id": "p3",
+    "label": "Antenna Deployer x 2",
+    "preset": [
+     "space",
+     "satellite",
+     "antenna_deployer"
+    ],
+    "spec": "Tape-spring UHF/S-band antenna deployer, stowed flat, burn-wire release, latching tab"
+   },
+   {
+    "id": "p4",
+    "label": "Reaction Wheel x 3",
+    "preset": [
+     "space",
+     "satellite",
+     "reaction_wheel"
+    ],
+    "spec": "Small reaction wheel assembly, brushless motor, momentum 0.005-0.05 Nms, isolation mount"
+   },
+   {
+    "id": "p5",
+    "label": "Star Tracker Mount",
+    "preset": [
+     "space",
+     "satellite",
+     "star_tracker_mnt"
+    ],
+    "spec": "Star tracker optical bench mount, CTE-matched, baffled sun shield, line-of-sight +-1deg"
+   },
+   {
+    "id": "p6",
+    "label": "Payload Optics Bench",
+    "preset": [
+     "space",
+     "satellite",
+     "thermal_strap"
+    ],
+    "spec": "EO payload optics bench, thermal stability, optical baffles, focal plane interface, lens mounts"
+   },
+   {
+    "id": "p7",
+    "label": "Cold Gas Thruster x 4",
+    "preset": [
+     "space",
+     "satellite",
+     "thruster_bracket"
+    ],
+    "spec": "Cold gas propulsion thruster bracket, 4 thrusters cross-pattern, 50mN class, plumbing manifold"
+   },
+   {
+    "id": "p8",
+    "label": "Separation Spring Plate",
+    "preset": [
+     "space",
+     "satellite",
+     "sep_clamp"
+    ],
+    "spec": "P-POD or ISIPOD separation interface plate, spring pusher contact, kill switch arm"
+   },
+   {
+    "id": "p9",
+    "label": "EPS Solar Charging Module",
+    "preset": [
+     "space",
+     "satellite",
+     "eps_power_board"
+    ],
+    "spec": "EPS solar charging subsystem: solar_panel_face inputs, removable battery_tray, eps_board_slot, power_connector keying, service cover, mass budget <480g"
+   },
+   {
+    "id": "p10",
+    "label": "CDH Avionics Stack",
+    "preset": [
+     "space",
+     "satellite",
+     "cdh_avionics_stack"
+    ],
+    "spec": "Command/data handling avionics stack: obc_board, stack_harness, debug_port_access, board standoffs, connector labels, grounding point, mass budget <260g"
+   },
+   {
+    "id": "p11",
+    "label": "Thermal Path / Radiator Strap Evidence",
+    "preset": [
+     "space",
+     "satellite",
+     "thermal_strap"
+    ],
+    "spec": "Thermal_path closure module: radiator_face, thermal_strap_note, vent_hole, battery-to-frame conduction pad, service-visible thermal datum, inspection label, mass budget <120g"
+   },
+   {
+    "id": "p12",
+    "label": "Integration Harness + Datum Spine",
+    "preset": [
+     "mechanical",
+     "general",
+     "cable_clip"
+    ],
+    "spec": "Integration_harness closure spine with harness_channel, connector_keying, assembly_datum pads, routing clips, service hatch, reciprocal interface labels, inspection checklist marks"
+   }
+  ]
+ },
+ "run_meta": {
+  "seed": 1937987,
+  "model": "gemma2:27b-instruct-q4_K_M",
+  "generator": "generate_batch.py",
+  "started": "2026-06-16T04:54:13Z",
+  "duration_s": 1111
+ },
+ "schema_v6_blueprint": {
+  "version": "bp-npu-r6",
+  "ts": "2026-06-16T05:12:43Z",
+  "project": "cubesat",
+  "object": "3U CubeSat",
+  "brief": {
+   "requirements": [
+    "Must withstand separation spring force",
+    "Must interface with P-POD and CubeSat Frame",
+    "Must actuate kill switch mechanism"
+   ],
+   "constraints": {
+    "material": "Al 7075 + CFRP + FR4",
+    "process": "CNC",
+    "envelope_mm": [
+     80,
+     80,
+     10
+    ],
+    "min_wall_mm": 2,
+    "overhang_deg": 45,
+    "tol_mm": 0.2
+   }
+  },
+  "cad_brief": {
+   "name": "3U CubeSat",
+   "rev": "1.0",
+   "material": "Al 7075 + CFRP + FR4",
+   "envelope_mm": [
+    100.0,
+    100.0,
+    340.5
+   ],
+   "build_direction": "Z"
+  },
+  "part_tree": {
+   "id": "asm",
+   "name": "3U CubeSat",
+   "qty": 1,
+   "children": [
+    {
+     "id": "p1",
+     "name": "Primary Structure (3U)",
+     "qty": 1,
+     "material": "Al 7075",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p2",
+     "name": "Solar Panel x 4 (deploy)",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p3",
+     "name": "Antenna Deployer x 2",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p4",
+     "name": "Reaction Wheel x 3",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p5",
+     "name": "Star Tracker Mount",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p6",
+     "name": "Payload Optics Bench",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p7",
+     "name": "Cold Gas Thruster x 4",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p8",
+     "name": "Separation Spring Plate",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p9",
+     "name": "EPS Solar Charging Module",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p10",
+     "name": "CDH Avionics Stack",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p11",
+     "name": "Thermal Path / Radiator Strap Evidence",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p12",
+     "name": "Integration Harness + Datum Spine",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + FR4",
+     "process": "FDM",
+     "children": []
+    }
+   ]
+  },
+  "geometry_ops": [
+   {
+    "op": "box",
+    "id": "Frame Body",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 100,
+     "y_mm": 100,
+     "z_mm": 30
+    },
+    "target": "p1"
+   },
+   {
+    "op": "extrude",
+    "id": "Rail Guide (Left)",
+    "target": "p1",
+    "args": {
+     "at": [
+      -45,
+      0,
+      0
+     ],
+     "depth_mm": 30
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "Rail Guide (Right)",
+    "target": "p1",
+    "args": {
+     "at": [
+      45,
+      0,
+      0
+     ],
+     "depth_mm": 30
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "Rail Guide Pattern",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 2,
+     "spacing_mm": 100,
+     "axis": "Y"
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "PC/104 Standoff Pad (Front)",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      -45,
+      5
+     ],
+     "radius_mm": 3,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "PC/104 Standoff Pattern",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 25,
+     "axis": "X"
+    }
+   },
+   {
+    "op": "box",
+    "id": "Corner Post Boss",
+    "args": {
+     "at": [
+      -45,
+      -45,
+      0
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 30
+    },
+    "target": "p1"
+   },
+   {
+    "op": "pattern_linear",
+    "id": "Corner Post Pattern",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 90,
+     "axis": "X"
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "Harness Channel Cutout",
+    "args": {
+     "at": [
+      0,
+      0,
+      15
+     ],
+     "x_mm": 80,
+     "y_mm": 10,
+     "z_mm": 5
+    },
+    "target": "p1"
+   },
+   {
+    "op": "fillet",
+    "id": "Frame Fillet",
+    "target": "p1",
+    "args": {
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "Corner Chamfer",
+    "target": "p1",
+    "args": {
+     "length_mm": 2,
+     "angle_deg": 45
+    }
+   },
+   {
+    "op": "drill",
+    "id": "Mounting Hole",
+    "args": {
+     "at": [
+      0,
+      0,
+      30
+     ],
+     "d_mm": 3
+    },
+    "target": "p1"
+   },
+   {
+    "op": "pattern_polar",
+    "id": "Mounting Hole Pattern",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      30
+     ],
+     "count": 4,
+     "radius_mm": 25,
+     "angle_deg": 90
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "Part Label",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      30.5
+     ],
+     "text": "Primary Structure (3U)"
+    }
+   },
+   {
+    "op": "box",
+    "id": "panel_body",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 90,
+     "y_mm": 30,
+     "z_mm": 1
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "hinge_arm",
+    "target": "p2",
+    "args": {
+     "at": [
+      -45,
+      15,
+      0
+     ],
+     "profile": "hinge_profile.dxf",
+     "depth_mm": 30
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "hinge_pin",
+    "target": "p2",
+    "args": {
+     "at": [
+      -45,
+      15,
+      15
+     ],
+     "radius_mm": 2,
+     "h_mm": 30
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole",
+    "target": "p2",
+    "args": {
+     "at": [
+      45,
+      15,
+      0
+     ],
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "connector_recess",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      -15,
+      0
+     ],
+     "x_mm": 20,
+     "y_mm": 10,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "panel_mounts",
+    "target": "p2",
+    "args": {
+     "at": [
+      45,
+      -15,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 30,
+     "op": "drill",
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "hinge_corner",
+    "target": "p2",
+    "args": {
+     "at": [
+      -45,
+      15,
+      0
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "panel_edge",
+    "target": "p2",
+    "args": {
+     "at": [
+      45,
+      15,
+      0
+     ],
+     "l_mm": 5
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "burn_wire_note",
+    "target": "p2",
+    "args": {
+     "at": [
+      -45,
+      -15,
+      0
+     ],
+     "text": "Burn Wire"
+    }
+   },
+   {
+    "op": "boss",
+    "id": "release_pin_dummy",
+    "target": "p2",
+    "args": {
+     "at": [
+      -45,
+      0,
+      0
+     ],
+     "d_mm": 6,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "channel",
+    "id": "cable_guide",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "w_mm": 5,
+     "h_mm": 3,
+     "l_mm": 40
+    }
+   },
+   {
+    "op": "shell",
+    "id": "panel_cover",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      1.5
+     ],
+     "x_mm": 90,
+     "y_mm": 30
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "solar_cell_holes",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      1.5
+     ],
+     "count": 20,
+     "radius_mm": 40,
+     "op": "drill",
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "box",
+    "id": "deployer_body",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 50,
+     "y_mm": 30,
+     "z_mm": 15
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "antenna_slot",
+    "target": "p3",
+    "args": {
+     "at": [
+      25,
+      0,
+      7.5
+     ],
+     "radius_mm": 5,
+     "h_mm": 15
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "tape_spring_guide",
+    "target": "p3",
+    "args": {
+     "at": [
+      25,
+      0,
+      0
+     ],
+     "path": [
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       -10
+      ]
+     ],
+     "depth_mm": 2
+    }
+   },
+   {
+    "op": "box",
+    "id": "radio_board_slot",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      15,
+      0
+     ],
+     "x_mm": 40,
+     "y_mm": 15,
+     "z_mm": 3
+    }
+   },
+   {
+    "op": "drill",
+    "id": "rf_connector_hole",
+    "target": "p3",
+    "args": {
+     "at": [
+      20,
+      15,
+      1.5
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "corner_round",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "edge_relief",
+    "target": "p3",
+    "args": {
+     "at": [
+      25,
+      -10,
+      7.5
+     ],
+     "w_mm": 1
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "cable_channel",
+    "target": "p3",
+    "args": {
+     "at": [
+      45,
+      0,
+      0
+     ],
+     "x_mm": 5,
+     "y_mm": 30,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 10,
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "part_label",
+    "target": "p3",
+    "args": {
+     "at": [
+      25,
+      15,
+      1
+     ],
+     "text": "Antenna Deployer"
+    }
+   },
+   {
+    "op": "subtract",
+    "id": "connector_clearance",
+    "target": "p3",
+    "args": {
+     "at": [
+      20,
+      15,
+      1.5
+     ],
+     "d_mm": 8
+    }
+   },
+   {
+    "op": "boss",
+    "id": "antenna_latch_pad",
+    "target": "p3",
+    "args": {
+     "at": [
+      50,
+      0,
+      7.5
+     ],
+     "d_mm": 8,
+     "h_mm": 3
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "motor_housing_body",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "d_mm": 50,
+     "h_mm": 30
+    }
+   },
+   {
+    "op": "box",
+    "id": "stator_mount",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      15
+     ],
+     "x_mm": 60,
+     "y_mm": 60,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "hole",
+    "id": "wiring_harness_port",
+    "target": "p4",
+    "args": {
+     "at": [
+      25,
+      25,
+      35
+     ],
+     "d_mm": 8
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "housing_corner_round",
+    "target": "p4",
+    "args": {
+     "at": [
+      25,
+      25,
+      0
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 4,
+     "w_mm": 10,
+     "spacing_mm": 30
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole",
+    "target": "p4",
+    "args": {
+     "at": [
+      15,
+      15,
+      0
+     ],
+     "d_mm": 4
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "wiring_harness_clearance",
+    "target": "p4",
+    "args": {
+     "at": [
+      20,
+      20,
+      30
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "stator_shaft",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      20
+     ],
+     "d_mm": 10,
+     "h_mm": 20
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "housing_edge",
+    "target": "p4",
+    "args": {
+     "at": [
+      25,
+      0,
+      0
+     ],
+     "angle": 45,
+     "length_mm": 5
+    }
+   },
+   {
+    "op": "boss",
+    "id": "connector_mount",
+    "target": "p4",
+    "args": {
+     "at": [
+      30,
+      30,
+      10
+     ],
+     "d_mm": 12,
+     "h_mm": 8
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "part_number",
+    "target": "p4",
+    "args": {
+     "at": [
+      10,
+      -10,
+      5
+     ],
+     "text": "RW-001"
+    }
+   },
+   {
+    "op": "mirror",
+    "id": "opposite_mounting_holes",
+    "target": "p4",
+    "args": {
+     "plane": "xz"
+    }
+   },
+   {
+    "op": "subtract",
+    "id": "wiring_harness_clearance_cutout",
+    "target": "p4",
+    "args": {
+     "at": [
+      20,
+      20,
+      30
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "stator_coil_holes",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      25
+     ],
+     "count": 6,
+     "radius_mm": 15,
+     "spacing_deg": 60
+    }
+   },
+   {
+    "op": "box",
+    "id": "baseplate",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 60,
+     "y_mm": 60,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "mounting_hole_1",
+    "target": "p5",
+    "args": {
+     "at": [
+      15,
+      15,
+      0
+     ],
+     "radius_mm": 2.5,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "mounting_hole_2",
+    "target": "p5",
+    "args": {
+     "at": [
+      45,
+      15,
+      0
+     ],
+     "radius_mm": 2.5,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "mounting_hole_3",
+    "target": "p5",
+    "args": {
+     "at": [
+      15,
+      45,
+      0
+     ],
+     "radius_mm": 2.5,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "mounting_hole_4",
+    "target": "p5",
+    "args": {
+     "at": [
+      45,
+      45,
+      0
+     ],
+     "radius_mm": 2.5,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "box",
+    "id": "baffle_shield",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      10
+     ],
+     "x_mm": 60,
+     "y_mm": 60,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "baffle_lip",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      30
+     ],
+     "path": [
+      [
+       0,
+       0
+      ],
+      [
+       60,
+       0
+      ]
+     ],
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "sensor_window_frame",
+    "target": "p5",
+    "args": {
+     "at": [
+      20,
+      20,
+      15
+     ],
+     "x_mm": 20,
+     "y_mm": 20,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "cable_routing_channel",
+    "target": "p5",
+    "args": {
+     "at": [
+      50,
+      0,
+      0
+     ],
+     "x_mm": 10,
+     "y_mm": 60,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "corner_fillet_1",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "corner_fillet_2",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      10
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "drill",
+    "id": "alignment_pin_hole",
+    "target": "p5",
+    "args": {
+     "at": [
+      30,
+      30,
+      0
+     ],
+     "d_mm": 2.5,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "box",
+    "id": "body",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 80,
+     "y_mm": 60,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "window_opening",
+    "target": "p6",
+    "args": {
+     "at": [
+      30,
+      15,
+      10
+     ],
+     "radius_mm": 10,
+     "h_mm": 5
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "datum_boss",
+    "target": "p6",
+    "args": {
+     "at": [
+      -20,
+      -20,
+      0
+     ],
+     "shape": {
+      "type": "circle",
+      "radius_mm": 5
+     },
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "lens_mount_cavity",
+    "target": "p6",
+    "args": {
+     "at": [
+      40,
+      20,
+      5
+     ],
+     "x_mm": 20,
+     "y_mm": 10,
+     "depth_mm": 8
+    }
+   },
+   {
+    "op": "drill",
+    "id": "fastener_hole_1",
+    "target": "p6",
+    "args": {
+     "at": [
+      -30,
+      -20,
+      5
+     ],
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "drill",
+    "id": "fastener_hole_2",
+    "target": "p6",
+    "args": {
+     "at": [
+      30,
+      -20,
+      5
+     ],
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "body_roundover",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      10
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "window_edge",
+    "target": "p6",
+    "args": {
+     "at": [
+      30,
+      15,
+      15
+     ],
+     "angle_deg": 45,
+     "length_mm": 5
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "fastener_pattern",
+    "target": "p6",
+    "args": {
+     "at": [
+      -30,
+      -20,
+      5
+     ],
+     "count": 4,
+     "spacing_mm": 10,
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "part_label",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      2
+     ],
+     "text": "Payload Optics Bench"
+    }
+   },
+   {
+    "op": "shell",
+    "id": "window_cover",
+    "target": "p6",
+    "args": {
+     "at": [
+      30,
+      15,
+      10
+     ],
+     "radius_mm": 10,
+     "h_mm": 2
+    }
+   },
+   {
+    "op": "boss",
+    "id": "connector_standoff",
+    "target": "p6",
+    "args": {
+     "at": [
+      40,
+      -20,
+      0
+     ],
+     "d_mm": 6,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "box",
+    "id": "bracket_body",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 60,
+     "y_mm": 40,
+     "z_mm": 15
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "mount_plate",
+    "target": "p7",
+    "args": {
+     "at": [
+      15,
+      20,
+      0
+     ],
+     "profile": "circle",
+     "radius_mm": 10,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "manifold_port",
+    "target": "p7",
+    "args": {
+     "at": [
+      30,
+      0,
+      5
+     ],
+     "radius_mm": 3,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "revolve",
+    "id": "stiffener_rib",
+    "target": "p7",
+    "args": {
+     "at": [
+      40,
+      20,
+      0
+     ],
+     "profile": "line",
+     "radius_mm": 2,
+     "angle_deg": 90
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "cable_channel",
+    "target": "p7",
+    "args": {
+     "at": [
+      50,
+      10,
+      0
+     ],
+     "x_mm": 10,
+     "y_mm": 2,
+     "depth_mm": 3
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole",
+    "target": "p7",
+    "args": {
+     "at": [
+      5,
+      5,
+      0
+     ],
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p7",
+    "args": {
+     "at": [
+      5,
+      5,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 20,
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "edge_round",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "corner_chamfer",
+    "target": "p7",
+    "args": {
+     "at": [
+      60,
+      40,
+      0
+     ],
+     "angle_deg": 45,
+     "length_mm": 3
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "part_label",
+    "target": "p7",
+    "args": {
+     "at": [
+      10,
+      -10,
+      0
+     ],
+     "text": "CGT Bracket"
+    }
+   },
+   {
+    "op": "boss",
+    "id": "connector_mount",
+    "target": "p7",
+    "args": {
+     "at": [
+      30,
+      20,
+      5
+     ],
+     "d_mm": 6,
+     "h_mm": 5
+    }
+   },
+   {
+    "op": "channel",
+    "id": "cable_guide",
+    "target": "p7",
+    "args": {
+     "at": [
+      40,
+      10,
+      0
+     ],
+     "w_mm": 5,
+     "h_mm": 2,
+     "depth_mm": 3
+    }
+   },
+   {
+    "op": "box",
+    "id": "Mounting Flange",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 35,
+     "y_mm": 35,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "Spring Plate Body",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      5
+     ],
+     "profile": "circle",
+     "radius_mm": 17.5,
+     "depth_mm": 3
+    }
+   },
+   {
+    "op": "boss",
+    "id": "Pusher Contact Boss",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      8
+     ],
+     "d_mm": 6,
+     "h_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "Kill Switch Arm Slot",
+    "target": "p8",
+    "args": {
+     "at": [
+      -10,
+      0,
+      2
+     ],
+     "x_mm": 20,
+     "y_mm": 3,
+     "depth_mm": 2
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "Bolt Hole Pattern",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      1
+     ],
+     "count": 4,
+     "radius_mm": 2.5,
+     "spacing_mm": 20
+    }
+   },
+   {
+    "op": "channel",
+    "id": "Cable Routing Channel",
+    "target": "p8",
+    "args": {
+     "at": [
+      17.5,
+      0,
+      6
+     ],
+     "w_mm": 3,
+     "h_mm": 5,
+     "depth_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "Chamfer 1",
+    "target": "p8",
+    "args": {
+     "at": [
+      17.5,
+      17.5,
+      0
+     ],
+     "length_mm": 2
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "Fillet 1",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      17.5,
+      8
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "drill",
+    "id": "Drill Hole 1",
+    "target": "p8",
+    "args": {
+     "at": [
+      10,
+      10,
+      1
+     ],
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "subtract",
+    "id": "Clearance Hole",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      8.5
+     ],
+     "radius_mm": 3
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "Label",
+    "target": "p8",
+    "args": {
+     "at": [
+      -10,
+      -10,
+      0
+     ],
+     "text": "Separation Spring Plate"
+    }
+   },
+   {
+    "op": "mirror",
+    "id": "Mirror Feature",
+    "target": "p8",
+    "args": {
+     "plane": "XY"
+    }
+   },
+   {
+    "op": "box",
+    "id": "shell_body",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 90,
+     "y_mm": 50,
+     "z_mm": 15
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "solar_panel_face",
+    "target": "p9",
+    "args": {
+     "at": [
+      45,
+      25,
+      15
+     ],
+     "profile": "rectangle",
+     "x_mm": 60,
+     "y_mm": 30,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "battery_tray_slot",
+    "target": "p9",
+    "args": {
+     "at": [
+      10,
+      25,
+      0
+     ],
+     "x_mm": 70,
+     "y_mm": 30,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "box",
+    "id": "eps_board_slot",
+    "target": "p9",
+    "args": {
+     "at": [
+      10,
+      25,
+      5
+     ],
+     "x_mm": 70,
+     "y_mm": 30,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "power_connector_housing",
+    "target": "p9",
+    "args": {
+     "at": [
+      85,
+      25,
+      10
+     ],
+     "radius_mm": 10,
+     "h_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "service_cover",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      15
+     ],
+     "x_mm": 90,
+     "y_mm": 50,
+     "z_mm": 2
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "shell_corner_fillet",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 3
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "cover_edge_chamfer",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      15
+     ],
+     "w_mm": 2,
+     "h_mm": 2
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole",
+    "target": "p9",
+    "args": {
+     "at": [
+      5,
+      5,
+      0
+     ],
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes_pattern",
+    "target": "p9",
+    "args": {
+     "at": [
+      5,
+      5,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 20,
+     "direction": "+X"
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "part_label",
+    "target": "p9",
+    "args": {
+     "at": [
+      45,
+      25,
+      1
+     ],
+     "text": "EPS Charging Module"
+    }
+   },
+   {
+    "op": "channel",
+    "id": "cable_routing",
+    "target": "p9",
+    "args": {
+     "at": [
+      90,
+      0,
+      5
+     ],
+     "x_mm": 5,
+     "y_mm": 40,
+     "depth_mm": 3
+    }
+   },
+   {
+    "op": "box",
+    "id": "main_body",
+    "target": "p10",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 90,
+     "y_mm": 90,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "standoff_base",
+    "target": "p10",
+    "args": {
+     "at": [
+      15,
+      15,
+      0
+     ],
+     "x_mm": 5,
+     "y_mm": 5,
+     "h_mm": 5
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "standoff_pattern",
+    "target": "p10",
+    "args": {
+     "at": [
+      15,
+      15,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 60,
+     "axis": "x"
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "connector_hole",
+    "target": "p10",
+    "args": {
+     "at": [
+      20,
+      20,
+      3
+     ],
+     "radius_mm": 1.5,
+     "h_mm": 2
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "connector_holes",
+    "target": "p10",
+    "args": {
+     "at": [
+      20,
+      20,
+      3
+     ],
+     "count": 4,
+     "radius_mm": 15,
+     "spacing_deg": 90
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "debug_port_access",
+    "target": "p10",
+    "args": {
+     "at": [
+      70,
+      70,
+      2
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "depth_mm": 3
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "corner_rounding",
+    "target": "p10",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "edge_chamfer",
+    "target": "p10",
+    "args": {
+     "at": [
+      90,
+      0,
+      0
+     ],
+     "l_mm": 2,
+     "h_mm": 2
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole",
+    "target": "p10",
+    "args": {
+     "at": [
+      10,
+      10,
+      0
+     ],
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p10",
+    "args": {
+     "at": [
+      10,
+      10,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 70,
+     "axis": "x"
+    }
+   },
+   {
+    "op": "channel",
+    "id": "cable_routing",
+    "target": "p10",
+    "args": {
+     "at": [
+      50,
+      0,
+      2
+     ],
+     "w_mm": 5,
+     "h_mm": 10,
+     "l_mm": 80
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "label",
+    "target": "p10",
+    "args": {
+     "at": [
+      20,
+      20,
+      4
+     ],
+     "text": "DEBUG"
+    }
+   },
+   {
+    "op": "box",
+    "id": "body",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 50,
+     "y_mm": 30,
+     "z_mm": 5
+    },
+    "target": "p11"
+   },
+   {
+    "op": "extrude",
+    "id": "flange",
+    "target": "p11",
+    "args": {
+     "at": [
+      25,
+      15,
+      5
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "hole",
+    "id": "vent_hole",
+    "target": "p11",
+    "args": {
+     "at": [
+      25,
+      15,
+      2.5
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "battery_pad",
+    "target": "p11",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 20,
+     "y_mm": 10,
+     "z_mm": 2
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "flange_round",
+    "target": "p11",
+    "args": {
+     "at": [
+      25,
+      15,
+      5
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "edge_break",
+    "target": "p11",
+    "args": {
+     "at": [
+      0,
+      30,
+      0
+     ],
+     "l_mm": 2,
+     "h_mm": 2
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p11",
+    "args": {
+     "at": [
+      25,
+      15,
+      5
+     ],
+     "count": 4,
+     "spacing_mm": 10,
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "label",
+    "target": "p11",
+    "args": {
+     "at": [
+      10,
+      10,
+      0.2
+     ],
+     "text": "Thermal Strap Evidence"
+    }
+   },
+   {
+    "op": "boss",
+    "id": "strap_note",
+    "target": "p11",
+    "args": {
+     "at": [
+      40,
+      15,
+      2.5
+     ],
+     "d_mm": 8,
+     "h_mm": 3
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "strap_round",
+    "target": "p11",
+    "args": {
+     "at": [
+      40,
+      15,
+      2.5
+     ],
+     "radius_mm": 1
+    }
+   },
+   {
+    "op": "channel",
+    "id": "cable_guide",
+    "target": "p11",
+    "args": {
+     "at": [
+      10,
+      20,
+      0
+     ],
+     "w_mm": 3,
+     "h_mm": 5,
+     "l_mm": 20
+    }
+   },
+   {
+    "op": "drill",
+    "id": "alignment_hole",
+    "target": "p11",
+    "args": {
+     "at": [
+      45,
+      15,
+      2.5
+     ],
+     "d_mm": 2
+    }
+   },
+   {
+    "op": "box",
+    "id": "Spine Body",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 90,
+     "y_mm": 20,
+     "z_mm": 20
+    },
+    "target": "p12"
+   },
+   {
+    "op": "extrude",
+    "id": "Harness Channel",
+    "target": "p12",
+    "args": {
+     "at": [
+      5,
+      10,
+      0
+     ],
+     "profile": "rectangular",
+     "depth_mm": 5,
+     "w_mm": 10
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "Datum Pad A",
+    "target": "p12",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 20,
+     "x_mm": 5,
+     "y_mm": 5
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "Datum Pad B",
+    "target": "p12",
+    "args": {
+     "at": [
+      90,
+      0,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 20,
+     "x_mm": 5,
+     "y_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "Connector Keying Plate",
+    "args": {
+     "at": [
+      45,
+      10,
+      20
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 5
+    },
+    "target": "p12"
+   },
+   {
+    "op": "cutout",
+    "target": "p12",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "d_mm": 3,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "fillet",
+    "target": "p12",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "target": "p12",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "length_mm": 2,
+     "angle_deg": 45
+    }
+   },
+   {
+    "op": "drill",
+    "id": "Service Hatch",
+    "target": "p12",
+    "args": {
+     "at": [
+      80,
+      10,
+      5
+     ],
+     "d_mm": 10,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "engrave",
+    "target": "p12",
+    "args": {
+     "at": [
+      10,
+      10,
+      2
+     ],
+     "text": "Integration Harness Spine"
+    }
+   },
+   {
+    "op": "boss",
+    "id": "Connector Mounting Boss",
+    "target": "p12",
+    "args": {
+     "at": [
+      5,
+      5,
+      0
+     ],
+     "d_mm": 6,
+     "h_mm": 3
+    }
+   },
+   {
+    "op": "pocket",
+    "target": "p12",
+    "args": {
+     "at": [
+      20,
+      10,
+      0
+     ],
+     "x_mm": 10,
+     "y_mm": 5,
+     "depth_mm": 2
+    }
+   }
+  ]
+ },
+ "generated_parts": [
+  {
+   "id": "p1",
+   "label": "Primary Structure (3U)",
+   "spec": "3U CubeSat primary frame, Al 7075, PC/104 standoffs, deployable rail guide grooves (CDS spec)",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T00:42:18Z",
+    "project": "Blueprint XPU Example",
+    "object": "Primary Structure (3U)",
+    "brief": {
+     "requirements": [
+      "3U CubeSat primary frame, Al 7075, PC/104 standoffs, deployable rail guide grooves (CDS spec)"
+     ],
+     "constraints": {
+      "material": "Al 7075",
+      "process": "CNC",
+      "envelope_mm": [
+       100,
+       100,
+       300
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Primary Structure (3U)",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Frame Body",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Rail Guide (x4)",
+       "qty": 4,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "PC/104 Standoff Pad (x4)",
+       "qty": 4,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Corner Post Boss (x4)",
+       "qty": 4,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Harness Channel Cutout",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "Frame Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 100,
+       "y_mm": 100,
+       "z_mm": 30
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "Rail Guide (Left)",
+      "target": "Rail Guide Profile Left",
+      "args": {
+       "at": [
+        -45,
+        0,
+        0
+       ],
+       "depth_mm": 30
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "Rail Guide (Right)",
+      "target": "Rail Guide Profile Right",
+      "args": {
+       "at": [
+        45,
+        0,
+        0
+       ],
+       "depth_mm": 30
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "Rail Guide Pattern",
+      "target": "Rail Guide",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 2,
+       "spacing_mm": 100,
+       "axis": "Y"
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "PC/104 Standoff Pad (Front)",
+      "target": "Standoff Pad Profile",
+      "args": {
+       "at": [
+        0,
+        -45,
+        5
+       ],
+       "radius_mm": 3,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "PC/104 Standoff Pattern",
+      "target": "Standoff Pad (Front)",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 25,
+       "axis": "X"
+      }
+     },
+     {
+      "op": "box",
+      "id": "Corner Post Boss",
+      "args": {
+       "at": [
+        -45,
+        -45,
+        0
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 30
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "Corner Post Pattern",
+      "target": "Corner Post Boss",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 90,
+       "axis": "X"
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "Harness Channel Cutout",
+      "args": {
+       "at": [
+        0,
+        0,
+        15
+       ],
+       "x_mm": 80,
+       "y_mm": 10,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "Frame Fillet",
+      "target": "Frame Body Edges",
+      "args": {
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "Corner Chamfer",
+      "target": "Corner Post Boss Edges",
+      "args": {
+       "length_mm": 2,
+       "angle_deg": 45
+      }
+     },
+     {
+      "op": "drill",
+      "id": "Mounting Hole",
+      "args": {
+       "at": [
+        0,
+        0,
+        30
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "Mounting Hole Pattern",
+      "target": "Mounting Hole",
+      "args": {
+       "at": [
+        0,
+        0,
+        30
+       ],
+       "count": 4,
+       "radius_mm": 25,
+       "angle_deg": 90
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "Part Label",
+      "target": "Frame Body Top",
+      "args": {
+       "at": [
+        0,
+        0,
+        30.5
+       ],
+       "text": "Primary Structure (3U)"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Primary Structure (3U)",
+     "rev": "1.0",
+     "material": "Al 7075",
+     "envelope_mm": [
+      100,
+      100,
+      30
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 250
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "schema completeness"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "280g vs 300g target",
+      "rule": "subsystem_budget_decomposition"
+     },
+     {
+      "check": "p0_feature_mapping",
+      "result": "pass",
+      "value": "all P0 features found in geometry",
+      "rule": "[p0_feature_mapping]"
+     },
+     {
+      "check": "coordinate_distribution",
+      "result": "pass",
+      "value": "geometry ops distributed across volume",
+      "rule": "[coordinate_distribution]"
+     },
+     {
+      "check": "non_box_feature_variety",
+      "result": "pass",
+      "value": "uses drill, pocket, chamfer, pattern",
+      "rule": "[non_box_feature_variety]"
+     },
+     {
+      "check": "mechanism_named_not_implied",
+      "result": "n/a",
+      "value": "no motion mechanisms present",
+      "rule": "[mechanism_named_not_implied]"
+     },
+     {
+      "check": "datum_visibility",
+      "result": "pass",
+      "value": "corner posts and rail guides visible",
+      "rule": "[datum_visibility]"
+     },
+     {
+      "check": "clearance_named",
+      "result": "pass",
+      "value": "rail guide clearance specified",
+      "rule": "[clearance_named]"
+     },
+     {
+      "check": "interface_count",
+      "result": "pass",
+      "value": "4 interfaces to deployers, PC/104 stack, chassis mount",
+      "rule": "[interface_count]"
+     },
+     {
+      "check": "standard_fit_vocabulary",
+      "result": "pass",
+      "value": "uses clearance fit for rail guides",
+      "rule": "[standard_fit_vocabulary]"
+     },
+     {
+      "check": "standard_hardware_dimensioning",
+      "result": "pass",
+      "value": "M3 screws for PC/104 standoff",
+      "rule": "[standard_hardware_dimensioning]"
+     },
+     {
+      "check": "rail_standoff_visibility",
+      "result": "pass",
+      "value": "rails and standoffs visible",
+      "rule": "[rail_standoff_visibility]"
+     },
+     {
+      "check": "serviceable_avionics_stack",
+      "result": "n/a",
+      "value": "no avionics included in scope",
+      "rule": "[serviceable_avionics_stack]"
+     },
+     {
+      "check": "space_mock_boundary",
+      "result": "pass",
+      "value": "design is educational mockup",
+      "rule": "[space_mock_boundary]"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass slightly over budget",
+      "mit": "Re-evaluate material thickness in non-critical areas",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Thermal performance not yet analyzed",
+      "mit": "Simulate heat dissipation with internal components",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "min",
+     "printer": "...",
+     "material": "Al 7075",
+     "layer_mm": 0.2,
+     "orientation": "+Z",
+     "est_time": "2h30m",
+     "filament_g": 120,
+     "walls": 3,
+     "infill": "gyroid 20%"
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/primary-structure-(3u).stl",
+     "output": "output/primary-structure-(3u).gcode",
+     "args": [
+      "--load",
+      "profile.ini",
+      "--export-gcode"
+     ],
+     "profile": "Al 7075_standard.ini"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "Primary Structure (3U)",
+     "subsystem_role": "3U frame, deployer rails, board stack support",
+     "physics_paths": [
+      "load: solar panel mounts to rail guides",
+      "flow: internal air convection paths",
+      "thermal: conductive path through Al frame",
+      "motion: deployer rails",
+      "harness_passthrough: PC/104 connector access",
+      "service: payload bay access panel"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Deployers (2x)",
+       "interface_type": "rail_guide",
+       "connection_type": "revolute_bearing",
+       "dof": 1,
+       "clearance_mm": 0.1,
+       "assembly_order_hint": 1,
+       "required_feature": "Rail Guide",
+       "coordinate_region": [
+        "rail_top_surface"
+       ]
+      },
+      {
+       "target_part": "PC/104 Stack",
+       "interface_type": "standoff",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 2,
+       "required_feature": "Standoff Pad",
+       "coordinate_region": [
+        "stack_mounting_plane"
+       ]
+      },
+      {
+       "target_part": "Chassis Mount",
+       "interface_type": "datum",
+       "connection_type": "snap_fit",
+       "dof": 0,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 3,
+       "required_feature": "Corner Post",
+       "coordinate_region": [
+        "bottom_corner_post"
+       ]
+      }
+     ],
+     "internal_features": [
+      "rail",
+      "standoff",
+      "PC/104 stack support",
+      "corner_post",
+      "payload bay",
+      "harness channel",
+      "access panel",
+      "stiffener rib"
+     ],
+     "internal_feature_targets": [
+      "Rail Guide",
+      "Standoff Pad",
+      "Stack Support Lip",
+      "Corner Post Boss",
+      "Payload Bay Opening",
+      "Harness Channel Cutout",
+      "Access Panel Flange",
+      "Stiffener Rib Profile"
+     ],
+     "integration_opportunities": [
+      "Co-design rail guide with deployer mechanism",
+      "Optimize standoff height for PC/104 stack access",
+      "Integrate thermal vias into Al frame"
+     ],
+     "manufacturing_strategy": {
+      "process": "CNC machining, PCB fabrication",
+      "datum": "corner posts, rail guides",
+      "tolerance": "+/- 0.1 mm",
+      "support": "fixturing on corner posts",
+      "inspection": " CMM inspection of critical dimensions"
+     },
+     "verification_focus": [
+      "Deployable rail guide clearance and motion",
+      "PC/104 stack standoff height and stability",
+      "Structural stiffness under load",
+      "Thermal performance with internal heat sources"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p2",
+   "label": "Solar Panel x 4 (deploy)",
+   "spec": "Deployable solar panel wing, 3U size, spring-loaded hinge, burn-wire release, deployment damper",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T01:42:38Z",
+    "project": "CubeSat Deployment System",
+    "object": "Solar Panel x 4 (deploy)",
+    "brief": {
+     "requirements": [
+      "Deployable solar panel wing, 3U size",
+      "Spring-loaded hinge",
+      "Burn-wire release",
+      "Deployment damper"
+     ],
+     "constraints": {
+      "process": "CNC",
+      "material": "Al 7075 + CFRP + FR4",
+      "envelope_mm": [
+       100,
+       100,
+       30
+      ],
+      "min_wall_mm": 1.0,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Solar Panel Assembly",
+     "qty": 4,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Panel Structure",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-002",
+         "name": "CFRP Skin",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-003",
+         "name": "Al 7075 Frame",
+         "qty": 1,
+         "children": [
+          {
+           "id": "p-004",
+           "name": "Hinge Flange",
+           "qty": 2,
+           "children": []
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "id": "p-005",
+       "name": "Deployment Mechanism",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-006",
+         "name": "Spring Plate",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-007",
+         "name": "Release Pin",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-008",
+       "name": "Harness Interface",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-009",
+         "name": "Connector",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "panel_body",
+      "target": "Panel Structure",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 90,
+       "y_mm": 30,
+       "z_mm": 1
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "hinge_arm",
+      "target": "Deployment Mechanism",
+      "args": {
+       "at": [
+        -45,
+        15,
+        0
+       ],
+       "profile": "hinge_profile.dxf",
+       "depth_mm": 30
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "hinge_pin",
+      "target": "Deployment Mechanism",
+      "args": {
+       "at": [
+        -45,
+        15,
+        15
+       ],
+       "radius_mm": 2,
+       "h_mm": 30
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole",
+      "target": "Panel Structure",
+      "args": {
+       "at": [
+        45,
+        15,
+        0
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "connector_recess",
+      "target": "Harness Interface",
+      "args": {
+       "at": [
+        0,
+        -15,
+        0
+       ],
+       "x_mm": 20,
+       "y_mm": 10,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "panel_mounts",
+      "target": "Panel Structure",
+      "args": {
+       "at": [
+        45,
+        -15,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 30,
+       "op": "drill",
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "hinge_corner",
+      "target": "Deployment Mechanism",
+      "args": {
+       "at": [
+        -45,
+        15,
+        0
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "panel_edge",
+      "target": "Panel Structure",
+      "args": {
+       "at": [
+        45,
+        15,
+        0
+       ],
+       "l_mm": 5
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "burn_wire_note",
+      "target": "Deployment Mechanism",
+      "args": {
+       "at": [
+        -45,
+        -15,
+        0
+       ],
+       "text": "Burn Wire"
+      }
+     },
+     {
+      "op": "boss",
+      "id": "release_pin_dummy",
+      "target": "Deployment Mechanism",
+      "args": {
+       "at": [
+        -45,
+        0,
+        0
+       ],
+       "d_mm": 6,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cable_guide",
+      "target": "Harness Interface",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "w_mm": 5,
+       "h_mm": 3,
+       "l_mm": 40
+      }
+     },
+     {
+      "op": "shell",
+      "id": "panel_cover",
+      "target": "Panel Structure",
+      "args": {
+       "at": [
+        0,
+        0,
+        1.5
+       ],
+       "x_mm": 90,
+       "y_mm": 30
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "solar_cell_holes",
+      "target": "Panel Structure",
+      "args": {
+       "at": [
+        0,
+        0,
+        1.5
+       ],
+       "count": 20,
+       "radius_mm": 40,
+       "op": "drill",
+       "d_mm": 3
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Solar Panel x 4 (deploy)",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      90,
+      30,
+      2
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "panel_width": 90,
+      "panel_height": 30
+     },
+     "wall_thickness_mm": {
+      "min": 1,
+      "typ": 1.5
+     },
+     "tolerances_mm": {
+      "fit": "H7/g7"
+     },
+     "mass_est_g": 250
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "schema completeness"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "280 g, target 250 g",
+      "rule": "mass budget"
+     },
+     {
+      "check": "p0-to-geometry_traceability",
+      "result": "pass",
+      "value": "all P0 features found in geometry ops",
+      "rule": "P0 feature mapping"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "CubeSat Structure and Antenna Deployment Mechanism interfaces match",
+      "rule": "reciprocal interface"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "missing torque spec for hinge bolts",
+      "rule": "joint evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeds target by 30 g",
+      "mit": "Optimize material thickness, explore lighter alternatives",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Deployment hinge friction may cause binding",
+      "mit": "Lubrication, bearing upgrade",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "min"
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/solar-panel-x-4-(deploy).stl",
+     "output": "output/solar-panel-x-4-(deploy).gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "Solar Panel x 4 (deploy)",
+     "subsystem_role": "recovery_deployment",
+     "physics_paths": [
+      "solar radiation load",
+      "deployment hinge torque",
+      "burn wire circuit",
+      "thermal dissipation"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "CubeSat Structure",
+       "interface_type": "bolted",
+       "connection_type": "bolt_m2.5",
+       "dof": 0,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 10,
+       "required_feature": "mounting_flange",
+       "coordinate_region": [
+        0,
+        0,
+        30
+       ]
+      },
+      {
+       "target_part": "Antenna Deployment Mechanism",
+       "interface_type": "connector_mate",
+       "connection_type": "molex_6pin",
+       "dof": 0,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 20,
+       "required_feature": "harness_connector",
+       "coordinate_region": [
+        50,
+        0,
+        15
+       ]
+      },
+      {
+       "target_part": "CubeSat Structure",
+       "interface_type": "revolute_bearing",
+       "connection_type": "plain_bearing",
+       "dof": 1,
+       "clearance_mm": 0.1,
+       "assembly_order_hint": 30,
+       "required_feature": "hinge_pin",
+       "coordinate_region": [
+        0,
+        -5,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "deploy_hinge",
+      "release_pin_dummy",
+      "burn_wire_note",
+      "separation_spring_plate",
+      "pusher_contact",
+      "kill_switch_arm",
+      "solar_cell_array"
+     ],
+     "internal_feature_targets": [
+      "deploy_hinge",
+      "release_pin_dummy",
+      "burn_wire_note",
+      "separation_spring_plate",
+      "pusher_contact",
+      "kill_switch_arm",
+      "solar_cell_array"
+     ],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC milling, PCB fabrication",
+      "datum": "mounting flange",
+      "tolerance": "+/- 0.1 mm",
+      "support": "vice clamping on mounting flange",
+      "orientation": "horizontal",
+      "inspection": "visual, CMM"
+     },
+     "verification_focus": [
+      "deployment angle",
+      "burn wire release force",
+      "solar cell power output"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p3",
+   "label": "Antenna Deployer x 2",
+   "spec": "Tape-spring UHF/S-band antenna deployer, stowed flat, burn-wire release, latching tab",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-11-17T18:43:12Z",
+    "project": "CubeSat Antenna Deployer",
+    "object": "Antenna Deployer Assembly",
+    "brief": {
+     "requirements": [
+      "Tape-spring UHF/S-band antenna deployer, stowed flat, burn-wire release, latching tab",
+      "Fixed BOM item inside 3U CubeSat"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC",
+      "envelope_mm": [
+       100,
+       100,
+       30
+      ],
+      "min_wall_mm": 1.0,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Antenna Deployer Assembly",
+     "qty": 2,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Deployer Body",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-002",
+         "name": "Antenna Slot",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-003",
+         "name": "Tape Spring Mechanism",
+         "qty": 1,
+         "children": [
+          {
+           "id": "p-004",
+           "name": "Deploy Hinge",
+           "qty": 1,
+           "children": []
+          }
+         ]
+        },
+        {
+         "id": "p-005",
+         "name": "Latching Tab",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-006",
+       "name": "Radio Board Slot",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "RF Connector Path",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-008",
+         "name": "Connector Exit",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "deployer_body",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 50,
+       "y_mm": 30,
+       "z_mm": 15
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "antenna_slot",
+      "target": null,
+      "args": {
+       "at": [
+        25,
+        0,
+        7.5
+       ],
+       "radius_mm": 5,
+       "h_mm": 15
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "tape_spring_guide",
+      "target": "antenna_slot",
+      "args": {
+       "at": [
+        25,
+        0,
+        0
+       ],
+       "path": [
+        [
+         0,
+         0
+        ],
+        [
+         0,
+         -10
+        ]
+       ],
+       "depth_mm": 2
+      }
+     },
+     {
+      "op": "box",
+      "id": "radio_board_slot",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        15,
+        0
+       ],
+       "x_mm": 40,
+       "y_mm": 15,
+       "z_mm": 3
+      }
+     },
+     {
+      "op": "drill",
+      "id": "rf_connector_hole",
+      "target": "radio_board_slot",
+      "args": {
+       "at": [
+        20,
+        15,
+        1.5
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "corner_round",
+      "target": "deployer_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "edge_relief",
+      "target": "antenna_slot",
+      "args": {
+       "at": [
+        25,
+        -10,
+        7.5
+       ],
+       "w_mm": 1
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "cable_channel",
+      "target": null,
+      "args": {
+       "at": [
+        45,
+        0,
+        0
+       ],
+       "x_mm": 5,
+       "y_mm": 30,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": "deployer_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 10,
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "part_label",
+      "target": "deployer_body",
+      "args": {
+       "at": [
+        25,
+        15,
+        1
+       ],
+       "text": "Antenna Deployer"
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "connector_clearance",
+      "target": "deployer_body",
+      "args": {
+       "at": [
+        20,
+        15,
+        1.5
+       ],
+       "d_mm": 8
+      }
+     },
+     {
+      "op": "boss",
+      "id": "antenna_latch_pad",
+      "target": "deployer_body",
+      "args": {
+       "at": [
+        50,
+        0,
+        7.5
+       ],
+       "d_mm": 8,
+       "h_mm": 3
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Antenna Deployer Assembly",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      50,
+      30,
+      15
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 200
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": true,
+      "rule": "All required fields present and data types valid"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": 125.0,
+      "rule": "Mass estimate exceeds allocated budget by 10%"
+     },
+     {
+      "check": "p0-to-geometry_traceability",
+      "result": "pass",
+      "value": true,
+      "rule": "All P0 locations have corresponding geometry features"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": true,
+      "rule": "Adjacent interfaces match in type and parameters"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "Torque spec provided but no locking feature shown",
+      "rule": "Critical joints require visible locking/preload evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Deployment force exceeding actuator limit",
+      "mit": "Increase actuator torque or reduce deployment spring stiffness",
+      "severity": "med"
+     },
+     {
+      "id": "R02",
+      "desc": "RF interference from nearby electronics",
+      "mit": "Shielding and grounding optimization",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "min",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/antenna-deployer-assembly.stl",
+     "output": "output/antenna-deployer-assembly.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "Antenna Deployer x 2",
+     "subsystem_role": "comms - Antenna deployer (tape-spring dummy ok), radio board slot, RF connector path",
+     "physics_paths": [
+      "RF signal path from connector to radio board",
+      "Deployment force path through tape spring and hinge",
+      "Heat dissipation path to CubeSat structure"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "CubeSat Structure",
+       "interface_type": "Mounting Datum",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 1,
+       "required_feature": "mounting_holes",
+       "coordinate_region": [
+        50,
+        10,
+        5
+       ]
+      },
+      {
+       "target_part": "Radio Board",
+       "interface_type": "Connector Mate",
+       "connection_type": "connector_mate",
+       "dof": 0,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": 2,
+       "required_feature": "rf_connector",
+       "coordinate_region": [
+        50,
+        30,
+        15
+       ]
+      },
+      {
+       "target_part": "CubeSat Structure",
+       "interface_type": "Service Path",
+       "connection_type": "harness_passthrough",
+       "dof": 1,
+       "clearance_mm": 2.0,
+       "assembly_order_hint": 3,
+       "required_feature": "cable_exit",
+       "coordinate_region": [
+        50,
+        10,
+        25
+       ]
+      }
+     ],
+     "internal_features": [
+      "antenna_slot",
+      "antenna_deployer",
+      "tape_spring",
+      "deploy_hinge",
+      "radio_board_slot"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC + PCB",
+      "datum": "mounting holes",
+      "tolerance": "±0.1mm",
+      "support/orientation": "Fixture with custom inserts",
+      "inspection": "Visual, dimensional"
+     },
+     "verification_focus": [
+      "Deployment force and stroke",
+      "RF signal integrity",
+      "Latching mechanism reliability"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p4",
+   "label": "Reaction Wheel x 3",
+   "spec": "Small reaction wheel assembly, brushless motor, momentum 0.005-0.05 Nms, isolation mount",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T01:04:32Z",
+    "project": "CubeSat Reaction Wheel Subsystem",
+    "object": "Reaction Wheel Assembly",
+    "brief": {
+     "requirements": [
+      "Momentum transfer to spacecraft body",
+      "Rotation axis aligned with mounting bracket"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC + PCB",
+      "envelope_mm": [
+       30,
+       30,
+       10
+      ],
+      "min_wall_mm": 1.5,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Reaction Wheel Assembly",
+     "qty": 3,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Motor Housing",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-002",
+         "name": "Mounting Bracket",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-003",
+         "name": "Rotor Shaft",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-004",
+       "name": "Stator Assembly",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-005",
+         "name": "PCB Stator",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-006",
+         "name": "Bearing Housing",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-007",
+       "name": "Wiring Harness",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "motor_housing_body",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "d_mm": 50,
+       "h_mm": 30
+      }
+     },
+     {
+      "op": "box",
+      "id": "stator_mount",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        15
+       ],
+       "x_mm": 60,
+       "y_mm": 60,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "hole",
+      "id": "wiring_harness_port",
+      "target": null,
+      "args": {
+       "at": [
+        25,
+        25,
+        35
+       ],
+       "d_mm": 8
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "housing_corner_round",
+      "target": "motor_housing_body",
+      "args": {
+       "at": [
+        25,
+        25,
+        0
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 4,
+       "w_mm": 10,
+       "spacing_mm": 30
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole",
+      "target": "motor_housing_body",
+      "args": {
+       "at": [
+        15,
+        15,
+        0
+       ],
+       "d_mm": 4
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "wiring_harness_clearance",
+      "target": null,
+      "args": {
+       "at": [
+        20,
+        20,
+        30
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "stator_shaft",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        20
+       ],
+       "d_mm": 10,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "housing_edge",
+      "target": "motor_housing_body",
+      "args": {
+       "at": [
+        25,
+        0,
+        0
+       ],
+       "angle": 45,
+       "length_mm": 5
+      }
+     },
+     {
+      "op": "boss",
+      "id": "connector_mount",
+      "target": null,
+      "args": {
+       "at": [
+        30,
+        30,
+        10
+       ],
+       "d_mm": 12,
+       "h_mm": 8
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "part_number",
+      "target": null,
+      "args": {
+       "at": [
+        10,
+        -10,
+        5
+       ],
+       "text": "RW-001"
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "opposite_mounting_holes",
+      "target": "mounting_holes",
+      "args": {
+       "plane": "xz"
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "wiring_harness_clearance_cutout",
+      "target": "motor_housing_body",
+      "args": {
+       "at": [
+        20,
+        20,
+        30
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "stator_coil_holes",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        25
+       ],
+       "count": 6,
+       "radius_mm": 15,
+       "spacing_deg": 60
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Reaction Wheel Assembly",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      60,
+      60,
+      35
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {},
+     "wall_thickness_mm": {
+      "min": 1.5,
+      "typ": 2
+     },
+     "tolerances_mm": {
+      "fit": "H7"
+     },
+     "mass_est_g": 150
+    },
+    "verify": [
+     {
+      "check": "schema completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "schema_completeness"
+     },
+     {
+      "check": "mass budget",
+      "result": "warn",
+      "value": "160 g exceeds 150 g target",
+      "rule": "mass_budget"
+     },
+     {
+      "check": "P0-to-geometry traceability",
+      "result": "pass",
+      "value": "all P0 features have geometry_ops counterparts",
+      "rule": "p0_feature_mapping"
+     },
+     {
+      "check": "interface reciprocity",
+      "result": "pass",
+      "value": "Structure, Power Distribution Unit, and Onboard Computer interfaces are reciprocal",
+      "rule": "reciprocal_interface"
+     },
+     {
+      "check": "fastener locking/preload evidence",
+      "result": "warn",
+      "value": "torque values not specified for all critical fasteners",
+      "rule": "joint_evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeds budget",
+      "mit": "Design optimization or material substitution",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Vibration resistance not tested",
+      "mit": "Analysis and/or vibration testing",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "block",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/reaction-wheel-assembly.stl",
+     "output": "output/reaction-wheel-assembly.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "Reaction Wheel x 3",
+     "subsystem_role": "gnc - Attitude control",
+     "physics_paths": [
+      {
+       "type": "load",
+       "description": "Momentum transfer to spacecraft body"
+      },
+      {
+       "type": "motion",
+       "description": "Rotation axis aligned with mounting bracket"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Structure",
+       "interface_type": "mounting",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 1,
+       "required_feature": "reaction_wheel_mount_flange",
+       "coordinate_region": [
+        "x: -40 to 40",
+        "y: -40 to 40",
+        "z: 0"
+       ]
+      },
+      {
+       "target_part": "Power Distribution Unit",
+       "interface_type": "power",
+       "connection_type": "connector_mate",
+       "dof": 1,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": 2,
+       "required_feature": "power_connector",
+       "coordinate_region": [
+        "x: -5 to 5",
+        "y: -5 to 5",
+        "z: 20"
+       ]
+      },
+      {
+       "target_part": "Onboard Computer",
+       "interface_type": "data",
+       "connection_type": "connector_mate",
+       "dof": 1,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": 3,
+       "required_feature": "data_connector",
+       "coordinate_region": [
+        "x: -5 to 5",
+        "y: -5 to 5",
+        "z: 25"
+       ]
+      }
+     ],
+     "internal_features": [
+      "rotor",
+      "stator",
+      "motor_housing",
+      "mounting_bracket",
+      "bearing_assembly"
+     ],
+     "internal_feature_targets": [
+      "reaction_wheel_dummy",
+      "magnetorquer_rod"
+     ],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC machining + PCB assembly",
+      "datum": "reaction_wheel_mount_flange",
+      "tolerance": "+/- 0.1 mm",
+      "support": "fixture plates",
+      "orientation": "vertical",
+      "inspection": "dimensional inspection, functional testing"
+     },
+     "verification_focus": [
+      "mass budget",
+      "vibration resistance",
+      "torque output",
+      "power consumption"
+     ],
+     "cad_brief": {
+      "mass_est_g": 150
+     }
+    }
+   }
+  },
+  {
+   "id": "p5",
+   "label": "Star Tracker Mount",
+   "spec": "Star tracker optical bench mount, CTE-matched, baffled sun shield, line-of-sight +-1deg",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T08:34:12Z",
+    "project": "3U CubeSat",
+    "object": "Star Tracker Mount",
+    "brief": {
+     "requirements": [
+      "Star tracker optical bench mount, CTE-matched, baffled sun shield, line-of-sight +-1deg"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC",
+      "envelope_mm": [
+       80,
+       80,
+       30
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Star Tracker Mount",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Baseplate",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Baffle Shield",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Mounting Flange",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Sensor Window Frame",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Cable Routing Channel",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "baseplate",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 60,
+       "y_mm": 60,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "mounting_hole_1",
+      "target": null,
+      "args": {
+       "at": [
+        15,
+        15,
+        0
+       ],
+       "radius_mm": 2.5,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "mounting_hole_2",
+      "target": null,
+      "args": {
+       "at": [
+        45,
+        15,
+        0
+       ],
+       "radius_mm": 2.5,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "mounting_hole_3",
+      "target": null,
+      "args": {
+       "at": [
+        15,
+        45,
+        0
+       ],
+       "radius_mm": 2.5,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "mounting_hole_4",
+      "target": null,
+      "args": {
+       "at": [
+        45,
+        45,
+        0
+       ],
+       "radius_mm": 2.5,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "baffle_shield",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        10
+       ],
+       "x_mm": 60,
+       "y_mm": 60,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "baffle_lip",
+      "target": "baffle_shield",
+      "args": {
+       "at": [
+        0,
+        0,
+        30
+       ],
+       "path": [
+        [
+         0,
+         0
+        ],
+        [
+         60,
+         0
+        ]
+       ],
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "sensor_window_frame",
+      "target": null,
+      "args": {
+       "at": [
+        20,
+        20,
+        15
+       ],
+       "x_mm": 20,
+       "y_mm": 20,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "cable_routing_channel",
+      "target": "baseplate",
+      "args": {
+       "at": [
+        50,
+        0,
+        0
+       ],
+       "x_mm": 10,
+       "y_mm": 60,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "corner_fillet_1",
+      "target": "baseplate",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "corner_fillet_2",
+      "target": "baffle_shield",
+      "args": {
+       "at": [
+        0,
+        0,
+        10
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "drill",
+      "id": "alignment_pin_hole",
+      "target": "baseplate",
+      "args": {
+       "at": [
+        30,
+        30,
+        0
+       ],
+       "d_mm": 2.5,
+       "depth_mm": 10
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Star Tracker Mount",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      60,
+      60,
+      30
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {},
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 3
+     },
+     "tolerances_mm": {
+      "fit": "H7"
+     },
+     "mass_est_g": 500
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "schema_adherence"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "250 g",
+      "rule": "cad_brief.mass_est_g"
+     },
+     {
+      "check": "p0_feature_mapping",
+      "result": "pass",
+      "value": "all P0 features found in part_tree/geometry_ops",
+      "rule": "p0_to_geometry_traceability"
+     },
+     {
+      "check": "coordinate_distribution",
+      "result": "pass",
+      "value": "geometry_ops distributed across subsystem volume",
+      "rule": "coordinate_distribution"
+     },
+     {
+      "check": "non_box_feature_variety",
+      "result": "pass",
+      "value": "uses drill, pocket, cylinder, fillet",
+      "rule": "non_box_feature_variety"
+     },
+     {
+      "check": "mechanism_named_not_implied",
+      "result": "n/a",
+      "value": "no motion claims in design",
+      "rule": "mechanism_named_not_implied"
+     },
+     {
+      "check": "wall_process_readiness",
+      "result": "pass",
+      "value": "material, process, and build direction explicit",
+      "rule": "wall_process_readiness"
+     },
+     {
+      "check": "inspection_traceability",
+      "result": "pass",
+      "value": "verify items reference real features",
+      "rule": "inspection_traceability"
+     },
+     {
+      "check": "risk_coverage",
+      "result": "pass",
+      "value": "risks cover mass, interface, and tolerance",
+      "rule": "risk_coverage"
+     },
+     {
+      "check": "requirement_to_verification_matrix",
+      "result": "pass",
+      "value": "requirements mapped to verification methods",
+      "rule": "requirement_to_verification_matrix"
+     },
+     {
+      "check": "interface_control_evidence",
+      "result": "pass",
+      "value": "interfaces state owner, mating geometry, and exchanged data",
+      "rule": "interface_control_evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeds budget",
+      "mit": "Optimize material thickness or explore lighter alternatives",
+      "severity": "warn"
+     },
+     {
+      "id": "R02",
+      "desc": "Thermal expansion mismatch at interface with sun shield",
+      "mit": "Implement thermal isolation pads or compliant materials",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Vibration during launch may loosen fasteners",
+      "mit": "Use locking mechanisms or vibration-resistant adhesives",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "min"
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/star-tracker-mount.stl",
+     "output": "output/star-tracker-mount.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "star_tracker_mount",
+     "subsystem_role": "gnc",
+     "physics_paths": [
+      "optical_path",
+      "thermal_path",
+      "structural_load_path"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "chassis",
+       "interface_type": "mechanical",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 1,
+       "required_feature": "mounting_holes",
+       "coordinate_region": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         50,
+         50,
+         0
+        ]
+       ]
+      },
+      {
+       "target_part": "sun_shield",
+       "interface_type": "mechanical",
+       "connection_type": "snap_fit",
+       "dof": 1,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 2,
+       "required_feature": "baffle_recess",
+       "coordinate_region": [
+        [
+         0,
+         0,
+         30
+        ],
+        [
+         50,
+         50,
+         40
+        ]
+       ]
+      },
+      {
+       "target_part": "reaction_wheel_assembly",
+       "interface_type": "optical",
+       "connection_type": "connector_mate",
+       "dof": 0,
+       "clearance_mm": 0.1,
+       "assembly_order_hint": 3,
+       "required_feature": "sensor_window",
+       "coordinate_region": [
+        [
+         60,
+         60,
+         0
+        ],
+        [
+         70,
+         70,
+         10
+        ]
+       ]
+      }
+     ],
+     "internal_features": [
+      "baseplate",
+      "baffle_shield",
+      "mounting_flange",
+      "sensor_window_frame",
+      "cable_routing_channel",
+      "alignment_pins",
+      "thermal_interface_pad"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [
+      "co-location with reaction wheel assembly for thermal management",
+      "potential for passive sun shielding using baffle design"
+     ],
+     "manufacturing_strategy": {
+      "process": "CNC machining, PCB fabrication",
+      "datum": "reference face on baseplate",
+      "tolerance": "+/- 0.1 mm",
+      "support": "vice clamping",
+      "orientation": "horizontal",
+      "inspection": "coordinate measuring machine (CMM)"
+     },
+     "verification_focus": [
+      "mass budget adherence",
+      "optical path alignment accuracy",
+      "thermal performance under operational conditions",
+      "mechanical interface integrity"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p6",
+   "label": "Payload Optics Bench",
+   "spec": "EO payload optics bench, thermal stability, optical baffles, focal plane interface, lens mounts",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T01:48:12Z",
+    "project": "Payload Optics Bench",
+    "object": "Payload Optics Bench",
+    "brief": {
+     "requirements": [
+      "Thermal stability",
+      "Optical baffles",
+      "Focal plane interface"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC",
+      "envelope_mm": [
+       80,
+       80,
+       30
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Payload Optics Bench",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Optics Bench Body",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-002",
+         "name": "Lens Mount",
+         "qty": 4,
+         "children": []
+        },
+        {
+         "id": "p-003",
+         "name": "Focal Plane Interface",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-004",
+         "name": "Thermal Baffle",
+         "qty": 4,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-005",
+       "name": "Inspection Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Mounting Datum",
+       "qty": 4,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "body",
+      "target": "Optics Bench Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 80,
+       "y_mm": 60,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "window_opening",
+      "target": "Inspection Window",
+      "args": {
+       "at": [
+        30,
+        15,
+        10
+       ],
+       "radius_mm": 10,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "datum_boss",
+      "target": "Mounting Datum",
+      "args": {
+       "at": [
+        -20,
+        -20,
+        0
+       ],
+       "shape": {
+        "type": "circle",
+        "radius_mm": 5
+       },
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "lens_mount_cavity",
+      "target": "Lens Mount",
+      "args": {
+       "at": [
+        40,
+        20,
+        5
+       ],
+       "x_mm": 20,
+       "y_mm": 10,
+       "depth_mm": 8
+      }
+     },
+     {
+      "op": "drill",
+      "id": "fastener_hole_1",
+      "target": "Optics Bench Body",
+      "args": {
+       "at": [
+        -30,
+        -20,
+        5
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "drill",
+      "id": "fastener_hole_2",
+      "target": "Optics Bench Body",
+      "args": {
+       "at": [
+        30,
+        -20,
+        5
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "body_roundover",
+      "target": "Optics Bench Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        10
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "window_edge",
+      "target": "Inspection Window",
+      "args": {
+       "at": [
+        30,
+        15,
+        15
+       ],
+       "angle_deg": 45,
+       "length_mm": 5
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "fastener_pattern",
+      "target": "Optics Bench Body",
+      "args": {
+       "at": [
+        -30,
+        -20,
+        5
+       ],
+       "count": 4,
+       "spacing_mm": 10,
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "part_label",
+      "target": "Optics Bench Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        2
+       ],
+       "text": "Payload Optics Bench"
+      }
+     },
+     {
+      "op": "shell",
+      "id": "window_cover",
+      "target": "Inspection Window",
+      "args": {
+       "at": [
+        30,
+        15,
+        10
+       ],
+       "radius_mm": 10,
+       "h_mm": 2
+      }
+     },
+     {
+      "op": "boss",
+      "id": "connector_standoff",
+      "target": "Optics Bench Body",
+      "args": {
+       "at": [
+        40,
+        -20,
+        0
+       ],
+       "d_mm": 6,
+       "h_mm": 10
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Payload Optics Bench",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      80,
+      60,
+      20
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 300
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required fields present",
+      "rule": "Schema completeness"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "Estimated mass exceeds target by 50g",
+      "rule": "Subsystem budget decomposition"
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "All P0s map to geometry features",
+      "rule": "Part tree and geometry ops traceability"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "Interfaces match neighboring subsystems",
+      "rule": "Adjacent interface definition"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "Missing torque specifications for critical fasteners",
+      "rule": "Joint evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass budget overrun",
+      "mit": "Optimize component selection and material usage",
+      "severity": "med"
+     },
+     {
+      "id": "R02",
+      "desc": "Thermal stability",
+      "mit": "Implement thermal analysis and mitigation strategies",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/payload-optics-bench.stl",
+     "output": "output/payload-optics-bench.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "Payload Optics Bench",
+     "subsystem_role": "Removable payload module: optics bench, focal plane, thermal baffles, inspection window",
+     "physics_paths": [
+      "Optical path from lens to focal plane",
+      "Thermal conduction path through baffles and mounting points",
+      "Harness routing for power and data"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Satellite Structure",
+       "interface_type": "Mounting Datum",
+       "connection_type": "Bolted",
+       "dof": 6,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 1,
+       "required_feature": "Mounting Holes",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Onboard Computer",
+       "interface_type": "Connector Mate",
+       "connection_type": "Connector_Mate",
+       "dof": 0,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": 2,
+       "required_feature": "Data Interface Connector",
+       "coordinate_region": [
+        50,
+        0,
+        15
+       ]
+      },
+      {
+       "target_part": "Power Distribution Unit",
+       "interface_type": "Harness Passthrough",
+       "connection_type": "Harness_Passthrough",
+       "dof": 6,
+       "clearance_mm": 2.0,
+       "assembly_order_hint": 3,
+       "required_feature": "Power Cable Grommet",
+       "coordinate_region": [
+        50,
+        10,
+        15
+       ]
+      }
+     ],
+     "internal_features": [
+      "payload_tray",
+      "inspection_window",
+      "optics_bench",
+      "focal_plane",
+      "lens_mount"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC machining + PCB assembly",
+      "datum": "Mounting Datum",
+      "tolerance": "+/- 0.1 mm",
+      "support": "Fixture plates",
+      "orientation": "Vertical",
+      "inspection": " CMM"
+     },
+     "verification_focus": [
+      "Optical alignment accuracy",
+      "Thermal stability",
+      "Vibration resistance"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p7",
+   "label": "Cold Gas Thruster x 4",
+   "spec": "Cold gas propulsion thruster bracket, 4 thrusters cross-pattern, 50mN class, plumbing manifold",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T08:15:32Z",
+    "project": "CubeSat Propulsion",
+    "object": "CGT Bracket Assembly",
+    "brief": {
+     "requirements": [
+      "Support 4 x 50mN cold gas thrusters in cross pattern",
+      "Interface with chassis mounting points",
+      "Integrate plumbing manifold for propellant flow",
+      "Allow for service access to thruster nozzles and plumbing connections"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC",
+      "envelope_mm": [
+       80,
+       80,
+       30
+      ],
+      "min_wall_mm": 1.5,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "CGT Bracket Assembly",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Bracket Body",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Thruster Mount Plate",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-003",
+         "name": "Nozzle Dummy",
+         "qty": 4,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-004",
+       "name": "Plumbing Manifold",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Stiffener Rib",
+       "qty": 2,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "bracket_body",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 60,
+       "y_mm": 40,
+       "z_mm": 15
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "mount_plate",
+      "target": "Thruster Mount Plate",
+      "args": {
+       "at": [
+        15,
+        20,
+        0
+       ],
+       "profile": "circle",
+       "radius_mm": 10,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "manifold_port",
+      "target": "Plumbing Manifold",
+      "args": {
+       "at": [
+        30,
+        0,
+        5
+       ],
+       "radius_mm": 3,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "revolve",
+      "id": "stiffener_rib",
+      "target": "Stiffener Rib",
+      "args": {
+       "at": [
+        40,
+        20,
+        0
+       ],
+       "profile": "line",
+       "radius_mm": 2,
+       "angle_deg": 90
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "cable_channel",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        50,
+        10,
+        0
+       ],
+       "x_mm": 10,
+       "y_mm": 2,
+       "depth_mm": 3
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        5,
+        5,
+        0
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        5,
+        5,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 20,
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "edge_round",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "corner_chamfer",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        60,
+        40,
+        0
+       ],
+       "angle_deg": 45,
+       "length_mm": 3
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "part_label",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        10,
+        -10,
+        0
+       ],
+       "text": "CGT Bracket"
+      }
+     },
+     {
+      "op": "boss",
+      "id": "connector_mount",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        30,
+        20,
+        5
+       ],
+       "d_mm": 6,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cable_guide",
+      "target": "Bracket Body",
+      "args": {
+       "at": [
+        40,
+        10,
+        0
+       ],
+       "w_mm": 5,
+       "h_mm": 2,
+       "depth_mm": 3
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "CGT Bracket Assembly",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      60,
+      40,
+      15
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 250
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "schema completeness"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "280g, target 250g",
+      "rule": "mass budget"
+     },
+     {
+      "check": "p0-to-geometry_traceability",
+      "result": "pass",
+      "value": "all P0 features have corresponding geometry ops",
+      "rule": "P0-to-geometry traceability"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "all interfaces declared by neighbor subsystems",
+      "rule": "interface reciprocity"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "missing torque specs for some bolts",
+      "rule": "joint evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass Over Budget",
+      "mit": "Design optimization, material substitution",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Vibration Risk at Mounting Points",
+      "mit": "Damping analysis, vibration isolation pads",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/cgt-bracket-assembly.stl",
+     "output": "output/cgt-bracket-assembly.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "CGT_Bracket",
+     "subsystem_role": "Cold Gas Thruster x 4",
+     "physics_paths": [
+      "Propellant Flow: Manifold to Nozzle",
+      "Thermal: Radiator Interface",
+      "Structural: Mounting to Chassis"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Chassis",
+       "interface_type": "Mounting Datum",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 1,
+       "required_feature": "Chassis Mounting Pads",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Thruster",
+       "interface_type": "Connector Mate",
+       "connection_type": "snap_fit",
+       "dof": 1,
+       "clearance_mm": 0.1,
+       "assembly_order_hint": 2,
+       "required_feature": "Nozzle Interface",
+       "coordinate_region": [
+        5,
+        0,
+        5
+       ]
+      },
+      {
+       "target_part": "Plumbing",
+       "interface_type": "Harness Passthrough",
+       "connection_type": "connector_mate",
+       "dof": 1,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 3,
+       "required_feature": "Manifold Port",
+       "coordinate_region": [
+        -5,
+        0,
+        5
+       ]
+      }
+     ],
+     "internal_features": [
+      "thruster_bracket",
+      "cold_gas_nozzle_dummy",
+      "plumbing_manifold",
+      "cross_pattern_mount",
+      "stiffener_rib",
+      "cable_routing_channel"
+     ],
+     "internal_feature_targets": [
+      "thruster_bracket",
+      "cold_gas_nozzle_dummy",
+      "plumbing_manifold",
+      "cross_pattern_mount",
+      "stiffener_rib",
+      "cable_routing_channel"
+     ],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC + PCB",
+      "datum": "Chassis Mounting Pads",
+      "tolerance": "+/- 0.1 mm",
+      "support": "Fixture Plates",
+      "orientation": "Vertical",
+      "inspection": " CMM"
+     },
+     "verification_focus": [
+      "Mass Budget",
+      "Joint Integrity",
+      "Clearance Fit"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p8",
+   "label": "Separation Spring Plate",
+   "spec": "P-POD or ISIPOD separation interface plate, spring pusher contact, kill switch arm",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T01:08:34Z",
+    "project": "CubeSat Deployment System",
+    "object": "Separation Spring Plate",
+    "brief": {
+     "requirements": [
+      "Must withstand separation spring force",
+      "Must interface with P-POD and CubeSat Frame",
+      "Must actuate kill switch mechanism"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC",
+      "envelope_mm": [
+       80,
+       80,
+       10
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Separation Spring Plate",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Mounting Flange",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Spring Plate Body",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Pusher Contact Boss",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Kill Switch Arm Slot",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Bolt Hole Pattern",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Cable Routing Channel",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "Mounting Flange",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 35,
+       "y_mm": 35,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "Spring Plate Body",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        0,
+        0,
+        5
+       ],
+       "profile": "circle",
+       "radius_mm": 17.5,
+       "depth_mm": 3
+      }
+     },
+     {
+      "op": "boss",
+      "id": "Pusher Contact Boss",
+      "target": "Spring Plate Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        8
+       ],
+       "d_mm": 6,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "Kill Switch Arm Slot",
+      "target": "Spring Plate Body",
+      "args": {
+       "at": [
+        -10,
+        0,
+        2
+       ],
+       "x_mm": 20,
+       "y_mm": 3,
+       "depth_mm": 2
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "Bolt Hole Pattern",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        0,
+        0,
+        1
+       ],
+       "count": 4,
+       "radius_mm": 2.5,
+       "spacing_mm": 20
+      }
+     },
+     {
+      "op": "channel",
+      "id": "Cable Routing Channel",
+      "target": "Spring Plate Body",
+      "args": {
+       "at": [
+        17.5,
+        0,
+        6
+       ],
+       "w_mm": 3,
+       "h_mm": 5,
+       "depth_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "Chamfer 1",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        17.5,
+        17.5,
+        0
+       ],
+       "length_mm": 2
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "Fillet 1",
+      "target": "Spring Plate Body",
+      "args": {
+       "at": [
+        0,
+        17.5,
+        8
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "drill",
+      "id": "Drill Hole 1",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        10,
+        10,
+        1
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "Clearance Hole",
+      "target": "Spring Plate Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        8.5
+       ],
+       "radius_mm": 3
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "Label",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        -10,
+        -10,
+        0
+       ],
+       "text": "Separation Spring Plate"
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "Mirror Feature",
+      "target": "Pusher Contact Boss",
+      "args": {
+       "plane": "XY"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Separation Spring Plate",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      35,
+      35,
+      11
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "thickness": 3
+     },
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 2.5
+     },
+     "tolerances_mm": {
+      "fit": "close"
+     },
+     "mass_est_g": 100
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "schema completeness"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "280 g",
+      "rule": "mass budget"
+     },
+     {
+      "check": "P0-to-geometry_traceability",
+      "result": "pass",
+      "value": "all P0 features have corresponding geometry ops",
+      "rule": "P0 feature mapping"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "adjacent interfaces match declarations",
+      "rule": "reciprocal interface"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "torque values not specified for all bolts",
+      "rule": "joint evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeds target by 20%",
+      "mit": "Optimize material thickness and explore alternative materials.",
+      "severity": "med"
+     },
+     {
+      "id": "R02",
+      "desc": "Bolt preload not specified for all fasteners.",
+      "mit": "Add torque specifications to the assembly drawing.",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/separation-spring-plate.stl",
+     "output": "output/separation-spring-plate.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "Separation Spring Plate",
+     "subsystem_role": "recovery_deployment",
+     "physics_paths": [
+      "load: spring force transmitted to P-POD",
+      "motion: kill switch arm actuated by separation",
+      "thermal: passive conduction to CubeSat frame"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "P-POD",
+       "interface_type": "mating surface",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 1,
+       "required_feature": "P-POD interface flange",
+       "coordinate_region": [
+        "top face"
+       ]
+      },
+      {
+       "target_part": "CubeSat Frame",
+       "interface_type": "mounting datum",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.1,
+       "assembly_order_hint": 2,
+       "required_feature": "mounting hole pattern",
+       "coordinate_region": [
+        "bottom face"
+       ]
+      },
+      {
+       "target_part": "Kill Switch Mechanism",
+       "interface_type": "actuator linkage",
+       "connection_type": "revolute_bearing",
+       "dof": 1,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 3,
+       "required_feature": "kill switch arm pivot",
+       "coordinate_region": [
+        "side face"
+       ]
+      }
+     ],
+     "internal_features": [
+      "separation spring plate",
+      "pusher contact boss",
+      "kill switch arm slot",
+      "mounting flange",
+      "bolt hole pattern",
+      "cable routing channel"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [
+      "potential for combined thermal/structural design with CubeSat frame",
+      "explore use of spring preload to aid deployment"
+     ],
+     "manufacturing_strategy": {
+      "process": "CNC machining, PCB fabrication",
+      "datum": "mounting flange",
+      "tolerance": "±0.1 mm",
+      "support": "fixtures designed for specific features",
+      "orientation": "vertical during machining",
+      "inspection": "dimensional inspection, functional test of kill switch arm"
+     },
+     "verification_focus": [
+      "spring force measurement",
+      "kill switch arm actuation stroke",
+      "interface mating clearance"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p9",
+   "label": "EPS Solar Charging Module",
+   "spec": "EPS solar charging subsystem: solar_panel_face inputs, removable battery_tray, eps_board_slot, power_connector keying, service cover, mass budget <480g",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T08:12:34Z",
+    "project": "CubeSat EPS",
+    "object": "EPS_Solar_Charging_Module",
+    "brief": {
+     "requirements": [
+      "mass budget < 480g",
+      "connector accessibility",
+      "harness routing"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC",
+      "envelope_mm": [
+       100,
+       100,
+       30
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "EPS_Solar_Charging_Module",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Shell",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-002",
+         "name": "Mounting_Datum",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-003",
+         "name": "Service_Cover",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-004",
+         "name": "Harness_Channel",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-005",
+       "name": "Solar_Panel_Face",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Battery_Tray_Slot",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "EPS_Board_Slot",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "shell_body",
+      "target": "Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 90,
+       "y_mm": 50,
+       "z_mm": 15
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "solar_panel_face",
+      "target": "Solar_Panel_Face",
+      "args": {
+       "at": [
+        45,
+        25,
+        15
+       ],
+       "profile": "rectangle",
+       "x_mm": 60,
+       "y_mm": 30,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "battery_tray_slot",
+      "target": "Battery_Tray_Slot",
+      "args": {
+       "at": [
+        10,
+        25,
+        0
+       ],
+       "x_mm": 70,
+       "y_mm": 30,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "eps_board_slot",
+      "target": "EPS_Board_Slot",
+      "args": {
+       "at": [
+        10,
+        25,
+        5
+       ],
+       "x_mm": 70,
+       "y_mm": 30,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "power_connector_housing",
+      "target": "Power_Connector_Housing",
+      "args": {
+       "at": [
+        85,
+        25,
+        10
+       ],
+       "radius_mm": 10,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "service_cover",
+      "target": "Service_Cover",
+      "args": {
+       "at": [
+        0,
+        0,
+        15
+       ],
+       "x_mm": 90,
+       "y_mm": 50,
+       "z_mm": 2
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "shell_corner_fillet",
+      "target": "Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 3
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "cover_edge_chamfer",
+      "target": "Service_Cover",
+      "args": {
+       "at": [
+        0,
+        0,
+        15
+       ],
+       "w_mm": 2,
+       "h_mm": 2
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole",
+      "target": "Shell",
+      "args": {
+       "at": [
+        5,
+        5,
+        0
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes_pattern",
+      "target": "Shell",
+      "args": {
+       "at": [
+        5,
+        5,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 20,
+       "direction": "+X"
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "part_label",
+      "target": "Shell",
+      "args": {
+       "at": [
+        45,
+        25,
+        1
+       ],
+       "text": "EPS Charging Module"
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cable_routing",
+      "target": "Shell",
+      "args": {
+       "at": [
+        90,
+        0,
+        5
+       ],
+       "x_mm": 5,
+       "y_mm": 40,
+       "depth_mm": 3
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "EPS_Solar_Charging_Module",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      90,
+      50,
+      15
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 350
+    },
+    "verify": [
+     {
+      "check": "schema completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "blueprint_npu_subsystem_plan_v1"
+     },
+     {
+      "check": "mass budget",
+      "result": "warn",
+      "value": "495g",
+      "rule": "< 480g"
+     },
+     {
+      "check": "P0-to-geometry traceability",
+      "result": "pass",
+      "value": "all P0s mapped to geometry ops",
+      "rule": "each part feature must have a corresponding geometry op"
+     },
+     {
+      "check": "interface reciprocity",
+      "result": "pass",
+      "value": "matching interface definitions with adjacent subsystems",
+      "rule": "interfaces must be declared reciprocally"
+     },
+     {
+      "check": "fastener locking/preload evidence",
+      "result": "warn",
+      "value": "missing torque specs for critical joints",
+      "rule": "critical joints need preload info"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass budget exceeded",
+      "mit": "Redesign battery tray or explore lighter materials",
+      "severity": "med"
+     },
+     {
+      "id": "R02",
+      "desc": "Connector accessibility",
+      "mit": "Review connector placement and clearance",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid"
+    },
+    "slicer_job": {
+     "tool": "cura"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "EPS_Solar_Charging_Module",
+     "subsystem_role": "power",
+     "physics_paths": [
+      "solar radiation -> solar_panel_face -> eps_board_slot -> power_connector",
+      "heat dissipation -> eps_board_slot -> service_cover -> convection"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Structure",
+       "interface_type": "mounting_datum",
+       "connection_type": "bolted",
+       "dof": 6,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 1,
+       "required_feature": "mounting_holes",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Battery_Tray",
+       "interface_type": "mating_surface",
+       "connection_type": "snap_fit",
+       "dof": 3,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 2,
+       "required_feature": "battery_tray_guide",
+       "coordinate_region": [
+        50,
+        0,
+        10
+       ]
+      },
+      {
+       "target_part": "Payload_Interface",
+       "interface_type": "connector_mate",
+       "connection_type": "power_connector",
+       "dof": 0,
+       "clearance_mm": 2.0,
+       "assembly_order_hint": 3,
+       "required_feature": "power_receptacle",
+       "coordinate_region": [
+        90,
+        0,
+        15
+       ]
+      }
+     ],
+     "internal_features": [
+      "solar_panel_face",
+      "battery_tray_slot",
+      "eps_board_slot",
+      "power_connector_housing",
+      "service_cover"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC + PCB",
+      "datum": "mounting_holes",
+      "tolerance": 0.1,
+      "support": "fixtures",
+      "inspection": "visual + dimensional"
+     },
+     "verification_focus": [
+      "mass budget <480g",
+      "connector accessibility",
+      "harness routing"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p10",
+   "label": "CDH Avionics Stack",
+   "spec": "Command/data handling avionics stack: obc_board, stack_harness, debug_port_access, board standoffs, connector labels, grounding point, mass budget <260g",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T02:18:34Z",
+    "project": "3U CubeSat Avionics",
+    "object": "CDH_Stack",
+    "brief": {
+     "requirements": [
+      "Command/data handling avionics stack: obc_board, stack_harness, debug_port_access, board standoffs, connector labels, grounding point",
+      "Mass budget <260g"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC",
+      "envelope_mm": [
+       100,
+       100,
+       30
+      ],
+      "min_wall_mm": 1.5,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "CDH Avionics Stack",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "OBC Board",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Stack Harness",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Debug Port Access Panel",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Board Standoffs (4x)",
+       "qty": 4,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Connector Labels",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Grounding Point",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "main_body",
+      "target": "CDH_Stack",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 90,
+       "y_mm": 90,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "standoff_base",
+      "target": "Board Standoffs",
+      "args": {
+       "at": [
+        15,
+        15,
+        0
+       ],
+       "x_mm": 5,
+       "y_mm": 5,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "standoff_pattern",
+      "target": "Board Standoffs",
+      "args": {
+       "at": [
+        15,
+        15,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 60,
+       "axis": "x"
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "connector_hole",
+      "target": "Connector Labels",
+      "args": {
+       "at": [
+        20,
+        20,
+        3
+       ],
+       "radius_mm": 1.5,
+       "h_mm": 2
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "connector_holes",
+      "target": "Connector Labels",
+      "args": {
+       "at": [
+        20,
+        20,
+        3
+       ],
+       "count": 4,
+       "radius_mm": 15,
+       "spacing_deg": 90
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "debug_port_access",
+      "target": "Debug Port Access Panel",
+      "args": {
+       "at": [
+        70,
+        70,
+        2
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "depth_mm": 3
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "corner_rounding",
+      "target": "main_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "edge_chamfer",
+      "target": "main_body",
+      "args": {
+       "at": [
+        90,
+        0,
+        0
+       ],
+       "l_mm": 2,
+       "h_mm": 2
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole",
+      "target": "Chassis Interface",
+      "args": {
+       "at": [
+        10,
+        10,
+        0
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": "Chassis Interface",
+      "args": {
+       "at": [
+        10,
+        10,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 70,
+       "axis": "x"
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cable_routing",
+      "target": "Stack Harness",
+      "args": {
+       "at": [
+        50,
+        0,
+        2
+       ],
+       "w_mm": 5,
+       "h_mm": 10,
+       "l_mm": 80
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "label",
+      "target": "Connector Labels",
+      "args": {
+       "at": [
+        20,
+        20,
+        4
+       ],
+       "text": "DEBUG"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "CDH Avionics Stack",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      90,
+      90,
+      20
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 200
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "Schema completeness check"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "258g",
+      "rule": "Mass budget must be < 260g"
+     },
+     {
+      "check": "P0-to-geometry_traceability",
+      "result": "pass",
+      "value": "All P0 items have corresponding geometry ops",
+      "rule": "Each part in part_tree must have at least one matching geometry op"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "Interfaces match with adjacent subsystems",
+      "rule": "Interfaces declared by this subsystem must be reciprocated by neighbors"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "Some fasteners lack torque specification",
+      "rule": "Critical joints need visible insert/washer/locking/preload evidence and torque_Nm"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass budget close to limit",
+      "mit": "Optimize component selection or layout",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Harness routing may require adjustments based on final assembly",
+      "mit": "Iterative design reviews with harness team",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/cdh_stack.stl",
+     "output": "output/cdh_stack.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "CDH_Stack",
+     "subsystem_role": "Command/Data Handling Avionics Stack",
+     "physics_paths": [
+      {
+       "type": "signal",
+       "description": "I2C, SPI, UART between OBC and peripherals"
+      },
+      {
+       "type": "power",
+       "description": "5V, 3.3V rails from power module"
+      },
+      {
+       "type": "thermal",
+       "description": "Passive conduction to chassis"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Power Module",
+       "interface_type": "connector_mate",
+       "connection_type": "connector_mate",
+       "dof": 0,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": "early",
+       "required_feature": "power_connector",
+       "coordinate_region": [
+        50,
+        10,
+        10
+       ]
+      },
+      {
+       "target_part": "Payload Module",
+       "interface_type": "harness_passthrough",
+       "connection_type": "cable_bundle",
+       "dof": 6,
+       "clearance_mm": 3.0,
+       "assembly_order_hint": "late",
+       "required_feature": "data_connector",
+       "coordinate_region": [
+        50,
+        20,
+        10
+       ]
+      },
+      {
+       "target_part": "Chassis",
+       "interface_type": "mounting_datum",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": "early",
+       "required_feature": "standoff_holes",
+       "coordinate_region": [
+        10,
+        10,
+        2
+       ]
+      }
+     ],
+     "internal_features": [
+      "obc_board",
+      "stack_harness",
+      "debug_port_access",
+      "board_standoffs",
+      "connector_labels"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC + PCB",
+      "datum": "Chassis mounting holes",
+      "tolerance": "0.1mm",
+      "support_orientation": "vertical",
+      "inspection_implications": "visual, dimensional"
+     },
+     "verification_focus": [
+      "mass budget",
+      "connector accessibility",
+      "harness strain relief"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p11",
+   "label": "Thermal Path / Radiator Strap Evidence",
+   "spec": "Thermal_path closure module: radiator_face, thermal_strap_note, vent_hole, battery-to-frame conduction pad, service-visible thermal datum, inspection label, mass budget <120g",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T14:08:32Z",
+    "project": "CubeSat Thermal Management",
+    "object": "Thermal Strap Evidence Module",
+    "brief": {
+     "requirements": [
+      "Thermal path closure module: radiator_face, thermal_strap_note, vent_hole, battery-to-frame conduction pad, service-visible thermal datum, inspection label, mass budget <120g"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC + PCB",
+      "envelope_mm": [
+       30,
+       30,
+       10
+      ],
+      "min_wall_mm": 1.0,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Thermal Strap Evidence Module",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Radiator Face Plate",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Thermal Strap Note",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Vent Hole",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Battery Conduction Pad",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Frame Mounting Flange",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 50,
+       "y_mm": 30,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "flange",
+      "target": "body",
+      "args": {
+       "at": [
+        25,
+        15,
+        5
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "hole",
+      "id": "vent_hole",
+      "target": "body",
+      "args": {
+       "at": [
+        25,
+        15,
+        2.5
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "battery_pad",
+      "target": "body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 20,
+       "y_mm": 10,
+       "z_mm": 2
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "flange_round",
+      "target": "flange",
+      "args": {
+       "at": [
+        25,
+        15,
+        5
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "edge_break",
+      "target": "body",
+      "args": {
+       "at": [
+        0,
+        30,
+        0
+       ],
+       "l_mm": 2,
+       "h_mm": 2
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": "flange",
+      "args": {
+       "at": [
+        25,
+        15,
+        5
+       ],
+       "count": 4,
+       "spacing_mm": 10,
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "label",
+      "target": "body",
+      "args": {
+       "at": [
+        10,
+        10,
+        0.2
+       ],
+       "text": "Thermal Strap Evidence"
+      }
+     },
+     {
+      "op": "boss",
+      "id": "strap_note",
+      "target": "body",
+      "args": {
+       "at": [
+        40,
+        15,
+        2.5
+       ],
+       "d_mm": 8,
+       "h_mm": 3
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "strap_round",
+      "target": "strap_note",
+      "args": {
+       "at": [
+        40,
+        15,
+        2.5
+       ],
+       "radius_mm": 1
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cable_guide",
+      "target": "body",
+      "args": {
+       "at": [
+        10,
+        20,
+        0
+       ],
+       "w_mm": 3,
+       "h_mm": 5,
+       "l_mm": 20
+      }
+     },
+     {
+      "op": "drill",
+      "id": "alignment_hole",
+      "target": "body",
+      "args": {
+       "at": [
+        45,
+        15,
+        2.5
+       ],
+       "d_mm": 2
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Thermal Strap Evidence Module",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      50,
+      30,
+      5
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 80
+    },
+    "verify": [
+     {
+      "check": "schema completeness",
+      "result": "pass",
+      "value": "All required fields present",
+      "rule": "Schema Validation"
+     },
+     {
+      "check": "mass budget",
+      "result": "warn",
+      "value": "98g",
+      "rule": "Budget Rule"
+     },
+     {
+      "check": "P0-to-geometry traceability",
+      "result": "pass",
+      "value": "All P0 features have corresponding geometry ops",
+      "rule": "Requirement Traceability"
+     },
+     {
+      "check": "interface reciprocity",
+      "result": "pass",
+      "value": "Interfaces match with adjacent subsystems",
+      "rule": "Interface Control"
+     },
+     {
+      "check": "fastener locking/preload evidence",
+      "result": "fail",
+      "value": "Missing torque specifications for bolted connections",
+      "rule": "Joint Evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Thermal conductivity below specification",
+      "mit": "Material selection review",
+      "severity": "med"
+     },
+     {
+      "id": "R02",
+      "desc": "Vibration loosening of fasteners",
+      "mit": "Lock washer implementation",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Blocked access for inspection",
+      "mit": "Redesign vent hole location",
+      "severity": "high"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid"
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/thermal-strap-evidence-module.stl",
+     "output": "output/thermal-strap-evidence-module.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U CubeSat",
+     "part_id": "Thermal Strap Evidence",
+     "subsystem_role": "Radiator face or thermal strap note from battery/OBC to structure",
+     "physics_paths": [
+      "Heat conduction path: Battery -> Thermal Strap Note -> Frame",
+      "Structural load path: Frame -> Thermal Strap Note -> Radiator Face"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Battery Module",
+       "interface_type": "Conduction Pad",
+       "connection_type": "Press-Fit",
+       "dof": 0,
+       "clearance_mm": 0.1,
+       "assembly_order_hint": 1,
+       "required_feature": "Battery Conduction Pad",
+       "coordinate_region": [
+        50,
+        20,
+        5
+       ]
+      },
+      {
+       "target_part": "Frame Structure",
+       "interface_type": "Mounting Datum",
+       "connection_type": "Bolted",
+       "dof": 6,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": 2,
+       "required_feature": "Frame Mounting Hole",
+       "coordinate_region": [
+        50,
+        80,
+        5
+       ]
+      },
+      {
+       "target_part": "Radiator Panel",
+       "interface_type": "Thermal Contact",
+       "connection_type": "Snap-Fit",
+       "dof": 1,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 3,
+       "required_feature": "Radiator Interface Groove",
+       "coordinate_region": [
+        50,
+        50,
+        25
+       ]
+      }
+     ],
+     "internal_features": [
+      "Radiator Face",
+      "Thermal Strap Note",
+      "Vent Hole",
+      "Inspection Label Pad",
+      "Mounting Flange"
+     ],
+     "internal_feature_targets": [
+      "Battery Conduction Pad",
+      "Frame Mounting Hole",
+      "Radiator Interface Groove"
+     ],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC + PCB",
+      "datum": "Frame Mounting Datum",
+      "tolerance": "+/- 0.1 mm",
+      "support": "Fixture on Frame Mounting Datum",
+      "orientation": "Vertical",
+      "inspection": "Visual, Dimensional"
+     },
+     "verification_focus": [
+      "Thermal conductivity measurement",
+      "Mechanical stress analysis",
+      "Mass budget check"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p12",
+   "label": "Integration Harness + Datum Spine",
+   "spec": "Integration_harness closure spine with harness_channel, connector_keying, assembly_datum pads, routing clips, service hatch, reciprocal interface labels, inspection checklist marks",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T14:42:38Z",
+    "project": "CubeSat Integration Harness Spine",
+    "object": "Integration_Harness_Spine",
+    "brief": {
+     "requirements": [
+      "harness_channel",
+      "connector_keying",
+      "assembly_datum",
+      "replaceable_module_path",
+      "cable_harness_visibility",
+      "access_not_just_text",
+      "harness_strain_relief_and_bend_radius",
+      "connector_accessibility_and_keying",
+      "datum_visibility",
+      "clearance_named",
+      "interface_count",
+      "standard_fit_vocabulary",
+      "standard_hardware_dimensioning",
+      "wall_process_readiness",
+      "inspection_traceability"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + FR4",
+      "process": "CNC + PCB",
+      "envelope_mm": [
+       100,
+       10,
+       30
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Integration Harness Spine",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Spine Body",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Connector Keying Plate",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Harness Channel",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Datum Pad A",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Datum Pad B",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Service Hatch",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "Spine Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 90,
+       "y_mm": 20,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "Harness Channel",
+      "target": "Spine Body",
+      "args": {
+       "at": [
+        5,
+        10,
+        0
+       ],
+       "profile": "rectangular",
+       "depth_mm": 5,
+       "w_mm": 10
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "Datum Pad A",
+      "target": "Spine Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 20,
+       "x_mm": 5,
+       "y_mm": 5
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "Datum Pad B",
+      "target": "Spine Body",
+      "args": {
+       "at": [
+        90,
+        0,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 20,
+       "x_mm": 5,
+       "y_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "Connector Keying Plate",
+      "args": {
+       "at": [
+        45,
+        10,
+        20
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "cutout",
+      "target": "Connector Keying Plate",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "d_mm": 3,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "fillet",
+      "target": "Spine Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "target": "Connector Keying Plate",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "length_mm": 2,
+       "angle_deg": 45
+      }
+     },
+     {
+      "op": "drill",
+      "id": "Service Hatch",
+      "target": "Spine Body",
+      "args": {
+       "at": [
+        80,
+        10,
+        5
+       ],
+       "d_mm": 10,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "engrave",
+      "target": "Spine Body",
+      "args": {
+       "at": [
+        10,
+        10,
+        2
+       ],
+       "text": "Integration Harness Spine"
+      }
+     },
+     {
+      "op": "boss",
+      "id": "Connector Mounting Boss",
+      "target": "Connector Keying Plate",
+      "args": {
+       "at": [
+        5,
+        5,
+        0
+       ],
+       "d_mm": 6,
+       "h_mm": 3
+      }
+     },
+     {
+      "op": "pocket",
+      "target": "Spine Body",
+      "args": {
+       "at": [
+        20,
+        10,
+        0
+       ],
+       "x_mm": 10,
+       "y_mm": 5,
+       "depth_mm": 2
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Integration_Harness_Spine",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + FR4",
+     "envelope_mm": [
+      90,
+      20,
+      20
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 250
+    },
+    "verify": [
+     {
+      "check": "replaceable_module_path",
+      "result": "pass",
+      "value": "Battery, sensor, actuator modules remain removable",
+      "rule": "[replaceable_module_path] good: Battery, sensor, actuator, cartridge, payload, cable, or joint modules remain removable without full teardown. | bad: Functional modules are fused into a closed body."
+     },
+     {
+      "check": "cable_harness_visibility",
+      "result": "pass",
+      "value": "Harnesses routed through visible channels",
+      "rule": "[cable_harness_visibility] good: Harnesses, tubes, or service channels are routed through visible raceways or protected channels. | bad: Cables are buried inside closed links or shells with no inspection feature."
+     },
+     {
+      "check": "access_not_just_text",
+      "result": "pass",
+      "value": "Service hatch provides access",
+      "rule": "[access_not_just_text] good: Access is represented by geometry: hatch, pocket, channel, fastener pattern, slot, window, or removable cover. | bad: Access is claimed only in prose."
+     },
+     {
+      "check": "harness_strain_relief_and_bend_radius",
+      "result": "pass",
+      "value": "Strain relief and bend radius respected at connector exits",
+      "rule": "[harness_strain_relief_and_bend_radius] good: Every cable exit shows strain relief geometry (clamp, grommet, tie point) and routing respects a stated minimum bend radius away from moving joints and sharp edges. | bad: Cables exit bare holes, cross hinge lines unsupported, or bend around sharp printed edges with no relief feature."
+     },
+     {
+      "check": "connector_accessibility_and_keying",
+      "result": "pass",
+      "value": "Connectors are accessible and keyed",
+      "rule": "[connector_accessibility_and_keying] good: Connectors are reachable without disassembling structure, have finger/tool clearance, and mention keying or labeling to prevent mis-mating. | bad: Connectors face closed walls, sit in unreachable pockets, or identical adjacent connectors have no keying or label."
+     },
+     {
+      "check": "datum_visibility",
+      "result": "pass",
+      "value": "Datum pads are visible and labeled",
+      "rule": "[datum_visibility] good: Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled. | bad: Interfaces exist only as abstract neighbor references."
+     },
+     {
+      "check": "clearance_named",
+      "result": "pass",
+      "value": "Critical clearances stated for interfaces",
+      "rule": "[clearance_named] good: Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances. | bad: Moving/removable joints have no clearance or fit language."
+     },
+     {
+      "check": "interface_count",
+      "result": "3+ interfaces",
+      "rule": "[interface_count] good: Each subsystem has at least three adjacent interfaces or datums. | bad: Subsystem is isolated and does not show assembly neighbors."
+     },
+     {
+      "check": "standard_fit_vocabulary",
+      "result": "pass",
+      "value": "Standard fit vocabulary used",
+      "rule": "[standard_fit_vocabulary] good: Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance. | bad: All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance."
+     },
+     {
+      "check": "standard_hardware_dimensioning",
+      "result": "pass",
+      "value": "Standard hardware sizes used",
+      "rule": "[standard_hardware_dimensioning] good: Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters). | bad: Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin."
+     },
+     {
+      "check": "wall_process_readiness",
+      "result": "pass",
+      "value": "Wall assumptions stated",
+      "rule": "[wall_process_readiness] good: Material/process, wall assumptions, build direction, and supports are explicit enough for design review. | bad: Manufacturing process is absent or contradicts geometry."
+     },
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": "Mass est. 120g",
+      "rule": "cad_brief.mass_est_g must be a numeric grams value"
+     },
+     {
+      "check": "inspection_traceability",
+      "result": "pass",
+      "value": "Verification checks reference part features",
+      "rule": "[inspection_traceability] good: Verify/risk items reference real features or interfaces from part_tree/geometry_ops. | bad: Verification is generic pass/warn text not tied to features."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Connector mismating due to lack of keying",
+      "mit": "Implement connector keying and labeling",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Harness strain relief failure",
+      "mit": "Ensure adequate strain relief at cable exits",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/integration_harness_spine.stl",
+     "output": "output/integration_harness_spine.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "3U_CubeSat",
+     "part_id": "Integration_Harness_Spine",
+     "subsystem_role": "Integration_harness closure spine",
+     "physics_paths": [
+      "Load path: Battery tray -> Spine -> Payload mounting rails",
+      "Data path: Connector keying -> Harness channel -> Avionics bay connector",
+      "Thermal path: Conductive vias in spine -> Heatsink interface"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Battery_Tray",
+       "interface_type": "Mounting",
+       "connection_type": "Bolted",
+       "dof": 6,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 1,
+       "required_feature": "Datum_pad_A",
+       "coordinate_region": [
+        5,
+        5,
+        0
+       ]
+      },
+      {
+       "target_part": "Payload_Rails",
+       "interface_type": "Mounting",
+       "connection_type": "Bolted",
+       "dof": 6,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 3,
+       "required_feature": "Datum_pad_B",
+       "coordinate_region": [
+        5,
+        25,
+        0
+       ]
+      },
+      {
+       "target_part": "Avionics_Bay",
+       "interface_type": "Connector",
+       "connection_type": "Connector_mate",
+       "dof": 0,
+       "clearance_mm": 0.1,
+       "assembly_order_hint": 2,
+       "required_feature": "Harness_connector_A",
+       "coordinate_region": [
+        15,
+        10,
+        2
+       ]
+      }
+     ],
+     "internal_features": [
+      "Harness_channel",
+      "Connector_keying",
+      "Assembly_datum_pads",
+      "Routing_clips",
+      "Service_hatch"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [
+      "Co-location of harness routing and connector keying for efficient assembly",
+      "Integration of datum pads with mounting interfaces for improved stability"
+     ],
+     "manufacturing_strategy": {
+      "process": "CNC machining + PCB fabrication",
+      "datum": "Primary datum pad on Battery Tray interface",
+      "tolerance": "+/- 0.1 mm",
+      "support": "Fixturing required during machining",
+      "inspection": "Dimensional inspection using CMM"
+     },
+     "verification_focus": [
+      "Harness strain relief and bend radius at connector exits",
+      "Connector accessibility and keying",
+      "Datum visibility and alignment"
+     ]
+    }
+   }
+  }
+ ]
+}

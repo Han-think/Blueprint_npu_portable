@@ -1,0 +1,198 @@
+{
+  "schema": "blueprint_print_assembly_manifest_v1",
+  "seed": "tiltrotor",
+  "process": "FDM",
+  "print_fit_defaults": {
+    "default_clearance_mm": 0.25,
+    "hole_compensation_mm": 0.15
+  },
+  "safety_note": "Educational mock assembly for design review; verify all fits with the coupon before committing full prints.",
+  "print_first": {
+    "file": "fit_test_coupon.stl",
+    "purpose": "pin Ø6 + holes at clearances [0.2, 0.25, 0.3] mm — confirm which clearance fits your printer before printing parts"
+  },
+  "parts": [
+    {
+      "part_id": "new-001",
+      "label": "integrated fuselage spine and spar socket core",
+      "file": "new-001_integrated_fuselage_spine_and_spar_socke.stl",
+      "print_count": 1,
+      "bbox_mm": [
+        210.0,
+        41.8,
+        33.8
+      ],
+      "volume_mm3": 29051.0,
+      "applied_clearance_mm": 0.2,
+      "orientation": "bottom face on bed (as exported)"
+    },
+    {
+      "part_id": "new-002",
+      "label": "removable nacelle service pods",
+      "file": "new-002_removable_nacelle_service_pods.stl",
+      "print_count": 2,
+      "bbox_mm": [
+        46.0,
+        33.8,
+        31.8
+      ],
+      "volume_mm3": 48398.0,
+      "applied_clearance_mm": 0.25,
+      "orientation": "bottom face on bed (as exported)"
+    },
+    {
+      "part_id": "new-003",
+      "label": "separate tilt linkage cartridges",
+      "file": "new-003_separate_tilt_linkage_cartridges.stl",
+      "print_count": 2,
+      "bbox_mm": [
+        33.8,
+        13.8,
+        42.0
+      ],
+      "volume_mm3": 4544.0,
+      "applied_clearance_mm": 0.2,
+      "orientation": "bottom face on bed (as exported)"
+    },
+    {
+      "part_id": "new-004",
+      "label": "slide-in battery and payload service module",
+      "file": "new-004_slide_in_battery_and_payload_service_mod.stl",
+      "print_count": 1,
+      "bbox_mm": [
+        102.5,
+        41.4,
+        29.7
+      ],
+      "volume_mm3": 117972.0,
+      "applied_clearance_mm": 0.3,
+      "orientation": "bottom face on bed (as exported)"
+    },
+    {
+      "part_id": "new-005",
+      "label": "replaceable V-tail and landing gear modules",
+      "file": "new-005_replaceable_v_tail_and_landing_gear_modu.stl",
+      "print_count": 1,
+      "bbox_mm": [
+        48.0,
+        9.8,
+        17.8
+      ],
+      "volume_mm3": 5582.0,
+      "applied_clearance_mm": 0.2,
+      "orientation": "bottom face on bed (as exported)"
+    }
+  ],
+  "joints": [
+    {
+      "id": "J1",
+      "male_part": "new-001",
+      "female_part": "new-005",
+      "mate": "press",
+      "clearance_mm": 0.2,
+      "containment": false,
+      "note": "wing-root spar key (boss f-spar-key)"
+    },
+    {
+      "id": "J2",
+      "male_part": "new-002",
+      "female_part": "new-001",
+      "mate": "face",
+      "clearance_mm": 0.25,
+      "containment": false,
+      "note": "nacelle service pod ↔ fuselage spine"
+    },
+    {
+      "id": "J3",
+      "male_part": "new-004",
+      "female_part": "new-001",
+      "mate": "slot",
+      "clearance_mm": 0.3,
+      "containment": false,
+      "note": "battery/payload slide module"
+    },
+    {
+      "id": "J4",
+      "male_part": "new-005",
+      "female_part": "new-001",
+      "mate": "pin",
+      "clearance_mm": 0.2,
+      "containment": false,
+      "note": "V-tail / landing gear replaceable"
+    },
+    {
+      "id": "J5",
+      "male_part": "new-003",
+      "female_part": "new-002",
+      "mate": "pin",
+      "clearance_mm": 0.2,
+      "containment": false,
+      "note": "tilt linkage cartridge pin into nacelle service pod"
+    }
+  ],
+  "fasteners": [
+    {
+      "id": "F1",
+      "standard": "M3",
+      "kind": "screw",
+      "length_mm": 8,
+      "qty": 4,
+      "anchor": "corners_4",
+      "joins": [
+        "new-003",
+        "new-002"
+      ],
+      "hole": "clearance",
+      "torque_Ncm": 50,
+      "note": "servo horn adjustment (drill f-servo-pocket Ø3)"
+    },
+    {
+      "id": "F2",
+      "standard": "M3",
+      "kind": "screw",
+      "length_mm": 6,
+      "qty": 4,
+      "anchor": "face_+Y",
+      "joins": [
+        "new-002",
+        "new-001"
+      ],
+      "hole": "clearance",
+      "torque_Ncm": 45,
+      "note": "motor/ESC service lid → nacelle pod"
+    },
+    {
+      "id": "F3",
+      "standard": "PIN3",
+      "kind": "pin",
+      "length_mm": 14,
+      "qty": 2,
+      "anchor": "face_+Y",
+      "joins": [
+        "new-002",
+        "new-003"
+      ],
+      "hole": "through",
+      "note": "tilt-axis pin (nacelle ↔ tilt linkage cartridge)"
+    }
+  ],
+  "hardware_bom": [
+    {
+      "standard": "M3",
+      "qty": 8
+    },
+    {
+      "standard": "PIN3",
+      "qty": 2
+    }
+  ],
+  "segmentation": [],
+  "assembly_order": [
+    "J1: new-001 → new-005 (press)",
+    "J2: new-002 → new-001 (face)",
+    "J3: new-004 → new-001 (slot)",
+    "J4: new-005 → new-001 (pin)",
+    "J5: new-003 → new-002 (pin)"
+  ],
+  "warnings": []
+}

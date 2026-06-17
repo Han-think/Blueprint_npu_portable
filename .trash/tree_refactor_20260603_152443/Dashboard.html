@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Dashboard · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Dashboard'),100);</script>
+<script type="text/babel">
+const C={c:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+  lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+function Tile({label,val,sub,c,href,wide}){
+  return (
+    <a href={href||'#'} style={{display:'block',textDecoration:'none',gridColumn:wide?'span 2':'auto',
+        border:`1px solid ${C.frame}`,borderLeft:`3px solid ${c}`,background:C.c2,padding:'12px 14px'}}>
+      <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.14em'}}>{label}</div>
+      <div className="mono" style={{color:c,fontSize:22,marginTop:4,lineHeight:1.1}}>{val}</div>
+      <div className="mono" style={{color:C.ink3,fontSize:10,marginTop:2}}>{sub}</div>
+    </a>
+  );
+}
+function App(){
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600}}>Dashboard</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          SN-002 · build lock T-33d · 2026-04-27 · last sync 12:04 UTC
+        </span>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:14}}>
+        <Tile label="T-0" val="33d" sub="2026-05-30 build lock" c={C.lh2} href="Supply.html"/>
+        <Tile label="MASS" val="187.4 kg" sub="target 190 · margin 1.4%" c={C.lox} href="Mass.html"/>
+        <Tile label="MIN MoS" val="+0.18" sub="P08 throat · CASE-3" c={C.inter} href="Loads.html"/>
+        <Tile label="MAX TEMP" val="894 K" sub="P08 hot-side · limit 1050" c={C.lh2} href="Thermal.html"/>
+        <Tile label="OPEN ECN" val="3" sub="2 approved · 1 review" c={C.lh2} href="ECN.html"/>
+        <Tile label="FMEA RPN≥100" val="4" sub="14 modes tracked" c={C.risk} href="FMEA.html"/>
+        <Tile label="COC PENDING" val="4 / 12" sub="V-band · 38999 conn" c={C.lh2} href="Supply.html"/>
+        <Tile label="TEST PASS" val="11 / 14" sub="3 in flight" c={C.inter} href="Test.html"/>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1.5fr 1fr',gap:14}}>
+        <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+          <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.14em',marginBottom:10}}>
+            CRITICAL PATH TO T-0
+          </div>
+          {[
+            {d:'2026-04-27',  t:'TODAY',                       s:'live',  c:C.lox},
+            {d:'2026-04-30',  t:'V-band CoC arrive · Eaton',   s:'gate',  c:C.lh2},
+            {d:'2026-05-04',  t:'Print P15 nozzle · 38h',      s:'queued',c:C.lh2},
+            {d:'2026-05-09',  t:'HIP cycle · Aalberts',         s:'gate',  c:C.lh2},
+            {d:'2026-05-15',  t:'CMM + CT inspection · P08',    s:'gate',  c:C.lh2},
+            {d:'2026-05-22',  t:'Sub-assembly torque-down',     s:'plan',  c:C.ink2},
+            {d:'2026-05-27',  t:'FAI close-out · ECN-014 sign', s:'plan',  c:C.ink2},
+            {d:'2026-05-30',  t:'BUILD LOCK · SN-002 release',  s:'T-0',   c:C.inter},
+          ].map((r,i)=>(
+            <div key={i} style={{display:'grid',gridTemplateColumns:'90px 70px 1fr',gap:10,
+                padding:'7px 0',borderBottom:i<7?`1px dashed ${C.frame}`:'none',alignItems:'center'}}>
+              <span className="mono" style={{color:C.ink3,fontSize:10}}>{r.d}</span>
+              <span className="mono" style={{color:r.c,fontSize:9.5,letterSpacing:'.08em',
+                  border:`1px solid ${r.c}`,padding:'2px 6px',textAlign:'center'}}>{r.s.toUpperCase()}</span>
+              <span style={{color:C.ink,fontSize:11.5}}>{r.t}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{display:'flex',flexDirection:'column',gap:14}}>
+          <div style={{border:`1px solid ${C.risk}`,background:C.c2,padding:14}}>
+            <div className="mono" style={{color:C.risk,fontSize:11,letterSpacing:'.14em',marginBottom:8}}>TOP RISKS</div>
+            {[
+              {id:'R-04',t:'V-band lead time slip',  rpn:25,c:C.risk},
+              {id:'F-01',t:'GRCop witness line',     rpn:160,c:C.risk},
+              {id:'F-05',t:'Hi-Lok preload var',     rpn:120,c:C.lh2},
+              {id:'R-07',t:'Test cell window',       rpn:16,c:C.lh2},
+            ].map(r=>(
+              <div key={r.id} style={{display:'flex',gap:10,padding:'5px 0',alignItems:'baseline'}}>
+                <span className="mono" style={{color:r.c,fontSize:10,width:36}}>{r.id}</span>
+                <span style={{color:C.ink,fontSize:11,flex:1}}>{r.t}</span>
+                <span className="mono" style={{color:r.c,fontSize:10}}>{r.rpn}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+            <div className="mono" style={{color:C.inter,fontSize:11,letterSpacing:'.14em',marginBottom:8}}>
+              SIGN-OFF MATRIX
+            </div>
+            {[['Design',  'M.Park',     'signed'],
+              ['Stress',  'J.Lee',      'signed'],
+              ['Thermal', 'A.Cho',      'signed'],
+              ['Mfg',     'D.Hwang',    'pending'],
+              ['QA',      'S.Kim',      'pending'],
+              ['Program', 'CEO',        'gate']].map(([r,n,s])=>(
+              <div key={r} style={{display:'grid',gridTemplateColumns:'70px 1fr 80px',
+                  padding:'4px 0',fontSize:10.5}} className="mono">
+                <span style={{color:C.ink3}}>{r}</span>
+                <span style={{color:C.ink}}>{n}</span>
+                <span style={{color:s==='signed'?C.inter:s==='pending'?C.lh2:C.ink3,textAlign:'right'}}>
+                  {s.toUpperCase()}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

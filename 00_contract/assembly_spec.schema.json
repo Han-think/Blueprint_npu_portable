@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "blueprint_assembly_spec_v1",
+  "title": "Blueprint NPU — Assembly/Fastener Spec (schema_v6 확장)",
+  "description": "schema_v6 는 불변. 체결(fastener)·결합(joint)·하드웨어 BOM 을 별도 계약으로 추가한다.",
+  "type": "object",
+  "required": ["version", "target", "fasteners", "joints"],
+  "properties": {
+    "version": { "const": "bp-assembly-v1" },
+    "target":  { "type": "string", "description": "schema_v6 part_tree 루트 / vehicle_id" },
+
+    "fasteners": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "standard", "kind", "qty", "joins", "hole"],
+        "properties": {
+          "id":        { "type": "string", "pattern": "^F\\d+$" },
+          "standard":  { "type": "string", "examples": ["M2", "M2.5", "M3", "M4"] },
+          "kind":      { "enum": ["screw", "bolt", "pin", "standoff", "nut", "washer"] },
+          "length_mm": { "type": "number" },
+          "qty":       { "type": "integer", "minimum": 1 },
+          "anchor":    { "type": "string", "description": "build_solid anchor 토큰 (corners_4 등)" },
+          "joins":     { "type": "array", "items": { "type": "string" }, "minItems": 1,
+                         "description": "체결되는 part_tree id 들" },
+          "hole":      { "enum": ["clearance", "tap", "through"],
+                         "description": "clearance=통과홀(Ø+0.2), tap=탭홀(Ø-0.4)" },
+          "torque_Ncm":{ "type": "number" }
+        }
+      }
+    },
+
+    "joints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "partA", "partB", "mate"],
+        "properties": {
+          "id":           { "type": "string", "pattern": "^J\\d+$" },
+          "partA":        { "type": "string" },
+          "partB":        { "type": "string" },
+          "mate":         { "enum": ["face", "slot", "pin", "snap", "thread", "press"] },
+          "clearance_mm": { "type": "number" },
+          "note":         { "type": "string" }
+        }
+      }
+    },
+
+    "hardware_bom": {
+      "type": "array",
+      "description": "fasteners 에서 자동 집계 가능. 선택.",
+      "items": {
+        "type": "object",
+        "required": ["standard", "qty"],
+        "properties": {
+          "standard": { "type": "string" },
+          "qty":      { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  }
+}

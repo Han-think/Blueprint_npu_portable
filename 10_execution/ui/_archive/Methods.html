@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Methods</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>body{margin:0;background:#0c1e35;min-height:100vh;font-family:'Inter','Noto Sans KR',system-ui,sans-serif;color:#e6ecf5;}</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', canvas3:'#08152a', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+};
+
+function Sec({tag,title,sub,children,accent=C.lox}){
+  return (
+    <section style={{marginBottom:36}}>
+      <div style={{borderLeft:`2px solid ${accent}`,paddingLeft:14,marginBottom:14}}>
+        <div className="mono" style={{fontSize:10,color:accent,letterSpacing:'.16em'}}>{tag}</div>
+        <h2 style={{color:C.ink,fontSize:22,margin:'4px 0 4px',fontWeight:600}}>{title}</h2>
+        {sub && <p style={{color:C.ink3,fontSize:13,margin:0,maxWidth:780,lineHeight:1.55}}>{sub}</p>}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function Tag({c,children,filled}){
+  return <span className="mono" style={{
+    fontSize:9.5,letterSpacing:'.08em',padding:'2px 7px',
+    color:filled?C.canvas:c, background:filled?c:'transparent',
+    border:`1px solid ${c}`, whiteSpace:'nowrap',
+  }}>{children}</span>;
+}
+
+// MODELS TABLE
+const MODELS = [
+  ['Qwen2.5-3B-Instruct-int4-ov',   '1.9 GB', '~12 tok/s', 'NPU', 'Korean OK · current default', C.inter],
+  ['Qwen2.5-7B-Instruct-int4-ov',   '4.5 GB', '~5-6 tok/s','NPU', 'Smarter · tight on 16 GB RAM',  C.lox],
+  ['Llama-3.2-3B-int4-ov',          '1.8 GB', '~13 tok/s', 'NPU', 'English-leaning',                C.lox],
+  ['Phi-3.5-mini-int4-ov',          '2.1 GB', '~10 tok/s', 'NPU', 'Strong reasoning · short ctx',   C.lox],
+  ['DeepSeek-Coder-V2-Lite-int4',   '8 GB',   '~3 tok/s',  'NPU', 'Code/G-code helper · slow',      C.lh2],
+  ['GGUF (any)',                    '—',      '—',         '✕',   "Convert: optimum-cli export openvino", C.risk],
+];
+
+// TRAINING METHODS
+const METHODS = [
+  {
+    name:'Full checkpoint retrain',
+    where:'❌ workstation impossible',
+    cost:'$500K · weeks · 64× H100',
+    output:'New base model',
+    why:"Reserved for foundation labs. Don't.",
+    color:C.risk,
+  },
+  {
+    name:'Continued pretraining (domain)',
+    where:'⚠ rented cloud only',
+    cost:'$3K · 3 days · 4× A100',
+    output:'Domain-specialized base (e.g. Blueprint-Qwen-3B)',
+    why:'Feed 5-10GB of NASA TM, AIAA papers, DfAM manuals. Real specialization, not just style.',
+    color:C.lh2,
+  },
+  {
+    name:'LoRA / QLoRA SFT',
+    where:'✓ Arc A770 16GB',
+    cost:'free · 30-90 min',
+    output:'40-200 MB adapter',
+    why:'Teaches format & structure. Step before DPO.',
+    color:C.inter,
+  },
+  {
+    name:'DPO + LoRA  ⭐  current',
+    where:'✓ Arc A770 16GB',
+    cost:'free · 1-2 hr',
+    output:'Adapter + preference history',
+    why:'Aligns to your taste from chosen/rejected pairs. The self-loop in SelfLoop.html.',
+    color:C.inter,
+  },
+  {
+    name:'CPO / IPO / KTO',
+    where:'✓ Arc A770 16GB',
+    cost:'free · 1-2 hr',
+    output:'Adapter (more stable than DPO)',
+    why:'DPO variants. Less hyperparam-sensitive. Drop-in via TRL.',
+    color:C.lox,
+  },
+  {
+    name:'Prompt tuning',
+    where:'✓ NPU even',
+    cost:'free · 5-10 min',
+    output:'~200 KB soft prompt',
+    why:'Tiniest adapter. Useful for quick A/B style tweaks.',
+    color:C.lox,
+  },
+];
+
+// PATHS TO "OWN MODEL"
+const PATHS = [
+  {
+    tag:'(a) Continued pretrain',
+    title:'Domain-specialized 3B',
+    bullets:[
+      'Take Qwen2.5-3B base · feed it rocket / DfAM / additive corpus',
+      '5-10 GB of NASA TM + AIAA + GrabCAD comments + MakerBot manuals',
+      'Lambda Labs ~$3K, 3 days on 4× A100',
+      'Output: Blueprint-Qwen-3B (still general-purpose Q&A, but fluent in domain)',
+    ],
+    color:C.lh2,
+    diff:'⭐⭐⭐',
+  },
+  {
+    tag:'(b) Distillation',
+    title:'A truly bespoke 0.5B-1B model',
+    bullets:[
+      'Use GPT-4o / Claude as teacher → generate 50K (brief, blueprint) pairs (~$200 API)',
+      'Train a 0.5B model from scratch on Arc A770, ~1 week',
+      'Output: 30 tok/s on NPU · beats general 3B in this single domain',
+      'This is the most realistic path to "your own model" on a workstation',
+    ],
+    color:C.halo,
+    diff:'⭐⭐⭐⭐',
+  },
+  {
+    tag:'(c) MoE router',
+    title:'4× small experts behind a router',
+    bullets:[
+      'Classifier picks: [engine / aero / drone / structural]',
+      '4× 0.5B experts, each with own LoRA — NPU loads 1 at a time',
+      'Faster + more accurate than one general 3B',
+      'Build incrementally — start with 2 experts',
+    ],
+    color:C.inter,
+    diff:'⭐⭐⭐',
+  },
+];
+
+// COMPLEMENTARY (not training)
+const COMPLEMENTS = [
+  ['RAG', 'Vector DB + brief retrieval', 'No training. Embed 1000 NASA TM PDFs into ChromaDB, fetch 3 nearest at brief time. Massive accuracy gain for $0.', '⭐'],
+  ['Constrained decoding', 'JSON schema enforcement', "Use `outlines` library. part_tree.json is 100% parseable, every time. No more 'almost valid JSON'.", '⭐⭐'],
+  ['Tool-use', 'LLM calls Python for math', "Mass, TWR, Reynolds — don't let LLM guess. It writes a function call, real Python runs, result is fed back.", '⭐⭐'],
+  ['Symbolic verifier', 'DfAM rule engine', 'Hard rules: overhang ≥ 30°, channel ≥ 1.5mm, stock available. Auto-rejects bad blueprints before user sees them.', '⭐⭐⭐'],
+  ['Custom tokenizer', 'Add domain vocabulary', '"Inconel-718", "M8×1.25", "GRCop-42" become single tokens. Faster + cheaper context.', '⭐⭐'],
+  ['CAD-code fine-tune', 'OpenSCAD generation', 'Teach model to emit OpenSCAD code instead of prose. Real STL fall out the other end.', '⭐⭐⭐⭐'],
+];
+
+function App(){
+  return (
+    <div style={{maxWidth:1100,margin:'0 auto',padding:'28px 24px 60px'}}>
+
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:14,marginBottom:24}}>
+        <div className="mono" style={{fontSize:11,color:C.halo,letterSpacing:'.14em'}}>METHODS · MODEL & TRAINING REFERENCE</div>
+        <h1 style={{color:C.ink,fontSize:32,margin:'4px 0 6px',fontWeight:600}}>How does the model actually learn?</h1>
+        <p style={{color:C.ink3,fontSize:14,margin:0,maxWidth:780,lineHeight:1.55}}>
+          What runs on NPU, how training works on a workstation, what it would take to own a real model — and the techniques that complement training entirely.
+        </p>
+      </div>
+
+      {/* MODELS */}
+      <Sec tag="01 · MODELS" title="What runs on NPU" accent={C.lox}
+           sub="OpenVINO IR + INT4 only. GGUF must be converted with optimum-cli before NPU sees it.">
+        <div style={{border:`1px solid ${C.frame}`,background:C.canvas2}}>
+          <div style={{display:'grid',gridTemplateColumns:'2fr 0.8fr 1fr 0.6fr 2fr',gap:0,padding:'10px 14px',background:C.canvas3,borderBottom:`1px solid ${C.frame}`}}>
+            {['MODEL','SIZE','THROUGHPUT','DEVICE','NOTE'].map(h=>(
+              <div key={h} className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.1em'}}>{h}</div>
+            ))}
+          </div>
+          {MODELS.map((r,i)=>(
+            <div key={i} style={{display:'grid',gridTemplateColumns:'2fr 0.8fr 1fr 0.6fr 2fr',gap:0,padding:'9px 14px',borderBottom:i<MODELS.length-1?`1px dashed ${C.frame}`:'none',alignItems:'center'}}>
+              <span className="mono" style={{fontSize:11.5,color:C.ink}}>{r[0]}</span>
+              <span className="mono" style={{fontSize:11,color:C.ink3}}>{r[1]}</span>
+              <span className="mono" style={{fontSize:11,color:r[5]}}>{r[2]}</span>
+              <Tag c={r[3]==='✕'?C.risk:C.inter}>{r[3]}</Tag>
+              <span style={{fontSize:11.5,color:C.ink2}}>{r[4]}</span>
+            </div>
+          ))}
+        </div>
+      </Sec>
+
+      {/* TRAINING */}
+      <Sec tag="02 · TRAINING" title="Checkpoint vs LoRA — what's even possible?" accent={C.inter}
+           sub="On a workstation (Arc A770 16 GB) the only sane path is LoRA. DPO+LoRA is what SelfLoop runs.">
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
+          {METHODS.map((m,i)=>(
+            <div key={i} style={{border:`1px solid ${m.color}`,padding:14,background:C.canvas2,opacity:m.where.startsWith('❌')?0.55:1}}>
+              <div className="mono" style={{fontSize:12.5,color:m.color,letterSpacing:'.02em',fontWeight:500,marginBottom:8,lineHeight:1.3}}>{m.name}</div>
+              <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:8}}>
+                <Tag c={m.color}>{m.where}</Tag>
+                <span className="mono" style={{fontSize:10.5,color:C.ink3,padding:'2px 0'}}>{m.cost}</span>
+              </div>
+              <div className="mono" style={{fontSize:10.5,color:C.ink2,marginBottom:8,padding:'4px 8px',background:C.canvas3,border:`1px dashed ${C.frame}`}}>→ {m.output}</div>
+              <p style={{fontSize:12,color:C.ink2,margin:0,lineHeight:1.5}}>{m.why}</p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginTop:14,padding:'12px 14px',border:`1px dashed ${C.frame}`,background:C.canvas3}}>
+          <div className="mono" style={{fontSize:10,color:C.lox,letterSpacing:'.1em',marginBottom:6}}>FLOW · DPO+LoRA cycle (current SelfLoop)</div>
+          <pre className="mono" style={{fontSize:11,color:C.ink2,margin:0,lineHeight:1.7,whiteSpace:'pre-wrap'}}>
+{`v1 model  →  generate 1000 briefs on NPU
+          →  user picks favourites  (chosen, rejected) pairs
+          →  Arc A770: trl + LoRA-DPO  (~90 min)
+          →  adapter.safetensors  (40-200 MB)
+          →  merge into base  →  optimum-cli export openvino --weight-format int4
+          →  models/ov_npu_ready/qwen2.5-3b-int4-ov-v2/
+          →  back to NPU.  loop.`}
+          </pre>
+        </div>
+      </Sec>
+
+      {/* OWN MODEL */}
+      <Sec tag="03 · OWN MODEL" title="Three real paths to a bespoke model" accent={C.halo}
+           sub="Pretraining from zero is gone — $500K, weeks of H100s. But there are three credible workstation-scale alternatives.">
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12}}>
+          {PATHS.map((p,i)=>(
+            <div key={i} style={{border:`1px solid ${p.color}`,padding:16,background:C.canvas2}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
+                <div className="mono" style={{fontSize:10,color:p.color,letterSpacing:'.1em'}}>{p.tag}</div>
+                <span className="mono" style={{fontSize:10,color:C.ink3}}>diff {p.diff}</span>
+              </div>
+              <div style={{fontSize:14,color:C.ink,fontWeight:500,marginBottom:10,letterSpacing:'-0.01em'}}>{p.title}</div>
+              <ul style={{margin:0,padding:'0 0 0 14px',color:C.ink2,fontSize:11.5,lineHeight:1.6}}>
+                {p.bullets.map((b,j)=><li key={j} style={{marginBottom:4}}>{b}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </Sec>
+
+      {/* COMPLEMENTARY */}
+      <Sec tag="04 · BEYOND TRAINING" title="Techniques that need no GPU" accent={C.lh2}
+           sub="Often the biggest accuracy wins aren't training. Mix any of these into the existing NPU pipeline.">
+        <div style={{border:`1px solid ${C.frame}`,background:C.canvas2}}>
+          {COMPLEMENTS.map((r,i)=>(
+            <div key={i} style={{display:'grid',gridTemplateColumns:'auto 1.4fr 3fr 0.4fr',gap:14,padding:'12px 14px',borderBottom:i<COMPLEMENTS.length-1?`1px dashed ${C.frame}`:'none',alignItems:'start'}}>
+              <span className="mono" style={{fontSize:10,color:C.lh2,letterSpacing:'.06em',paddingTop:2}}>{String(i+1).padStart(2,'0')}</span>
+              <div>
+                <div className="mono" style={{fontSize:12,color:C.ink,letterSpacing:'.02em'}}>{r[0]}</div>
+                <div style={{fontSize:11,color:C.ink3,marginTop:2}}>{r[1]}</div>
+              </div>
+              <div style={{fontSize:11.5,color:C.ink2,lineHeight:1.55}}>{r[2]}</div>
+              <span className="mono" style={{fontSize:10,color:C.lh2,textAlign:'right'}}>{r[3]}</span>
+            </div>
+          ))}
+        </div>
+      </Sec>
+
+      {/* RECOMMENDATION */}
+      <Sec tag="05 · ORDER OF OPERATIONS" title="What to do first, second, third" accent={C.lox}
+           sub="The honest priority list — biggest accuracy gain per hour spent.">
+        <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+          {[
+            ['NOW',     '1. RAG',                  'Embed NASA TM / DfAM PDFs into ChromaDB. Zero training, instant accuracy.', C.inter],
+            ['NEXT',    '2. Constrained decode',   "outlines library, JSON schema. Stop parsing failures.",                      C.inter],
+            ['SOON',    '3. DPO + LoRA',           'After 100+ user prefs collect. Self-loop activates.',                        C.lox],
+            ['LATER',   '4. Distill 0.5B',         'Once domain is stable, bake a tiny model. 30 tok/s · own weights.',         C.halo],
+          ].map(([when,what,why,col],i)=>(
+            <div key={i} style={{border:`1px solid ${col}`,padding:14,background:C.canvas2}}>
+              <div className="mono" style={{fontSize:9.5,color:col,letterSpacing:'.14em',marginBottom:6}}>{when}</div>
+              <div style={{fontSize:14,color:C.ink,fontWeight:500,marginBottom:6}}>{what}</div>
+              <div style={{fontSize:11,color:C.ink2,lineHeight:1.5}}>{why}</div>
+            </div>
+          ))}
+        </div>
+      </Sec>
+
+      <div style={{borderTop:`1px solid ${C.frame}`,paddingTop:14,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>this page = strategy. SelfLoop = current implementation. Compare = visible result.</span>
+        <span><a href="SelfLoop.html" style={{color:C.lox}}>SelfLoop</a> · <a href="Compare.html" style={{color:C.lox}}>Compare</a> · <a href="Setup.html" style={{color:C.lox}}>Setup</a></span>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Methods'),100);
+</script>
+</body>
+</html>

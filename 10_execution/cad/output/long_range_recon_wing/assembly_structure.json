@@ -1,0 +1,176 @@
+{
+  "schema": "blueprint_step_assembly_structure_v1",
+  "seed": "long_range_recon_wing",
+  "assembly_step": "long_range_recon_wing_assembly.step",
+  "note": "Educational mock assembly geometry — CFD/FEA on this model is for shape comparison and trend review, not absolute performance.",
+  "parts": [
+    {
+      "part_id": "new-001",
+      "label": "integrated center spine and spar socket core",
+      "step_file": "step/new-001_integrated_center_spine_and_spar_socket_.step",
+      "qty": 1,
+      "bbox_mm": [
+        256.02,
+        57.88,
+        34.56
+      ],
+      "placement_translation_mm": [
+        -21.2,
+        -9.64,
+        -5.32
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-002",
+      "label": "removable sensor nose and pitot boom module",
+      "step_file": "step/new-002_removable_sensor_nose_and_pitot_boom_mod.step",
+      "qty": 1,
+      "bbox_mm": [
+        78.0,
+        38.0,
+        34.0
+      ],
+      "placement_translation_mm": [
+        -21.2,
+        38.55,
+        -5.32
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-003",
+      "label": "slide-in mission payload and battery CG rail module",
+      "step_file": "step/new-003_slide_in_mission_payload_and_battery_cg_.step",
+      "qty": 1,
+      "bbox_mm": [
+        72.0,
+        32.0,
+        18.0
+      ],
+      "placement_translation_mm": [
+        -21.2,
+        -9.64,
+        21.26
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-004",
+      "label": "serviceable propulsion-display and rear cable module",
+      "step_file": "step/new-004_serviceable_propulsion_display_and_rear_.step",
+      "qty": 1,
+      "bbox_mm": [
+        48.0,
+        26.0,
+        22.0
+      ],
+      "placement_translation_mm": [
+        -173.41,
+        -9.64,
+        -5.32
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "part_id": "new-005",
+      "label": "replaceable wing, elevon, and skid service modules",
+      "step_file": "step/new-005_replaceable_wing__elevon__and_skid_servi.step",
+      "qty": 1,
+      "bbox_mm": [
+        260.0,
+        34.0,
+        20.0
+      ],
+      "placement_translation_mm": [
+        237.01,
+        -9.64,
+        -5.32
+      ],
+      "placement_rotation_deg": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "mates": [
+    {
+      "id": "J1",
+      "kind": "revolute",
+      "part_a": "new-005",
+      "part_b": "new-001",
+      "mate": "press",
+      "clearance_mm": 0.2,
+      "containment": false,
+      "note": "wing-root spar key ↔ center spine"
+    },
+    {
+      "id": "J2",
+      "kind": "revolute",
+      "part_a": "new-002",
+      "part_b": "new-001",
+      "mate": "slot",
+      "clearance_mm": 0.25,
+      "containment": false,
+      "note": "sensor nose module"
+    },
+    {
+      "id": "J3",
+      "kind": "revolute",
+      "part_a": "new-003",
+      "part_b": "new-001",
+      "mate": "slot",
+      "clearance_mm": 0.3,
+      "containment": false,
+      "note": "mission payload / battery CG rail slide"
+    },
+    {
+      "id": "J4",
+      "kind": "revolute",
+      "part_a": "new-005",
+      "part_b": "new-001",
+      "mate": "pin",
+      "clearance_mm": 0.2,
+      "containment": false,
+      "note": "elevon hinge rotation"
+    },
+    {
+      "id": "J5",
+      "kind": "rigid",
+      "part_a": "new-004",
+      "part_b": "new-001",
+      "mate": "face",
+      "clearance_mm": 0.2,
+      "containment": false,
+      "note": "propulsion-display and rear cable module mounts to center spine rear pylon"
+    }
+  ],
+  "consistency": {
+    "parts_exported": 5,
+    "part_tree_roots": 5,
+    "mates_recorded": 5
+  },
+  "layout": {
+    "method": "joint_directional_tree",
+    "datum": "new-001",
+    "unsatisfied_mates": [],
+    "note": "Children placed adjacent to BFS-tree parent on distinct faces; collision-free is re-verified by assembly_interference_audit, not assumed. Secondary mates of multi-mate parts are reported as unsatisfied residuals (no constraint solver)."
+  }
+}

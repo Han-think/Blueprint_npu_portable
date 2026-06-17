@@ -1,0 +1,32 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "electronics_routing",
+  "title": "Electronics, Signal, and Motor Wiring Judgment",
+  "applies_to": ["robot_arm", "haptic_glove", "cubesat", "tiltrotor", "long_range_recon_wing"],
+  "criteria": [
+    {
+      "criterion": "power_signal_separation",
+      "weight": 9,
+      "good": "Motor power lines and sensor/encoder signal lines run in separate channels or are spaced/crossed at right angles, with the separation visible in routing geometry.",
+      "bad": "Power and signal wires share one tight bundle along the whole route with no separation or shielding note.",
+      "signals": ["power_channel", "signal_channel", "separation", "shield", "twisted_pair"],
+      "loop_feedback": "Split power and signal into separate raceways or add spacing/shielding notes where they must share a channel."
+    },
+    {
+      "criterion": "return_path_and_grounding_intent",
+      "weight": 8,
+      "good": "Each electronics module states its grounding scheme (star point, chassis bond, isolated) and signal returns route alongside their signals.",
+      "bad": "Grounding is unmentioned; returns are implied through structure with no bond feature or note.",
+      "signals": ["ground_point", "chassis_bond", "star_ground", "return_path"],
+      "loop_feedback": "Add a named ground/bond feature per module and state how each signal's return path is routed."
+    },
+    {
+      "criterion": "board_mounting_and_clearance",
+      "weight": 8,
+      "good": "PCBs mount on standoffs with keep-out clearance to walls and moving parts, connector edges face access openings, and mounting holes match standard board patterns.",
+      "bad": "Boards are floated or glued in cavities with no standoffs, clearance, or connector orientation logic.",
+      "signals": ["standoff", "keep_out", "mounting_hole", "connector_edge", "board_clearance"],
+      "loop_feedback": "Mount each board on standoffs with stated keep-out clearance and orient connector edges toward access openings."
+    }
+  ]
+}

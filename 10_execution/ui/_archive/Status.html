@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint NPU · Status</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<style>body{margin:0;background:#0c1e35;min-height:100vh;font-family:'Inter','Noto Sans KR',system-ui,sans-serif;color:#e6ecf5;}</style>
+</head>
+<body>
+<div id="topnav"></div>
+<div id="root"></div>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const C = {
+  canvas:'#0c1e35', canvas2:'#0a1a2e', frame:'#274a79', ink:'#fff', ink2:'#e6ecf5', ink3:'#9aa8bd',
+  lox:'#9fd3ff', lh2:'#ffd39f', inter:'#89ffa8', halo:'#caa9ff', risk:'#ff9fb5',
+  mono:"'JetBrains Mono',ui-monospace,Menlo,monospace",
+};
+
+function Pulse({c=C.inter}){return <span style={{display:'inline-block',width:8,height:8,borderRadius:'50%',background:c,boxShadow:`0 0 8px ${c}`,animation:'bp-pulse 1.4s infinite'}}/>;}
+function Tile({label, value, accent=C.lox, sub, big}){
+  return (
+    <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas2}}>
+      <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:6}}>{label}</div>
+      <div className="mono" style={{fontSize:big?24:16,color:accent,letterSpacing:'.02em'}}>{value}</div>
+      {sub && <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:4}}>{sub}</div>}
+    </div>
+  );
+}
+
+function Spark({values, color=C.lox, max=null}){
+  const w = 200, h = 32;
+  const m = max || Math.max(...values, 1);
+  const pts = values.map((v,i)=>`${(i/(values.length-1))*w},${h-(v/m)*h}`).join(' ');
+  return (
+    <svg width={w} height={h} style={{display:'block'}}>
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.4" />
+      <circle cx={w} cy={h-(values[values.length-1]/m)*h} r="2" fill={color}/>
+    </svg>
+  );
+}
+
+function App(){
+  const [online,setOnline] = useState('checking');
+  const [tps,setTps] = useState([8.2,9.1,11.4,12.0,11.8,12.3,12.1,11.9,12.4,12.2]);
+  const [npu,setNpu] = useState([34,38,42,48,52,58,61,55,49,52]);
+  const [mem,setMem] = useState([1.7,1.8,1.9,1.9,1.9,1.9,1.9,1.9,1.9,1.9]);
+  const [tick,setTick] = useState(0);
+
+  useEffect(()=>{
+    const ping = ()=>{
+      const ctrl = new AbortController();
+      const t = setTimeout(()=>ctrl.abort(), 1500);
+      fetch('http://127.0.0.1:7860/', { mode:'no-cors', signal:ctrl.signal })
+        .then(()=>setOnline('online'))
+        .catch(()=>setOnline('offline'))
+        .finally(()=>clearTimeout(t));
+    };
+    ping();
+    const id = setInterval(()=>{
+      ping();
+      setTps(a=>[...a.slice(1), 11+Math.random()*2.4]);
+      setNpu(a=>[...a.slice(1), 40+Math.random()*30]);
+      setMem(a=>[...a.slice(1), 1.85+Math.random()*0.1]);
+      setTick(t=>t+1);
+    }, 2000);
+    return ()=>clearInterval(id);
+  },[]);
+
+  const isLive = online==='online';
+
+  return (
+    <div style={{maxWidth:1100,margin:'0 auto',padding:'28px 24px 60px'}}>
+
+      {/* hero */}
+      <div style={{borderBottom:`2px solid ${C.frame}`,paddingBottom:14,marginBottom:20,display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:18,flexWrap:'wrap'}}>
+        <div>
+          <div className="mono" style={{fontSize:11,color:C.halo,letterSpacing:'.14em'}}>SYSTEM · LIVE STATUS</div>
+          <h1 style={{color:C.ink,fontSize:28,margin:'4px 0 4px',fontWeight:600}}>{isLive?'Everything looks healthy.':online==='offline'?'Server is offline.':'Probing localhost…'}</h1>
+          <p style={{color:C.ink3,fontSize:13,margin:0}}>Auto-refresh every 2 s · last tick #{tick} · <a href="Errors.html" style={{color:C.lox}}>open Errors →</a></p>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:8,padding:'8px 14px',border:`1px solid ${isLive?C.inter:C.risk}`,fontFamily:C.mono,fontSize:11,color:isLive?C.inter:C.risk,letterSpacing:'.08em'}}>
+          <Pulse c={isLive?C.inter:C.risk}/>
+          {isLive?'127.0.0.1:7860 · ALL GREEN':'127.0.0.1:7860 · OFFLINE'}
+        </div>
+      </div>
+
+      {/* TILES */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:18}}>
+        <Tile label="active model" value={isLive?'qwen2.5-3b-int4':'—'} accent={C.lox} big sub={isLive?'OV-IR · NPU · v2 (DPO)':'no model loaded'}/>
+        <Tile label="device" value={isLive?'NPU':'—'} accent={C.inter} big sub={isLive?'Intel NPU 4 · 12 TOPS':'pick device on launch'}/>
+        <Tile label="throughput" value={isLive?`${tps[tps.length-1].toFixed(1)} tok/s`:'—'} accent={C.halo} big sub={isLive?'1st-token 218 ms':''}/>
+        <Tile label="memory" value={isLive?`${mem[mem.length-1].toFixed(2)} GB`:'—'} accent={C.lh2} big sub={isLive?'INT4 weights · KV cache 0.4 GB':''}/>
+      </div>
+
+      {/* SPARKS */}
+      {isLive && (
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:18}}>
+          {[
+            ['THROUGHPUT (tok/s)', tps, C.lox, 16],
+            ['NPU UTILIZATION (%)', npu, C.halo, 100],
+            ['MEMORY (GB)', mem, C.lh2, 4],
+          ].map(([k,v,c,m])=>(
+            <div key={k} style={{border:`1px solid ${C.frame}`,padding:'12px 14px',background:C.canvas2}}>
+              <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.1em',marginBottom:6}}>{k}</div>
+              <Spark values={v} color={c} max={m}/>
+              <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:4,display:'flex',justifyContent:'space-between'}}>
+                <span>min {Math.min(...v).toFixed(1)}</span>
+                <span>now {v[v.length-1].toFixed(1)}</span>
+                <span>max {Math.max(...v).toFixed(1)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* DEVICES + MODELS */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14,marginBottom:18}}>
+        <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas2}}>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em',marginBottom:10}}>OPENVINO DEVICES</div>
+          {[
+            ['NPU','Intel NPU 4 · 12 TOPS', isLive?'active':'—', isLive?C.inter:C.ink3],
+            ['GPU','Intel Arc A770 16 GB','idle',C.ink3],
+            ['CPU','Core Ultra 7 258V','idle (fallback)',C.ink3],
+          ].map(([k,name,st,c])=>(
+            <div key={k} style={{display:'grid',gridTemplateColumns:'60px 1fr auto',gap:10,padding:'7px 0',borderBottom:`1px dashed ${C.frame}`,alignItems:'center'}}>
+              <span className="mono" style={{fontSize:11,color:c}}>{k}</span>
+              <span style={{fontSize:12,color:C.ink2}}>{name}</span>
+              <span className="mono" style={{fontSize:10,color:c,letterSpacing:'.08em'}}>{st}</span>
+            </div>
+          ))}
+        </div>
+        <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas2}}>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em',marginBottom:10}}>MODELS · ov_npu_ready/</div>
+          {[
+            ['qwen2.5-3b-int4',  '1.92 GB · v2 (DPO)', 'active', C.inter],
+            ['qwen2.5-3b-int4',  '1.92 GB · v1',      'cached', C.ink3],
+            ['llama-3.2-1b-int4','0.71 GB · base',    'cached', C.ink3],
+            ['phi-3.5-mini-int4','2.10 GB · base',    'cached', C.ink3],
+          ].map(([k,sz,st,c],i)=>(
+            <div key={i} style={{display:'grid',gridTemplateColumns:'1.4fr 1fr auto',gap:10,padding:'7px 0',borderBottom:`1px dashed ${C.frame}`,alignItems:'center'}}>
+              <span className="mono" style={{fontSize:11,color:C.ink}}>{k}</span>
+              <span className="mono" style={{fontSize:10,color:C.ink3}}>{sz}</span>
+              <span className="mono" style={{fontSize:10,color:c,letterSpacing:'.08em'}}>{st}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* SESSIONS */}
+      <div style={{border:`1px solid ${C.frame}`,padding:14,background:C.canvas2,marginBottom:18}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10}}>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.12em'}}>RECENT SESSIONS · save/sessions/</div>
+          <a href="Output.html" className="mono" style={{fontSize:10,color:C.lox,letterSpacing:'.08em'}}>open output →</a>
+        </div>
+        {[
+          ['2026-05-04_091422','Saturn V S-IC booster brief','3 variants','12 m ago', C.lox],
+          ['2026-05-03_173011','Pencil engine transition',  '2 variants','17 h ago', C.ink3],
+          ['2026-05-03_142233','Low-noise drone prop',      '4 variants','21 h ago', C.ink3],
+          ['2026-05-02_201800','Ramjet inlet M2-4',         '3 variants','1 d ago',  C.ink3],
+        ].map((r,i)=>(
+          <div key={i} style={{display:'grid',gridTemplateColumns:'1.4fr 1.6fr 0.8fr 0.6fr',gap:10,padding:'7px 0',borderBottom:i<3?`1px dashed ${C.frame}`:'none',alignItems:'center'}}>
+            <span className="mono" style={{fontSize:11,color:r[4]}}>{r[0]}</span>
+            <span style={{fontSize:12,color:C.ink2}}>{r[1]}</span>
+            <span className="mono" style={{fontSize:10,color:C.ink3}}>{r[2]}</span>
+            <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.06em'}}>{r[3]}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* OFFLINE BANNER */}
+      {!isLive && (
+        <div style={{border:`1px solid ${C.risk}`,background:'rgba(255,159,181,0.05)',padding:16,marginBottom:18}}>
+          <div className="mono" style={{fontSize:11,color:C.risk,letterSpacing:'.12em',marginBottom:6}}>SERVER OFFLINE</div>
+          <p style={{color:C.ink2,fontSize:13,margin:'0 0 8px',lineHeight:1.55}}>
+            All tiles above are showing zeros / dashes because nothing is responding on <span className="mono">127.0.0.1:7860</span>.
+          </p>
+          <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+            <a href="Run.html" style={{fontFamily:C.mono,fontSize:11,padding:'5px 12px',color:C.lox,border:`1px solid ${C.lox}`,textDecoration:'none',letterSpacing:'.06em'}}>RUN CHECKLIST →</a>
+            <a href="Errors.html#E02" style={{fontFamily:C.mono,fontSize:11,padding:'5px 12px',color:C.risk,border:`1px solid ${C.risk}`,textDecoration:'none',letterSpacing:'.06em'}}>E02 SERVER OFFLINE →</a>
+          </div>
+        </div>
+      )}
+
+      {/* footer */}
+      <div style={{borderTop:`1px solid ${C.frame}`,paddingTop:14,fontFamily:C.mono,fontSize:10,color:C.ink3,letterSpacing:'.06em',display:'flex',justifyContent:'space-between'}}>
+        <span>polling 127.0.0.1:7860/health · 2 s interval · zero telemetry</span>
+        <span><a href="Minimal.html" style={{color:C.lox}}>Minimal</a> · <a href="Output.html" style={{color:C.lox}}>Output</a> · <a href="Errors.html" style={{color:C.lox}}>Errors</a></span>
+      </div>
+
+      <style>{`@keyframes bp-pulse{0%,100%{opacity:.4}50%{opacity:1}}`}</style>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Status'),100);
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "haptic_glove",
+  "title": "Haptic Glove Pair Criteria",
+  "applies_to": ["haptic_glove"],
+  "criteria": [
+    {
+      "criterion": "finger_cartridge_service",
+      "weight": 14,
+      "good": "Per-finger linkage cartridges are removable by single pin or visible hinge access.",
+      "bad": "Finger linkages are glued, buried, or represented only as a glove shell.",
+      "signals": ["finger cartridge", "single-pin", "hinge", "linkage", "thimble"],
+      "loop_feedback": "Model per-finger cartridges with hinge pin holes, thimble sockets, and visible single-pin removal path."
+    },
+    {
+      "criterion": "actuator_module_access",
+      "weight": 12,
+      "good": "Flexion-resistance actuator modules plug in and remain visible near knuckle row.",
+      "bad": "Actuators are bonded or hidden without connector/service geometry.",
+      "signals": ["actuator module", "plug-in", "connector", "knuckle row", "brake"],
+      "loop_feedback": "Add plug-in actuator pockets, connector openings, knuckle-row mounts, and service labels."
+    },
+    {
+      "criterion": "wearable_comfort_boundary",
+      "weight": 9,
+      "good": "Rigid mock assembly preserves soft-contact cues, wrist quick release, and ergonomic clearance.",
+      "bad": "Rigid shell ignores don/doff, comfort, and finger clearance.",
+      "signals": ["wrist band", "quick release", "soft liner", "clearance", "comfort"],
+      "loop_feedback": "Add wrist quick release, soft-contact interface zones, finger clearance, and cable raceway inspection."
+    },
+    {
+      "criterion": "flex_cycle_harness_durability",
+      "weight": 9,
+      "good": "Finger and wrist wiring uses service loops, strain relief at every flex boundary, and a stated bend radius sized for repeated flexion cycles.",
+      "bad": "Wires run taut across knuckles or terminate at rigid mounts with no relief, inviting fatigue failure.",
+      "signals": ["service_loop", "strain_relief", "bend_radius", "flex_cycle", "knuckle_crossing"],
+      "loop_feedback": "Add service loops and strain relief at each knuckle and wrist crossing, and state a flex-rated bend radius.",
+      "source_refs": ["sources/public/nasa-std-87394a_w_change_4_0.pdf"]
+    }
+  ]
+}

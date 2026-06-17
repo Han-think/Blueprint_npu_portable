@@ -1,0 +1,201 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "cubesat",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "adcs",
+    "discipline": "gnc",
+    "function": "Attitude control evidence: reaction wheel/magnetorquer dummies, star tracker mount, sun sensor windows",
+    "evidence_features": [
+      "reaction_wheel_dummy",
+      "magnetorquer_rod",
+      "sensor_window",
+      "star_tracker_mount",
+      "baffle_shield"
+    ],
+    "criteria_refs": [
+      "geometry_grounding",
+      "mrl05_readiness"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "title": "P0 to Geometry Grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "weight": 14,
+          "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+          "bad": "P0 lists features but geometry_ops are generic boxes at the origin.",
+          "signals": [
+            "_subsystem_plan.internal_feature_targets",
+            "geometry_ops.id",
+            "geometry_ops.target"
+          ],
+          "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "weight": 12,
+          "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+          "bad": "Geometry is stacked at [0,0,0] or lacks coordinates.",
+          "signals": [
+            "args.at",
+            "coordinate_spread_score"
+          ],
+          "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "weight": 10,
+          "good": "Uses drill, pocket, boss, channel, cylinder, chamfer, fillet, pattern, and engrave where appropriate.",
+          "bad": "Primary output is a rectangular box with shallow labels.",
+          "signals": [
+            "drill",
+            "pocket",
+            "boss",
+            "channel",
+            "pattern_linear",
+            "pattern_polar",
+            "fillet",
+            "chamfer"
+          ],
+          "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+        },
+        {
+          "criterion": "mechanism_named_not_implied",
+          "weight": 9,
+          "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "signals": [
+            "four_bar",
+            "cam",
+            "rack_pinion",
+            "lead_screw",
+            "pivot_hole",
+            "linkage_bar"
+          ],
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "source_refs": [
+            "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mrl05_readiness",
+      "title": "MRL-0.5 Readiness Evidence",
+      "criteria": [
+        {
+          "criterion": "wall_process_readiness",
+          "weight": 10,
+          "good": "Material/process, wall assumptions, build direction, and supports are explicit enough for design review.",
+          "bad": "Manufacturing process is absent or contradicts geometry.",
+          "signals": [
+            "material",
+            "process",
+            "min_wall_mm",
+            "build_direction",
+            "supports"
+          ],
+          "loop_feedback": "State material/process, min wall, build direction, and support implications in cad_brief and print_profile."
+        },
+        {
+          "criterion": "inspection_traceability",
+          "weight": 10,
+          "good": "Verify/risk items reference real features or interfaces from part_tree/geometry_ops.",
+          "bad": "Verification is generic pass/warn text not tied to features.",
+          "signals": [
+            "verify.check",
+            "risk.mit",
+            "geometry_ops.id"
+          ],
+          "loop_feedback": "Tie each verification check to a named geometry feature, datum, interface, or service access path."
+        },
+        {
+          "criterion": "risk_coverage",
+          "weight": 9,
+          "good": "Risks cover blocked access, weak interfaces, tolerance mismatch, process limitations, and unsafe overclaiming.",
+          "bad": "Risks are missing or only mention vague quality concerns.",
+          "signals": [
+            "risk",
+            "blocked",
+            "clearance",
+            "support",
+            "inspection",
+            "not_for"
+          ],
+          "loop_feedback": "Add concrete risks for blocked service, datum loss, clearance conflict, unsupported geometry, and unsafe overclaiming."
+        },
+        {
+          "criterion": "requirement_to_verification_matrix",
+          "weight": 9,
+          "good": "Each stated requirement maps to a verification method (inspection, demonstration, analysis, test) tied to a named feature or interface.",
+          "bad": "Requirements and verification lists exist independently with no traceable pairing.",
+          "signals": [
+            "requirement_id",
+            "verify.method",
+            "inspection",
+            "demonstration",
+            "analysis",
+            "test"
+          ],
+          "loop_feedback": "Pair every requirement with one verification method and the geometry feature or interface that provides the evidence.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        },
+        {
+          "criterion": "interface_control_evidence",
+          "weight": 8,
+          "good": "Cross-subsystem interfaces state owner, mating geometry, and what is exchanged (load, power, data, fluid), like a miniature interface control entry.",
+          "bad": "Subsystems reference each other by name only, with no statement of what crosses the interface.",
+          "signals": [
+            "interface_owner",
+            "exchange_type",
+            "load",
+            "power",
+            "data",
+            "mating_feature"
+          ],
+          "loop_feedback": "For each interface, state both sides, the mating feature, and the exchanged quantity (load/power/data/fluid).",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    },
+    {
+      "title": "1800 Mechanical Movements, Devices and Appliances (Hiscox, 1899, public domain)",
+      "target_topics": [
+        "linkages",
+        "cams",
+        "gears",
+        "mechanism vocabulary"
+      ]
+    }
+  ]
+}

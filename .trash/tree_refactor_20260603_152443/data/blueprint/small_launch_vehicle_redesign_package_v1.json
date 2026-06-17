@@ -1,0 +1,429 @@
+{
+  "schema": "blueprint_small_launch_vehicle_redesign_package_v1",
+  "created_at": "2026-06-03T14:00:00+09:00",
+  "target": {
+    "vehicle_id": "small_launch_vehicle",
+    "label": "Small launch vehicle educational cutaway mockup",
+    "scope": "design-thinking and 3D-printable assembly package before STL generation",
+    "not_for": "flight hardware, propulsion certification, propellant formula, ignition instructions, pressure vessel design, launch operations, or working engine manufacture"
+  },
+  "primary_metric": {
+    "name": "assembly_serviceability_flowpath_readability",
+    "definition": "Reduce assembly effort while preserving access to engine display cartridge, tank modules, interstage datum, fairing split, avionics service bay, and visible non-functional flow-path labels.",
+    "failure_rule": "Part count reduction fails if engine/tank service access or tank-to-engine flow readability is blocked."
+  },
+  "existing_bom": [
+    {
+      "id": "old-001",
+      "label": "combustion chamber dummy",
+      "qty": 1,
+      "role": "non-functional engine chamber display volume",
+      "interfaces": ["nozzle", "turbopump dummy", "engine bay frame"],
+      "service_access": "engine display cartridge must remain removable and inspectable"
+    },
+    {
+      "id": "old-002",
+      "label": "nozzle display part",
+      "qty": 1,
+      "role": "non-functional divergent nozzle visual cue",
+      "interfaces": ["combustion chamber dummy", "aft skirt"],
+      "service_access": "nozzle display must remain visible from aft cutaway"
+    },
+    {
+      "id": "old-003",
+      "label": "turbopump and feedline dummy",
+      "qty": 1,
+      "role": "non-functional flow-path teaching placeholder",
+      "interfaces": ["tank labels", "engine cartridge", "service bay"],
+      "service_access": "feedline labels and dummy pump shape must remain visible"
+    },
+    {
+      "id": "old-004",
+      "label": "fuel tank shell",
+      "qty": 1,
+      "role": "non-functional tank volume and flow origin label",
+      "interfaces": ["body shell", "interstage", "flow label"],
+      "service_access": "tank module must slide out for inspection"
+    },
+    {
+      "id": "old-005",
+      "label": "oxidizer tank shell",
+      "qty": 1,
+      "role": "non-functional tank volume and flow origin label",
+      "interfaces": ["body shell", "interstage", "flow label"],
+      "service_access": "tank module must slide out for inspection"
+    },
+    {
+      "id": "old-006",
+      "label": "interstage ring",
+      "qty": 1,
+      "role": "stage alignment and separation teaching datum",
+      "interfaces": ["first stage shell", "second stage dummy", "service labels"],
+      "service_access": "datum face must remain visible after assembly"
+    },
+    {
+      "id": "old-007",
+      "label": "second-stage engine dummy",
+      "qty": 1,
+      "role": "non-functional upper-stage engine display",
+      "interfaces": ["interstage", "upper-stage shell"],
+      "service_access": "upper engine dummy must remain removable"
+    },
+    {
+      "id": "old-008",
+      "label": "payload fairing",
+      "qty": 1,
+      "role": "split fairing and payload access demonstration",
+      "interfaces": ["upper-stage shell", "payload bay", "alignment keys"],
+      "service_access": "fairing halves must separate without opening lower stages"
+    },
+    {
+      "id": "old-009",
+      "label": "replaceable fin set",
+      "qty": 4,
+      "role": "external stabilization feature for display silhouette",
+      "interfaces": ["aft skirt", "fin sockets"],
+      "service_access": "fins must be replaceable after print damage"
+    },
+    {
+      "id": "old-010",
+      "label": "avionics and service bay",
+      "qty": 1,
+      "role": "non-functional electronics placeholder and cable guide",
+      "interfaces": ["body shell", "tank modules", "fairing"],
+      "service_access": "service bay cover and cable route must remain openable"
+    }
+  ],
+  "redesigned_bom": [
+    {
+      "id": "new-001",
+      "label": "split cutaway core with alignment keys",
+      "qty": 1,
+      "replaces": ["old-004 partial", "old-005 partial", "old-006 partial", "old-010 partial"],
+      "printable_as": "PETG left/right body shell halves with open cutaway window and keyed stage datum faces",
+      "service_access_preserved": ["body cutaway window", "interstage datum", "tank module slots", "service bay opening"]
+    },
+    {
+      "id": "new-002",
+      "label": "slide-in tank and flow-path module pair",
+      "qty": 1,
+      "replaces": ["old-004", "old-005", "old-003 partial"],
+      "printable_as": "clear PETG/PETG tank dummies with engraved non-functional flow arrows and removable feedline label strip",
+      "service_access_preserved": ["fuel tank inspection", "oxidizer tank inspection", "flow-path readability", "feedline label visibility"]
+    },
+    {
+      "id": "new-003",
+      "label": "removable engine display cartridge",
+      "qty": 1,
+      "replaces": ["old-001", "old-002", "old-003 partial", "old-007"],
+      "printable_as": "PETG non-functional chamber/nozzle/upper-engine display cartridge with no working propulsion details",
+      "service_access_preserved": ["engine dummy removal", "nozzle display visibility", "upper engine dummy access", "aft cutaway inspection"]
+    },
+    {
+      "id": "new-004",
+      "label": "indexed interstage and avionics service ring",
+      "qty": 1,
+      "replaces": ["old-006", "old-010"],
+      "printable_as": "PETG indexed ring with visible datum ticks, service bay cover, and cable guide channel",
+      "service_access_preserved": ["interstage alignment", "avionics bay access", "service cover removal", "cable guide inspection"]
+    },
+    {
+      "id": "new-005",
+      "label": "replaceable fairing and fin module set",
+      "qty": 1,
+      "replaces": ["old-008", "old-009"],
+      "printable_as": "PETG split fairing with keyed payload bay and replaceable fins with TPU display feet",
+      "service_access_preserved": ["payload fairing split", "payload bay access", "fin replacement", "display foot replacement"]
+    }
+  ],
+  "integration_decisions": [
+    {
+      "decision": "integrate body shell halves with cutaway window and tank module slots",
+      "expected_gain": "reduces separate shell-cover alignment operations while making internal layout readable",
+      "guardrail": "tank modules slide out and the flow path remains visible through the cutaway"
+    },
+    {
+      "decision": "integrate tank dummies with non-functional flow labels",
+      "expected_gain": "teaches tank-to-engine relationship without adding loose arrow tags",
+      "guardrail": "labels are descriptive only and do not include working propulsion instructions"
+    },
+    {
+      "decision": "keep engine display as a removable cartridge",
+      "expected_gain": "engine area can be inspected or swapped without rebuilding the body shell",
+      "guardrail": "cartridge remains a non-functional display module"
+    },
+    {
+      "decision": "index the interstage ring with visible datum ticks",
+      "expected_gain": "stage alignment is easier to teach and verify",
+      "guardrail": "datum face remains visible after upper stage installation"
+    },
+    {
+      "decision": "keep fairing and fins replaceable",
+      "expected_gain": "fragile external parts can be serviced after handling or display damage",
+      "guardrail": "fairing split and fin sockets stay accessible from outside"
+    }
+  ],
+  "assembly_delta": {
+    "baseline_steps": 30,
+    "redesigned_steps": 16,
+    "removed_operations": [
+      "align multiple body shell covers",
+      "install loose flow-path labels",
+      "remove lower body to inspect engine dummy",
+      "open tank area to access avionics bay",
+      "re-square interstage after fairing removal",
+      "replace full aft shell after fin damage"
+    ],
+    "retained_service_access_points": [
+      "engine display cartridge removal",
+      "aft nozzle display inspection",
+      "fuel tank slide-out module",
+      "oxidizer tank slide-out module",
+      "visible tank-to-engine flow labels",
+      "indexed interstage datum ticks",
+      "avionics service bay cover",
+      "payload fairing split",
+      "payload bay access",
+      "replaceable fin sockets",
+      "external display feet"
+    ]
+  },
+  "print_strategy": [
+    {
+      "part_id": "new-001",
+      "orientation": "body halves flat on cut line, cutaway window upward",
+      "supports": "tree",
+      "reason": "preserve long shell alignment keys and keep cutaway edges clean"
+    },
+    {
+      "part_id": "new-002",
+      "orientation": "tank modules horizontal with engraved labels upward",
+      "supports": "min",
+      "reason": "protect slide rails and keep flow-path labels readable"
+    },
+    {
+      "part_id": "new-003",
+      "orientation": "engine cartridge axis horizontal, nozzle display supported lightly",
+      "supports": "tree",
+      "reason": "preserve removable cartridge rails and aft nozzle display silhouette"
+    },
+    {
+      "part_id": "new-004",
+      "orientation": "interstage ring flat with datum ticks upward",
+      "supports": "none",
+      "reason": "keep stage datum face flat and service bay cover readable"
+    },
+    {
+      "part_id": "new-005",
+      "orientation": "fairing halves on split faces; fins and TPU feet flat",
+      "supports": "min",
+      "reason": "protect fairing keys while making fragile fins easy to replace"
+    }
+  ],
+  "assembly_sequence": [
+    "Print split cutaway core halves with keyed body and interstage faces.",
+    "Print slide-in fuel and oxidizer tank modules with non-functional flow labels.",
+    "Print removable engine display cartridge and upper-engine dummy insert.",
+    "Print indexed interstage and avionics service ring.",
+    "Print split fairing halves, replaceable fins, and TPU display feet.",
+    "Join the left/right cutaway core around the open inspection side.",
+    "Insert fuel tank module and verify the slide rail stays visible.",
+    "Insert oxidizer tank module and verify the flow labels face the cutaway window.",
+    "Slide the engine display cartridge into the aft bay.",
+    "Attach indexed interstage ring and align datum ticks.",
+    "Install upper-stage dummy and verify second-stage engine display access.",
+    "Install avionics service bay cover without blocking the cable guide.",
+    "Attach split payload fairing and verify payload bay access.",
+    "Snap fins into replaceable aft sockets and install TPU display feet.",
+    "Check tank-to-engine flow readability from the cutaway side.",
+    "Perform final service access check for engine, tanks, interstage, fairing, fins, and service bay."
+  ],
+  "schema_v6_blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-03T14:00:00+09:00",
+    "project": "Small Launch Vehicle Redesign V1",
+    "object": "Small launch vehicle printable cutaway serviceability mockup",
+    "brief": {
+      "requirements": [
+        "Create a 3D-printable small launch vehicle educational cutaway mockup design package.",
+        "Reduce assembly steps while preserving engine display, tank module, interstage, fairing, fin, and avionics service access.",
+        "Preserve visible non-functional tank-to-engine flow-path readability.",
+        "Prepare geometry intent for later STL generation, not flight hardware or working propulsion."
+      ],
+      "constraints": {
+        "material": "PETG + clear PETG windows + TPU pads",
+        "process": "FDM",
+        "envelope_mm": [120, 120, 420],
+        "min_wall_mm": 1.8,
+        "min_channel_mm": 4,
+        "overhang_deg": 45,
+        "tol_mm": 0.3
+      }
+    },
+    "part_tree": {
+      "id": "small-launch-vehicle-redesign-v1",
+      "name": "Small launch vehicle printable cutaway serviceability mockup",
+      "qty": 1,
+      "material": "PETG + clear PETG windows + TPU pads",
+      "process": "FDM",
+      "children": [
+        {
+          "id": "new-001",
+          "name": "split cutaway core with alignment keys",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-body-half-left", "name": "left cutaway body half", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-body-half-right", "name": "right cutaway body half", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-cutaway-window", "name": "open internal inspection window", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-002",
+          "name": "slide-in tank and flow-path module pair",
+          "qty": 1,
+          "material": "PETG + clear PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-fuel-tank-dummy", "name": "fuel tank dummy slide module", "qty": 1, "material": "clear PETG", "process": "FDM", "children": []},
+            {"id": "f-oxidizer-tank-dummy", "name": "oxidizer tank dummy slide module", "qty": 1, "material": "clear PETG", "process": "FDM", "children": []},
+            {"id": "f-flow-label-strip", "name": "non-functional flow label strip", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-003",
+          "name": "removable engine display cartridge",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-chamber-dummy", "name": "non-functional chamber display dummy", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-nozzle-display", "name": "nozzle display insert", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-upper-engine-dummy", "name": "upper-stage engine display dummy", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-004",
+          "name": "indexed interstage and avionics service ring",
+          "qty": 1,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {"id": "f-interstage-datum", "name": "visible interstage datum ticks", "qty": 8, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-avionics-cover", "name": "removable avionics service cover", "qty": 1, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-cable-guide", "name": "service bay cable guide", "qty": 1, "material": "PETG", "process": "FDM", "children": []}
+          ]
+        },
+        {
+          "id": "new-005",
+          "name": "replaceable fairing and fin module set",
+          "qty": 1,
+          "material": "PETG + TPU",
+          "process": "FDM",
+          "children": [
+            {"id": "f-fairing-half", "name": "split payload fairing halves", "qty": 2, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-fin-socket", "name": "replaceable aft fin sockets", "qty": 4, "material": "PETG", "process": "FDM", "children": []},
+            {"id": "f-display-foot", "name": "TPU display feet", "qty": 3, "material": "TPU", "process": "FDM", "children": []}
+          ]
+        }
+      ]
+    },
+    "geometry_ops": [
+      {"id": "op-001", "op": "cylinder", "target": "small-launch-vehicle-redesign-v1", "args": {"diameter_mm": 82, "height_mm": 420, "purpose": "overall vertical display envelope"}},
+      {"id": "op-002", "op": "subtract", "target": "small-launch-vehicle-redesign-v1", "args": {"plane": "longitudinal split reference", "purpose": "left/right printable body halves"}},
+      {"id": "op-003", "op": "shell", "target": "f-body-half-left", "args": {"wall_mm": 1.8, "open_faces": ["cutaway"], "purpose": "lightweight cutaway body half"}},
+      {"id": "op-004", "op": "shell", "target": "f-body-half-right", "args": {"wall_mm": 1.8, "open_faces": ["cutaway"], "purpose": "lightweight cutaway body half"}},
+      {"id": "op-005", "op": "pocket", "target": "f-cutaway-window", "args": {"size_mm": [42, 260], "purpose": "internal tank and engine inspection window"}},
+      {"id": "op-006", "op": "boss", "target": "new-001", "args": {"count": 8, "size_mm": [6, 4, 3], "purpose": "body half alignment keys"}},
+      {"id": "op-007", "op": "cylinder", "target": "f-fuel-tank-dummy", "args": {"diameter_mm": 54, "height_mm": 100, "purpose": "non-functional fuel tank display module"}},
+      {"id": "op-008", "op": "cylinder", "target": "f-oxidizer-tank-dummy", "args": {"diameter_mm": 54, "height_mm": 120, "purpose": "non-functional oxidizer tank display module"}},
+      {"id": "op-009", "op": "channel", "target": "new-002", "args": {"width_mm": 6, "clearance_mm": 0.35, "purpose": "slide-in tank module guide channels"}},
+      {"id": "op-010", "op": "engrave", "target": "f-flow-label-strip", "args": {"text": "VISIBLE FLOW PATH - DISPLAY ONLY", "depth_mm": 0.35}},
+      {"id": "op-011", "op": "box", "target": "f-flow-label-strip", "args": {"size_mm": [10, 6, 210], "purpose": "non-functional feedline label strip"}},
+      {"id": "op-012", "op": "cylinder", "target": "f-chamber-dummy", "args": {"diameter_mm": 32, "height_mm": 42, "purpose": "non-functional chamber display"}},
+      {"id": "op-013", "op": "loft", "target": "f-nozzle-display", "args": {"sections": ["diameter_22mm", "diameter_42mm"], "height_mm": 38, "purpose": "nozzle display silhouette"}},
+      {"id": "op-014", "op": "boss", "target": "new-003", "args": {"width_mm": 5, "clearance_mm": 0.3, "purpose": "removable engine cartridge guide bosses"}},
+      {"id": "op-015", "op": "cylinder", "target": "f-upper-engine-dummy", "args": {"diameter_mm": 24, "height_mm": 30, "purpose": "upper-stage engine display dummy"}},
+      {"id": "op-016", "op": "cylinder", "target": "f-interstage-datum", "args": {"diameter_mm": 82, "height_mm": 14, "tick_count": 8, "purpose": "indexed stage alignment datum ring"}},
+      {"id": "op-017", "op": "pocket", "target": "f-avionics-cover", "args": {"size_mm": [30, 18], "purpose": "removable avionics service cover"}},
+      {"id": "op-018", "op": "channel", "target": "f-cable-guide", "args": {"width_mm": 5, "depth_mm": 3, "purpose": "visible service bay cable guide"}},
+      {"id": "op-019", "op": "loft", "target": "f-fairing-half", "args": {"sections": ["payload_ring", "nose_tip"], "qty": 2, "purpose": "split fairing halves"}},
+      {"id": "op-020", "op": "pattern_polar", "target": "f-fin-socket", "args": {"count": 4, "feature": "replaceable fin socket", "radius_mm": 42}},
+      {"id": "op-021", "op": "box", "target": "f-display-foot", "args": {"size_mm": [24, 10, 7], "qty": 3, "purpose": "TPU display feet"}},
+      {"id": "op-022", "op": "engrave", "target": "small-launch-vehicle-redesign-v1", "args": {"text": "INERT CUTAWAY MOCKUP", "depth_mm": 0.35}},
+      {"id": "op-023", "op": "chamfer", "target": "small-launch-vehicle-redesign-v1", "args": {"edges": "service module edges", "amount_mm": 0.6}},
+      {"id": "op-024", "op": "fillet", "target": "small-launch-vehicle-redesign-v1", "args": {"edges": "handled fairing and body corners", "radius_mm": 1.0}}
+    ],
+    "cad_brief": {
+      "name": "small_launch_vehicle_cutaway_redesign_v1",
+      "rev": "1.0",
+      "material": "PETG + clear PETG windows + TPU pads",
+      "envelope_mm": [120, 120, 420],
+      "build_direction": "body halves flat on cut line; tank labels upward; interstage ring flat; fairing halves on split faces",
+      "key_dims_mm": {
+        "mockup_height": 420,
+        "body_diameter": 82,
+        "tank_module_count": 2,
+        "replaceable_fin_count": 4
+      },
+      "wall_thickness_mm": {"min": 1.8, "typ": 2.0},
+      "tolerances_mm": {"tank_slide_clearance": 0.35, "engine_cartridge_clearance": 0.3, "fairing_key_clearance": 0.3},
+      "surface": {"Ra_um": 18, "post_process": "deburr cutaway window, slide rails, interstage ring, and fairing keys"},
+      "mass_est_g": 390
+    },
+    "verify": [
+      {"check": "existing and redesigned BOM both present in design package", "result": "pass", "value": "10 baseline groups, 5 redesigned groups", "rule": "small-launch-v1-package"},
+      {"check": "assembly steps explicitly reduced", "result": "pass", "value": "30 baseline steps to 16 redesigned steps", "rule": "small-launch-v1-serviceability"},
+      {"check": "engine display cartridge access retained", "result": "pass", "value": "removable engine cartridge with visible nozzle display", "rule": "small-launch-v1-engine"},
+      {"check": "tank module access retained", "result": "pass", "value": "fuel and oxidizer tank dummies slide out", "rule": "small-launch-v1-tanks"},
+      {"check": "interstage alignment datum retained", "result": "pass", "value": "indexed interstage datum ticks visible", "rule": "small-launch-v1-interstage"},
+      {"check": "fairing and payload bay access retained", "result": "pass", "value": "split fairing opens without lower-stage disassembly", "rule": "small-launch-v1-fairing"},
+      {"check": "avionics service bay access retained", "result": "pass", "value": "removable service cover and cable guide visible", "rule": "small-launch-v1-service-bay"},
+      {"check": "flow-path readability retained", "result": "pass", "value": "non-functional tank-to-engine label strip visible from cutaway side", "rule": "small-launch-v1-flow-readability"},
+      {"check": "engine cartridge fit after print", "result": "warn", "value": "requires prototype slide clearance test", "rule": "small-launch-v1-printability"}
+    ],
+    "risk": [
+      {"id": "R01", "desc": "Over-integration of engine display or tank dummies into the body shell may block engine cartridge and tank service.", "mit": "Keep engine display as a removable non-functional cartridge and use slide-in tank modules.", "severity": "high"},
+      {"id": "R02", "desc": "Flow path may become hidden if tank modules and body shell are closed into one piece.", "mit": "Use a cutaway window and visible non-functional flow label strip.", "severity": "high"},
+      {"id": "R03", "desc": "Interstage alignment may be lost if datum ticks are hidden by the upper-stage shell.", "mit": "Expose indexed interstage datum ring after assembly.", "severity": "high"},
+      {"id": "R04", "desc": "Fairing and fin service may be blocked if fragile exterior parts are printed as one body.", "mit": "Keep fairing halves and fins replaceable.", "severity": "med"},
+      {"id": "R05", "desc": "Safety boundary may drift if the mockup is treated as working propulsion hardware, and tall body halves may warp.", "mit": "Mark the package as inert cutaway display only, avoid functional propulsion details, print halves flat, and prototype slide clearances.", "severity": "high"}
+    ],
+    "print_profile": {
+      "printer": "FDM printer with 0.4mm nozzle",
+      "material": "PETG structural parts, clear PETG tank windows, TPU display feet",
+      "layer_mm": 0.2,
+      "walls": 4,
+      "infill": "15% gyroid for shell halves, 20% for tank modules, 30% for engine cartridge and interstage ring",
+      "supports": "tree",
+      "orientation": "body halves flat on split line; tank modules horizontal with labels upward; engine cartridge horizontal; interstage ring flat; fairing halves on split faces",
+      "est_time": "14-18h total prototype set",
+      "filament_g": 390
+    },
+    "slicer_job": {
+      "tool": "prusaslicer",
+      "input_stl": "output/small_launch_vehicle_cutaway_redesign_v1.stl",
+      "output": "output/small_launch_vehicle_cutaway_redesign_v1.gcode",
+      "args": ["--layer-height", "0.20", "--fill-density", "15%", "--support-material-auto"],
+      "profile": "PETG_CLEARPETG_TPU_0.4mm_small_launch_vehicle_cutaway_mockup"
+    }
+  },
+  "quality_scenarios": [
+    {
+      "case": "body shell and engine dummy fully integrated reduce parts but block engine inspection",
+      "expected": "fail",
+      "reason": "engine display cartridge access is mandatory"
+    },
+    {
+      "case": "body shell is a split cutaway core while engine and tank modules remain slide-in",
+      "expected": "pass",
+      "reason": "assembly is simplified without hiding service modules or flow labels"
+    },
+    {
+      "case": "print is easy but tank-to-engine flow labels are hidden",
+      "expected": "risk",
+      "reason": "flow-path readability is part of the primary metric"
+    }
+  ]
+}

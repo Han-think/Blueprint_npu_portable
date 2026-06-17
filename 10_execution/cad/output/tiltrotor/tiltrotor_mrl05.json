@@ -1,0 +1,84 @@
+{
+  "schema": "blueprint_mrl05_manufacturing_readiness_v1",
+  "seed": "tiltrotor",
+  "target": {
+    "vehicle_id": "tiltrotor_vtol",
+    "label": "Tiltrotor VTOL Hybrid educational mockup",
+    "scope": "design-thinking and 3D-printable assembly package before STL generation",
+    "not_for": "flight certification, autonomous flight, payload delivery, military use, or structural airworthiness claims"
+  },
+  "score": 97,
+  "status": "ready",
+  "disclaimer": "MRL-0.5 readiness evidence only; not manufacturing, flight, medical, or certification approval.",
+  "categories": [
+    {
+      "name": "wall/process readiness",
+      "score": 100,
+      "note": "process=FDM, min_wall=1.8, required_floor=1.2"
+    },
+    {
+      "name": "overhang/support readiness",
+      "score": 100,
+      "note": "overhang=45, supports=tree, orientation=fuselage long axis on bed; nacelle datum pads upward; cartridges flat; tail and gear modules flat"
+    },
+    {
+      "name": "fastener/joint sanity",
+      "score": 100,
+      "note": "valid fasteners 3/3, clearance joints 4/4"
+    },
+    {
+      "name": "serviceability",
+      "score": 100,
+      "note": "service access points 9, service terms 229, svg markers 1"
+    },
+    {
+      "name": "inspection readiness",
+      "score": 86,
+      "note": "verify pass/warn/fail 6/1/0, inspection terms 102"
+    },
+    {
+      "name": "mass/process traceability",
+      "score": 100,
+      "note": "mass=280g, stl triangles=105055, svg=True"
+    },
+    {
+      "name": "risk coverage",
+      "score": 93,
+      "note": "mitigated risks 5/5, high risks 2"
+    }
+  ],
+  "issues": [],
+  "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for tiltrotor: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+  "evidence": {
+    "stl": {
+      "exists": true,
+      "bytes": 5252834,
+      "triangles": 105055
+    },
+    "svg": {
+      "exists": true,
+      "bytes": 11840,
+      "markers": [
+        "service"
+      ]
+    },
+    "process": "FDM",
+    "material": "PETG + TPU pads",
+    "min_wall_mm": 1.8,
+    "tol_mm": 0.3,
+    "fasteners": 3,
+    "joints": 4,
+    "service_access_points": 9,
+    "verify": {
+      "pass": 6,
+      "warn": 1,
+      "fail": 0,
+      "total": 7
+    },
+    "risks": {
+      "total": 5,
+      "mitigated": 5,
+      "high": 2
+    }
+  }
+}

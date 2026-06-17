@@ -1,0 +1,30 @@
+{
+  "version": "bp-assembly-v1",
+  "target": "cubesat_3u",
+  "fasteners": [
+    {
+      "id": "F1", "standard": "M2", "kind": "screw", "length_mm": 6, "qty": 8,
+      "anchor": "corners_4", "joins": ["new-002", "new-001"],
+      "hole": "clearance", "torque_Ncm": 20,
+      "note": "captive screw boss (f-captive-boss) — 서비스 패널을 spine 에 고정"
+    },
+    {
+      "id": "F2", "standard": "PIN2", "kind": "pin", "length_mm": 10, "qty": 2,
+      "anchor": "face_+Z", "joins": ["new-004", "new-001"],
+      "hole": "through",
+      "note": "antenna hinge dummy pin (drill Ø2)"
+    }
+  ],
+  "joints": [
+    { "id": "J1", "partA": "new-002", "partB": "new-001", "mate": "slot",
+      "clearance_mm": 0.25, "note": "service panel slide — cad_brief panel_slide_clearance" },
+    { "id": "J2", "partA": "new-003", "partB": "new-001", "mate": "slot",
+      "clearance_mm": 0.35, "containment": true, "note": "board shelf ladder slides inside spine bay — board_dummy_clearance" },
+    { "id": "J3", "partA": "new-004", "partB": "new-001", "mate": "pin",
+      "clearance_mm": 0.20, "note": "antenna hinge rotation" }
+  ],
+  "hardware_bom": [
+    { "standard": "M2", "qty": 8 },
+    { "standard": "PIN2", "qty": 2 }
+  ]
+}

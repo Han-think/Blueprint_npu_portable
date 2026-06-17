@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Print Queue · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('PrintQueue'),100);</script>
+<script type="text/babel">
+const C={canvas:'#0c1e35',canvas2:'#0a1a2f',canvas3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#ff9fc6',risk:'#ff8c8c'};
+
+// Printers (heterogeneous farm)
+const MACHINES = [
+  {id:'M1', name:'Bambu X1C #1',    type:'FDM',  env:[256,256,256], mat:'PA-CF / PETG-CF', util:0},
+  {id:'M2', name:'Bambu X1C #2',    type:'FDM',  env:[256,256,256], mat:'PA-CF / PETG-CF', util:0},
+  {id:'M3', name:'Markforged Mark2',type:'CFR',  env:[320,132,154], mat:'Onyx + CF',       util:0},
+  {id:'M4', name:'EOS M290',        type:'LPBF', env:[250,250,325], mat:'IN718 / Ti64',    util:0},
+  {id:'M5', name:'Velo3D Sapphire', type:'LPBF', env:[315,315,400], mat:'GRCop-42 / CuCrZr',util:0},
+];
+
+// Parts (mirrors Assembly tree)
+const PARTS = [
+  {id:'P1',  label:'Dome upper',         bbox:[180,180,40],  mat:'PA-CF',          orient:'flat',     overhang:0,  t:120, prio:1, post:['stress-relief']},
+  {id:'P2',  label:'Barrel ring',        bbox:[180,180,60],  mat:'PA-CF',          orient:'flat',     overhang:0,  t:140, prio:1, post:['stress-relief']},
+  {id:'P3',  label:'Dome lower',         bbox:[180,180,40],  mat:'PA-CF',          orient:'flat',     overhang:0,  t:120, prio:1, post:['stress-relief']},
+  {id:'P4',  label:'CH4 Dome upper',     bbox:[180,180,40],  mat:'PA-CF',          orient:'flat',     overhang:0,  t:120, prio:2, post:['stress-relief']},
+  {id:'P5',  label:'CH4 Barrel ring',    bbox:[180,180,60],  mat:'PA-CF',          orient:'flat',     overhang:0,  t:140, prio:2, post:['stress-relief']},
+  {id:'P6',  label:'CH4 Dome lower',     bbox:[180,180,40],  mat:'PA-CF',          orient:'flat',     overhang:0,  t:120, prio:2, post:['stress-relief']},
+  {id:'P7',  label:'Combustion chamber', bbox:[140,140,180], mat:'GRCop-42 LPBF',  orient:'vertical', overhang:0,  t:480, prio:3, post:['SR','support-remove','HIP','aged','CNC-finish','CMM'], critical:true, witness:true},
+  {id:'P8',  label:'Injector head',      bbox:[140,140,60],  mat:'Inconel 718',    orient:'flat',     overhang:42, t:300, prio:3, post:['SR','support-remove','HIP','solution-age','CNC','CMM'], critical:true},
+  {id:'P9',  label:'Nozzle extension',   bbox:[200,200,160], mat:'Inconel 625',    orient:'vertical', overhang:0,  t:540, prio:3, post:['SR','support-remove','HIP','aged','CMM'], critical:true},
+  {id:'P10', label:'Gimbal ring',        bbox:[220,220,30],  mat:'Ti-6Al-4V',      orient:'flat',     overhang:0,  t:240, prio:4, post:['SR','HIP','machined','CMM']},
+  {id:'P11', label:'Strut',              bbox:[40,40,180],   mat:'Ti-6Al-4V',      orient:'angled',   overhang:55, t:80,  prio:4, post:['SR','HIP','machined']},
+  {id:'P12', label:'Feed manifold',      bbox:[120,80,100],  mat:'AlSi10Mg',       orient:'flat',     overhang:38, t:200, prio:5, post:['SR','HIP','flow-test']},
+  {id:'P13', label:'Pressurant tee',     bbox:[60,60,60],    mat:'AlSi10Mg',       orient:'flat',     overhang:0,  t:60,  prio:5, post:['SR','HIP']},
+  {id:'P14', label:'Bay housing',        bbox:[120,90,80],   mat:'PETG-CF',        orient:'flat',     overhang:0,  t:180, prio:6, post:[]},
+  {id:'P15', label:'Battery tray',       bbox:[100,70,30],   mat:'PETG-CF',        orient:'flat',     overhang:0,  t:90,  prio:6, post:[]},
+];
+
+// Greedy schedule: assign each part to compatible machine with earliest finish
+function schedule(){
+  const compat = (p,m)=>{
+    if(p.mat.includes('LPBF') && m.type!=='LPBF') return false;
+    if(p.mat.includes('Inconel')&&m.type!=='LPBF') return false;
+    if(p.mat.includes('Ti-')&&m.type!=='LPBF') return false;
+    if(p.mat.includes('AlSi')&&m.type!=='LPBF') return false;
+    if(p.mat.includes('GRCop')&&m.id!=='M5') return false;
+    if((p.mat.includes('PA-CF')||p.mat.includes('PETG'))&&m.type!=='FDM') return false;
+    return p.bbox[0]<=m.env[0] && p.bbox[1]<=m.env[1] && p.bbox[2]<=m.env[2];
+  };
+  const ends = Object.fromEntries(MACHINES.map(m=>[m.id,0]));
+  const jobs = [];
+  const sorted = [...PARTS].sort((a,b)=> a.prio-b.prio || b.t-a.t);
+  sorted.forEach(p=>{
+    const opts = MACHINES.filter(m=>compat(p,m));
+    if(!opts.length){ jobs.push({p,m:null,start:0,end:0}); return; }
+    const m = opts.reduce((a,b)=> ends[a.id]<=ends[b.id]?a:b);
+    const start = ends[m.id]; const end = start + p.t;
+    ends[m.id] = end;
+    jobs.push({p,m,start,end});
+  });
+  const makespan = Math.max(...Object.values(ends));
+  return {jobs, makespan, ends};
+}
+
+const {jobs, makespan, ends} = schedule();
+const SCALE = 900/makespan; // px per min
+
+const POST_STAGES = [
+  {k:'BUILD',     desc:'LPBF deposition · 30 µm layer · Ar atmosphere', risk:'witness-line if process restarts', color:C.lox},
+  {k:'CUTOFF',    desc:'Wire-EDM from build plate',                     risk:'residual stress release → warp',  color:C.ink2},
+  {k:'SR',        desc:'Stress relief @ 650 °C / 2 hr',                 risk:'incomplete → distortion in HIP',  color:C.lh2},
+  {k:'SUPPORT',   desc:'Manual / EDM support removal',                  risk:'tool damage on critical surfaces',color:C.ink2},
+  {k:'HIP',       desc:'HIP 100–200 MPa · 1120 °C · 4 hr',              risk:'cannot heal surface-connected porosity',color:C.halo},
+  {k:'AGE',       desc:'Solution + age (IN718: 980+720+620 °C)',        risk:'grain coarsening if overheld',    color:C.lh2},
+  {k:'CNC',       desc:'5-axis finish on datum + sealing surfaces',     risk:'tolerance miss → reject',         color:C.ink2},
+  {k:'CMM',       desc:'CMM scan vs CAD — full GD&T conformance',       risk:'first-article fail → re-print',   color:C.inter},
+  {k:'CERT',      desc:'CoC + FAI + material lot sign-off',             risk:'AS9100 audit failure',            color:C.inter},
+];
+
+function Stat({k,v,u,col}){return (
+  <div style={{border:`1px solid ${col}`,padding:'14px 16px',background:C.canvas2}}>
+    <div className="mono" style={{fontSize:9.5,color:col,letterSpacing:'.14em',marginBottom:6}}>{k}</div>
+    <div style={{fontSize:24,fontWeight:500,color:C.ink,lineHeight:1}}>{v}<span className="mono" style={{fontSize:11,color:C.ink3,marginLeft:6}}>{u}</span></div>
+  </div>
+);}
+
+function App(){
+  const hours = (makespan/60).toFixed(1);
+  const critical = jobs.filter(j=>j.p.critical).length;
+  const witness = jobs.filter(j=>j.p.witness).length;
+  const failed  = jobs.filter(j=>!j.m).length;
+  const totalMin= PARTS.reduce((s,p)=>s+p.t,0);
+  const sumUtil = Math.round(100 * totalMin / (MACHINES.length * makespan));
+
+  return (
+    <div style={{maxWidth:1300,margin:'0 auto',padding:'24px 28px 80px'}}>
+      <div style={{borderBottom:`1px solid ${C.frame}`,paddingBottom:18,marginBottom:22}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.2em',marginBottom:6}}>BLUEPRINT NPU · PRINT QUEUE · v0.5</div>
+        <div style={{fontSize:34,fontWeight:500,letterSpacing:'-.02em',marginBottom:8}}>Multi-machine scheduling + post-processing chain</div>
+        <div style={{fontSize:13,color:C.ink2,maxWidth:880,lineHeight:1.55}}>
+          15 parts across 5 heterogeneous machines (FDM × 3 + LPBF × 2). Greedy schedule respects material compatibility, bed envelope,
+          and assembly priority. After build, each part walks the post-processing chain — <b style={{color:C.halo}}>witness-line risk</b> is tracked
+          for LPBF chambers (re: GRCop-42 LLAMA failure at 0.29 s).
+        </div>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:18}}>
+        <Stat k="MAKESPAN"      v={hours}     u="hr"    col={C.lox}/>
+        <Stat k="UTILIZATION"   v={sumUtil}   u="%"     col={C.inter}/>
+        <Stat k="CRITICAL PARTS"v={critical}  u="LPBF"  col={C.halo}/>
+        <Stat k="WITNESS RISK"  v={witness}   u="parts" col={C.risk}/>
+        <Stat k="UNSCHEDULED"   v={failed}    u="parts" col={failed?C.risk:C.inter}/>
+      </div>
+
+      {/* GANTT */}
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18,marginBottom:14}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:14}}>GANTT · t=0 … {hours}h · greedy earliest-finish</div>
+        <div style={{display:'grid',gridTemplateColumns:'120px 1fr',gap:0,rowGap:6,alignItems:'center'}}>
+          {MACHINES.map(m=>{
+            const myJobs = jobs.filter(j=>j.m && j.m.id===m.id);
+            const util = Math.round(100 * (ends[m.id]||0)/makespan);
+            return (
+              <React.Fragment key={m.id}>
+                <div style={{paddingRight:12}}>
+                  <div style={{fontSize:11,color:C.ink}}>{m.name}</div>
+                  <div className="mono" style={{fontSize:9.5,color:m.type==='LPBF'?C.halo:C.lox,letterSpacing:'.08em',marginTop:2}}>{m.type} · {util}%</div>
+                </div>
+                <div style={{position:'relative',height:28,background:'#08152a',border:`1px solid ${C.frame}`}}>
+                  {myJobs.map((j,i)=>{
+                    const w = j.p.t*SCALE; const x = j.start*SCALE;
+                    const col = j.p.critical ? C.halo : (m.type==='LPBF'?C.lh2:C.lox);
+                    return (
+                      <div key={i} title={`${j.p.id} ${j.p.label} · ${j.p.t}min`} style={{
+                        position:'absolute',left:x,top:1,width:w-1,height:25,
+                        background:col,opacity:0.85,
+                        display:'flex',alignItems:'center',justifyContent:'center',
+                        fontFamily:"'JetBrains Mono',monospace",fontSize:9.5,color:'#0c1e35',fontWeight:600,
+                        overflow:'hidden',whiteSpace:'nowrap'}}>
+                        {j.p.id}
+                      </div>
+                    );
+                  })}
+                </div>
+              </React.Fragment>
+            );
+          })}
+        </div>
+        <div style={{marginTop:14,display:'flex',gap:18,fontSize:11,color:C.ink3}} className="mono">
+          <span><span style={{display:'inline-block',width:10,height:10,background:C.lox,marginRight:6,verticalAlign:'middle'}}/>FDM</span>
+          <span><span style={{display:'inline-block',width:10,height:10,background:C.lh2,marginRight:6,verticalAlign:'middle'}}/>LPBF non-critical</span>
+          <span><span style={{display:'inline-block',width:10,height:10,background:C.halo,marginRight:6,verticalAlign:'middle'}}/>LPBF critical</span>
+        </div>
+      </div>
+
+      {/* PARTS TABLE: orientation/overhang/witness */}
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18,marginBottom:14}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:12}}>BUILD ORIENTATION & RISK</div>
+        <table style={{width:'100%',borderCollapse:'collapse',fontSize:11}}>
+          <thead><tr style={{color:C.ink3}} className="mono">
+            {['PART','BBOX mm','MAT','MACHINE','ORIENT','OVERHANG','WITNESS','POST'].map(h=>(
+              <th key={h} style={{textAlign:'left',padding:'5px 8px',borderBottom:`1px solid ${C.frame}`,letterSpacing:'.06em'}}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody className="mono">
+            {jobs.map(j=>(
+              <tr key={j.p.id} style={{color:C.ink2,borderBottom:`1px dashed #1a3458`}}>
+                <td style={{padding:'6px 8px',color:C.lox}}>{j.p.id} {j.p.label}</td>
+                <td style={{padding:'6px 8px'}}>{j.p.bbox.join('×')}</td>
+                <td style={{padding:'6px 8px'}}>{j.p.mat}</td>
+                <td style={{padding:'6px 8px',color:j.m?C.ink:C.risk}}>{j.m?j.m.id:'NO FIT'}</td>
+                <td style={{padding:'6px 8px'}}>{j.p.orient}</td>
+                <td style={{padding:'6px 8px',color:j.p.overhang>40?C.risk:C.ink2}}>{j.p.overhang}°{j.p.overhang>40?' ⚠':''}</td>
+                <td style={{padding:'6px 8px',color:j.p.witness?C.risk:C.ink3}}>{j.p.witness?'monitor':'—'}</td>
+                <td style={{padding:'6px 8px',fontSize:10}}>{j.p.post.join(' → ')||'—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:10,lineHeight:1.6}}>
+          rule: overhang &gt; 40° needs support · vertical LPBF builds → tensile residual stress · SR mandatory before HIP ·
+          witness-line monitored for LPBF chambers (3-decade porosity at restart layers cannot be healed by HIP)
+        </div>
+      </div>
+
+      {/* POST-PROCESS CHAIN */}
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:14}}>POST-PROCESSING CHAIN · LPBF critical part</div>
+        <div style={{display:'flex',alignItems:'stretch',gap:0,overflowX:'auto',paddingBottom:4}}>
+          {POST_STAGES.map((s,i)=>(
+            <div key={s.k} style={{display:'flex',alignItems:'stretch',flex:'0 0 auto'}}>
+              <div style={{minWidth:165,padding:'12px 14px',background:C.canvas3,borderLeft:`3px solid ${s.color}`}}>
+                <div className="mono" style={{fontSize:9.5,color:s.color,letterSpacing:'.12em',marginBottom:6}}>{String(i+1).padStart(2,'0')} · {s.k}</div>
+                <div style={{fontSize:11,color:C.ink,marginBottom:8,lineHeight:1.45}}>{s.desc}</div>
+                <div className="mono" style={{fontSize:9.5,color:C.risk,lineHeight:1.4}}>risk · {s.risk}</div>
+              </div>
+              {i<POST_STAGES.length-1 && <div style={{display:'flex',alignItems:'center',padding:'0 4px',color:C.ink3,fontFamily:'JetBrains Mono'}}>→</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{marginTop:20,fontSize:11,color:C.ink3,fontFamily:"'JetBrains Mono',monospace",lineHeight:1.6}}>
+        ref: GRCop-42 chamber LLAMA failure · 0.29s separation traced to witness-line porosity (3 orders of magnitude vs control after HIP)
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script></body></html>

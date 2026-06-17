@@ -1,0 +1,178 @@
+{
+ "schema": "blueprint_generated_package_v1",
+ "seed": "long_range_recon_wing",
+ "run_id": "20260615_090304",
+ "vehicle": {
+  "id": "wing_long_range",
+  "label": "Recon Wing",
+  "envelope": "1000x200x100 mm",
+  "material": "PETG",
+  "process": "FDM"
+ },
+ "run_meta": {
+  "seed": 42
+ },
+ "schema_v6_blueprint": {
+  "version": "bp-npu-r6",
+  "ts": "2026-06-15T09:03:04Z",
+  "project": "long_range_recon_wing",
+  "object": "Recon Wing",
+  "brief": {
+   "requirements": [],
+   "constraints": {
+    "material": "PETG",
+    "process": "FDM",
+    "envelope_mm": [
+     1000.0,
+     200.0,
+     100.0
+    ],
+    "min_wall_mm": 1.5,
+    "overhang_deg": 45,
+    "tol_mm": 0.2
+   }
+  },
+  "cad_brief": {
+   "name": "Recon Wing",
+   "rev": "1.0",
+   "material": "PETG",
+   "envelope_mm": [
+    1000.0,
+    200.0,
+    100.0
+   ],
+   "build_direction": "Z"
+  },
+  "part_tree": {
+   "id": "asm",
+   "name": "Recon Wing",
+   "qty": 1,
+   "children": [
+    {
+     "id": "new-001",
+     "name": "Spine",
+     "qty": 1,
+     "material": "PETG",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "new-002",
+     "name": "Motor Pod",
+     "qty": 1,
+     "material": "PETG",
+     "process": "FDM",
+     "children": []
+    }
+   ]
+  },
+  "geometry_ops": [
+   {
+    "op": "box",
+    "target": "new-001",
+    "args": {
+     "size_mm": [
+      400,
+      40,
+      30
+     ],
+     "at": [
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   {
+    "op": "cylinder",
+    "target": "new-002",
+    "args": {
+     "diameter_mm": 40,
+     "height_mm": 60,
+     "at": [
+      0,
+      0,
+      0
+     ]
+    }
+   }
+  ]
+ },
+ "generated_parts": [
+  {
+   "id": "new-001",
+   "label": "Spine",
+   "spec": "spar",
+   "blueprint": {
+    "object": "Spine",
+    "geometry_ops": [
+     {
+      "op": "box",
+      "target": "new-001",
+      "args": {
+       "size_mm": [
+        400,
+        40,
+        30
+       ],
+       "at": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    ],
+    "cad_brief": {
+     "material": "PETG",
+     "process": "FDM"
+    },
+    "_subsystem_plan": {
+     "adjacent_interfaces": [
+      {
+       "target_part": "Wing",
+       "interface_type": "mount",
+       "required_feature": "bolt"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "new-002",
+   "label": "Motor Pod",
+   "spec": "motor",
+   "blueprint": {
+    "object": "Motor",
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "target": "new-002",
+      "args": {
+       "diameter_mm": 40,
+       "height_mm": 60,
+       "at": [
+        0,
+        0,
+        0
+       ]
+      }
+     }
+    ],
+    "cad_brief": {
+     "material": "PETG",
+     "process": "FDM"
+    },
+    "_subsystem_plan": {
+     "adjacent_interfaces": [
+      {
+       "target_part": "Spine",
+       "interface_type": "mount",
+       "required_feature": "bolt"
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

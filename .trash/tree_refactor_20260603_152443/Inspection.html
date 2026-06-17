@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Inspection · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Inspection'),100);</script>
+<script type="text/babel">
+const {useState}=React;
+const C={canvas:'#0c1e35',canvas2:'#0a1a2f',canvas3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#ff9fc6',risk:'#ff8c8c'};
+
+// FAI characteristics for BP-V1.2-P7-A0042 (GRCop-42 combustion chamber)
+const FAI = [
+  {ch:'001', feat:'Outer Ø top',      drf:'A',    spec:'Ø140.00 ±0.10',  meas:140.04, nom:140.00, tol:0.10, type:'dim'},
+  {ch:'002', feat:'Outer Ø mid',      drf:'A',    spec:'Ø140.00 ±0.10',  meas:140.07, nom:140.00, tol:0.10, type:'dim'},
+  {ch:'003', feat:'Outer Ø bottom',   drf:'A',    spec:'Ø140.00 ±0.10',  meas:139.96, nom:140.00, tol:0.10, type:'dim'},
+  {ch:'004', feat:'Throat Ø',         drf:'A|B',  spec:'Ø48.00 ±0.05',   meas:48.03,  nom:48.00,  tol:0.05, type:'dim'},
+  {ch:'005', feat:'Chamber length',   drf:'A',    spec:'180.00 ±0.15',   meas:180.08, nom:180.00, tol:0.15, type:'dim'},
+  {ch:'006', feat:'Flange face flatness',drf:'A', spec:'⏥ 0.05',         meas:0.038,  nom:0,      tol:0.05, type:'form'},
+  {ch:'007', feat:'Bolt circle PCD',  drf:'A|B',  spec:'Ø124.00 ±0.05',  meas:124.02, nom:124.00, tol:0.05, type:'dim'},
+  {ch:'008', feat:'Bolt hole pos (8)',drf:'A|B|C',spec:'⊕ Ø0.10 Ⓜ',     meas:0.082,  nom:0,      tol:0.10, type:'gdt'},
+  {ch:'009', feat:'Throat concentricity',drf:'A', spec:'◎ Ø0.08',        meas:0.071,  nom:0,      tol:0.08, type:'gdt'},
+  {ch:'010', feat:'Wall thk min',     drf:'A',    spec:'2.50 +0.30/-0',  meas:2.62,   nom:2.65,   tol:0.30, type:'dim'},
+  {ch:'011', feat:'Cooling ch Ø',     drf:'—',    spec:'Ø1.20 ±0.10',    meas:1.18,   nom:1.20,   tol:0.10, type:'dim'},
+  {ch:'012', feat:'Surface Ra (gas)', drf:'—',    spec:'Ra ≤ 3.2 µm',    meas:2.8,    nom:0,      tol:3.2,  type:'surf'},
+  {ch:'013', feat:'Surface Ra (cool)',drf:'—',    spec:'Ra ≤ 12 µm',     meas:14.2,   nom:0,      tol:12,   type:'surf', fail:true},
+  {ch:'014', feat:'Density (HIP)',    drf:'—',    spec:'≥ 99.5%',        meas:99.82,  nom:100,    tol:0.5,  type:'mat'},
+  {ch:'015', feat:'Witness-line scan',drf:'—',    spec:'no signature',   meas:0,      nom:0,      tol:1,    type:'mat'},
+];
+
+// Deviation map points: pre-baked (x,y,deviation) sampled around chamber outer surface
+const SAMPLES = (()=>{
+  const out=[];
+  for(let i=0;i<28;i++){
+    for(let j=0;j<14;j++){
+      const u=i/27, v=j/13;
+      const noise = Math.sin(u*Math.PI*4)*0.04 + Math.cos(v*Math.PI*3)*0.03 + (u>0.78&&v>0.55?0.08:0);
+      const dev = 0.02*Math.sin(u*6+v*4) + noise + (j===7&&i>20?0.12:0);
+      out.push({u,v,dev:+dev.toFixed(3)});
+    }
+  }
+  return out;
+})();
+
+function colorForDev(d, max=0.15){
+  const t = Math.max(-1, Math.min(1, d/max));
+  if(t>=0){ // hot: red-ish
+    const r=255, g=Math.round(220*(1-t)), b=Math.round(160*(1-t));
+    return `rgb(${r},${g},${b})`;
+  } else { // cold: blue-ish
+    const r=Math.round(159*(1+t)), g=Math.round(211*(1+t*0.5)), b=255;
+    return `rgb(${r},${g},${b})`;
+  }
+}
+
+function status(c){
+  if(c.fail) return 'FAIL';
+  const slack = c.type==='form'||c.type==='gdt'||c.type==='surf'
+    ? (c.tol - c.meas)/c.tol
+    : 1 - Math.abs(c.meas - c.nom)/c.tol;
+  return slack < 0 ? 'FAIL' : slack < 0.2 ? 'MARGINAL' : 'PASS';
+}
+
+function App(){
+  const [sel,setSel]=useState('004');
+  const ch = FAI.find(x=>x.ch===sel);
+  const passed = FAI.filter(c=>status(c)==='PASS').length;
+  const marginal = FAI.filter(c=>status(c)==='MARGINAL').length;
+  const failed = FAI.filter(c=>status(c)==='FAIL').length;
+  const maxDev = Math.max(...SAMPLES.map(s=>Math.abs(s.dev)));
+
+  return (
+    <div style={{maxWidth:1300,margin:'0 auto',padding:'24px 28px 80px'}}>
+      <div style={{borderBottom:`1px solid ${C.frame}`,paddingBottom:18,marginBottom:22}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.2em',marginBottom:6}}>BLUEPRINT NPU · CMM INSPECTION & FAI · AS9102 Form 3</div>
+        <div style={{fontSize:34,fontWeight:500,letterSpacing:'-.02em',marginBottom:8}}>What the printed part actually measured</div>
+        <div style={{fontSize:13,color:C.ink2,maxWidth:880,lineHeight:1.55}}>
+          Serial <span className="mono" style={{color:C.lox}}>BP-V1.2-P7-A0042</span> · GRCop-42 combustion chamber post-HIP.
+          15 GD&amp;T characteristics inspected on CMM + surface profilometer + density scan. One fail (cooling-channel Ra) blocks CoC sign-off.
+        </div>
+      </div>
+
+      {/* Summary tiles */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:18}}>
+        {[
+          ['PART','P7 · V1.2',C.lox],
+          ['CHARACTERISTICS',`${FAI.length}`,C.ink2],
+          ['PASS',`${passed}`,C.inter],
+          ['MARGINAL',`${marginal}`,C.lh2],
+          ['FAIL',`${failed}`,failed?C.risk:C.inter],
+        ].map(([k,v,col],i)=>(
+          <div key={i} style={{border:`1px solid ${col}`,padding:'14px 16px',background:C.canvas2}}>
+            <div className="mono" style={{fontSize:9.5,color:col,letterSpacing:'.14em',marginBottom:6}}>{k}</div>
+            <div style={{fontSize:22,fontWeight:500,color:C.ink,lineHeight:1}}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Deviation heatmap */}
+      <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:14,marginBottom:14}}>
+        <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:12}}>CMM SCAN vs CAD · unrolled outer surface · scale ±0.15 mm</div>
+          <svg viewBox="0 0 560 280" style={{width:'100%',display:'block'}}>
+            <rect x="0" y="0" width="560" height="280" fill={C.canvas3}/>
+            {SAMPLES.map((s,i)=>{
+              const x = 10 + s.u*540;
+              const y = 10 + s.v*260;
+              const w = 540/28, h = 260/14;
+              return <rect key={i} x={x} y={y} width={w} height={h} fill={colorForDev(s.dev)} opacity="0.92"/>;
+            })}
+            {/* axis labels */}
+            <text x="10" y="276" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono">θ 0°</text>
+            <text x="540" y="276" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="end">360°</text>
+            <text x="2"   y="14"  fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono">z+</text>
+            <text x="2"   y="270" fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono">z−</text>
+            {/* annotation: hotspot */}
+            <circle cx="465" cy="155" r="20" fill="none" stroke={C.risk} strokeWidth="1.5"/>
+            <text x="490" y="148" fill={C.risk} fontSize="10" fontFamily="JetBrains Mono">witness</text>
+            <text x="490" y="160" fill={C.risk} fontSize="10" fontFamily="JetBrains Mono">+0.12 mm</text>
+          </svg>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginTop:12,fontSize:10}} className="mono">
+            <span style={{color:C.ink3}}>−0.15</span>
+            <div style={{flex:1,height:8,background:'linear-gradient(to right,#9fd3ff,#0c1e35,#fff,#0c1e35,#ff8c8c)'}}/>
+            <span style={{color:C.ink3}}>+0.15 mm</span>
+          </div>
+          <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:8,lineHeight:1.6}}>
+            max dev {maxDev.toFixed(3)} mm · localized hotspot at θ≈285°, z≈55 mm — witness-line residual from build restart, survived HIP
+          </div>
+        </div>
+
+        <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+          <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:10}}>CH {ch.ch} · {ch.feat}</div>
+          <div style={{fontSize:18,color:C.ink,marginBottom:14}}>{ch.spec}</div>
+          {[
+            ['Datum ref', ch.drf],
+            ['Nominal', ch.type==='dim' ? ch.nom.toFixed(3) : (ch.type==='surf'?'0':'0')],
+            ['Tolerance', `±${ch.tol}`],
+            ['Measured', ch.meas.toFixed(3)],
+            ['Deviation', ch.type==='dim'? (ch.meas-ch.nom).toFixed(3) : ch.meas.toFixed(3)],
+          ].map(([k,v],i)=>(
+            <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:`1px dashed ${C.frame}`}}>
+              <span className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em'}}>{k.toUpperCase()}</span>
+              <span className="mono" style={{fontSize:12,color:C.ink}}>{v}</span>
+            </div>
+          ))}
+          <div style={{marginTop:14,padding:'10px 14px',
+                       background:status(ch)==='FAIL'?'#2a0c14':status(ch)==='MARGINAL'?'#2a200c':'#0c2a1a',
+                       border:`1px solid ${status(ch)==='FAIL'?C.risk:status(ch)==='MARGINAL'?C.lh2:C.inter}`}}>
+            <div className="mono" style={{fontSize:11,color:status(ch)==='FAIL'?C.risk:status(ch)==='MARGINAL'?C.lh2:C.inter,letterSpacing:'.12em'}}>
+              {status(ch)}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* FAI table */}
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18,marginBottom:14}}>
+        <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.16em',marginBottom:12}}>AS9102 FORM 3 · CHARACTERISTIC ACCOUNTABILITY</div>
+        <table style={{width:'100%',borderCollapse:'collapse',fontSize:11}}>
+          <thead><tr style={{color:C.ink3}} className="mono">
+            {['CH','FEATURE','DRF','TYPE','SPEC','MEAS','STATUS'].map(h=>(
+              <th key={h} style={{textAlign:'left',padding:'6px 8px',borderBottom:`1px solid ${C.frame}`,letterSpacing:'.06em'}}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody className="mono">
+            {FAI.map(c=>{
+              const st = status(c);
+              const col = st==='FAIL'?C.risk : st==='MARGINAL'?C.lh2 : C.inter;
+              return (
+                <tr key={c.ch} onClick={()=>setSel(c.ch)} style={{
+                  color:C.ink2,cursor:'pointer',
+                  background:c.ch===sel?'#08152a':'transparent',
+                  borderBottom:`1px dashed #1a3458`}}>
+                  <td style={{padding:'7px 8px',color:C.lox}}>{c.ch}</td>
+                  <td style={{padding:'7px 8px',color:C.ink}}>{c.feat}</td>
+                  <td style={{padding:'7px 8px'}}>{c.drf}</td>
+                  <td style={{padding:'7px 8px',fontSize:9.5,letterSpacing:'.06em'}}>{c.type.toUpperCase()}</td>
+                  <td style={{padding:'7px 8px'}}>{c.spec}</td>
+                  <td style={{padding:'7px 8px',color:C.ink}}>{c.meas}</td>
+                  <td style={{padding:'7px 8px',color:col}}>{st}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* NCR / Disposition */}
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18,marginBottom:14}}>
+        <div className="mono" style={{fontSize:10,color:C.risk,letterSpacing:'.16em',marginBottom:12}}>NON-CONFORMANCE REPORT · NCR-2026-117</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:18}}>
+          <div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>FAILED CHARACTERISTIC</div>
+            <div style={{fontSize:13,color:C.ink,marginBottom:14}}>CH 013 · Cooling channel surface Ra = 14.2 µm (spec ≤ 12 µm)</div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>ROOT CAUSE (preliminary)</div>
+            <div style={{fontSize:12,color:C.ink2,lineHeight:1.6}}>
+              Internal Ø1.2 mm cooling channel built at 90° orientation. As-built down-skin roughness exceeds spec.
+              Abrasive flow machining (AFM) not yet applied to this lot.
+            </div>
+          </div>
+          <div>
+            <div className="mono" style={{fontSize:10,color:C.ink3,letterSpacing:'.08em',marginBottom:6}}>DISPOSITION OPTIONS</div>
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {[
+                {opt:'REWORK · AFM polish 30 min',  cost:'$240',  time:'2 hr',  rec:true},
+                {opt:'USE-AS-IS · MRB engineering analysis', cost:'$0',   time:'8 hr',  rec:false},
+                {opt:'SCRAP · reprint on M5',         cost:'$3,800',time:'9 hr',  rec:false},
+              ].map((d,i)=>(
+                <div key={i} style={{
+                  display:'flex',justifyContent:'space-between',padding:'9px 12px',
+                  border:`1px solid ${d.rec?C.inter:C.frame}`,
+                  background:d.rec?'#0c2a1a':C.canvas3}}>
+                  <span style={{fontSize:11.5,color:C.ink}}>{d.opt}</span>
+                  <span className="mono" style={{fontSize:10,color:C.ink2}}>{d.cost} · {d.time} {d.rec && <span style={{color:C.inter,marginLeft:6}}>← rec</span>}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{background:C.canvas2,border:`1px solid ${C.frame}`,padding:18}}>
+        <div className="mono" style={{fontSize:10,color:C.halo,letterSpacing:'.16em',marginBottom:12}}>SCHEMA · inspection.v0.5 · feeds lineage.fai</div>
+        <pre className="mono" style={{margin:0,fontSize:10.5,lineHeight:1.6,color:C.ink2,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{`{
+  "schema": "inspection.v0.5",
+  "serial": "BP-V1.2-P7-A0042",
+  "method":  ["CMM Zeiss Prismo", "Mitutoyo SJ-410", "Archimedes density"],
+  "characteristics": 15,  "pass": ${passed},  "marginal": ${marginal},  "fail": ${failed},
+  "ncr": "NCR-2026-117",
+  "disposition": "rework-AFM",
+  "coc_blocked_until": "rework-complete"
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script></body></html>

@@ -1,0 +1,84 @@
+{
+  "schema": "blueprint_mrl05_manufacturing_readiness_v1",
+  "seed": "cubesat",
+  "target": {
+    "vehicle_id": "cubesat_3u",
+    "label": "3U CubeSat educational mockup",
+    "scope": "design-thinking and 3D-printable assembly package before STL generation",
+    "not_for": "flight certification, launch hardware, pressure vessel, deployable mission hardware"
+  },
+  "score": 97,
+  "status": "ready",
+  "disclaimer": "MRL-0.5 readiness evidence only; not manufacturing, flight, medical, or certification approval.",
+  "categories": [
+    {
+      "name": "wall/process readiness",
+      "score": 100,
+      "note": "process=FDM, min_wall=1.6, required_floor=1.2"
+    },
+    {
+      "name": "overhang/support readiness",
+      "score": 100,
+      "note": "overhang=45, supports=min, orientation=rail-frame long axis along Z; panels face-down; ladder vertical; hinge barrels horizontal"
+    },
+    {
+      "name": "fastener/joint sanity",
+      "score": 92,
+      "note": "valid fasteners 2/2, clearance joints 3/3"
+    },
+    {
+      "name": "serviceability",
+      "score": 100,
+      "note": "service access points 5, service terms 266, svg markers 1"
+    },
+    {
+      "name": "inspection readiness",
+      "score": 86,
+      "note": "verify pass/warn/fail 4/1/0, inspection terms 83"
+    },
+    {
+      "name": "mass/process traceability",
+      "score": 100,
+      "note": "mass=210g, stl triangles=37856, svg=True"
+    },
+    {
+      "name": "risk coverage",
+      "score": 100,
+      "note": "mitigated risks 5/5, high risks 1"
+    }
+  ],
+  "issues": [],
+  "loop_feedback": "Preserve MRL-0.5 manufacturing evidence for cubesat: keep datum, tolerance, service, inspection, and risk traces while improving geometry.\n- Add or preserve datum/tolerance/inspection statements tied to visible geometry and assembly interfaces.\n- Keep the design at educational mockup level; do not claim certification or real flight/manufacturing readiness.",
+  "evidence": {
+    "stl": {
+      "exists": true,
+      "bytes": 1892884,
+      "triangles": 37856
+    },
+    "svg": {
+      "exists": true,
+      "bytes": 47926,
+      "markers": [
+        "service"
+      ]
+    },
+    "process": "FDM",
+    "material": "PETG",
+    "min_wall_mm": 1.6,
+    "tol_mm": 0.25,
+    "fasteners": 2,
+    "joints": 3,
+    "service_access_points": 5,
+    "verify": {
+      "pass": 4,
+      "warn": 1,
+      "fail": 0,
+      "total": 5
+    },
+    "risks": {
+      "total": 5,
+      "mitigated": 5,
+      "high": 1
+    }
+  }
+}

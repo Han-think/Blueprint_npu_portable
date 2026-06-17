@@ -1,0 +1,43 @@
+{
+  "schema": "blueprint_connection_taxonomy_v1",
+  "id": "connection_types",
+  "title": "Part-to-Part Connection Type Taxonomy",
+  "purpose": "Vocabulary for how parts actually join in an assembly. Every inter-part interface should name a specific connection type from here, with its degrees of freedom (DOF) and a plausible clearance, instead of a vague 'mount'. DOF code: 0=fixed, 1R=revolute(1 rotation), 1T=prismatic(1 translation), 1R1T=cylindrical, 3R=spherical, planar=2T1R.",
+  "source_refs": ["sources/public/machineryshandbo00indu.pdf", "sources/public/McMaster-Carr Catalog 123.pdf", "sources/public/Fastener Design Manual (NASA).pdf"],
+  "families": {
+    "fastened": [
+      {"type": "bolted_through", "dof": 0, "when_to_use": "two parts with back access, repeated disassembly, high preload", "typical_clearance_mm": 0.2, "evidence_features": ["bolt_circle", "clearance_hole", "washer_face", "nut_pocket"], "failure_modes": ["loosening without locking", "no engagement length", "thin wall around hole"]},
+      {"type": "threaded_insert", "dof": 0, "when_to_use": "screw into printed/soft material, repeated cycles", "typical_clearance_mm": 0.0, "evidence_features": ["heat_set_insert_boss", "pilot_hole", "engagement_depth_1p5d"], "failure_modes": ["thread pullout", "insufficient boss wall"]},
+      {"type": "rivet", "dof": 0, "when_to_use": "permanent thin-sheet joint, no back access for nut", "typical_clearance_mm": 0.1, "evidence_features": ["rivet_hole", "edge_distance_2d"], "failure_modes": ["edge tear-out", "wrong grip length"]}
+    ],
+    "form_fit": [
+      {"type": "snap_fit", "dof": 0, "when_to_use": "tool-less, low-load, frequent service covers", "typical_clearance_mm": 0.15, "evidence_features": ["cantilever_hook", "undercut_ledge", "relief_slot"], "failure_modes": ["over-stress on insertion", "creep loosening", "no lead-in chamfer"]},
+      {"type": "press_fit", "dof": 0, "when_to_use": "bearing race, dowel, bushing into bore, permanent location", "typical_clearance_mm": -0.02, "evidence_features": ["interference_bore", "lead_in_chamfer", "shoulder_stop"], "failure_modes": ["cracking thin boss", "loss of fit after thermal cycling"]},
+      {"type": "dovetail_slide", "dof": "1T", "when_to_use": "removable module on a rail, indexed insertion", "typical_clearance_mm": 0.25, "evidence_features": ["dovetail_rail", "slot", "end_stop", "retention_detent"], "failure_modes": ["bind from no clearance", "no retention at end of travel"]},
+      {"type": "keyed_spline", "dof": "1T", "when_to_use": "transmit torque while allowing axial slide, anti-rotation", "typical_clearance_mm": 0.1, "evidence_features": ["key", "keyway", "anti_rotation_flat"], "failure_modes": ["backlash", "key shear under torque"]},
+      {"type": "tongue_groove", "dof": 0, "when_to_use": "aligned panel seam, shear transfer, light seal", "typical_clearance_mm": 0.2, "evidence_features": ["tongue_rib", "groove_channel"], "failure_modes": ["gap from loose fit", "no glue land if bonded"]}
+    ],
+    "pinned_hinged": [
+      {"type": "dowel_pin", "dof": 0, "when_to_use": "precise location between two fastened parts (locate, don't carry load)", "typical_clearance_mm": 0.0, "evidence_features": ["reamed_pin_hole", "pin_pair"], "failure_modes": ["using pins to carry shear meant for bolts"]},
+      {"type": "clevis_pin", "dof": "1R", "when_to_use": "removable single-axis pivot, linkage end", "typical_clearance_mm": 0.2, "evidence_features": ["clevis_lug", "pin_bore", "retaining_clip_groove"], "failure_modes": ["no retention clip", "lug too thin"]},
+      {"type": "revolute_bearing", "dof": "1R", "when_to_use": "continuous rotation joint (robot axis, tilt axis, wheel)", "typical_clearance_mm": 0.05, "evidence_features": ["bearing_seat", "shoulder", "retaining_ring_groove", "axis_label"], "failure_modes": ["no axial retention", "no shoulder to set race"]}
+    ],
+    "clamped": [
+      {"type": "band_clamp", "dof": 0, "when_to_use": "circular butt joint, quick separation plane (stage, duct, tank)", "typical_clearance_mm": 0.3, "evidence_features": ["clamp_band_groove", "v_flange", "tension_screw"], "failure_modes": ["uneven preload", "no anti-slip flange angle"]},
+      {"type": "collar_setscrew", "dof": 0, "when_to_use": "fix a hub on a shaft at adjustable position", "typical_clearance_mm": 0.1, "evidence_features": ["split_collar", "setscrew_hole", "shaft_flat"], "failure_modes": ["marring shaft", "slip without flat"]}
+    ],
+    "bonded": [
+      {"type": "adhesive_lap", "dof": 0, "when_to_use": "lightweight permanent joint, dissimilar materials, sealing", "typical_clearance_mm": 0.1, "evidence_features": ["glue_land", "overlap_area", "fillet_relief"], "failure_modes": ["peel at edge", "no overlap area", "no bond gap for adhesive"]},
+      {"type": "weld_seam", "dof": 0, "when_to_use": "metal structural permanent joint (reference only for mock)", "typical_clearance_mm": 0.0, "evidence_features": ["weld_prep_chamfer", "joint_root"], "failure_modes": ["distortion", "access for weld torch"]}
+    ],
+    "sealed": [
+      {"type": "o_ring", "dof": 0, "when_to_use": "fluid/gas/pressure seal at a joint, serviceable", "typical_clearance_mm": 0.0, "evidence_features": ["o_ring_groove", "gland_dimensions", "lead_in_chamfer"], "failure_modes": ["wrong groove squeeze", "no chamfer cuts ring on assembly"]},
+      {"type": "face_gasket", "dof": 0, "when_to_use": "flat flange seal, low pressure", "typical_clearance_mm": 0.0, "evidence_features": ["gasket_face", "bolt_pattern_around_seal", "raised_seal_land"], "failure_modes": ["uneven bolt spacing leaks", "no seal land"]}
+    ],
+    "routed": [
+      {"type": "connector_mate", "dof": 0, "when_to_use": "electrical/data link between modules, blind or service mate", "typical_clearance_mm": 0.3, "evidence_features": ["connector_pocket", "keying", "strain_relief", "mate_clearance"], "failure_modes": ["no keying mis-mates", "no service clearance to grip"]},
+      {"type": "harness_passthrough", "dof": 0, "when_to_use": "cable crosses a wall or joint", "typical_clearance_mm": 1.0, "evidence_features": ["grommet_hole", "edge_radius", "tie_point", "service_loop"], "failure_modes": ["chafe on sharp edge", "no strain relief", "taut across moving joint"]},
+      {"type": "fluid_manifold", "dof": 0, "when_to_use": "distribute fluid/gas to several ports", "typical_clearance_mm": 0.0, "evidence_features": ["port_bosses", "internal_runner", "seal_face_per_port"], "failure_modes": ["dead-leg", "no seal per port"]}
+    ]
+  }
+}

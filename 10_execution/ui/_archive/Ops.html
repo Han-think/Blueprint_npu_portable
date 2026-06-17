@@ -1,0 +1,198 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Ops · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Ops'),100);</script>
+<script type="text/babel">
+const {useState}=React;
+const C={canvas:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// Life-limited parts ledger — per part: cycles consumed, limit, action.
+// Cycle = one hot-fire (acceptance or mission burn). Refurb = inspect + repair + re-cert.
+const PARTS = [
+  { id:'P8',  name:'Throat insert',          mat:'GRCop-42',   used:7,  limit:10, refurb:'CT scan · re-coat',         cost:'$$',  driver:'HCF · thermal' },
+  { id:'P1',  name:'Chamber barrel',         mat:'GRCop-42',   used:6,  limit:15, refurb:'Borescope · pressure-test', cost:'$$$', driver:'LCF · pressure' },
+  { id:'P10', name:'Gimbal yoke',            mat:'Ti-6Al-4V',  used:4,  limit:5,  refurb:'FPI · NDI',                  cost:'$',   driver:'fatigue · pivot' },
+  { id:'P2',  name:'Forward bulkhead',       mat:'IN718',      used:6,  limit:20, refurb:'Visual · torque check',     cost:'$',   driver:'thermal soak' },
+  { id:'P14', name:'LOX inlet manifold',     mat:'IN718',      used:6,  limit:20, refurb:'He leak · clean',           cost:'$',   driver:'cryo cycle' },
+  { id:'P5',  name:'LH2 feed line',          mat:'316L',       used:6,  limit:25, refurb:'He leak · flush',           cost:'$',   driver:'cryo cycle' },
+  { id:'P12', name:'Cable tray',             mat:'AL-6061',    used:6,  limit:30, refurb:'continuity test',           cost:'$',   driver:'vibe · EMI' },
+  { id:'P9',  name:'Turbopump shaft',        mat:'IN718',      used:5,  limit:8,  refurb:'balance · bearing swap',    cost:'$$$', driver:'HCF · bearing' },
+  { id:'P15', name:'Injector face',          mat:'GRCop-42',   used:7,  limit:12, refurb:'CT · clean orifices',       cost:'$$',  driver:'thermal · soot' },
+  { id:'P4',  name:'Manifold (purge)',       mat:'IN718',      used:6,  limit:20, refurb:'He leak',                   cost:'$',   driver:'pressure cycle' },
+];
+
+const COST_BAR = { '$':1, '$$':2, '$$$':3 };
+
+function bandColor(pct){
+  if(pct>=0.85) return C.risk;
+  if(pct>=0.60) return C.lh2;
+  return C.inter;
+}
+
+// engine SN-001 with 6 cycles consumed (most parts). Compute fleet-wide next-action queue.
+function nextAction(p){
+  const left = p.limit - p.used;
+  if(left<=0) return {label:'REFURB NOW', c:C.risk};
+  if(left<=2) return {label:`REFURB IN ${left}`, c:C.lh2};
+  return {label:`OK · ${left} LEFT`, c:C.inter};
+}
+
+function App(){
+  const [sel,setSel] = useState('P8');
+  const sP = PARTS.find(p=>p.id===sel);
+
+  const needsNow   = PARTS.filter(p=>p.used>=p.limit).length;
+  const needsSoon  = PARTS.filter(p=>p.used<p.limit && (p.limit-p.used)<=2).length;
+  const oneShot    = 0; // none currently
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>Ops</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          Life-limit ledger · engine NPU-A SN-001 · 7 hot-fires logged
+        </span>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'CYCLES',      v:'7',  c:C.lox,   s:'on SN-001'},
+          {k:'TRACKED',     v:PARTS.length, c:C.lox, s:'life-limited parts'},
+          {k:'REFURB NOW',  v:needsNow, c:C.risk, s:'cycles ≥ limit'},
+          {k:'REFURB SOON', v:needsSoon, c:C.lh2, s:'≤2 cycles to go'},
+          {k:'NEXT FIRE',   v:'8', c:C.inter,  s:'mission M-3 LEO'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.c2,padding:'10px 12px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:20,marginTop:4}}>{t.v}</div>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:14}}>
+        {/* fleet ledger with usage bars */}
+        <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+          <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em',marginBottom:10}}>
+            LIFE-LIMIT LEDGER · click row for detail
+          </div>
+          <div className="mono" style={{display:'grid',gridTemplateColumns:'60px 1fr 70px 110px 110px',
+                  fontSize:9.5,letterSpacing:'.08em',color:C.ink3,padding:'4px 0 6px',borderBottom:`1px solid ${C.frame}`}}>
+            <span>PART</span><span>USAGE</span><span style={{textAlign:'right'}}>CYC</span>
+            <span>DRIVER</span><span style={{textAlign:'right'}}>NEXT ACTION</span>
+          </div>
+          {PARTS.map(p=>{
+            const pct = p.used/p.limit;
+            const isSel = sel===p.id;
+            const act = nextAction(p);
+            return (
+              <div key={p.id} onClick={()=>setSel(p.id)}
+                   style={{display:'grid',gridTemplateColumns:'60px 1fr 70px 110px 110px',cursor:'pointer',
+                           padding:'8px 4px',borderBottom:`1px solid ${C.frame}`,
+                           background:isSel?C.c3:'transparent',alignItems:'center'}}>
+                <span className="mono" style={{color:isSel?C.lox:C.ink2,fontSize:11}}>{p.id}</span>
+                <div>
+                  <div className="mono" style={{color:C.ink,fontSize:11,marginBottom:3}}>{p.name}</div>
+                  <div style={{height:6,background:C.c3,border:`1px solid ${C.frame}`,position:'relative'}}>
+                    <div style={{position:'absolute',inset:0,width:`${pct*100}%`,background:bandColor(pct)}}/>
+                  </div>
+                </div>
+                <span className="mono" style={{color:C.ink2,fontSize:10.5,textAlign:'right'}}>{p.used}/{p.limit}</span>
+                <span className="mono" style={{color:C.ink3,fontSize:10}}>{p.driver}</span>
+                <span className="mono" style={{color:act.c,fontSize:9.5,textAlign:'right',letterSpacing:'.06em'}}>{act.label}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* detail + refurb path */}
+        <div style={{display:'grid',gap:14}}>
+          {sP && (
+            <div style={{border:`1px solid ${bandColor(sP.used/sP.limit)}`,background:C.c2,padding:14}}>
+              <div className="mono" style={{color:bandColor(sP.used/sP.limit),fontSize:11,letterSpacing:'.12em',marginBottom:6}}>
+                {sP.id} · {sP.name.toUpperCase()}
+              </div>
+              <div className="mono" style={{color:C.ink3,fontSize:10,marginBottom:14}}>
+                {sP.mat} · driver {sP.driver}
+              </div>
+              {/* cycle gauge */}
+              <div style={{position:'relative',height:18,background:C.c3,border:`1px solid ${C.frame}`,marginBottom:6}}>
+                {Array.from({length:sP.limit}).map((_,i)=>{
+                  const used = i<sP.used;
+                  return <div key={i} style={{position:'absolute',top:0,bottom:0,
+                              left:`${(i/sP.limit)*100}%`,width:`${(1/sP.limit)*100}%`,
+                              borderRight:i<sP.limit-1?`1px solid ${C.frame}`:'none',
+                              background:used?bandColor(sP.used/sP.limit):'transparent'}}/>;
+                })}
+              </div>
+              <div className="mono" style={{display:'flex',justifyContent:'space-between',fontSize:9.5,color:C.ink3}}>
+                <span>0</span>
+                <span style={{color:C.ink}}>{sP.used} / {sP.limit} cycles</span>
+                <span>LIMIT</span>
+              </div>
+
+              <div style={{marginTop:14,padding:10,border:`1px dashed ${C.frame}`}}>
+                <div className="mono" style={{color:C.lh2,fontSize:9.5,letterSpacing:'.12em',marginBottom:6}}>REFURB PROCEDURE</div>
+                <div className="mono" style={{color:C.ink,fontSize:11}}>{sP.refurb}</div>
+                <div className="mono" style={{color:C.ink3,fontSize:10,marginTop:4}}>
+                  cost band {sP.cost} · turnaround &gt;
+                  {sP.cost==='$'?' 3 d':sP.cost==='$$'?' 10 d':' 21 d'}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* refurb cycle diagram */}
+          <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+            <div className="mono" style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:10}}>
+              REFURB CYCLE
+            </div>
+            {[
+              {n:'1',t:'POST-FIRE',d:'engine secured · purge complete'},
+              {n:'2',t:'TEARDOWN',d:'remove life-limited parts'},
+              {n:'3',t:'NDI / CT',d:'flaw screen per Inspection plan'},
+              {n:'4',t:'REPAIR',d:'or scrap if MS<0 · log to Lineage'},
+              {n:'5',t:'RE-CERT',d:'CoC issued · cycle counter reset partial'},
+              {n:'6',t:'REASSY',d:'fixture · torque · leak check'},
+            ].map((s,i)=>(
+              <div key={s.n} style={{display:'flex',gap:10,alignItems:'flex-start',padding:'6px 0',
+                       borderBottom:i<5?`1px solid ${C.frame}`:'none'}}>
+                <span className="mono" style={{color:C.inter,fontSize:10,minWidth:18}}>{s.n}</span>
+                <div style={{flex:1}}>
+                  <div className="mono" style={{color:C.ink,fontSize:10.5,letterSpacing:'.06em'}}>{s.t}</div>
+                  <div className="mono" style={{color:C.ink3,fontSize:10}}>{s.d}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* schema */}
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.c3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · ops.v0.1 · doc BP-OPS-A</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "engine_sn":  "NPU-A-001",
+  "cycles_log": "+1 per hot-fire (acceptance or mission)",
+  "bands":      { "ok":"<60%", "watch":"60–85%", "danger":">85%" },
+  "policy":     { "block_fire_if":"any_part.used >= part.limit",
+                  "warn_at":"part.left <= 2",
+                  "refurb_resets":"partial only · per procedure" },
+  "drivers":    ["HCF","LCF","thermal","cryo cycle","vibe"],
+  "links":      ["parts.P##","fmea.F##","lineage.V#.#"]
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

@@ -1,0 +1,67 @@
+{
+  "schema": "blueprint_step_assembly_structure_v1",
+  "seed": "long_range_recon_wing",
+  "assembly_step": "long_range_recon_wing_assembly.step",
+  "note": "Educational mock assembly geometry — CFD/FEA on this model is for shape comparison and trend review, not absolute performance.",
+  "parts": [
+    {
+      "part_id": "new-001",
+      "label": "Spine",
+      "step_file": "step/new-001_spine.step",
+      "qty": 1,
+      "bbox_mm": [
+        400.0,
+        40.0,
+        30.0
+      ],
+      "placement_translation_mm": [
+        -20.62,
+        0.0,
+        0.0
+      ],
+      "placement_rotation_deg": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "part_id": "new-002",
+      "label": "Motor Pod",
+      "step_file": "step/new-002_motor_pod.step",
+      "qty": 1,
+      "bbox_mm": [
+        40.0,
+        40.0,
+        60.0
+      ],
+      "placement_translation_mm": [
+        200.38,
+        0.0,
+        0.0
+      ],
+      "placement_rotation_deg": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "mates": [
+    {
+      "id": "J1",
+      "kind": "revolute",
+      "part_a": "new-002",
+      "part_b": "new-001",
+      "mate": "face",
+      "clearance_mm": 0.25,
+      "containment": false,
+      "note": "mount: bolt"
+    }
+  ],
+  "consistency": {
+    "parts_exported": 2,
+    "part_tree_roots": 2,
+    "mates_recorded": 1
+  }
+}

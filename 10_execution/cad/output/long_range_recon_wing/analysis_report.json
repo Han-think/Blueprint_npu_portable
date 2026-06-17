@@ -1,0 +1,145 @@
+{
+  "schema": "blueprint_analysis_estimate_v1",
+  "name": "long_range_recon_wing",
+  "seed": "long_range_recon_wing",
+  "disclaimer": "First-order analytical proxy (aero fineness / structural slenderness / self-weight bending FoS / thermal area-per-watt). Computed from geometry + assumed load factor and material allowable — NOT a CFD/FEA solver or certified structural analysis. Shape/sizing trend and comparison only.",
+  "assembly_extent_mm": [
+    564.4,
+    96.1,
+    52.9
+  ],
+  "aero": {
+    "applicable": true,
+    "fineness_ratio": 5.87,
+    "frontal_area_mm2": 5084.0,
+    "cd_estimate": 0.1,
+    "drag_index": 0.5,
+    "score": 90,
+    "findings": [],
+    "solver": {
+      "available": false,
+      "reason": "no OpenFOAM (native/WSL) on this machine",
+      "fallback": "first-order aero proxy retained",
+      "hook": "install OpenFOAM, then this driver meshes fluid_domain.step and runs steady RANS"
+    },
+    "provenance": "proxy:fineness_ratio (CFD solver_unavailable)"
+  },
+  "structural": {
+    "buckling_risk_parts": 0,
+    "worst": [],
+    "score": 100,
+    "findings": []
+  },
+  "sizing": {
+    "applicable": true,
+    "material": "petg",
+    "allowable_mpa": 20.2,
+    "load_factor": 3.0,
+    "fos_target": 1.5,
+    "worst_fos": 9.35,
+    "under_sized_parts": 0,
+    "worst": [
+      {
+        "part_id": "new-005",
+        "label": "replaceable wing, elevon, and skid service modules",
+        "load_model": "carried_system_load",
+        "section_b_mm": 20.0,
+        "section_h_mm": 34.0,
+        "len_mm": 260.0,
+        "bending_stress_mpa": 2.17,
+        "fos": 9.35,
+        "ok": true
+      },
+      {
+        "part_id": "new-001",
+        "label": "integrated center spine and spar socket core",
+        "load_model": "carried_system_load",
+        "section_b_mm": 34.6,
+        "section_h_mm": 57.9,
+        "len_mm": 256.0,
+        "bending_stress_mpa": 0.43,
+        "fos": 47.56,
+        "ok": true
+      },
+      {
+        "part_id": "new-003",
+        "label": "slide-in mission payload and battery CG rail module",
+        "load_model": "self_weight",
+        "section_b_mm": 18.0,
+        "section_h_mm": 32.0,
+        "len_mm": 72.0,
+        "bending_stress_mpa": 0.02,
+        "fos": 1114.79,
+        "ok": true
+      },
+      {
+        "part_id": "new-002",
+        "label": "removable sensor nose and pitot boom module",
+        "load_model": "self_weight",
+        "section_b_mm": 34.0,
+        "section_h_mm": 38.0,
+        "len_mm": 78.0,
+        "bending_stress_mpa": 0.02,
+        "fos": 1127.99,
+        "ok": true
+      },
+      {
+        "part_id": "new-004",
+        "label": "serviceable propulsion-display and rear cable module",
+        "load_model": "self_weight",
+        "section_b_mm": 22.0,
+        "section_h_mm": 26.0,
+        "len_mm": 48.0,
+        "bending_stress_mpa": 0.01,
+        "fos": 2037.98,
+        "ok": true
+      }
+    ],
+    "score": 100,
+    "findings": [],
+    "total_mass_kg": 1.0905,
+    "density_g_mm3": 0.00127,
+    "fea": {
+      "ok": true,
+      "solver": "euler_bernoulli_beam_fe_numpy",
+      "elements": 8,
+      "I_mm4": 65506.7,
+      "EI_Nmm2": 137564000.0,
+      "tip_deflection_mm": 1.4724,
+      "max_bending_moment_Nmm": 9201.1,
+      "max_bending_stress_mpa": 2.39,
+      "fos": 8.46,
+      "member": "new-005",
+      "material": "petg"
+    },
+    "provenance": "solver:euler_bernoulli_beam_fe_numpy",
+    "solver_fos": 8.46,
+    "solver_max_stress_mpa": 2.39
+  },
+  "thermal": {
+    "applicable": true,
+    "total_power_w": 15.0,
+    "surface_cm2": 1087.0,
+    "cm2_per_w": 72.5,
+    "score": 100,
+    "findings": []
+  },
+  "kinematic": {
+    "applicable": true,
+    "joints": [
+      {
+        "joint": "J4",
+        "mover": "new-001",
+        "swept_radius_mm": 128.0,
+        "clearance_mm": 0.2,
+        "ok": true
+      }
+    ],
+    "score": 100,
+    "findings": []
+  },
+  "score": 98,
+  "status": "ok",
+  "findings": [],
+  "loop_feedback": "Analytical first-order estimate for long_range_recon_wing: ok, score 98/100 (trend-level, not a solver).\n- These are empirical proxies for shape comparison; do not claim certified performance."
+}

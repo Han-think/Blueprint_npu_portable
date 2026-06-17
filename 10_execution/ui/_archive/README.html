@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Blueprint NPU · README</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('README'),100);</script>
+<script type="text/babel">
+const C={canvas:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff'};
+
+const PAGES = [
+  // structure
+  { id:'Assembly',   href:'Assembly.html',   cluster:'STRUCTURE',  q:'어떻게 생겼고 어떻게 조립되나', a:'부품 트리 · 단계별 조립 · 좌표',  links:['joints','mass'] },
+  { id:'Joints',     href:'Joints.html',     cluster:'STRUCTURE',  q:'부품 사이 연결은',       a:'Hi-Lok · V-band · 용접 · datum',       links:['assembly','loads'] },
+  { id:'Mass',       href:'Mass.html',       cluster:'STRUCTURE',  q:'전체 무게는',           a:'질량 집계 · CG · MOI',                 links:['assembly','loads'] },
+
+  // material/process
+  { id:'Materials',  href:'Materials.html',  cluster:'MATERIAL',   q:'무슨 재료로',           a:'GRCop-42 · IN718 · Ti64 spec',         links:['parts','thermal'] },
+  { id:'PrintQueue', href:'PrintQueue.html', cluster:'MATERIAL',   q:'어떻게 만드나',         a:'LPBF 빌드 큐 · 후처리 체인',           links:['materials','inspection'] },
+  { id:'Inspection', href:'Inspection.html', cluster:'MATERIAL',   q:'검사는 어떻게',         a:'CMM · CT · FAI 보고서',                links:['printqueue','test'] },
+  { id:'Supply',     href:'Supply.html',     cluster:'MATERIAL',   q:'자재 어디서 사나',      a:'BOM · vendor lot · CoC',              links:['parts','lineage'] },
+
+  // analysis
+  { id:'Loads',      href:'Loads.html',      cluster:'ANALYSIS',   q:'하중은 얼마나',         a:'load case · margin of safety',         links:['parts','test'] },
+  { id:'Thermal',    href:'Thermal.html',    cluster:'ANALYSIS',   q:'온도는 얼마나',         a:'열 지도 · regen cooling',              links:['materials','loads'] },
+  { id:'Test',       href:'Test.html',       cluster:'ANALYSIS',   q:'어떻게 검증',          a:'hot-fire · coupon · FAI',              links:['fmea','loads'] },
+  { id:'FMEA',       href:'FMEA.html',       cluster:'ANALYSIS',   q:'무엇이 망가질까',       a:'failure mode · RPN · mitigation',      links:['test','ops'] },
+
+  // ops/cm
+  { id:'Lineage',    href:'Lineage.html',    cluster:'OPS',        q:'어느 버전인가',         a:'V1→V1.2 design tree · serial',         links:['supply','ecn'] },
+  { id:'Ops',        href:'Ops.html',        cluster:'OPS',        q:'얼마나 쓸수있나',       a:'life limit · refurb · cycle',          links:['fmea','inspection'] },
+  { id:'ECN',        href:'ECN.html',        cluster:'OPS',        q:'설계변경은',           a:'change notice · approval · close-out',  links:['lineage','ecn'] },
+  { id:'ICD',        href:'ICD.html',        cluster:'OPS',        q:'기체와 인터페이스',     a:'mount · power · fluid · TVC',          links:['structure','loads'] },
+];
+
+const CLUSTERS = {
+  STRUCTURE:{c:C.lox,   desc:'무엇을 만드나'},
+  MATERIAL: {c:C.lh2,   desc:'무엇으로 / 어떻게'},
+  ANALYSIS: {c:C.inter, desc:'정말 작동하나'},
+  OPS:      {c:C.halo,  desc:'시간이 지나면'},
+};
+
+function App(){
+  return (
+    <div style={{maxWidth:1100,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:6}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>README</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>
+          Blueprint NPU · 16 docs · v0.4 · 2026-04-27
+        </span>
+      </div>
+      <div style={{color:C.ink2,fontSize:13,lineHeight:1.6,marginBottom:22,maxWidth:780}}>
+        하나의 액체 로켓 엔진을 설계·제작·운영하는 데 필요한 모든 문서의 색인.
+        각 문서는 한 가지 질문에 답하고, 인접 문서로 연결됩니다. AS9100 흐름을 따릅니다.
+      </div>
+
+      {/* clusters */}
+      {Object.entries(CLUSTERS).map(([k,v])=>(
+        <div key={k} style={{marginBottom:22}}>
+          <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:8,
+                      paddingBottom:6,borderBottom:`1px solid ${v.c}`}}>
+            <span className="mono" style={{color:v.c,fontSize:11,letterSpacing:'.16em'}}>{k}</span>
+            <span className="mono" style={{color:C.ink3,fontSize:11}}>· {v.desc}</span>
+            <span style={{flex:1}}/>
+            <span className="mono" style={{color:C.ink3,fontSize:10}}>
+              {PAGES.filter(p=>p.cluster===k).length} docs
+            </span>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:10}}>
+            {PAGES.filter(p=>p.cluster===k).map(p=>(
+              <a key={p.id} href={p.href}
+                style={{display:'block',border:`1px solid ${C.frame}`,background:C.c2,
+                        padding:'12px 14px',textDecoration:'none',
+                        borderLeft:`3px solid ${v.c}`}}>
+                <div style={{display:'flex',alignItems:'baseline',gap:10,marginBottom:4}}>
+                  <span className="mono" style={{color:v.c,fontSize:12}}>{p.id}</span>
+                  <span className="mono" style={{color:C.ink3,fontSize:9.5}}>·</span>
+                  <span style={{color:C.ink2,fontSize:11}}>{p.q}</span>
+                </div>
+                <div style={{color:C.ink,fontSize:11.5,lineHeight:1.5}}>{p.a}</div>
+                <div className="mono" style={{color:C.ink3,fontSize:9,marginTop:6,letterSpacing:'.08em'}}>
+                  → {p.links.join(' · ')}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* reading paths */}
+      <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:16,marginBottom:16}}>
+        <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em',marginBottom:10}}>READING PATHS</div>
+        <div style={{display:'grid',gridTemplateColumns:'120px 1fr',gap:'8px 14px',fontSize:11.5,lineHeight:1.6}}>
+          {[
+            ['신규 검토자', 'README → Assembly → Joints → Test'],
+            ['제조',       'Supply → Materials → PrintQueue → Inspection → Lineage'],
+            ['설계 변경', 'ECN → Lineage → Assembly → Joints → Mass'],
+            ['이상 분석', 'FMEA → Test → Inspection → ECN'],
+            ['통합·인터페이스', 'ICD → Assembly → Loads → Mass'],
+            ['운영', 'Ops → FMEA → Inspection → Lineage'],
+          ].map(([k,v])=>(
+            <React.Fragment key={k}>
+              <span className="mono" style={{color:C.ink3,fontSize:10.5,letterSpacing:'.06em'}}>{k}</span>
+              <span className="mono" style={{color:C.ink,fontSize:10.5}}>{v}</span>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* standards / metadata */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+        <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+          <div className="mono" style={{color:C.inter,fontSize:11,letterSpacing:'.12em',marginBottom:8}}>STANDARDS</div>
+          <div className="mono" style={{fontSize:10.5,color:C.ink2,lineHeight:1.7}}>
+            <div>ASME Y14.5-2018 · GD&amp;T · datum reference frame</div>
+            <div>AS9100D · aerospace quality management</div>
+            <div>MIL-DTL-38999 · circular connectors</div>
+            <div>MIL-STD-1540 · environmental test</div>
+            <div>NASA-STD-6030 · AM for spaceflight</div>
+            <div>ECSS-Q-ST-70-80C · AM space materials</div>
+          </div>
+        </div>
+        <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+          <div className="mono" style={{color:C.lh2,fontSize:11,letterSpacing:'.12em',marginBottom:8}}>CONVENTIONS</div>
+          <div className="mono" style={{fontSize:10.5,color:C.ink2,lineHeight:1.7}}>
+            <div>P## · part &nbsp;·&nbsp; J## · joint &nbsp;·&nbsp; F## · failure mode</div>
+            <div>ECN-### · engineering change notice</div>
+            <div>units · SI (mm, kg, N, MPa, K) · time UTC</div>
+            <div>colors · LOX/blue · LH2 fuel/orange · interface/green · halo/purple</div>
+            <div>T-0 · build lock for current SN (Supply)</div>
+            <div>schema versions printed on each page footer</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{marginTop:18,padding:'12px 14px',border:`1px dashed ${C.frame}`,fontSize:10.5,
+                  color:C.ink3,lineHeight:1.6}} className="mono">
+        Blueprint NPU © 2026 · for design review only · not flight-released ·
+        all serial numbers fictional · figures illustrative
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

@@ -1,0 +1,50 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "datum_tolerance",
+  "title": "Datum, Interface, and Tolerance Judgment",
+  "applies_to": ["all"],
+  "criteria": [
+    {
+      "criterion": "datum_visibility",
+      "weight": 11,
+      "good": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+      "bad": "Interfaces exist only as abstract neighbor references.",
+      "signals": ["datum", "axis_ring", "rail", "socket", "mounting_pad", "interface_zone"],
+      "loop_feedback": "Add visible datum pads or axis/rail/socket features and label their mating function."
+    },
+    {
+      "criterion": "clearance_named",
+      "weight": 8,
+      "good": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+      "bad": "Moving/removable joints have no clearance or fit language.",
+      "signals": ["clearance_mm", "tol_mm", "fit", "slip", "snap", "pin"],
+      "loop_feedback": "Add clearance_mm or tolerance notes for hinge pins, slide rails, sockets, and removable cartridges."
+    },
+    {
+      "criterion": "interface_count",
+      "weight": 8,
+      "good": "Each subsystem has at least three adjacent interfaces or datums.",
+      "bad": "Subsystem is isolated and does not show assembly neighbors.",
+      "signals": ["adjacent_interfaces", "target_part", "interface_type"],
+      "loop_feedback": "Add at least three adjacent interfaces: mount, service, electrical/data, flow, or inspection datum."
+    },
+    {
+      "criterion": "standard_fit_vocabulary",
+      "weight": 8,
+      "good": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+      "bad": "All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance.",
+      "signals": ["clearance_fit", "transition_fit", "press_fit", "allowance_mm", "H7", "shaft_basis"],
+      "loop_feedback": "Classify each mating diameter as clearance/transition/press fit and add a numeric allowance instead of line-to-line nominals.",
+      "source_refs": ["sources/public/machineryshandbo00indu.pdf"]
+    },
+    {
+      "criterion": "standard_hardware_dimensioning",
+      "weight": 7,
+      "good": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+      "bad": "Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin.",
+      "signals": ["M3", "M4", "bearing_od", "dowel_pin", "catalog_size"],
+      "loop_feedback": "Snap hole, pin, and bearing dimensions to standard catalog sizes and name the intended hardware in callouts.",
+      "source_refs": ["sources/public/McMaster-Carr Catalog 123.pdf"]
+    }
+  ]
+}

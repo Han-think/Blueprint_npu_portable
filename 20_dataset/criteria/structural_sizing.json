@@ -1,0 +1,49 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "structural_sizing",
+  "title": "First-Order Structural Sizing Judgment",
+  "applies_to": ["all"],
+  "purpose": "Dimensions must be defended by a load path and a first-order margin, not chosen by appearance. Taught here, measured by analysis_estimate.sizing (computed bending stress / Factor of Safety vs material allowable). Educational first-order check, NOT a certified structural analysis.",
+  "criteria": [
+    {
+      "criterion": "load_path_declared",
+      "weight": 10,
+      "good": "Each primary structural member states what load it carries and how it reacts into the datum (cantilever root, simply supported, axial, shear pin).",
+      "bad": "Members exist with no stated load, support condition, or reaction path.",
+      "signals": ["load_path", "reaction", "cantilever", "support", "axial_load", "bending", "shear", "preload_N", "load_case"],
+      "loop_feedback": "Declare each primary member's load case (force/moment), support condition, and reaction into the datum so its cross-section can be sized."
+    },
+    {
+      "criterion": "factor_of_safety",
+      "weight": 10,
+      "good": "Cross-sections give a stated or derivable Factor of Safety >= 1.5 against the declared load using the part material allowable.",
+      "bad": "No margin stated; cross-sections appear arbitrary relative to load.",
+      "signals": ["factor_of_safety", "FoS", "margin_of_safety", "MoS", "safety_factor", "allowable_stress", "yield_mpa"],
+      "loop_feedback": "Size primary members to a Factor of Safety >= 1.5: increase section depth, add ribs/bracing, or raise wall thickness where the computed bending stress approaches the material allowable."
+    },
+    {
+      "criterion": "section_sizing",
+      "weight": 8,
+      "good": "Long members use depth/section modulus (ribs, I/box section, tube) appropriate to bending, not flat slender bars.",
+      "bad": "Long members are thin slender bars with low section modulus that buckle or deflect.",
+      "signals": ["section_modulus", "moment_of_inertia", "rib", "box_section", "I_section", "tube", "wall_thickness_mm", "second_moment"],
+      "loop_feedback": "Raise section modulus on long members: add depth, ribs, a box/tube section, or bracing instead of a flat slender bar."
+    },
+    {
+      "criterion": "material_allowable_named",
+      "weight": 7,
+      "good": "Material and its allowable (yield/tensile, with FDM layer-adhesion knockdown for printed parts) are named and used to justify wall and section.",
+      "bad": "Material is unnamed or allowable stress is never referenced when sizing.",
+      "signals": ["material", "yield_mpa", "tensile_mpa", "allowable", "knockdown", "layer_adhesion", "PETG", "PLA", "aluminum"],
+      "loop_feedback": "Name the material allowable (and FDM knockdown for printed parts) and use it when justifying wall thickness and section size."
+    },
+    {
+      "criterion": "fastener_joint_sizing",
+      "weight": 6,
+      "good": "Bolted/pinned joints state fastener size, count, and a shear/preload rationale matched to the joint load.",
+      "bad": "Joints show holes with no fastener size, count, or shear/preload justification.",
+      "signals": ["fastener_shear", "bolt_shear", "preload_N", "torque_Nm", "pin_shear", "bearing_stress", "fastener_count"],
+      "loop_feedback": "For each loaded joint state fastener size, count, and shear/preload capacity vs the joint load."
+    }
+  ]
+}

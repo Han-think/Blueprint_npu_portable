@@ -1,0 +1,81 @@
+{
+ "version": "bp-assembly-v1",
+ "target": "haptic_glove_pair",
+ "fasteners": [
+  {
+   "id": "f-lid-screw",
+   "standard": "M2",
+   "kind": "screw",
+   "length_mm": 6,
+   "anchor": "corners_4",
+   "joins": [
+    "new-001",
+    "new-003"
+   ],
+   "hole": "clearance",
+   "torque_Ncm": 20,
+   "note": "dorsal lid screws secure electronics/actuator module under the control lid"
+  },
+  {
+   "id": "f-hinge-pin",
+   "standard": "D3",
+   "kind": "pin",
+   "length_mm": 16,
+   "anchor": "finger_joint",
+   "joins": [
+    "new-002",
+    "new-001"
+   ],
+   "hole": "clearance",
+   "note": "finger linkage hinge pin into dorsal module knuckle row"
+  },
+  {
+   "id": "f-actuator-screw",
+   "standard": "M2",
+   "kind": "screw",
+   "length_mm": 5,
+   "anchor": "knuckle_row",
+   "joins": [
+    "new-001",
+    "new-003"
+   ],
+   "hole": "tap",
+   "torque_Ncm": 18
+  }
+ ],
+ "joints": [
+  {
+   "id": "j-linkage-slide",
+   "partA": "new-002",
+   "partB": "new-001",
+   "mate": "slot",
+   "clearance_mm": 0.25
+  },
+  {
+   "id": "j-band-buckle",
+   "partA": "new-004",
+   "partB": "new-001",
+   "mate": "snap",
+   "clearance_mm": 0.4,
+   "note": "wrist band quick-release buckle snaps onto dorsal control module"
+  },
+  {
+   "id": "J4",
+   "partA": "new-003",
+   "partB": "new-001",
+   "mate": "snap",
+   "clearance_mm": 0.3,
+   "note": "flexion-resistance actuator snaps into dorsal knuckle-row mount"
+  }
+ ],
+ "hardware_bom": [
+  {
+   "standard": "M2 screw",
+   "qty": 26
+  },
+  {
+   "standard": "D3 pin",
+   "qty": 10
+  }
+ ]
+}

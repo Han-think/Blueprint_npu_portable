@@ -1,0 +1,251 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>Test · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('Test'),100);</script>
+<script type="text/babel">
+const {useState,useMemo}=React;
+const C={canvas:'#0c1e35',c2:'#0a1a2f',c3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// Test campaign · 4 categories · MIL-STD-810 / AS9100 verification chain
+// each test closes specific FMEA modes (cross-ref)
+const CATS = [
+  {id:'coupon',  name:'COUPON',   desc:'Material qualification on witness specimens', c:C.lox},
+  {id:'component', name:'COMPONENT', desc:'Single-part proof / leak / fatigue', c:C.lh2},
+  {id:'subassy', name:'SUBASSY',  desc:'Joined-part fit, alignment, vibration',  c:C.inter},
+  {id:'hotfire', name:'HOT-FIRE', desc:'Full engine test stand campaign',  c:C.halo},
+];
+
+const TESTS = [
+  // coupon
+  {id:'T-CP01', cat:'coupon', name:'GRCop-42 tensile (built+HIP)', spec:'AMS 4999 / ASTM E8', n:6, freq:'every 5 builds',
+   closes:['F01','F03'], pass:'UTS ≥ 320 MPa · El ≥ 25%', status:'PASS', last:'2026-04-18', val:'342 MPa · 28.4%'},
+  {id:'T-CP02', cat:'coupon', name:'GRCop-42 LCF @ 540°C', spec:'ASTM E606', n:3, freq:'every 5 builds',
+   closes:['F01','F10'], pass:'Nf ≥ 10⁴ cycles @ ±0.4% strain', status:'PASS', last:'2026-04-18', val:'1.4×10⁴ cyc'},
+  {id:'T-CP03', cat:'coupon', name:'IN718 creep @ 650°C', spec:'AMS 5663 / ASTM E139', n:3, freq:'every 5 builds',
+   closes:['F03'], pass:'≤ 0.1% strain @ 100h / 690 MPa', status:'PASS', last:'2026-04-12', val:'0.07%'},
+  {id:'T-CP04', cat:'coupon', name:'Ti-6Al-4V tensile (HIP+aged)', spec:'AMS 4999', n:6, freq:'every build',
+   closes:['F09'], pass:'UTS ≥ 895 MPa · El ≥ 10%', status:'PASS', last:'2026-04-20', val:'948 MPa · 13.1%'},
+  {id:'T-CP05', cat:'coupon', name:'Hi-Lok Ti bolt tensile (post-bake)', spec:'NASM 1312-8', n:10, freq:'every lot',
+   closes:['F05'], pass:'≥ 95 ksi shear · no H₂ embrittle (24h sustained)', status:'WAIT', last:'—', val:'in queue'},
+  {id:'T-CP06', cat:'coupon', name:'IN625 fatigue surface effect', spec:'ASTM E466', n:4, freq:'qualification',
+   closes:['F07'], pass:'HCF limit ≥ 240 MPa @ Ra ≤ 8µm', status:'PASS', last:'2026-03-05', val:'258 MPa'},
+
+  // component
+  {id:'T-CO01', cat:'component', name:'P7 chamber proof pressure', spec:'CT-scan + 1.5× MEOP', n:1, freq:'every unit',
+   closes:['F01','F02'], pass:'No yield · no leak · no CT defect ≥ Ø0.3mm', status:'PASS', last:'2026-04-22', val:'15.0 MPa held 5min'},
+  {id:'T-CO02', cat:'component', name:'P7 cooling channel ΔP', spec:'Flow bench · 3 MPa N₂', n:1, freq:'every unit',
+   closes:['F02','F13'], pass:'ΔP ≤ 0.42 MPa @ 1.2 kg/s', status:'FAIL', last:'2026-04-22', val:'0.49 MPa'},
+  {id:'T-CO03', cat:'component', name:'P3 turbine housing burst margin', spec:'Hydrostatic to 2.0× MEOP', n:1, freq:'qualification',
+   closes:['F03'], pass:'No rupture · ΔØ ≤ 0.15mm', status:'PASS', last:'2026-03-28', val:'ΔØ 0.09mm'},
+  {id:'T-CO04', cat:'component', name:'P9 nozzle skirt mass', spec:'Mass.v0.3 budget', n:1, freq:'every unit',
+   closes:['F04'], pass:'≤ 14.20 kg', status:'FAIL', last:'2026-04-25', val:'14.97 kg (+5.4%)'},
+  {id:'T-CO05', cat:'component', name:'P10 yoke FPI dye penetrant', spec:'ASTM E1417', n:1, freq:'every 5 hot-fires',
+   closes:['F09'], pass:'No indication > 0.5mm', status:'PASS', last:'2026-04-19', val:'clean'},
+  {id:'T-CO06', cat:'component', name:'P8 throat CMM erosion', spec:'CMM · ±0.02mm', n:1, freq:'every hot-fire',
+   closes:['F10'], pass:'Ø ≤ 48.30mm', status:'PASS', last:'2026-04-26', val:'Ø 48.11mm'},
+  {id:'T-CO07', cat:'component', name:'P6 HX thermal performance', spec:'LH2 cold-flow', n:1, freq:'every unit',
+   closes:['F13'], pass:'Q ≥ 0.85× predicted', status:'WAIT', last:'—', val:'scheduled W18'},
+  {id:'T-CO08', cat:'component', name:'P11 injector flow bench', spec:'Water flow · Kw 0.95±0.03', n:1, freq:'every 3 hot-fires',
+   closes:['F08'], pass:'Cd within ±3% · no orifice blocked', status:'PASS', last:'2026-04-24', val:'Cd 0.948'},
+
+  // subassy
+  {id:'T-SA01', cat:'subassy', name:'J1 V-band He leak', spec:'MIL-STD-1576 · 1×10⁻⁵ scc/s', n:1, freq:'every assy',
+   closes:['F06'], pass:'≤ 1×10⁻⁵ scc/s after 3 thermal cycles', status:'PASS', last:'2026-04-25', val:'4.2×10⁻⁶'},
+  {id:'T-SA02', cat:'subassy', name:'P3+P4+P7+P8 alignment', spec:'Optical fixture · runout', n:1, freq:'every assy',
+   closes:['F14'], pass:'TIR ≤ 0.40mm at throat', status:'WAIT', last:'—', val:'pending stack rework'},
+  {id:'T-SA03', cat:'subassy', name:'P5 LH2 line flow', spec:'Cold-flow LN2 surrogate', n:1, freq:'every unit',
+   closes:['F07'], pass:'ṁ ≥ 0.95× nominal', status:'PASS', last:'2026-04-21', val:'0.97×'},
+  {id:'T-SA04', cat:'subassy', name:'Full-engine sine vibe', spec:'MIL-STD-810 · 5-2000 Hz', n:1, freq:'qualification',
+   closes:['F06','F09'], pass:'No mode shift > 5% post-vibe', status:'PASS', last:'2026-04-15', val:'Δf 2.1%'},
+  {id:'T-SA05', cat:'subassy', name:'Gimbal sweep range', spec:'±8° pitch/yaw · 2 Hz', n:1, freq:'every assy',
+   closes:['F09'], pass:'Full travel · no bind · torque < 12 N·m', status:'PASS', last:'2026-04-23', val:'10.2 N·m'},
+
+  // hot-fire
+  {id:'T-HF01', cat:'hotfire', name:'5s ignition validation', spec:'Stand A · LOX/LH2', n:1, freq:'milestone',
+   closes:['F08','F10'], pass:'Pc rise ≤ 250ms · stable to t=5s', status:'PASS', last:'2026-04-02', val:'Pc rise 198ms'},
+  {id:'T-HF02', cat:'hotfire', name:'30s nominal Pc soak', spec:'Stand A · 10 MPa Pc', n:1, freq:'milestone',
+   closes:['F01','F02','F10'], pass:'Pc within ±2% · no leak · throat ΔØ ≤ 0.1mm', status:'PASS', last:'2026-04-11', val:'±1.4% · ΔØ 0.06'},
+  {id:'T-HF03', cat:'hotfire', name:'120s mission-duty cycle', spec:'Stand A · 3 throttle pts', n:1, freq:'milestone',
+   closes:['F08','F10'], pass:'Isp ≥ 442s · no instability', status:'WAIT', last:'—', val:'planned W19'},
+  {id:'T-HF04', cat:'hotfire', name:'Gimbaled hot-fire (±5° sweep)', spec:'Stand A', n:1, freq:'milestone',
+   closes:['F09'], pass:'No FPI indication post-fire · TVC lag ≤ 80ms', status:'WAIT', last:'—', val:'planned W20'},
+];
+
+const STATUS_C = {PASS:C.inter, FAIL:C.risk, WAIT:C.lh2, SKIP:C.ink3};
+
+function App(){
+  const [cat,setCat] = useState('all');
+  const [sel,setSel] = useState('T-CO02');
+
+  const filtered = useMemo(()=> cat==='all' ? TESTS : TESTS.filter(t=>t.cat===cat), [cat]);
+  const sT = TESTS.find(t=>t.id===sel);
+
+  const stats = useMemo(()=>{
+    const total=TESTS.length;
+    const pass=TESTS.filter(t=>t.status==='PASS').length;
+    const fail=TESTS.filter(t=>t.status==='FAIL').length;
+    const wait=TESTS.filter(t=>t.status==='WAIT').length;
+    return {total,pass,fail,wait,pct:Math.round(pass/total*100)};
+  },[]);
+
+  // FMEA closure coverage
+  const fmeaClosed = useMemo(()=>{
+    const all=new Set();
+    TESTS.forEach(t=>t.closes.forEach(f=>all.add(f)));
+    const passing=new Set();
+    TESTS.filter(t=>t.status==='PASS').forEach(t=>t.closes.forEach(f=>passing.add(f)));
+    return {total:all.size, closed:passing.size, list:[...all].sort()};
+  },[]);
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>Test</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>Verification campaign · MIL-STD-810 / AS9100 · {TESTS.length} tests</span>
+      </div>
+
+      {/* summary */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'TESTS',     v:stats.total, c:C.lox,   s:'total in campaign'},
+          {k:'PASS',      v:stats.pass,  c:C.inter, s:`${stats.pct}% complete`},
+          {k:'FAIL',      v:stats.fail,  c:C.risk,  s:'blocks release'},
+          {k:'WAIT',      v:stats.wait,  c:C.lh2,   s:'scheduled / queued'},
+          {k:'FMEA CLOSED', v:`${fmeaClosed.closed}/${fmeaClosed.total}`, c:C.halo, s:'modes verified'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.c2,padding:'12px 14px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:22,marginTop:4}}>{t.v}</div>
+            <div className="mono" style={{color:C.ink3,fontSize:10}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* category chips */}
+      <div style={{display:'flex',gap:6,marginBottom:10,flexWrap:'wrap'}}>
+        <button onClick={()=>setCat('all')} className="mono"
+          style={{fontSize:10,letterSpacing:'.08em',padding:'4px 10px',
+                  background:cat==='all'?C.ink:'transparent',color:cat==='all'?C.canvas:C.ink2,
+                  border:`1px solid ${cat==='all'?C.ink:C.frame}`,cursor:'pointer'}}>ALL</button>
+        {CATS.map(k=>(
+          <button key={k.id} onClick={()=>setCat(k.id)} className="mono"
+            style={{fontSize:10,letterSpacing:'.08em',padding:'4px 10px',
+                    background:cat===k.id?k.c:'transparent',color:cat===k.id?C.canvas:C.ink2,
+                    border:`1px solid ${cat===k.id?k.c:C.frame}`,cursor:'pointer'}}>
+            {k.name} · {TESTS.filter(t=>t.cat===k.id).length}
+          </button>
+        ))}
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'1fr 380px',gap:14}}>
+        {/* table */}
+        <div style={{border:`1px solid ${C.frame}`,background:C.c2,padding:14}}>
+          <table className="mono" style={{width:'100%',borderCollapse:'collapse',fontSize:10.5}}>
+            <thead><tr style={{color:C.ink3,borderBottom:`1px solid ${C.frame}`}}>
+              <th style={{textAlign:'left',padding:'5px 6px'}}>ID</th>
+              <th style={{textAlign:'left',padding:'5px 6px'}}>TEST</th>
+              <th style={{textAlign:'left',padding:'5px 6px'}}>SPEC</th>
+              <th style={{textAlign:'right',padding:'5px 6px'}}>n</th>
+              <th style={{textAlign:'left',padding:'5px 6px'}}>FMEA</th>
+              <th style={{textAlign:'left',padding:'5px 6px'}}>RESULT</th>
+              <th style={{padding:'5px 6px'}}>STAT</th>
+            </tr></thead>
+            <tbody>
+            {filtered.map(t=>{
+              const catObj = CATS.find(c=>c.id===t.cat);
+              return (
+                <tr key={t.id} onClick={()=>setSel(t.id)}
+                    style={{cursor:'pointer',background:sel===t.id?'rgba(159,211,255,0.08)':'transparent',
+                            borderBottom:`1px dashed ${C.frame}`}}>
+                  <td style={{padding:'4px 6px',color:catObj.c}}>{t.id}</td>
+                  <td style={{padding:'4px 6px',color:C.ink}}>{t.name}</td>
+                  <td style={{padding:'4px 6px',color:C.ink3,fontSize:9.5}}>{t.spec}</td>
+                  <td style={{padding:'4px 6px',textAlign:'right',color:C.ink2}}>{t.n}</td>
+                  <td style={{padding:'4px 6px',color:C.halo,fontSize:9.5}}>{t.closes.join(',')}</td>
+                  <td style={{padding:'4px 6px',color:t.status==='FAIL'?C.risk:C.ink2,fontSize:9.5}}>{t.val}</td>
+                  <td style={{padding:'4px 6px',textAlign:'center'}}>
+                    <span style={{color:STATUS_C[t.status],fontSize:9.5,letterSpacing:'.06em',
+                                  border:`1px solid ${STATUS_C[t.status]}`,padding:'1px 6px'}}>{t.status}</span>
+                  </td>
+                </tr>
+              );
+            })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* detail */}
+        {sT && (
+          <div style={{border:`1px solid ${STATUS_C[sT.status]}`,background:C.c2,padding:16,alignSelf:'start'}}>
+            <div style={{display:'flex',alignItems:'baseline',gap:10,marginBottom:10}}>
+              <span className="mono" style={{color:CATS.find(c=>c.id===sT.cat).c,fontSize:13,letterSpacing:'.06em'}}>{sT.id}</span>
+              <span style={{flex:1}}/>
+              <span className="mono" style={{color:STATUS_C[sT.status],fontSize:10,letterSpacing:'.08em',
+                                              border:`1px solid ${STATUS_C[sT.status]}`,padding:'2px 8px'}}>{sT.status}</span>
+            </div>
+            <div style={{color:C.ink,fontSize:13,fontWeight:500,marginBottom:10}}>{sT.name}</div>
+            <div style={{display:'grid',gridTemplateColumns:'72px 1fr',gap:'4px 12px',fontSize:11,lineHeight:1.55}} className="mono">
+              <span style={{color:C.ink3}}>CATEGORY</span> <span style={{color:CATS.find(c=>c.id===sT.cat).c}}>{CATS.find(c=>c.id===sT.cat).name}</span>
+              <span style={{color:C.ink3}}>SPEC</span>     <span style={{color:C.ink2}}>{sT.spec}</span>
+              <span style={{color:C.ink3}}>SAMPLES</span>  <span style={{color:C.ink2}}>{sT.n}</span>
+              <span style={{color:C.ink3}}>FREQUENCY</span><span style={{color:C.ink2}}>{sT.freq}</span>
+              <span style={{color:C.ink3}}>PASS</span>     <span style={{color:C.inter}}>{sT.pass}</span>
+              <span style={{color:C.ink3}}>LAST</span>     <span style={{color:C.ink2}}>{sT.last}</span>
+              <span style={{color:C.ink3}}>RESULT</span>   <span style={{color:sT.status==='FAIL'?C.risk:C.ink}}>{sT.val}</span>
+              <span style={{color:C.ink3}}>CLOSES</span>   <span style={{color:C.halo}}>→ FMEA {sT.closes.join(', ')}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* FMEA coverage strip */}
+      <div style={{marginTop:18,padding:14,border:`1px solid ${C.frame}`,background:C.c2}}>
+        <div className="mono" style={{color:C.halo,fontSize:11,letterSpacing:'.12em',marginBottom:10}}>FMEA CLOSURE COVERAGE</div>
+        <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+          {fmeaClosed.list.map(f=>{
+            const tests = TESTS.filter(t=>t.closes.includes(f));
+            const anyPass = tests.some(t=>t.status==='PASS');
+            const anyFail = tests.some(t=>t.status==='FAIL');
+            const col = anyFail ? C.risk : anyPass ? C.inter : C.lh2;
+            return (
+              <span key={f} className="mono"
+                style={{fontSize:10,padding:'3px 8px',border:`1px solid ${col}`,color:col,letterSpacing:'.06em'}}>
+                {f} · {tests.length}
+              </span>
+            );
+          })}
+        </div>
+        <div className="mono" style={{fontSize:10,color:C.ink3,marginTop:10,lineHeight:1.6}}>
+          <span style={{color:C.inter}}>● closed by pass</span> ·{' '}
+          <span style={{color:C.lh2}}>● tests scheduled, none passed yet</span> ·{' '}
+          <span style={{color:C.risk}}>● at least one fail blocking</span>
+        </div>
+      </div>
+
+      {/* schema */}
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.c3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · test.v0.4</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "categories": ["coupon", "component", "subassy", "hotfire"],
+  "closes":     "fmea.F## · test is the evidence that mitigation works",
+  "policy":     { "any_FAIL_blocks": "lineage.fai_release",
+                  "all_critical_FMEA_closed": "required for flight cert" },
+  "feeds":      ["lineage.fai_record", "inspection.CH##"],
+  "standards":  ["AMS 4999/5663", "ASTM E8/E139/E466/E606/E1417",
+                 "NASM 1312-8", "MIL-STD-810/1576"]
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

@@ -1,0 +1,50 @@
+{
+  "schema": "blueprint_criteria_v1",
+  "id": "common_dfm",
+  "title": "Common DFM/DFA Judgment",
+  "applies_to": ["all"],
+  "criteria": [
+    {
+      "criterion": "part_consolidation_with_guardrails",
+      "weight": 10,
+      "good": "Parts are integrated only when service access, inspection, and interface clarity remain visible.",
+      "bad": "Monolithic body hides removable modules, datums, or inspection paths.",
+      "signals": ["integrate_with_guardrail", "partial_integrate", "defer_integration"],
+      "loop_feedback": "Consolidate only low-risk covers or labels; keep service modules, datums, and inspection windows visible."
+    },
+    {
+      "criterion": "fastener_joint_sanity",
+      "weight": 10,
+      "good": "Fastener patterns, pin joints, slots, bosses, and mating clearances are explicitly represented.",
+      "bad": "Joints are described in prose but not represented as holes, bosses, pins, slots, or datums.",
+      "signals": ["drill", "boss", "slot", "clearance_mm", "fastener_pattern"],
+      "loop_feedback": "Add visible fastener holes, bosses, joint pins, and clearance notes for each critical interface."
+    },
+    {
+      "criterion": "inspection_readability",
+      "weight": 9,
+      "good": "A reviewer can see what to inspect and why without opening raw JSON.",
+      "bad": "Design has no callouts, access windows, labels, datum pads, or verification focus.",
+      "signals": ["inspection_window", "engrave", "callout", "verification_focus"],
+      "loop_feedback": "Add inspection callouts, datum labels, visible windows, and verification checks tied to geometry features."
+    },
+    {
+      "criterion": "fastener_locking_and_preload_evidence",
+      "weight": 9,
+      "good": "Critical joints state locking method (locknut, insert, washer, adhesive note) and torque/preload intent; bolt patterns match load direction.",
+      "bad": "Fasteners appear as bare holes with no locking, washer, engagement-length, or preload language anywhere.",
+      "signals": ["locknut", "insert", "washer", "torque", "preload", "thread_engagement"],
+      "loop_feedback": "For each critical joint, name the locking feature, add washer/insert geometry, and state a torque or preload intent note.",
+      "source_refs": ["sources/public/Fastener Design Manual (NASA).pdf"]
+    },
+    {
+      "criterion": "thread_and_insert_engagement_sanity",
+      "weight": 8,
+      "good": "Threaded connections into printed or soft material use inserts or bosses with adequate engagement depth (~1.5x diameter) and wall around the hole.",
+      "bad": "Screws thread directly into thin printed walls or blind features with no boss, insert, or depth note.",
+      "signals": ["heat_set_insert", "boss", "engagement_depth", "pilot_hole", "min_wall_mm"],
+      "loop_feedback": "Add insert bosses with engagement depth >= 1.5x screw diameter and surrounding wall thickness for every threaded joint.",
+      "source_refs": ["sources/public/Fastener Design Manual (NASA).pdf", "sources/public/machineryshandbo00indu.pdf"]
+    }
+  ]
+}

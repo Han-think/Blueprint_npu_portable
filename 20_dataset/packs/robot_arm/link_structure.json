@@ -1,0 +1,244 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "robot_arm",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "link_structure",
+    "discipline": "structures",
+    "function": "Rigid links with load path from tool flange to base, ribs where needed",
+    "evidence_features": [
+      "link_body",
+      "rib",
+      "base_flange"
+    ],
+    "criteria_refs": [
+      "robot_arm",
+      "common_dfm"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "common_dfm",
+      "title": "Common DFM/DFA Judgment",
+      "criteria": [
+        {
+          "criterion": "part_consolidation_with_guardrails",
+          "weight": 10,
+          "good": "Parts are integrated only when service access, inspection, and interface clarity remain visible.",
+          "bad": "Monolithic body hides removable modules, datums, or inspection paths.",
+          "signals": [
+            "integrate_with_guardrail",
+            "partial_integrate",
+            "defer_integration"
+          ],
+          "loop_feedback": "Consolidate only low-risk covers or labels; keep service modules, datums, and inspection windows visible."
+        },
+        {
+          "criterion": "fastener_joint_sanity",
+          "weight": 10,
+          "good": "Fastener patterns, pin joints, slots, bosses, and mating clearances are explicitly represented.",
+          "bad": "Joints are described in prose but not represented as holes, bosses, pins, slots, or datums.",
+          "signals": [
+            "drill",
+            "boss",
+            "slot",
+            "clearance_mm",
+            "fastener_pattern"
+          ],
+          "loop_feedback": "Add visible fastener holes, bosses, joint pins, and clearance notes for each critical interface."
+        },
+        {
+          "criterion": "inspection_readability",
+          "weight": 9,
+          "good": "A reviewer can see what to inspect and why without opening raw JSON.",
+          "bad": "Design has no callouts, access windows, labels, datum pads, or verification focus.",
+          "signals": [
+            "inspection_window",
+            "engrave",
+            "callout",
+            "verification_focus"
+          ],
+          "loop_feedback": "Add inspection callouts, datum labels, visible windows, and verification checks tied to geometry features."
+        },
+        {
+          "criterion": "fastener_locking_and_preload_evidence",
+          "weight": 9,
+          "good": "Critical joints state locking method (locknut, insert, washer, adhesive note) and torque/preload intent; bolt patterns match load direction.",
+          "bad": "Fasteners appear as bare holes with no locking, washer, engagement-length, or preload language anywhere.",
+          "signals": [
+            "locknut",
+            "insert",
+            "washer",
+            "torque",
+            "preload",
+            "thread_engagement"
+          ],
+          "loop_feedback": "For each critical joint, name the locking feature, add washer/insert geometry, and state a torque or preload intent note.",
+          "source_refs": [
+            "sources/public/Fastener Design Manual (NASA).pdf"
+          ]
+        },
+        {
+          "criterion": "thread_and_insert_engagement_sanity",
+          "weight": 8,
+          "good": "Threaded connections into printed or soft material use inserts or bosses with adequate engagement depth (~1.5x diameter) and wall around the hole.",
+          "bad": "Screws thread directly into thin printed walls or blind features with no boss, insert, or depth note.",
+          "signals": [
+            "heat_set_insert",
+            "boss",
+            "engagement_depth",
+            "pilot_hole",
+            "min_wall_mm"
+          ],
+          "loop_feedback": "Add insert bosses with engagement depth >= 1.5x screw diameter and surrounding wall thickness for every threaded joint.",
+          "source_refs": [
+            "sources/public/Fastener Design Manual (NASA).pdf",
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "robot_arm",
+      "title": "6-DOF Robot Arm Criteria",
+      "criteria": [
+        {
+          "criterion": "axis_datum_readability",
+          "weight": 14,
+          "good": "J1-J6 axis rings, reducer/bearing dummies, encoder covers, and tool flange datum are visible.",
+          "bad": "Arm links are generic cylinders with no joint service evidence.",
+          "signals": [
+            "J1",
+            "J2",
+            "axis ring",
+            "encoder cover",
+            "tool flange",
+            "bearing dummy"
+          ],
+          "loop_feedback": "Add J1-J6 axis datum labels, removable joint cartridge covers, encoder pockets, and tool flange bolt pattern."
+        },
+        {
+          "criterion": "cable_spine_serviceability",
+          "weight": 12,
+          "good": "Cable spine clips externally or remains inspectable through open channels.",
+          "bad": "Cable routing is buried inside closed links.",
+          "signals": [
+            "cable spine",
+            "open channel",
+            "clip",
+            "harness"
+          ],
+          "loop_feedback": "Externalize the cable spine or add open link channels with replaceable covers and strain relief."
+        },
+        {
+          "criterion": "joint_cartridge_replaceability",
+          "weight": 11,
+          "good": "Joint cartridges can be removed without cutting printed links.",
+          "bad": "Reducers/bearings are fused into structural links.",
+          "signals": [
+            "removable cartridge",
+            "joint cover",
+            "fastener pattern",
+            "clearance"
+          ],
+          "loop_feedback": "Separate removable joint cartridges from printed links and add fastener/clearance features."
+        },
+        {
+          "criterion": "bearing_shaft_mounting_sanity",
+          "weight": 10,
+          "good": "Each joint shows a bearing seat with shoulder or retaining feature, shaft locating geometry, and stated fit intent for inner/outer races.",
+          "bad": "Bearing dummies float in links with no seat, shoulder, retaining ring groove, or axial location scheme.",
+          "signals": [
+            "bearing_seat",
+            "shoulder",
+            "retaining_ring",
+            "axial_location",
+            "race_fit"
+          ],
+          "loop_feedback": "Add bearing seats with shoulders or retaining features at each joint and state which race is fixed and how."
+        },
+        {
+          "criterion": "moving_joint_harness_workmanship",
+          "weight": 9,
+          "good": "Harness crossing each joint has slack loop, strain relief at both ends, and routing that avoids pinch points through the full motion range.",
+          "bad": "Cables cross joints taut, pass through pinch zones, or have no relief at link entry/exit.",
+          "signals": [
+            "slack_loop",
+            "strain_relief",
+            "pinch_point",
+            "motion_range",
+            "cable_guide"
+          ],
+          "loop_feedback": "Add slack loops and dual-end strain relief at every joint crossing and verify no pinch through motion extremes.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    },
+    {
+      "title": "NASA Fastener Design Manual (RP-1228)",
+      "target_topics": [
+        "fastener selection",
+        "torque/preload",
+        "locking features",
+        "washers",
+        "inserts"
+      ]
+    },
+    {
+      "title": "1800 Mechanical Movements, Devices and Appliances (Hiscox, 1899, public domain)",
+      "target_topics": [
+        "linkages",
+        "cams",
+        "gears",
+        "mechanism vocabulary"
+      ]
+    },
+    {
+      "title": "Machinery's Handbook (early edition scan, archive.org)",
+      "target_topics": [
+        "fits",
+        "threads",
+        "machining allowances",
+        "shop vocabulary"
+      ]
+    },
+    {
+      "title": "CNC Programming Basics",
+      "target_topics": [
+        "machining setup",
+        "datum/work offset vocabulary"
+      ]
+    },
+    {
+      "title": "McMaster-Carr Catalog 123",
+      "target_topics": [
+        "standard fastener/bearing/hardware dimensions",
+        "part naming vocabulary"
+      ]
+    }
+  ]
+}

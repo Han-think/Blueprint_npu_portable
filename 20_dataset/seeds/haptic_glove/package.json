@@ -1,0 +1,2566 @@
+{
+  "schema": "blueprint_haptic_glove_package_v1",
+  "created_at": "2026-06-05T00:00:00+09:00",
+  "target": {
+    "vehicle_id": "haptic_glove_pair",
+    "label": "Force-feedback exo-glove (pair)",
+    "scope": "wearable force-feedback exoskeleton glove for VR grasp resistance; design-thinking + 3D-printable assembly before STL",
+    "not_for": "medical rehabilitation device, certified safety equipment, high-force industrial restraint"
+  },
+  "primary_metric": {
+    "name": "wearable_serviceability_efficiency",
+    "definition": "Deliver per-finger flexion resistance (grasp feel) while keeping linkage cartridges, actuators and electronics field-replaceable and the glove comfortable to don.",
+    "failure_rule": "Resistance fidelity fails if finger linkages bind, cable routing is blocked, or a module cannot be swapped without full teardown."
+  },
+  "closure_profile": {
+    "version": "closure_frame_hardening_v3",
+    "ui_vehicle_id": "haptic_glove_pair",
+    "bom_items": 12,
+    "skeleton_required_subsystems": 7,
+    "coverage_target": "7/7 required subsystems mapped by fixed wearable assembly BOM items",
+    "part_subsystem_map": {
+      "p1": "electronics_hub",
+      "p2": "finger_linkages",
+      "p3": "actuation_brakes",
+      "p4": "wearable_structure",
+      "p5": "flex_wiring",
+      "p6": "finger_linkages",
+      "p7": "sensing",
+      "p8": "power",
+      "p9": "flex_wiring",
+      "p10": "actuation_brakes",
+      "p11": "wearable_structure",
+      "p12": "flex_wiring"
+    },
+    "closure_parts": [
+      "p11 Fit Calibration + Safety Release Set",
+      "p12 Service Port + Flex-Wiring Inspection Cover"
+    ],
+    "boundary": "Educational wearable mock assembly evidence only; not medical, rehabilitation, certified safety, or high-force restraint equipment."
+  },
+  "existing_bom": [
+    {
+      "id": "old-001",
+      "label": "monolithic glove shell",
+      "qty": 2,
+      "role": "hand cover",
+      "service_access": "none"
+    },
+    {
+      "id": "old-002",
+      "label": "glued finger linkages",
+      "qty": 10,
+      "role": "exoskeleton",
+      "service_access": "not removable"
+    },
+    {
+      "id": "old-003",
+      "label": "bonded actuator pods",
+      "qty": 10,
+      "role": "flexion brake",
+      "service_access": "not removable"
+    },
+    {
+      "id": "old-004",
+      "label": "internal cable harness",
+      "qty": 2,
+      "role": "wiring",
+      "service_access": "buried"
+    },
+    {
+      "id": "old-005",
+      "label": "fixed control box",
+      "qty": 2,
+      "role": "electronics",
+      "service_access": "screwed shut"
+    }
+  ],
+  "redesigned_bom": [
+    {
+      "id": "new-001",
+      "label": "dorsal control module (snap-in)",
+      "qty": 2,
+      "role": "electronics + battery + wireless",
+      "service_access": "tool-less lid"
+    },
+    {
+      "id": "new-002",
+      "label": "per-finger exo linkage cartridge",
+      "qty": 10,
+      "role": "two-segment exoskeleton + joint pins",
+      "service_access": "single-pin removable"
+    },
+    {
+      "id": "new-003",
+      "label": "flexion-resistance actuator module",
+      "qty": 10,
+      "role": "tendon brake/clutch",
+      "service_access": "plug-in connector"
+    },
+    {
+      "id": "new-004",
+      "label": "adjustable wrist band",
+      "qty": 2,
+      "role": "anchor + cable raceway",
+      "service_access": "quick release"
+    }
+  ],
+  "assembly_delta": {
+    "baseline_steps": 28,
+    "redesigned_steps": 14,
+    "retained_service_access_points": [
+      "dorsal lid tool-less open",
+      "finger cartridge single-pin swap",
+      "actuator plug-in connector",
+      "wrist band quick release"
+    ]
+  },
+  "schema_v6_blueprint": {
+    "cad_brief": {
+      "name": "haptic_exo_glove_pair",
+      "rev": "1.0",
+      "material": "PETG",
+      "envelope_mm": [
+        220,
+        200,
+        60
+      ],
+      "build_direction": "+Z for dorsal plate; linkages along Y; band as open ring",
+      "key_dims_mm": {
+        "pair_envelope": "220x200x60",
+        "fingers_per_hand": 5,
+        "actuators_per_hand": 5,
+        "hand_pitch_mm": 240
+      },
+      "wall_thickness_mm": {
+        "min": 1.6,
+        "typ": 2.0
+      },
+      "tolerances_mm": {
+        "hinge_pin_clearance": 0.2,
+        "linkage_slide_clearance": 0.25,
+        "thimble_fit_clearance": 0.3
+      },
+      "surface": {
+        "Ra_um": 16,
+        "post_process": "deburr hinge holes and raceway"
+      },
+      "mass_est_g": 240
+    },
+    "version": "bp-npu-r6",
+    "ts": "2026-06-05T00:00:00+09:00",
+    "project": "blueprint_npu",
+    "object": "haptic_exo_glove_pair",
+    "brief": {
+      "requirements": [
+        "Create a 3D-printable force-feedback exo-glove (pair) educational mockup design package.",
+        "Reduce assembly steps while preserving finger-cartridge, actuator, cable and lid service access.",
+        "Keep fragile finger linkages and actuators field-replaceable modules.",
+        "Prepare geometry intent for later STL generation, not a certified device."
+      ],
+      "constraints": {
+        "material": "PETG",
+        "process": "FDM",
+        "envelope_mm": [
+          220,
+          200,
+          60
+        ],
+        "min_wall_mm": 1.6,
+        "min_channel_mm": 3,
+        "overhang_deg": 45,
+        "tol_mm": 0.25
+      }
+    },
+    "part_tree": {
+      "id": "haptic-glove-pair-v1",
+      "name": "Force-feedback exo-glove printable serviceability mockup (pair)",
+      "qty": 1,
+      "material": "PETG",
+      "process": "FDM",
+      "children": [
+        {
+          "id": "new-001",
+          "name": "dorsal control module",
+          "qty": 2,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {
+              "id": "f-actuator-bay",
+              "name": "aligned actuator/brake bays",
+              "qty": 10,
+              "material": "PETG",
+              "process": "FDM",
+              "children": []
+            },
+            {
+              "id": "f-control-lid",
+              "name": "tool-less service lid",
+              "qty": 2,
+              "material": "PETG",
+              "process": "FDM",
+              "children": []
+            },
+            {
+              "id": "f-hex-emblem",
+              "name": "dorsal hex emblem core",
+              "qty": 2,
+              "material": "PETG",
+              "process": "FDM",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "new-002",
+          "name": "per-finger exo linkage cartridge",
+          "qty": 10,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {
+              "id": "f-finger-link",
+              "name": "two-bar dorsal linkage",
+              "qty": 10,
+              "material": "PETG",
+              "process": "FDM",
+              "children": []
+            },
+            {
+              "id": "f-hinge-pin",
+              "name": "single removable hinge pin",
+              "qty": 10,
+              "material": "PETG",
+              "process": "FDM",
+              "children": []
+            },
+            {
+              "id": "f-thimble",
+              "name": "fingertip thimble",
+              "qty": 10,
+              "material": "PETG",
+              "process": "FDM",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "new-003",
+          "name": "flexion-resistance actuator module",
+          "qty": 10,
+          "material": "PETG",
+          "process": "FDM",
+          "children": [
+            {
+              "id": "f-brake-drum",
+              "name": "cable brake drum",
+              "qty": 10,
+              "material": "PETG",
+              "process": "FDM",
+              "children": []
+            },
+            {
+              "id": "f-cable-anchor",
+              "name": "plug-in cable anchor",
+              "qty": 10,
+              "material": "PETG",
+              "process": "FDM",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "new-004",
+          "name": "adjustable wrist band",
+          "qty": 2,
+          "material": "TPU",
+          "process": "FDM",
+          "children": [
+            {
+              "id": "f-cable-raceway",
+              "name": "cable/tendon raceway",
+              "qty": 2,
+              "material": "TPU",
+              "process": "FDM",
+              "children": []
+            },
+            {
+              "id": "f-quick-release",
+              "name": "quick-release buckle",
+              "qty": 2,
+              "material": "TPU",
+              "process": "FDM",
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    "geometry_ops": [
+      {
+        "id": "op-001",
+        "op": "box",
+        "target": "new-001",
+        "args": {
+          "size_mm": [
+            86,
+            70,
+            14
+          ],
+          "purpose": "dorsal control module housing"
+        }
+      },
+      {
+        "id": "op-002",
+        "op": "shell",
+        "target": "new-001",
+        "args": {
+          "wall_mm": 1.6,
+          "open_faces": [
+            "+Z"
+          ],
+          "purpose": "electronics bay with tool-less lid"
+        }
+      },
+      {
+        "id": "op-003",
+        "op": "pattern_linear",
+        "target": "f-actuator-bay",
+        "args": {
+          "count": 5,
+          "positions": [
+            "knuckle row"
+          ],
+          "feature": "brake_bay_12x12x10mm"
+        }
+      },
+      {
+        "id": "op-004",
+        "op": "box",
+        "target": "new-002",
+        "args": {
+          "size_mm": [
+            13,
+            60,
+            6
+          ],
+          "purpose": "per-finger dorsal linkage cartridge blank"
+        }
+      },
+      {
+        "id": "op-005",
+        "op": "pattern_linear",
+        "target": "f-finger-link",
+        "args": {
+          "count": 5,
+          "positions": [
+            "finger backs"
+          ],
+          "feature": "two_bar_link_phi5"
+        }
+      },
+      {
+        "id": "op-006",
+        "op": "drill",
+        "target": "f-hinge-pin",
+        "args": {
+          "dia_mm": 3,
+          "count": 5,
+          "purpose": "single removable hinge pin per finger"
+        }
+      },
+      {
+        "id": "op-007",
+        "op": "box",
+        "target": "new-003",
+        "args": {
+          "size_mm": [
+            11,
+            11,
+            9
+          ],
+          "purpose": "flexion-resistance actuator/brake body"
+        }
+      },
+      {
+        "id": "op-008",
+        "op": "boss",
+        "target": "f-brake-drum",
+        "args": {
+          "dia_mm": 11,
+          "count": 5,
+          "purpose": "cable brake drum"
+        }
+      },
+      {
+        "id": "op-009",
+        "op": "box",
+        "target": "new-004",
+        "args": {
+          "size_mm": [
+            72,
+            24,
+            24
+          ],
+          "purpose": "wrist band ring blank"
+        }
+      },
+      {
+        "id": "op-010",
+        "op": "channel",
+        "target": "f-cable-raceway",
+        "args": {
+          "width_mm": 6,
+          "path": "wrist band perimeter",
+          "purpose": "cable/tendon raceway"
+        }
+      },
+      {
+        "id": "op-011",
+        "op": "pocket",
+        "target": "f-thimble",
+        "args": {
+          "depth_mm": 8,
+          "count": 5,
+          "purpose": "fingertip thimble cavity"
+        }
+      },
+      {
+        "id": "op-012",
+        "op": "chamfer",
+        "target": "new-001",
+        "args": {
+          "edges": "dorsal top edges",
+          "size_mm": 1.5,
+          "purpose": "soften dorsal housing edges"
+        }
+      },
+      {
+        "id": "op-013",
+        "op": "fillet",
+        "target": "new-004",
+        "args": {
+          "edges": "band edges",
+          "radius_mm": 2,
+          "purpose": "comfort fillet on wrist band"
+        }
+      },
+      {
+        "id": "op-014",
+        "op": "engrave",
+        "target": "f-hex-emblem",
+        "args": {
+          "text": "HAPTIC",
+          "depth_mm": 0.6,
+          "purpose": "dorsal hex emblem label"
+        }
+      }
+    ],
+    "verify": [
+      {
+        "check": "existing and redesigned BOM both present in design package",
+        "result": "pass",
+        "value": "5 baseline groups, 4 redesigned groups",
+        "rule": "glove-v1-package"
+      },
+      {
+        "check": "assembly steps explicitly reduced",
+        "result": "pass",
+        "value": "28 baseline steps to 14 redesigned steps",
+        "rule": "glove-v1-serviceability"
+      },
+      {
+        "check": "service access preserved for finger cartridge, actuator, lid, wrist",
+        "result": "pass",
+        "value": "4 retained service access points",
+        "rule": "glove-v1-service-access"
+      },
+      {
+        "check": "min wall meets FDM floor",
+        "result": "pass",
+        "value": "1.6mm >= 1.2mm",
+        "rule": "glove-v1-wall"
+      },
+      {
+        "check": "hinge pin clearance specified for replaceable linkage",
+        "result": "pass",
+        "value": "0.2mm pin clearance",
+        "rule": "glove-v1-tolerance"
+      },
+      {
+        "check": "tendon routing interference under load",
+        "result": "warn",
+        "value": "needs load test",
+        "rule": "glove-v1-routing"
+      }
+    ],
+    "risk": [
+      {
+        "id": "R01",
+        "desc": "Over-integration of finger linkages may slow single-finger replacement despite fewer parts.",
+        "mit": "Keep each finger as a single-pin removable cartridge with plug-in actuator.",
+        "severity": "high"
+      },
+      {
+        "id": "R02",
+        "desc": "Flexible TPU wrist band may warp or stretch and lose cable raceway alignment.",
+        "mit": "Print band as open ring with fillet edges; calibrate TPU flow on a coupon first.",
+        "severity": "med"
+      },
+      {
+        "id": "R03",
+        "desc": "Hinge pin friction may add resistance noise to flexion feedback.",
+        "mit": "Hold 0.2mm pin clearance and deburr holes; verify with free-motion check.",
+        "severity": "med"
+      }
+    ],
+    "print_profile": {
+      "printer": "FDM printer with 0.4mm nozzle",
+      "material": "PETG",
+      "layer_mm": 0.2,
+      "walls": 4,
+      "infill": "20% gyroid for housings, 30% for linkages",
+      "supports": "min",
+      "orientation": "dorsal plate flat; finger linkages along Y; brake drums upright; band as open ring",
+      "est_time": "10-14h total prototype pair",
+      "filament_g": 240
+    },
+    "slicer_job": {
+      "tool": "prusaslicer",
+      "input_stl": "output/haptic_glove.stl",
+      "output": "output/haptic_glove.gcode",
+      "args": [
+        "--layer-height",
+        "0.20",
+        "--fill-density",
+        "20%",
+        "--support-material-auto"
+      ],
+      "profile": "PETG_0.4mm_serviceability_mockup"
+    }
+  },
+  "detail_parts": {
+    "spine_shell": null,
+    "parts": [
+      {
+        "id": "R_palm",
+        "type": "cyl",
+        "size_mm": [
+          42,
+          42,
+          12
+        ],
+        "pos_mm": [
+          120,
+          6,
+          0
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_palm_pad",
+        "type": "cyl",
+        "size_mm": [
+          38,
+          38,
+          5
+        ],
+        "pos_mm": [
+          120,
+          6,
+          -7
+        ],
+        "role": "external"
+      },
+      {
+        "id": "R_base_plate",
+        "type": "cyl",
+        "size_mm": [
+          30,
+          30,
+          6
+        ],
+        "pos_mm": [
+          120,
+          2,
+          8
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_logo",
+        "type": "hex",
+        "size_mm": [
+          9,
+          0,
+          3
+        ],
+        "pos_mm": [
+          120,
+          -4,
+          11
+        ],
+        "role": "external"
+      },
+      {
+        "id": "R_act_0",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          98,
+          20,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "R_act_1",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          112,
+          20,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "R_act_2",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          127,
+          20,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "R_act_3",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          141,
+          20,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "R_act_thumb",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          96,
+          2,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "R_pump",
+        "type": "cyl",
+        "size_mm": [
+          9,
+          9,
+          16
+        ],
+        "pos_mm": [
+          120,
+          -16,
+          9
+        ],
+        "role": "internal"
+      },
+      {
+        "id": "R_manifold",
+        "type": "tube",
+        "size_mm": [
+          16,
+          12,
+          6
+        ],
+        "pos_mm": [
+          120,
+          -8,
+          9
+        ],
+        "role": "internal"
+      },
+      {
+        "id": "R_wrist",
+        "type": "tube",
+        "size_mm": [
+          34,
+          28,
+          24
+        ],
+        "pos_mm": [
+          120,
+          -50,
+          0
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_wrist_pad",
+        "type": "tube",
+        "size_mm": [
+          28,
+          25,
+          22
+        ],
+        "pos_mm": [
+          120,
+          -50,
+          0
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_idx_base",
+        "type": "sphere",
+        "size_mm": [
+          6.5
+        ],
+        "pos_mm": [
+          98,
+          38,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_idx_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          33.6
+        ],
+        "pos_mm": [
+          98,
+          59.8,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_idx_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.3,
+          5.3,
+          27.3
+        ],
+        "pos_mm": [
+          98,
+          94.25,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_idx_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          98,
+          111.9,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_idx_link1",
+        "type": "cyl",
+        "size_mm": [
+          2.2,
+          2.2,
+          37.6
+        ],
+        "pos_mm": [
+          98,
+          59.8,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_idx_link2",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          29.3
+        ],
+        "pos_mm": [
+          98,
+          94.25,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_idx_hinge",
+        "type": "cyl",
+        "size_mm": [
+          3,
+          3,
+          6
+        ],
+        "pos_mm": [
+          98,
+          80.6,
+          9
+        ],
+        "role": "internal",
+        "rot_deg": [
+          0,
+          90,
+          0
+        ]
+      },
+      {
+        "id": "R_idx_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          98,
+          109.9,
+          2
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_idx_cable",
+        "type": "cyl",
+        "size_mm": [
+          1.2,
+          1.2,
+          71.6
+        ],
+        "pos_mm": [
+          98,
+          25.0,
+          10
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_mid_base",
+        "type": "sphere",
+        "size_mm": [
+          6.5
+        ],
+        "pos_mm": [
+          112,
+          41,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_mid_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          37.76
+        ],
+        "pos_mm": [
+          112,
+          64.88,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_mid_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.3,
+          5.3,
+          30.68
+        ],
+        "pos_mm": [
+          112,
+          103.1,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_mid_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          112,
+          122.44,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_mid_link1",
+        "type": "cyl",
+        "size_mm": [
+          2.2,
+          2.2,
+          41.76
+        ],
+        "pos_mm": [
+          112,
+          64.88,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_mid_link2",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          32.68
+        ],
+        "pos_mm": [
+          112,
+          103.1,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_mid_hinge",
+        "type": "cyl",
+        "size_mm": [
+          3,
+          3,
+          6
+        ],
+        "pos_mm": [
+          112,
+          87.76,
+          9
+        ],
+        "role": "internal",
+        "rot_deg": [
+          0,
+          90,
+          0
+        ]
+      },
+      {
+        "id": "R_mid_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          112,
+          120.44,
+          2
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_mid_cable",
+        "type": "cyl",
+        "size_mm": [
+          1.2,
+          1.2,
+          78.76
+        ],
+        "pos_mm": [
+          112,
+          26.5,
+          10
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_rng_base",
+        "type": "sphere",
+        "size_mm": [
+          6.5
+        ],
+        "pos_mm": [
+          127,
+          39,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_rng_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          33.6
+        ],
+        "pos_mm": [
+          127,
+          60.8,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_rng_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.3,
+          5.3,
+          27.3
+        ],
+        "pos_mm": [
+          127,
+          95.25,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_rng_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          127,
+          112.9,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_rng_link1",
+        "type": "cyl",
+        "size_mm": [
+          2.2,
+          2.2,
+          37.6
+        ],
+        "pos_mm": [
+          127,
+          60.8,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_rng_link2",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          29.3
+        ],
+        "pos_mm": [
+          127,
+          95.25,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_rng_hinge",
+        "type": "cyl",
+        "size_mm": [
+          3,
+          3,
+          6
+        ],
+        "pos_mm": [
+          127,
+          81.6,
+          9
+        ],
+        "role": "internal",
+        "rot_deg": [
+          0,
+          90,
+          0
+        ]
+      },
+      {
+        "id": "R_rng_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          127,
+          110.9,
+          2
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_rng_cable",
+        "type": "cyl",
+        "size_mm": [
+          1.2,
+          1.2,
+          72.6
+        ],
+        "pos_mm": [
+          127,
+          25.5,
+          10
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_pky_base",
+        "type": "sphere",
+        "size_mm": [
+          6.5
+        ],
+        "pos_mm": [
+          141,
+          35,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_pky_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          26.24
+        ],
+        "pos_mm": [
+          141,
+          53.12,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_pky_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.3,
+          5.3,
+          21.32
+        ],
+        "pos_mm": [
+          141,
+          80.9,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_pky_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          141,
+          95.56,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_pky_link1",
+        "type": "cyl",
+        "size_mm": [
+          2.2,
+          2.2,
+          30.24
+        ],
+        "pos_mm": [
+          141,
+          53.12,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_pky_link2",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          23.32
+        ],
+        "pos_mm": [
+          141,
+          80.9,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_pky_hinge",
+        "type": "cyl",
+        "size_mm": [
+          3,
+          3,
+          6
+        ],
+        "pos_mm": [
+          141,
+          70.24,
+          9
+        ],
+        "role": "internal",
+        "rot_deg": [
+          0,
+          90,
+          0
+        ]
+      },
+      {
+        "id": "R_pky_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          141,
+          93.56,
+          2
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_pky_cable",
+        "type": "cyl",
+        "size_mm": [
+          1.2,
+          1.2,
+          61.24
+        ],
+        "pos_mm": [
+          141,
+          23.5,
+          10
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "R_thumb_base",
+        "type": "sphere",
+        "size_mm": [
+          7
+        ],
+        "pos_mm": [
+          86,
+          4,
+          0
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_thumb_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          26
+        ],
+        "pos_mm": [
+          74,
+          12,
+          -1
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -100,
+          0,
+          26
+        ]
+      },
+      {
+        "id": "R_thumb_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.2,
+          5.2,
+          20
+        ],
+        "pos_mm": [
+          58,
+          22,
+          -3
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -100,
+          0,
+          26
+        ]
+      },
+      {
+        "id": "R_thumb_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          48,
+          30,
+          -4
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "R_thumb_link",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          40
+        ],
+        "pos_mm": [
+          66,
+          16,
+          6
+        ],
+        "role": "external",
+        "rot_deg": [
+          -100,
+          0,
+          26
+        ]
+      },
+      {
+        "id": "R_thumb_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          48,
+          30,
+          -4
+        ],
+        "role": "external",
+        "rot_deg": [
+          -100,
+          0,
+          26
+        ]
+      },
+      {
+        "id": "L_palm",
+        "type": "cyl",
+        "size_mm": [
+          42,
+          42,
+          12
+        ],
+        "pos_mm": [
+          -120,
+          6,
+          0
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_palm_pad",
+        "type": "cyl",
+        "size_mm": [
+          38,
+          38,
+          5
+        ],
+        "pos_mm": [
+          -120,
+          6,
+          -7
+        ],
+        "role": "external"
+      },
+      {
+        "id": "L_base_plate",
+        "type": "cyl",
+        "size_mm": [
+          30,
+          30,
+          6
+        ],
+        "pos_mm": [
+          -120,
+          2,
+          8
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_logo",
+        "type": "hex",
+        "size_mm": [
+          9,
+          0,
+          3
+        ],
+        "pos_mm": [
+          -120,
+          -4,
+          11
+        ],
+        "role": "external"
+      },
+      {
+        "id": "L_act_0",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          -98,
+          20,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "L_act_1",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          -112,
+          20,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "L_act_2",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          -127,
+          20,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "L_act_3",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          -141,
+          20,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "L_act_thumb",
+        "type": "cyl",
+        "size_mm": [
+          5.5,
+          5.5,
+          9
+        ],
+        "pos_mm": [
+          -96,
+          2,
+          10
+        ],
+        "role": "external"
+      },
+      {
+        "id": "L_pump",
+        "type": "cyl",
+        "size_mm": [
+          9,
+          9,
+          16
+        ],
+        "pos_mm": [
+          -120,
+          -16,
+          9
+        ],
+        "role": "internal"
+      },
+      {
+        "id": "L_manifold",
+        "type": "tube",
+        "size_mm": [
+          16,
+          12,
+          6
+        ],
+        "pos_mm": [
+          -120,
+          -8,
+          9
+        ],
+        "role": "internal"
+      },
+      {
+        "id": "L_wrist",
+        "type": "tube",
+        "size_mm": [
+          34,
+          28,
+          24
+        ],
+        "pos_mm": [
+          -120,
+          -50,
+          0
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_wrist_pad",
+        "type": "tube",
+        "size_mm": [
+          28,
+          25,
+          22
+        ],
+        "pos_mm": [
+          -120,
+          -50,
+          0
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_idx_base",
+        "type": "sphere",
+        "size_mm": [
+          6.5
+        ],
+        "pos_mm": [
+          -98,
+          38,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_idx_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          33.6
+        ],
+        "pos_mm": [
+          -98,
+          59.8,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_idx_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.3,
+          5.3,
+          27.3
+        ],
+        "pos_mm": [
+          -98,
+          94.25,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_idx_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          -98,
+          111.9,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_idx_link1",
+        "type": "cyl",
+        "size_mm": [
+          2.2,
+          2.2,
+          37.6
+        ],
+        "pos_mm": [
+          -98,
+          59.8,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_idx_link2",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          29.3
+        ],
+        "pos_mm": [
+          -98,
+          94.25,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_idx_hinge",
+        "type": "cyl",
+        "size_mm": [
+          3,
+          3,
+          6
+        ],
+        "pos_mm": [
+          -98,
+          80.6,
+          9
+        ],
+        "role": "internal",
+        "rot_deg": [
+          0,
+          90,
+          0
+        ]
+      },
+      {
+        "id": "L_idx_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          -98,
+          109.9,
+          2
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_idx_cable",
+        "type": "cyl",
+        "size_mm": [
+          1.2,
+          1.2,
+          71.6
+        ],
+        "pos_mm": [
+          -98,
+          25.0,
+          10
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_mid_base",
+        "type": "sphere",
+        "size_mm": [
+          6.5
+        ],
+        "pos_mm": [
+          -112,
+          41,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_mid_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          37.76
+        ],
+        "pos_mm": [
+          -112,
+          64.88,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_mid_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.3,
+          5.3,
+          30.68
+        ],
+        "pos_mm": [
+          -112,
+          103.1,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_mid_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          -112,
+          122.44,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_mid_link1",
+        "type": "cyl",
+        "size_mm": [
+          2.2,
+          2.2,
+          41.76
+        ],
+        "pos_mm": [
+          -112,
+          64.88,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_mid_link2",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          32.68
+        ],
+        "pos_mm": [
+          -112,
+          103.1,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_mid_hinge",
+        "type": "cyl",
+        "size_mm": [
+          3,
+          3,
+          6
+        ],
+        "pos_mm": [
+          -112,
+          87.76,
+          9
+        ],
+        "role": "internal",
+        "rot_deg": [
+          0,
+          90,
+          0
+        ]
+      },
+      {
+        "id": "L_mid_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          -112,
+          120.44,
+          2
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_mid_cable",
+        "type": "cyl",
+        "size_mm": [
+          1.2,
+          1.2,
+          78.76
+        ],
+        "pos_mm": [
+          -112,
+          26.5,
+          10
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_rng_base",
+        "type": "sphere",
+        "size_mm": [
+          6.5
+        ],
+        "pos_mm": [
+          -127,
+          39,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_rng_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          33.6
+        ],
+        "pos_mm": [
+          -127,
+          60.8,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_rng_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.3,
+          5.3,
+          27.3
+        ],
+        "pos_mm": [
+          -127,
+          95.25,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_rng_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          -127,
+          112.9,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_rng_link1",
+        "type": "cyl",
+        "size_mm": [
+          2.2,
+          2.2,
+          37.6
+        ],
+        "pos_mm": [
+          -127,
+          60.8,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_rng_link2",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          29.3
+        ],
+        "pos_mm": [
+          -127,
+          95.25,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_rng_hinge",
+        "type": "cyl",
+        "size_mm": [
+          3,
+          3,
+          6
+        ],
+        "pos_mm": [
+          -127,
+          81.6,
+          9
+        ],
+        "role": "internal",
+        "rot_deg": [
+          0,
+          90,
+          0
+        ]
+      },
+      {
+        "id": "L_rng_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          -127,
+          110.9,
+          2
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_rng_cable",
+        "type": "cyl",
+        "size_mm": [
+          1.2,
+          1.2,
+          72.6
+        ],
+        "pos_mm": [
+          -127,
+          25.5,
+          10
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_pky_base",
+        "type": "sphere",
+        "size_mm": [
+          6.5
+        ],
+        "pos_mm": [
+          -141,
+          35,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_pky_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          26.24
+        ],
+        "pos_mm": [
+          -141,
+          53.12,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_pky_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.3,
+          5.3,
+          21.32
+        ],
+        "pos_mm": [
+          -141,
+          80.9,
+          2
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_pky_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          -141,
+          95.56,
+          2
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_pky_link1",
+        "type": "cyl",
+        "size_mm": [
+          2.2,
+          2.2,
+          30.24
+        ],
+        "pos_mm": [
+          -141,
+          53.12,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_pky_link2",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          23.32
+        ],
+        "pos_mm": [
+          -141,
+          80.9,
+          9
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_pky_hinge",
+        "type": "cyl",
+        "size_mm": [
+          3,
+          3,
+          6
+        ],
+        "pos_mm": [
+          -141,
+          70.24,
+          9
+        ],
+        "role": "internal",
+        "rot_deg": [
+          0,
+          90,
+          0
+        ]
+      },
+      {
+        "id": "L_pky_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          -141,
+          93.56,
+          2
+        ],
+        "role": "external",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_pky_cable",
+        "type": "cyl",
+        "size_mm": [
+          1.2,
+          1.2,
+          61.24
+        ],
+        "pos_mm": [
+          -141,
+          23.5,
+          10
+        ],
+        "role": "internal",
+        "rot_deg": [
+          -90,
+          0,
+          0
+        ]
+      },
+      {
+        "id": "L_thumb_base",
+        "type": "sphere",
+        "size_mm": [
+          7
+        ],
+        "pos_mm": [
+          -86,
+          4,
+          0
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_thumb_p1",
+        "type": "cyl",
+        "size_mm": [
+          6,
+          6,
+          26
+        ],
+        "pos_mm": [
+          -74,
+          12,
+          -1
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -100,
+          0,
+          26
+        ]
+      },
+      {
+        "id": "L_thumb_p2",
+        "type": "cyl",
+        "size_mm": [
+          5.2,
+          5.2,
+          20
+        ],
+        "pos_mm": [
+          -58,
+          22,
+          -3
+        ],
+        "role": "structure",
+        "rot_deg": [
+          -100,
+          0,
+          26
+        ]
+      },
+      {
+        "id": "L_thumb_tip",
+        "type": "sphere",
+        "size_mm": [
+          5
+        ],
+        "pos_mm": [
+          -48,
+          30,
+          -4
+        ],
+        "role": "structure"
+      },
+      {
+        "id": "L_thumb_link",
+        "type": "cyl",
+        "size_mm": [
+          2,
+          2,
+          40
+        ],
+        "pos_mm": [
+          -66,
+          16,
+          6
+        ],
+        "role": "external",
+        "rot_deg": [
+          -100,
+          0,
+          26
+        ]
+      },
+      {
+        "id": "L_thumb_thimble",
+        "type": "tube",
+        "size_mm": [
+          7,
+          5.5,
+          8
+        ],
+        "pos_mm": [
+          -48,
+          30,
+          -4
+        ],
+        "role": "external",
+        "rot_deg": [
+          -100,
+          0,
+          26
+        ]
+      }
+    ]
+  },
+  "integration_decisions": [
+    {
+      "decision": "integrate finger linkage into a single-pin removable cartridge",
+      "expected_gain": "reduces per-finger assembly and lets a damaged linkage swap with one pin",
+      "guardrail": "each finger cartridge stays individually removable and inspectable"
+    },
+    {
+      "decision": "integrate electronics, battery and wireless into one dorsal module",
+      "expected_gain": "fewer harness runs and a single tool-less service lid",
+      "guardrail": "lid opens without tools and connectors stay reachable"
+    },
+    {
+      "decision": "combine cable and tendon routing in the wrist band raceway but keep them separable",
+      "expected_gain": "cleaner routing and fewer separate covers",
+      "guardrail": "raceway opens via quick release and keeps wiring separable"
+    }
+  ],
+  "print_strategy": [
+    {
+      "part_id": "new-001",
+      "orientation": "dorsal plate flat on bed, lid opening up",
+      "supports": "min",
+      "reason": "flat electronics bay, clean actuator-bay row"
+    },
+    {
+      "part_id": "new-002",
+      "orientation": "finger linkages lying along Y, hinge axes horizontal",
+      "supports": "min",
+      "reason": "preserve hinge clearance and slim profile"
+    },
+    {
+      "part_id": "new-003",
+      "orientation": "brake drums upright in a row",
+      "supports": "none",
+      "reason": "round drums print cleanly upright, plug-in face up"
+    },
+    {
+      "part_id": "new-004",
+      "orientation": "wrist band as open ring, buckle to side",
+      "supports": "min",
+      "reason": "TPU band flexible, quick-release accessible"
+    }
+  ],
+  "assembly_sequence": [
+    "Print dorsal control module, finger linkage cartridges, actuator modules, wrist band.",
+    "Snap dorsal control module onto the soft glove back.",
+    "Insert each finger linkage cartridge and lock with a single pin.",
+    "Plug flexion-resistance actuator modules into the dorsal connectors.",
+    "Route cables/tendons through the wrist band raceway.",
+    "Fit the wrist band and close the quick release."
+  ],
+  "quality_scenarios": [
+    {
+      "case": "finger count covered but a linkage cannot be removed without teardown",
+      "expected": "fail",
+      "reason": "field-replaceability is the primary serviceability metric"
+    },
+    {
+      "case": "all five fingers give independent flexion resistance and each module swaps fast",
+      "expected": "pass",
+      "reason": "per-finger control + modular service satisfied"
+    },
+    {
+      "case": "cables routed but tendon binds against the linkage under load",
+      "expected": "risk",
+      "reason": "routing interference reduces resistance fidelity"
+    }
+  ]
+}

@@ -1,0 +1,324 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "haptic_glove",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "flex_wiring",
+    "discipline": "integration",
+    "function": "Knuckle-crossing wiring with service loops and flex-rated bend radius; connection types and load-path closure",
+    "evidence_features": [
+      "service_loop",
+      "strain_relief",
+      "bend_radius_note"
+    ],
+    "criteria_refs": [
+      "haptic_glove",
+      "service_access",
+      "electronics_routing",
+      "assembly_integration"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "service_access",
+      "title": "Service Access and Maintainability",
+      "criteria": [
+        {
+          "criterion": "replaceable_module_path",
+          "weight": 13,
+          "good": "Battery, sensor, actuator, cartridge, payload, cable, or joint modules remain removable without full teardown.",
+          "bad": "Functional modules are fused into a closed body.",
+          "signals": [
+            "removable",
+            "slide-in",
+            "snap-in",
+            "single-pin",
+            "tool-less",
+            "service_access"
+          ],
+          "loop_feedback": "Separate the critical service module and add a visible removal path, latch, pin, or slide rail."
+        },
+        {
+          "criterion": "cable_harness_visibility",
+          "weight": 8,
+          "good": "Harnesses, tubes, or service channels are routed through visible raceways or protected channels.",
+          "bad": "Cables are buried inside closed links or shells with no inspection feature.",
+          "signals": [
+            "harness_channel",
+            "cable_raceway",
+            "channel",
+            "inspection_window"
+          ],
+          "loop_feedback": "Add external or inspectable harness channels with strain relief and access covers."
+        },
+        {
+          "criterion": "access_not_just_text",
+          "weight": 9,
+          "good": "Access is represented by geometry: hatch, pocket, channel, fastener pattern, slot, window, or removable cover.",
+          "bad": "Access is claimed only in prose.",
+          "signals": [
+            "pocket",
+            "channel",
+            "drill",
+            "slot",
+            "hatch",
+            "cover",
+            "window"
+          ],
+          "loop_feedback": "Convert service-access text into physical geometry_ops: cover, pocket, slot, window, and fastener pattern."
+        },
+        {
+          "criterion": "harness_strain_relief_and_bend_radius",
+          "weight": 9,
+          "good": "Every cable exit shows strain relief geometry (clamp, grommet, tie point) and routing respects a stated minimum bend radius away from moving joints and sharp edges.",
+          "bad": "Cables exit bare holes, cross hinge lines unsupported, or bend around sharp printed edges with no relief feature.",
+          "signals": [
+            "strain_relief",
+            "grommet",
+            "cable_clamp",
+            "bend_radius",
+            "tie_point",
+            "edge_protection"
+          ],
+          "loop_feedback": "Add strain-relief clamps or grommets at every cable exit, state a minimum bend radius, and reroute harnesses away from hinge lines and sharp edges.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        },
+        {
+          "criterion": "connector_accessibility_and_keying",
+          "weight": 8,
+          "good": "Connectors are reachable without disassembling structure, have finger/tool clearance, and mention keying or labeling to prevent mis-mating.",
+          "bad": "Connectors face closed walls, sit in unreachable pockets, or identical adjacent connectors have no keying or label.",
+          "signals": [
+            "connector_clearance",
+            "keying",
+            "label",
+            "mate_demate",
+            "access_pocket"
+          ],
+          "loop_feedback": "Reorient connectors toward access openings, add finger clearance pockets, and engrave keying/ID labels next to each connector.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "haptic_glove",
+      "title": "Haptic Glove Pair Criteria",
+      "criteria": [
+        {
+          "criterion": "finger_cartridge_service",
+          "weight": 14,
+          "good": "Per-finger linkage cartridges are removable by single pin or visible hinge access.",
+          "bad": "Finger linkages are glued, buried, or represented only as a glove shell.",
+          "signals": [
+            "finger cartridge",
+            "single-pin",
+            "hinge",
+            "linkage",
+            "thimble"
+          ],
+          "loop_feedback": "Model per-finger cartridges with hinge pin holes, thimble sockets, and visible single-pin removal path."
+        },
+        {
+          "criterion": "actuator_module_access",
+          "weight": 12,
+          "good": "Flexion-resistance actuator modules plug in and remain visible near knuckle row.",
+          "bad": "Actuators are bonded or hidden without connector/service geometry.",
+          "signals": [
+            "actuator module",
+            "plug-in",
+            "connector",
+            "knuckle row",
+            "brake"
+          ],
+          "loop_feedback": "Add plug-in actuator pockets, connector openings, knuckle-row mounts, and service labels."
+        },
+        {
+          "criterion": "wearable_comfort_boundary",
+          "weight": 9,
+          "good": "Rigid mock assembly preserves soft-contact cues, wrist quick release, and ergonomic clearance.",
+          "bad": "Rigid shell ignores don/doff, comfort, and finger clearance.",
+          "signals": [
+            "wrist band",
+            "quick release",
+            "soft liner",
+            "clearance",
+            "comfort"
+          ],
+          "loop_feedback": "Add wrist quick release, soft-contact interface zones, finger clearance, and cable raceway inspection."
+        },
+        {
+          "criterion": "flex_cycle_harness_durability",
+          "weight": 9,
+          "good": "Finger and wrist wiring uses service loops, strain relief at every flex boundary, and a stated bend radius sized for repeated flexion cycles.",
+          "bad": "Wires run taut across knuckles or terminate at rigid mounts with no relief, inviting fatigue failure.",
+          "signals": [
+            "service_loop",
+            "strain_relief",
+            "bend_radius",
+            "flex_cycle",
+            "knuckle_crossing"
+          ],
+          "loop_feedback": "Add service loops and strain relief at each knuckle and wrist crossing, and state a flex-rated bend radius.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "electronics_routing",
+      "title": "Electronics, Signal, and Motor Wiring Judgment",
+      "criteria": [
+        {
+          "criterion": "power_signal_separation",
+          "weight": 9,
+          "good": "Motor power lines and sensor/encoder signal lines run in separate channels or are spaced/crossed at right angles, with the separation visible in routing geometry.",
+          "bad": "Power and signal wires share one tight bundle along the whole route with no separation or shielding note.",
+          "signals": [
+            "power_channel",
+            "signal_channel",
+            "separation",
+            "shield",
+            "twisted_pair"
+          ],
+          "loop_feedback": "Split power and signal into separate raceways or add spacing/shielding notes where they must share a channel."
+        },
+        {
+          "criterion": "return_path_and_grounding_intent",
+          "weight": 8,
+          "good": "Each electronics module states its grounding scheme (star point, chassis bond, isolated) and signal returns route alongside their signals.",
+          "bad": "Grounding is unmentioned; returns are implied through structure with no bond feature or note.",
+          "signals": [
+            "ground_point",
+            "chassis_bond",
+            "star_ground",
+            "return_path"
+          ],
+          "loop_feedback": "Add a named ground/bond feature per module and state how each signal's return path is routed."
+        },
+        {
+          "criterion": "board_mounting_and_clearance",
+          "weight": 8,
+          "good": "PCBs mount on standoffs with keep-out clearance to walls and moving parts, connector edges face access openings, and mounting holes match standard board patterns.",
+          "bad": "Boards are floated or glued in cavities with no standoffs, clearance, or connector orientation logic.",
+          "signals": [
+            "standoff",
+            "keep_out",
+            "mounting_hole",
+            "connector_edge",
+            "board_clearance"
+          ],
+          "loop_feedback": "Mount each board on standoffs with stated keep-out clearance and orient connector edges toward access openings."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "title": "Part-to-Assembly Integration and Structural Development",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "weight": 12,
+          "good": "Every inter-part interface names a specific connection type (bolted, threaded_insert, snap_fit, press_fit, dovetail_slide, clevis_pin, revolute_bearing, band_clamp, adhesive_lap, o_ring, connector_mate, harness_passthrough) with its DOF and a numeric clearance.",
+          "bad": "Interfaces are labeled only 'mount' or 'attach' with no connection type, DOF, or clearance.",
+          "signals": [
+            "connection_type",
+            "dof",
+            "clearance_mm",
+            "bolt_circle",
+            "snap_fit",
+            "press_fit",
+            "band_clamp"
+          ],
+          "loop_feedback": "For each interface pick a connection type from the taxonomy, state its DOF (0/1R/1T/1R1T/3R), and add a numeric clearance and the matching geometry feature.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf",
+            "sources/public/Fastener Design Manual (NASA).pdf"
+          ]
+        },
+        {
+          "criterion": "assembly_sequence_feasible",
+          "weight": 10,
+          "good": "Parts can be installed in a stated order where every fastener, connector, and mating feature stays reachable; no installed part blocks access to a later one; last-installed and captive parts are identified.",
+          "bad": "Assembly order is unstated or impossible — a part traps another, or a fastener ends up behind a wall with no access.",
+          "signals": [
+            "assembly_order",
+            "install_first",
+            "install_last",
+            "captive",
+            "tool_access",
+            "access_clearance"
+          ],
+          "loop_feedback": "State an installation order and verify each joint is reachable when it is made; reorder or add access openings where a part would trap another.",
+          "source_refs": [
+            "sources/public/nasa_systems_engineering_handbook_0.pdf"
+          ]
+        },
+        {
+          "criterion": "datum_chain_continuity",
+          "weight": 10,
+          "good": "One primary datum part anchors the assembly; each other part locates off a named parent datum using a 3-2-1 scheme, so tolerance does not accumulate uncontrolled across the stack.",
+          "bad": "Parts float with no shared datum, or each part references a different feature so stack-up grows part-to-part.",
+          "signals": [
+            "primary_datum",
+            "datum_parent",
+            "locating_scheme",
+            "3-2-1",
+            "tolerance_stack"
+          ],
+          "loop_feedback": "Name one primary datum part, route each part's location back to it through one parent datum, and keep critical fits off the primary datum to limit stack-up.",
+          "source_refs": [
+            "sources/public/machineryshandbo00indu.pdf"
+          ]
+        },
+        {
+          "criterion": "load_path_closure",
+          "weight": 11,
+          "good": "Every part's primary load traces through named interfaces to the base/ground; the load path closes for all parts and high-load joints use load-appropriate connection types.",
+          "bad": "One or more parts carry load with no continuous path to ground, or a high-load joint uses a low-load connection (e.g. snap-fit holding a structural member).",
+          "signals": [
+            "load_path",
+            "to_base",
+            "carry_through",
+            "reaction",
+            "fitting",
+            "load_closure"
+          ],
+          "loop_feedback": "Trace each part's main load to the base through named interfaces; upgrade any load-bearing joint from snap/adhesive to bolted/pinned/clamped and add the fitting where the path breaks."
+        },
+        {
+          "criterion": "structural_development_direction",
+          "weight": 9,
+          "good": "Compared to the previous version the design moves the right direction: fewer interfaces, parts consolidated where service is preserved, open load paths closed, and redundancy added only at critical joints.",
+          "bad": "Iteration adds interfaces or loose parts without justification, or consolidates in a way that buries service access.",
+          "signals": [
+            "interface_count",
+            "part_consolidation",
+            "load_path_closed",
+            "redundancy",
+            "delta_vs_parent"
+          ],
+          "loop_feedback": "Drive the next version toward fewer justified interfaces, consolidated printable parts that keep service access, and closed load paths; add redundancy only at safety-critical joints."
+        },
+        {
+          "criterion": "interface_minimization",
+          "weight": 8,
+          "good": "The assembly uses the fewest interfaces that still allow service and manufacture; each remaining interface is justified by service, motion, manufacture split, or load transfer.",
+          "bad": "Many redundant or unexplained interfaces, or arbitrary part splits that add joints without a service/manufacture reason.",
+          "signals": [
+            "interface_count",
+            "justified_split",
+            "service_split",
+            "manufacture_split"
+          ],
+          "loop_feedback": "Merge interfaces that exist for no service/motion/manufacture/load reason; keep a split only when it earns its joint."
+        }
+      ]
+    }
+  ]
+}

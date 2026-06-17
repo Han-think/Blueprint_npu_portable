@@ -1,0 +1,213 @@
+{
+  "schema": "blueprint_skeleton_pack_v1",
+  "seed": "small_launch_vehicle",
+  "pass": "PASS-0",
+  "instruction": "Lay out the top-level part_tree with one node per required_subsystem, a global datum scheme, the overall envelope, and stub interfaces between subsystems. No detailed geometry.",
+  "disciplines": {
+    "structures": "Load-bearing geometry, frames, spars, skins, joints, stiffness",
+    "mechanisms": "Linkages, hinges, gears, cams, deployment, tilt/rotation devices",
+    "power": "Battery, solar generation, charging, distribution, connectors",
+    "electronics": "Boards, drivers, wiring, signal routing, grounding",
+    "recovery_deployment": "Parachutes, deployables, release mechanisms (display-level)",
+    "integration": "Datums, interfaces, harness routing, service access, assembly order"
+  },
+  "required_subsystems": [
+    {
+      "id": "primary_structure",
+      "discipline": "structures",
+      "function": "Propellant tank dummy barrels (LOX/fuel), interstage, payload fairing, fin set, skirts; stacking datums and alignment keys",
+      "evidence_features": [
+        "tank_dummy",
+        "propellant_tank_dummy",
+        "payload_fairing",
+        "nose_cone",
+        "fin_set",
+        "interstage_datum",
+        "alignment_key",
+        "bolt_circle_dummy"
+      ]
+    },
+    {
+      "id": "engine_display",
+      "discipline": "mechanisms",
+      "function": "Removable engine display cartridge: combustion chamber dummy, bell nozzle shell, turbopump dummy in cutaway bay (non-functional)",
+      "evidence_features": [
+        "engine_display_cartridge",
+        "combustion_chamber_dummy",
+        "bell_nozzle_shell",
+        "turbopump_assembly_dummy",
+        "impeller_dummy",
+        "stage_engine_mock",
+        "cutaway_window",
+        "slide_rail"
+      ]
+    },
+    {
+      "id": "avionics_bay",
+      "discipline": "electronics",
+      "function": "Avionics ring/tray with board mounts and harness pass-throughs",
+      "evidence_features": [
+        "avionics_tray",
+        "harness_passthrough",
+        "board_standoff"
+      ]
+    },
+    {
+      "id": "power_display",
+      "discipline": "power",
+      "function": "Battery module dummy with access panel",
+      "evidence_features": [
+        "battery_module",
+        "access_panel"
+      ]
+    },
+    {
+      "id": "recovery_bay",
+      "discipline": "recovery_deployment",
+      "function": "Parachute bay dummy with deployment door hinge (display-level)",
+      "evidence_features": [
+        "recovery_bay",
+        "deploy_door",
+        "hinge"
+      ]
+    },
+    {
+      "id": "separation_display",
+      "discipline": "mechanisms",
+      "function": "Stage separation plane shown as datum + dummy clamp band (no energetic device)",
+      "evidence_features": [
+        "separation_plane_datum",
+        "clamp_band_dummy"
+      ]
+    },
+    {
+      "id": "integration_inspection",
+      "discipline": "integration",
+      "function": "Assembly order evidence, inspection windows, readiness checklist hooks, connection types and load-path closure",
+      "evidence_features": [
+        "inspection_window",
+        "assembly_datum",
+        "checklist_callout"
+      ]
+    }
+  ],
+  "completeness_rule": "Every required_subsystem must appear in part_tree with at least one evidence_feature in geometry_ops; a missing subsystem is a scorecard failure, not a style issue.",
+  "global_judgment_summary": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "loop_feedback": "Map every P0 feature target into a named part_tree child and at least one geometry_op id or target."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "loop_feedback": "Add coordinate-bearing geometry_ops across upstream/downstream/side/service regions instead of stacking features."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "loop_feedback": "Replace box-only geometry with interface bosses, service pockets, drilled holes, channels, ribs, and labels."
+        },
+        {
+          "criterion": "mechanism_named_not_implied",
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry."
+        }
+      ]
+    },
+    {
+      "id": "datum_tolerance",
+      "criteria": [
+        {
+          "criterion": "datum_visibility",
+          "loop_feedback": "Add visible datum pads or axis/rail/socket features and label their mating function."
+        },
+        {
+          "criterion": "clearance_named",
+          "loop_feedback": "Add clearance_mm or tolerance notes for hinge pins, slide rails, sockets, and removable cartridges."
+        },
+        {
+          "criterion": "interface_count",
+          "loop_feedback": "Add at least three adjacent interfaces: mount, service, electrical/data, flow, or inspection datum."
+        },
+        {
+          "criterion": "standard_fit_vocabulary",
+          "loop_feedback": "Classify each mating diameter as clearance/transition/press fit and add a numeric allowance instead of line-to-line nominals."
+        },
+        {
+          "criterion": "standard_hardware_dimensioning",
+          "loop_feedback": "Snap hole, pin, and bearing dimensions to standard catalog sizes and name the intended hardware in callouts."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "loop_feedback": "For each interface pick a connection type from the taxonomy, state its DOF (0/1R/1T/1R1T/3R), and add a numeric clearance and the matching geometry feature."
+        },
+        {
+          "criterion": "assembly_sequence_feasible",
+          "loop_feedback": "State an installation order and verify each joint is reachable when it is made; reorder or add access openings where a part would trap another."
+        },
+        {
+          "criterion": "datum_chain_continuity",
+          "loop_feedback": "Name one primary datum part, route each part's location back to it through one parent datum, and keep critical fits off the primary datum to limit stack-up."
+        },
+        {
+          "criterion": "load_path_closure",
+          "loop_feedback": "Trace each part's main load to the base through named interfaces; upgrade any load-bearing joint from snap/adhesive to bolted/pinned/clamped and add the fitting where the path breaks."
+        },
+        {
+          "criterion": "structural_development_direction",
+          "loop_feedback": "Drive the next version toward fewer justified interfaces, consolidated printable parts that keep service access, and closed load paths; add redundancy only at safety-critical joints."
+        },
+        {
+          "criterion": "interface_minimization",
+          "loop_feedback": "Merge interfaces that exist for no service/motion/manufacture/load reason; keep a split only when it earns its joint."
+        }
+      ]
+    }
+  ],
+  "connection_taxonomy": {
+    "rule": "Name each inter-part interface with one of these connection types + its DOF + a numeric clearance, instead of a vague 'mount'.",
+    "dof_codes": "0=fixed, 1R=revolute, 1T=prismatic, 1R1T=cylindrical, 3R=spherical",
+    "families": {
+      "fastened": [
+        "bolted_through(0)",
+        "threaded_insert(0)",
+        "rivet(0)"
+      ],
+      "form_fit": [
+        "snap_fit(0)",
+        "press_fit(0)",
+        "dovetail_slide(1T)",
+        "keyed_spline(1T)",
+        "tongue_groove(0)"
+      ],
+      "pinned_hinged": [
+        "dowel_pin(0)",
+        "clevis_pin(1R)",
+        "revolute_bearing(1R)"
+      ],
+      "clamped": [
+        "band_clamp(0)",
+        "collar_setscrew(0)"
+      ],
+      "bonded": [
+        "adhesive_lap(0)",
+        "weld_seam(0)"
+      ],
+      "sealed": [
+        "o_ring(0)",
+        "face_gasket(0)"
+      ],
+      "routed": [
+        "connector_mate(0)",
+        "harness_passthrough(0)",
+        "fluid_manifold(0)"
+      ]
+    }
+  },
+  "boundary_note": "All subsystems are educational display mockups; no propulsion, ignition, or flight-performance design."
+}

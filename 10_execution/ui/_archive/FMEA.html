@@ -1,0 +1,359 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<title>FMEA · Blueprint NPU</title>
+<link rel="stylesheet" href="colors_and_type.css">
+<style>body{margin:0;background:#0c1e35;color:#eaf2ff;font-family:Inter,sans-serif}.mono{font-family:'JetBrains Mono',monospace}</style>
+</head><body class="bp">
+<div id="topnav"></div><div id="root"></div>
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script src="vendor/babel.js"></script>
+<script type="text/babel" src="TopNav.jsx"></script>
+<script type="text/babel">setTimeout(()=>window.BPMountTopNav&&window.BPMountTopNav('FMEA'),100);</script>
+<script type="text/babel">
+const {useState,useMemo}=React;
+const C={canvas:'#0c1e35',canvas2:'#0a1a2f',canvas3:'#08152a',frame:'#274a79',ink:'#eaf2ff',ink2:'#9fb6d9',ink3:'#6f8cb0',
+        lox:'#9fd3ff',lh2:'#ffd39f',inter:'#89ffa8',halo:'#caa9ff',risk:'#ff8c8c'};
+
+// AS9100 / SAE J1739 style D-FMEA · Severity(1-10) × Occurrence(1-10) × Detection(1-10) = RPN
+// 14 failure modes spanning AM defects, joint failure, material limits, post-process gaps
+const FMEA = [
+  {id:'F01', part:'P7 Combustion chamber', mat:'GRCop-42',
+   mode:'Witness-line porosity at restart layer',
+   cause:'LPBF process interruption → lack-of-fusion at restart',
+   effect:'Crack initiation under thermal cycling · burst at chamber pressure',
+   sev:10, occ:4, det:6,
+   ctrl:'CT-scan post-HIP · in-situ melt-pool monitoring',
+   mit:'No-restart policy · process witness coupons every 10mm Z · sub-CT before HIP',
+   owner:'AM-Lead', link:'lineage.NCR-2026-103', status:'OPEN'},
+
+  {id:'F02', part:'P7 Combustion chamber', mat:'GRCop-42',
+   mode:'Cooling channel Ra > 12µm',
+   cause:'90° build down-skin · staircase effect · no AFM',
+   effect:'Pressure drop +18% · coolant starvation · throat hot-spot',
+   sev:8, occ:7, det:3,
+   ctrl:'Borescope post-HIP · ΔP test at 3 MPa',
+   mit:'AFM rework spec on flight units · build at 45° if AFM unavailable',
+   owner:'Process-Eng', link:'inspection.CH013', status:'IN-WORK'},
+
+  {id:'F03', part:'P3 Turbine housing', mat:'IN718',
+   mode:'Anisotropic creep along build axis',
+   cause:'Columnar grain growth from LPBF thermal gradient',
+   effect:'Premature creep at 650°C operating temp · housing distortion',
+   sev:9, occ:3, det:5,
+   ctrl:'HIP recrystallisation · destructive creep test on coupon every 5 builds',
+   mit:'Build orientation 45° to load axis · solution+age per AMS 5663',
+   owner:'Materials', link:'materials.IN718', status:'CONTAINED'},
+
+  {id:'F04', part:'P9 Nozzle skirt', mat:'IN718',
+   mode:'Skirt mass over target +5.4%',
+   cause:'Wall thickness over-spec by 0.4mm for HIP safety margin',
+   effect:'CG shift aft 8mm · pitch authority margin reduced 6%',
+   sev:5, occ:8, det:2,
+   ctrl:'CMM wall scan + mass.v0.3 roll-up',
+   mit:'Iterate to V1.3 with topology-optimised wall · adjust gimbal travel +2°',
+   owner:'Design', link:'mass.P9', status:'ACCEPTED'},
+
+  {id:'F05', part:'J3 Hi-Lok bolts ×32 (P3↔P4)', mat:'Ti-6Al-4V',
+   mode:'Hydrogen embrittlement of cad-plated bolts',
+   cause:'Plating bath H₂ pickup · no post-plate bake',
+   effect:'Bolt head pops at preload · joint separation in flight',
+   sev:10, occ:2, det:7,
+   ctrl:'Post-plate bake 191°C/23h per AMS 2759/9 · sample tensile test',
+   mit:'Switch to passivated Ti Hi-Lok (no plating) · or A286 superalloy fastener',
+   owner:'Fasteners', link:'joints.J3', status:'OPEN'},
+
+  {id:'F06', part:'J1 V-band P3↔P4', mat:'IN718',
+   mode:'V-band relaxation at thermal soak',
+   cause:'CTE mismatch with mating flanges · clamp preload decay',
+   effect:'Joint leak · hot gas escape · ducting compromised',
+   sev:9, occ:5, det:4,
+   ctrl:'Helium leak check post-assembly · torque-stripe witness',
+   mit:'Belleville washers in stack · 5-point re-torque after 1st thermal cycle',
+   owner:'Joints', link:'joints.J1', status:'IN-WORK'},
+
+  {id:'F07', part:'P5 LH2 feed line', mat:'IN625',
+   mode:'Internal channel necking < Ø1.0mm',
+   cause:'LPBF down-skin droop in horizontal channel section',
+   effect:'Flow restriction · pressure drop · pump cavitation',
+   sev:8, occ:4, det:4,
+   ctrl:'CT scan on every flight unit',
+   mit:'Self-supporting teardrop cross-section · build axis aligned with flow',
+   owner:'Design', link:'materials.IN625', status:'MITIGATED'},
+
+  {id:'F08', part:'P11 Injector face', mat:'IN718',
+   mode:'Coking on injector orifice',
+   cause:'Surface Ra 8µm + hot-fire residue',
+   effect:'O/F ratio drift · combustion instability',
+   sev:8, occ:6, det:5,
+   ctrl:'Post hot-fire borescope · flow bench every 3 firings',
+   mit:'Electropolish orifice region post-machine · refurb interval 10 firings',
+   owner:'Process-Eng', link:null, status:'IN-WORK'},
+
+  {id:'F09', part:'P10 Gimbal yoke', mat:'Ti-6Al-4V',
+   mode:'Fatigue crack at bearing bore',
+   cause:'As-built α′ martensite + stress concentration at bore radius',
+   effect:'Yoke failure during gimballing · loss of thrust vector',
+   sev:10, occ:2, det:6,
+   ctrl:'FPI (fluorescent penetrant) every 5 hot-fires',
+   mit:'HIP sub-β + age · bore radius increased from R2 to R4',
+   owner:'Materials', link:'materials.Ti64', status:'MITIGATED'},
+
+  {id:'F10', part:'P8 Throat insert', mat:'GRCop-42',
+   mode:'Throat erosion beyond Ø48.3mm',
+   cause:'Cu vaporisation at 2800°C plume · oxidiser-rich pulse',
+   effect:'Isp drop · chamber pressure decay · thrust shortfall',
+   sev:7, occ:5, det:3,
+   ctrl:'Pre/post hot-fire CMM on throat · plume IR spectroscopy',
+   mit:'Refurb at +0.2mm growth · ZrC liner option for V1.3',
+   owner:'Test', link:'test.HF-2026-007', status:'ACCEPTED'},
+
+  {id:'F11', part:'P4 Hot-side manifold', mat:'IN718',
+   mode:'Residual stress warp at solution treat',
+   cause:'Long thin web · uneven cooling in furnace',
+   effect:'Mating flange flatness out of spec · gasket leak path',
+   sev:7, occ:6, det:3,
+   ctrl:'Pre/post solution CMM',
+   mit:'Stress-relief at 1065°C before unfastening from build plate · trim machine post-age',
+   owner:'Process-Eng', link:'inspection.CH006', status:'MITIGATED'},
+
+  {id:'F12', part:'P12 Cable tray', mat:'AlSi10Mg',
+   mode:'Anodise stripping near welds',
+   cause:'Surface contamination from build powder · post weld over-heat',
+   effect:'Galvanic corrosion contact with Ti fasteners · long-term embrittlement',
+   sev:5, occ:4, det:4,
+   ctrl:'Salt-spray test on coupon',
+   mit:'Mask weld zones · re-anodise post weld',
+   owner:'Process-Eng', link:null, status:'CONTAINED'},
+
+  {id:'F13', part:'P6 Heat exchanger core', mat:'IN625',
+   mode:'Internal channel partial blockage from un-melted powder',
+   cause:'Inadequate powder evacuation after build',
+   effect:'Heat transfer 35% below predicted · LH2 boil-off',
+   sev:9, occ:4, det:5,
+   ctrl:'Ultrasonic flush + weighed-out powder check',
+   mit:'Drain port at lowest point · 3-axis tumble + ultrasonic 30min · CT validation',
+   owner:'AM-Lead', link:null, status:'IN-WORK'},
+
+  {id:'F14', part:'Assembly · BP-V1.2', mat:'—',
+   mode:'Tolerance stack exceeds throat alignment budget 0.4mm',
+   cause:'P3+P4+P7+P8 stack RSS = 0.31mm (no margin for assembly slip)',
+   effect:'Throat off-axis · uneven heat load · chamber wall failure',
+   sev:9, occ:3, det:7,
+   ctrl:'Optical alignment fixture · post-stack runout measurement',
+   mit:'Add datum pin at P3 interface · tighten P7 outer Ø to ±0.07',
+   owner:'Design', link:'joints.tol_stack', status:'OPEN'},
+];
+
+const STATUS_C = {OPEN:C.risk, 'IN-WORK':C.lh2, MITIGATED:C.inter, ACCEPTED:C.halo, CONTAINED:C.lox};
+
+function rpn(f){ return f.sev * f.occ * f.det; }
+function rpnColor(r){
+  if(r>=200) return C.risk;
+  if(r>=120) return C.lh2;
+  if(r>=60)  return C.lox;
+  return C.inter;
+}
+
+// 10×10 risk heatmap on Severity × Occurrence axes, with cells highlighted for items in that bucket
+function RiskMatrix({items, sel, onSel}){
+  const cell = 26;
+  const W = 11*cell+30, H = 11*cell+30;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',maxWidth:400,height:'auto',background:C.canvas3}}>
+      {/* grid */}
+      {Array.from({length:10}).map((_,sev)=>Array.from({length:10}).map((_,occ)=>{
+        const s=10-sev, o=occ+1;
+        const inBucket = items.filter(f=>f.sev===s && f.occ===o);
+        const score = s*o;
+        const tone = score>=70?C.risk:score>=40?C.lh2:score>=20?C.lox:C.inter;
+        return (
+          <g key={sev+'-'+occ}>
+            <rect x={30+occ*cell} y={sev*cell} width={cell-1} height={cell-1}
+                  fill={tone} fillOpacity={0.08} stroke={C.frame} strokeWidth="0.5"/>
+            {inBucket.map((f,i)=>(
+              <circle key={f.id} cx={30+occ*cell+cell/2+(i-(inBucket.length-1)/2)*5} cy={sev*cell+cell/2}
+                      r={5} fill={rpnColor(rpn(f))} stroke={sel===f.id?C.ink:'transparent'} strokeWidth="1.5"
+                      style={{cursor:'pointer'}} onClick={()=>onSel(f.id)}>
+                <title>{f.id} · {f.part} · RPN {rpn(f)}</title>
+              </circle>
+            ))}
+          </g>
+        );
+      }))}
+      {/* y axis labels (severity) */}
+      <text x={6} y={H/2} fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono"
+            transform={`rotate(-90 6 ${H/2})`} textAnchor="middle">SEVERITY →</text>
+      {[10,8,6,4,2,1].map(s=>(
+        <text key={s} x={26} y={(10-s)*cell+cell/2+3} fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="end">{s}</text>
+      ))}
+      {/* x axis labels (occurrence) */}
+      <text x={W/2} y={H-4} fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="middle">OCCURRENCE →</text>
+      {[1,3,5,7,9,10].map(o=>(
+        <text key={o} x={30+(o-1)*cell+cell/2} y={11*cell+12} fill={C.ink3} fontSize="9" fontFamily="JetBrains Mono" textAnchor="middle">{o}</text>
+      ))}
+    </svg>
+  );
+}
+
+function App(){
+  const [sel,setSel] = useState('F01');
+  const [filter,setFilter] = useState('all');
+
+  const filtered = useMemo(()=>{
+    if(filter==='all') return FMEA;
+    if(filter==='critical') return FMEA.filter(f=>rpn(f)>=120);
+    return FMEA.filter(f=>f.status===filter);
+  },[filter]);
+
+  const selF = FMEA.find(f=>f.id===sel);
+  const stats = useMemo(()=>({
+    total:FMEA.length,
+    critical:FMEA.filter(f=>rpn(f)>=120).length,
+    open:FMEA.filter(f=>f.status==='OPEN').length,
+    maxRpn:Math.max(...FMEA.map(rpn)),
+    avgRpn:Math.round(FMEA.reduce((s,f)=>s+rpn(f),0)/FMEA.length),
+  }),[]);
+
+  return (
+    <div style={{maxWidth:1200,margin:'0 auto',padding:'18px 24px 60px'}}>
+      <div style={{display:'flex',alignItems:'baseline',gap:14,marginBottom:14}}>
+        <h1 style={{margin:0,fontSize:22,fontWeight:600,color:C.ink}}>FMEA</h1>
+        <span className="mono" style={{color:C.ink3,fontSize:11}}>D-FMEA · SAE J1739 · 14 modes · RPN = S × O × D</span>
+      </div>
+
+      {/* summary tiles */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(5,1fr)',gap:10,marginBottom:18}}>
+        {[
+          {k:'TOTAL MODES',  v:stats.total,   c:C.lox,   s:'tracked'},
+          {k:'CRITICAL',     v:stats.critical,c:C.risk,  s:'RPN ≥ 120'},
+          {k:'OPEN',         v:stats.open,    c:C.lh2,   s:'no mitigation yet'},
+          {k:'MAX RPN',      v:stats.maxRpn,  c:C.risk,  s:'worst mode'},
+          {k:'AVG RPN',      v:stats.avgRpn,  c:C.lox,   s:'all modes'},
+        ].map(t=>(
+          <div key={t.k} style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:'12px 14px'}}>
+            <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{t.k}</div>
+            <div className="mono" style={{color:t.c,fontSize:22,marginTop:4}}>{t.v}</div>
+            <div className="mono" style={{color:C.ink3,fontSize:10}}>{t.s}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'420px 1fr',gap:14,marginBottom:14}}>
+        {/* risk matrix */}
+        <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:14}}>
+          <div className="mono" style={{color:C.lox,fontSize:11,letterSpacing:'.12em',marginBottom:8}}>RISK MATRIX · S × O</div>
+          <RiskMatrix items={FMEA} sel={sel} onSel={setSel}/>
+          <div className="mono" style={{fontSize:9.5,color:C.ink3,marginTop:8,lineHeight:1.6}}>
+            Detection (D) shown as bubble color. RPN = S × O × D.<br/>
+            <span style={{color:C.risk}}>● RPN ≥ 200</span> &nbsp;
+            <span style={{color:C.lh2}}>● 120–199</span> &nbsp;
+            <span style={{color:C.lox}}>● 60–119</span> &nbsp;
+            <span style={{color:C.inter}}>● &lt; 60</span>
+          </div>
+        </div>
+
+        {/* selected detail */}
+        {selF && (
+          <div style={{border:`1px solid ${rpnColor(rpn(selF))}`,background:C.canvas2,padding:16}}>
+            <div style={{display:'flex',alignItems:'baseline',gap:10,marginBottom:8}}>
+              <span className="mono" style={{color:rpnColor(rpn(selF)),fontSize:13,letterSpacing:'.06em'}}>{selF.id}</span>
+              <span className="mono" style={{color:C.ink,fontSize:13}}>{selF.part}</span>
+              <span className="mono" style={{color:C.ink3,fontSize:10}}>· {selF.mat}</span>
+              <span style={{flex:1}}/>
+              <span className="mono" style={{color:STATUS_C[selF.status],fontSize:10,letterSpacing:'.08em',border:`1px solid ${STATUS_C[selF.status]}`,padding:'2px 8px'}}>{selF.status}</span>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'70px 1fr',gap:'4px 12px',fontSize:11,lineHeight:1.55}} className="mono">
+              <span style={{color:C.ink3}}>MODE</span>     <span style={{color:C.ink}}>{selF.mode}</span>
+              <span style={{color:C.ink3}}>CAUSE</span>    <span style={{color:C.ink2}}>{selF.cause}</span>
+              <span style={{color:C.ink3}}>EFFECT</span>   <span style={{color:C.risk}}>{selF.effect}</span>
+              <span style={{color:C.ink3}}>CONTROL</span>  <span style={{color:C.ink2}}>{selF.ctrl}</span>
+              <span style={{color:C.ink3}}>MITIGATE</span> <span style={{color:C.inter}}>{selF.mit}</span>
+              <span style={{color:C.ink3}}>OWNER</span>    <span style={{color:C.lox}}>{selF.owner}</span>
+              {selF.link && <><span style={{color:C.ink3}}>XREF</span>     <span style={{color:C.halo}}>→ {selF.link}</span></>}
+            </div>
+            <div style={{display:'flex',gap:14,marginTop:14,paddingTop:12,borderTop:`1px dashed ${C.frame}`}}>
+              {[['S',selF.sev,C.risk],['O',selF.occ,C.lh2],['D',selF.det,C.lox],['RPN',rpn(selF),rpnColor(rpn(selF))]].map(([k,v,col])=>(
+                <div key={k} style={{textAlign:'center'}}>
+                  <div className="mono" style={{color:C.ink3,fontSize:9.5,letterSpacing:'.12em'}}>{k}</div>
+                  <div className="mono" style={{color:col,fontSize:22}}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* filter chips */}
+      <div style={{display:'flex',gap:6,marginBottom:8}}>
+        {['all','critical','OPEN','IN-WORK','MITIGATED','ACCEPTED','CONTAINED'].map(f=>(
+          <button key={f} onClick={()=>setFilter(f)}
+            className="mono"
+            style={{
+              fontSize:10,letterSpacing:'.08em',padding:'4px 10px',
+              background:filter===f?C.lox:'transparent',
+              color:filter===f?C.canvas:C.ink2,
+              border:`1px solid ${filter===f?C.lox:C.frame}`,
+              cursor:'pointer',
+            }}>{f}</button>
+        ))}
+        <span style={{flex:1}}/>
+        <span className="mono" style={{color:C.ink3,fontSize:10,alignSelf:'center'}}>{filtered.length} of {FMEA.length} shown</span>
+      </div>
+
+      {/* table */}
+      <div style={{border:`1px solid ${C.frame}`,background:C.canvas2,padding:14}}>
+        <table className="mono" style={{width:'100%',borderCollapse:'collapse',fontSize:10.5}}>
+          <thead><tr style={{color:C.ink3,borderBottom:`1px solid ${C.frame}`}}>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>ID</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>PART</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>FAILURE MODE</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>S</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>O</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>D</th>
+            <th style={{textAlign:'right',padding:'5px 6px'}}>RPN</th>
+            <th style={{padding:'5px 6px'}}>STATUS</th>
+            <th style={{textAlign:'left',padding:'5px 6px'}}>OWNER</th>
+          </tr></thead>
+          <tbody>
+          {filtered.map(f=>{
+            const r = rpn(f);
+            return (
+              <tr key={f.id}
+                  onClick={()=>setSel(f.id)}
+                  style={{cursor:'pointer',background:sel===f.id?'rgba(159,211,255,0.08)':'transparent',borderBottom:`1px dashed ${C.frame}`}}>
+                <td style={{padding:'4px 6px',color:rpnColor(r)}}>{f.id}</td>
+                <td style={{padding:'4px 6px',color:C.ink}}>{f.part}</td>
+                <td style={{padding:'4px 6px',color:C.ink2}}>{f.mode}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.risk}}>{f.sev}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.lh2}}>{f.occ}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:C.lox}}>{f.det}</td>
+                <td style={{padding:'4px 6px',textAlign:'right',color:rpnColor(r),fontWeight:600}}>{r}</td>
+                <td style={{padding:'4px 6px',textAlign:'center'}}>
+                  <span style={{color:STATUS_C[f.status],fontSize:9.5,letterSpacing:'.06em',border:`1px solid ${STATUS_C[f.status]}`,padding:'1px 6px'}}>{f.status}</span>
+                </td>
+                <td style={{padding:'4px 6px',color:C.ink3}}>{f.owner}</td>
+              </tr>
+            );
+          })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* SCHEMA */}
+      <div style={{marginTop:18,padding:14,border:`1px dashed ${C.frame}`,background:C.canvas3}} className="mono">
+        <div style={{color:C.lox,fontSize:10,letterSpacing:'.12em',marginBottom:6}}>SCHEMA · fmea.v0.5 · SAE J1739</div>
+        <pre style={{margin:0,fontSize:10,color:C.ink2,lineHeight:1.5,background:'transparent',border:0,padding:0}}>{`{
+  "scale": "S,O,D ∈ [1..10]",
+  "rpn":   "S * O * D · max 1000",
+  "thresholds": { "critical": ">=120", "review": ">=60" },
+  "policy":     { "open_critical_blocks": "lineage.fai_release" },
+  "links":      ["lineage.NCR", "inspection.CH", "joints.J", "materials.lot"],
+  "feeds":      "test.required_coupons"
+}`}</pre>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body></html>

@@ -1,0 +1,50 @@
+{
+  "schema": "blueprint_design_pass_protocol_v1",
+  "purpose": "Progressive coarse-to-fine design protocol. The design is never generated in one shot: each pass receives only the minimum context slice (micro-pack) it needs, so a local model stays within a stable load budget while engineering judgment is applied at every level of detail.",
+  "principle": "Outer frame first, then infiltrate inward: skeleton -> per-subsystem detail -> interface reconciliation -> integration scoring. A later pass may only refine what an earlier pass established; it may not silently restructure it.",
+  "passes": [
+    {
+      "id": "PASS-0",
+      "name": "skeleton",
+      "model_call": "one call total",
+      "input": ["packs/<seed>/skeleton.json"],
+      "max_input_kb": 6,
+      "output": "Top-level part_tree with one node per required_subsystem, global datum scheme, overall envelope, and stub adjacent_interfaces between subsystems. No detailed geometry_ops allowed.",
+      "forbidden": ["detailed features", "fastener-level geometry", "per-subsystem internals"]
+    },
+    {
+      "id": "PASS-1",
+      "name": "subsystem_detail",
+      "model_call": "one call per required_subsystem, sequential",
+      "input": [
+        "packs/<seed>/<subsystem_id>.json",
+        "PASS-0 skeleton output",
+        "interface summaries of adjacent subsystems only (no foreign geometry)"
+      ],
+      "max_input_kb": 10,
+      "output": "For this subsystem only: P0 plan -> part_tree children -> 12-24 coordinate-bearing geometry_ops, with every evidence_feature represented.",
+      "forbidden": ["modifying other subsystems", "global envelope changes", "skipping evidence_features"]
+    },
+    {
+      "id": "PASS-2",
+      "name": "interface_reconcile",
+      "model_call": "one call total",
+      "input": ["adjacent_interfaces lists of all subsystems (geometry stripped)"],
+      "max_input_kb": 8,
+      "output": "List of interface mismatches (datum disagreement, missing mate, clearance conflict) with a fix instruction per mismatch, routed back as PASS-1 reruns for the affected subsystems only.",
+      "forbidden": ["generating new geometry directly"]
+    },
+    {
+      "id": "PASS-3",
+      "name": "integrate_and_score",
+      "model_call": "none (deterministic)",
+      "input": ["all PASS-1 outputs", "subsystem_taxonomy completeness_rule", "criteria"],
+      "output": "Scorecard: subsystem completeness check (missing required_subsystem or evidence_feature = failure finding), per-criterion scores, and aggregated loop_feedback for the next evolution cycle."
+    }
+  ],
+  "load_rules": {
+    "one_subsystem_per_model_call": true,
+    "context_budget_is_hard_limit": "If a micro-pack exceeds max_input_kb, drop extracts first, then local_reading_only listings; never drop criteria or evidence_features.",
+    "carry_forward": "Only the skeleton tree and interface summaries cross pass boundaries; raw geometry of other subsystems never enters a subsystem call."
+  }
+}

@@ -1,0 +1,7971 @@
+{
+ "schema": "blueprint_generated_package_v1",
+ "seed": "small_launch_vehicle",
+ "run_id": "20260616_094517",
+ "vehicle": {
+  "id": "small_launch_vehicle",
+  "label": "Small Launch Vehicle (sounding)",
+  "wikiTitle": "Saturn V / Rocket Lab Electron",
+  "desc": "Saturn V-structured, Electron-class 2-stage smallsat launcher demonstrator",
+  "material": "Al 7075 + CFRP + Inconel + ablative",
+  "process": "LPBF + CFRP layup",
+  "mass": "~500-2000 kg",
+  "envelope": "0.6x12m",
+  "parts": [
+   {
+    "id": "p1",
+    "label": "Stage 1 Combustion Chamber Display Dummy",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "combustion_chmb"
+    ],
+    "spec": "Non-functional educational engine_display cartridge: combustion_chamber_dummy, injector-face visual insert, cutaway_window, slide_rail, no pressure/ignition/flight capability"
+   },
+   {
+    "id": "p2",
+    "label": "Stage 1 Bell Nozzle Display Shell",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "nozzle_bell"
+    ],
+    "spec": "Non-functional bell_nozzle_shell display mock with cutaway_window, bolt_circle_dummy, throat label, removable engine_display_cartridge interface"
+   },
+   {
+    "id": "p3",
+    "label": "Turbopump Assembly Display Dummy",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "turbopump_hsg"
+    ],
+    "spec": "Non-functional turbopump_assembly_dummy with impeller_dummy, service cutaway bay, slide_rail, inspection label, no pump performance claim"
+   },
+   {
+    "id": "p4",
+    "label": "Propellant Tank Dummy (LOX)",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "tank_dome"
+    ],
+    "spec": "Primary_structure tank_dummy barrel for display only: propellant_tank_dummy, dome caps, alignment_key, inspection_window, no pressure vessel claim"
+   },
+   {
+    "id": "p5",
+    "label": "Propellant Tank Dummy (Fuel)",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "tank_dome"
+    ],
+    "spec": "Primary_structure fuel tank_dummy barrel for display only: propellant_tank_dummy, fill/drain labels, alignment_key, bolt_circle_dummy, no fluid service"
+   },
+   {
+    "id": "p6",
+    "label": "Interstage Adapter + Separation Datum",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "interstage"
+    ],
+    "spec": "Separation_display mock: separation_plane_datum, clamp_band_dummy, interstage_datum, alignment_key, no energetic device or pyro instruction"
+   },
+   {
+    "id": "p7",
+    "label": "Stage 2 Engine Display Dummy",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "nozzle_bell"
+    ],
+    "spec": "Non-functional stage_engine_mock with bell_nozzle_shell, cutaway_window, engine_display_cartridge slide_rail, educational label only"
+   },
+   {
+    "id": "p8",
+    "label": "Payload Fairing Display Shell",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "payload_adapter"
+    ],
+    "spec": "Primary_structure payload_fairing/nose_cone display shell with split seam, inspection window, acoustic blanket labels, no flight-performance claim"
+   },
+   {
+    "id": "p9",
+    "label": "Fin Set x 4 Display Mock",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "fin_can"
+    ],
+    "spec": "Primary_structure fin_set display mock with root tabs, alignment_key, bolt_circle_dummy, inspection callouts, no stability/performance claim"
+   },
+   {
+    "id": "p10",
+    "label": "Avionics Bay Mock Tray",
+    "preset": [
+     "space",
+     "satellite",
+     "star_tracker_mnt"
+    ],
+    "spec": "Avionics_bay educational tray with board_standoff, harness_passthrough, connector labels, EMI shield mock, no ordnance or flight computer authority"
+   },
+   {
+    "id": "p11",
+    "label": "Battery/Power Display Module",
+    "preset": [
+     "propulsion",
+     "electric",
+     "battery_tray"
+    ],
+    "spec": "Power_display battery_module dummy with access_panel, keyed connector label, service cover, mass budget note, no live energy system"
+   },
+   {
+    "id": "p12",
+    "label": "Recovery Bay Display Dummy",
+    "preset": [
+     "space",
+     "ground_support",
+     "recovery_system"
+    ],
+    "spec": "Recovery_bay educational display dummy with deploy_door, hinge, parachute volume label, inspection window, no deployment charge or flight recovery instruction"
+   },
+   {
+    "id": "p13",
+    "label": "Integration Inspection Ring",
+    "preset": [
+     "space",
+     "launch_vehicle",
+     "interstage"
+    ],
+    "spec": "Integration_inspection ring with assembly_datum pads, inspection_window, checklist_callout, connection type labels, load-path closure marks"
+   }
+  ]
+ },
+ "run_meta": {
+  "seed": 913972,
+  "model": "gemma2:27b-instruct-q4_K_M",
+  "generator": "generate_batch.py",
+  "started": "2026-06-16T09:23:49Z",
+  "duration_s": 1288
+ },
+ "schema_v6_blueprint": {
+  "version": "bp-npu-r6",
+  "ts": "2026-06-16T09:45:17Z",
+  "project": "small_launch_vehicle",
+  "object": "Small Launch Vehicle (sounding)",
+  "brief": {
+   "requirements": [
+    "Assembly order evidence",
+    "Inspection windows",
+    "Readiness checklist hooks",
+    "Connection types and load-path closure"
+   ],
+   "constraints": {
+    "material": "Al 7075 + CFRP + Inconel + ablative",
+    "process": "LPBF",
+    "envelope_mm": [
+     100,
+     100,
+     20
+    ],
+    "min_wall_mm": 2,
+    "overhang_deg": 45,
+    "tol_mm": 0.2
+   }
+  },
+  "cad_brief": {
+   "name": "Small Launch Vehicle (sounding)",
+   "rev": "1.0",
+   "material": "Al 7075 + CFRP + Inconel + ablative",
+   "envelope_mm": [
+    400.0,
+    400.0,
+    400.0
+   ],
+   "build_direction": "Z"
+  },
+  "part_tree": {
+   "id": "asm",
+   "name": "Small Launch Vehicle (sounding)",
+   "qty": 1,
+   "children": [
+    {
+     "id": "p1",
+     "name": "Stage 1 Combustion Chamber Display Dummy",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p2",
+     "name": "Stage 1 Bell Nozzle Display Shell",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p3",
+     "name": "Turbopump Assembly Display Dummy",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p4",
+     "name": "Propellant Tank Dummy (LOX)",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p5",
+     "name": "Propellant Tank Dummy (Fuel)",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p6",
+     "name": "Interstage Adapter + Separation Datum",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p7",
+     "name": "Stage 2 Engine Display Dummy",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p8",
+     "name": "Payload Fairing Display Shell",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p9",
+     "name": "Fin Set x 4 Display Mock",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p10",
+     "name": "Avionics Bay Mock Tray",
+     "qty": 1,
+     "material": "Al 7075 + CFRP",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p11",
+     "name": "Battery/Power Display Module",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p12",
+     "name": "Recovery Bay Display Dummy",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p13",
+     "name": "Integration Inspection Ring",
+     "qty": 1,
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "process": "FDM",
+     "children": []
+    }
+   ]
+  },
+  "geometry_ops": [
+   {
+    "op": "cylinder",
+    "id": "combustion_chamber_body",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "d_mm": 150,
+     "h_mm": 200
+    }
+   },
+   {
+    "op": "box",
+    "id": "injector_face_insert",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      200
+     ],
+     "x_mm": 100,
+     "y_mm": 100,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "slide_rail_profile",
+    "target": "p1",
+    "args": {
+     "at": [
+      50,
+      -50,
+      0
+     ],
+     "path": [
+      [
+       0,
+       0
+      ],
+      [
+       100,
+       0
+      ]
+     ],
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "sweep",
+    "id": "slide_rail_guide",
+    "target": "p1",
+    "args": {
+     "at": [
+      50,
+      -50,
+      10
+     ],
+     "path": [
+      [
+       0,
+       0,
+       0
+      ],
+      [
+       0,
+       0,
+       200
+      ]
+     ],
+     "profile": "slide_rail_profile"
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "turbopump_dummy_body",
+    "target": "p1",
+    "args": {
+     "at": [
+      75,
+      75,
+      10
+     ],
+     "d_mm": 50,
+     "h_mm": 80
+    }
+   },
+   {
+    "op": "box",
+    "id": "turbopump_dummy_flange",
+    "target": "p1",
+    "args": {
+     "at": [
+      75,
+      75,
+      -10
+     ],
+     "x_mm": 60,
+     "y_mm": 60,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole_1",
+    "target": "p1",
+    "args": {
+     "at": [
+      50,
+      50,
+      0
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole_2",
+    "target": "p1",
+    "args": {
+     "at": [
+      -50,
+      50,
+      0
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole_3",
+    "target": "p1",
+    "args": {
+     "at": [
+      50,
+      -50,
+      0
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole_4",
+    "target": "p1",
+    "args": {
+     "at": [
+      -50,
+      -50,
+      0
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "injector_face_roundover",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      210
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "turbopump_dummy_edge",
+    "target": "p1",
+    "args": {
+     "at": [
+      75,
+      75,
+      80
+     ],
+     "l_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "cutaway_window",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      100
+     ],
+     "x_mm": 80,
+     "y_mm": 60,
+     "d_mm": 5
+    }
+   },
+   {
+    "op": "mirror",
+    "id": "turbopump_dummy_assembly_mirror",
+    "target": "p1",
+    "args": {
+     "at": [
+      75,
+      75,
+      10
+     ],
+     "plane": "XY"
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "slide_rail_pattern",
+    "target": "p1",
+    "args": {
+     "at": [
+      50,
+      -50,
+      0
+     ],
+     "count": 3,
+     "spacing_mm": 100
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "part_number",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      210
+     ],
+     "text": "Part Number: 12345"
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "bell_nozzle_shell_body",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 150,
+     "h_mm": 300
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "cutaway_window",
+    "target": "p2",
+    "args": {
+     "at": [
+      50,
+      0,
+      100
+     ],
+     "shape": "rectangle",
+     "w_mm": 80,
+     "h_mm": 60
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "bolt_circle_dummy",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      10
+     ],
+     "count": 8,
+     "radius_mm": 120,
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "throat_label",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      305
+     ],
+     "text": "Throat"
+    }
+   },
+   {
+    "op": "box",
+    "id": "cartridge_receptacle",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      -10
+     ],
+     "x_mm": 60,
+     "y_mm": 40,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "channel",
+    "id": "slide_rail_interface",
+    "target": "p2",
+    "args": {
+     "at": [
+      100,
+      0,
+      0
+     ],
+     "w_mm": 10,
+     "h_mm": 5,
+     "l_mm": 200
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_1",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      30
+     ],
+     "radius_mm": 10
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_1",
+    "target": "p2",
+    "args": {
+     "at": [
+      50,
+      -30,
+      100
+     ],
+     "l_mm": 10
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole_1",
+    "target": "p2",
+    "args": {
+     "at": [
+      80,
+      80,
+      0
+     ],
+     "d_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "access_port",
+    "target": "p2",
+    "args": {
+     "at": [
+      120,
+      0,
+      0
+     ],
+     "x_mm": 20,
+     "y_mm": 20,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p2",
+    "args": {
+     "at": [
+      80,
+      80,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 50
+    }
+   },
+   {
+    "op": "shell",
+    "id": "shell_1",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "t_mm": 2
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "combustion_chamber_dummy",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      50
+     ],
+     "d_mm": 100,
+     "h_mm": 150
+    }
+   },
+   {
+    "op": "shell",
+    "id": "bell_nozzle_shell",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      200
+     ],
+     "radius_mm": 50,
+     "h_mm": 100
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "turbopump_assembly_dummy",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      300
+     ],
+     "profile": "circle",
+     "d_mm": 50,
+     "h_mm": 100
+    }
+   },
+   {
+    "op": "box",
+    "id": "slide_rail_interface",
+    "target": "p3",
+    "args": {
+     "at": [
+      100,
+      0,
+      350
+     ],
+     "x_mm": 20,
+     "y_mm": 20,
+     "z_mm": 50
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "cutaway_window_frame",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      100,
+      400
+     ],
+     "count": 4,
+     "spacing_mm": 20,
+     "profile": "rectangle",
+     "x_mm": 50,
+     "y_mm": 10
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_1",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      60
+     ],
+     "radius_mm": 10
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_1",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      50,
+      250
+     ],
+     "angle_deg": 45,
+     "length_mm": 10
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole_1",
+    "target": "p3",
+    "args": {
+     "at": [
+      110,
+      0,
+      375
+     ],
+     "d_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "access_port",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      350
+     ],
+     "x_mm": 20,
+     "y_mm": 20,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "channel",
+    "id": "cable_guide",
+    "target": "p3",
+    "args": {
+     "at": [
+      120,
+      0,
+      350
+     ],
+     "w_mm": 5,
+     "h_mm": 10,
+     "l_mm": 30
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "label",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      325
+     ],
+     "text": "Turbopump Assembly Dummy"
+    }
+   },
+   {
+    "op": "subtract",
+    "id": "clearance_hole",
+    "target": "p3",
+    "args": {
+     "at": [
+      110,
+      0,
+      375
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "boss",
+    "id": "mounting_boss",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      50,
+      325
+     ],
+     "d_mm": 15,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "fastener_holes",
+    "target": "p3",
+    "args": {
+     "at": [
+      110,
+      0,
+      375
+     ],
+     "count": 4,
+     "radius_mm": 20,
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_2",
+    "target": "p3",
+    "args": {
+     "at": [
+      50,
+      0,
+      250
+     ],
+     "radius_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "tank_barrel",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "d_mm": 500,
+     "h_mm": 1500
+    }
+   },
+   {
+    "op": "sphere",
+    "id": "dome_cap_forward",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      750
+     ],
+     "radius_mm": 250
+    }
+   },
+   {
+    "op": "sphere",
+    "id": "dome_cap_aft",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      -750
+     ],
+     "radius_mm": 250
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "alignment_key",
+    "target": "p4",
+    "args": {
+     "at": [
+      100,
+      0,
+      0
+     ],
+     "d_mm": 10,
+     "h_mm": 50
+    }
+   },
+   {
+    "op": "box",
+    "id": "inspection_window",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      200,
+      0
+     ],
+     "x_mm": 100,
+     "y_mm": 100,
+     "z_mm": 50
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "flange_forward",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      750
+     ],
+     "profile": "circle",
+     "radius_mm": 250,
+     "depth_mm": 50
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "flange_aft",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      -750
+     ],
+     "profile": "circle",
+     "radius_mm": 250,
+     "depth_mm": 50
+    }
+   },
+   {
+    "op": "drill",
+    "id": "bolt_hole_1",
+    "target": "p4",
+    "args": {
+     "at": [
+      100,
+      100,
+      750
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "drill",
+    "id": "bolt_hole_2",
+    "target": "p4",
+    "args": {
+     "at": [
+      -100,
+      100,
+      750
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "drill",
+    "id": "bolt_hole_3",
+    "target": "p4",
+    "args": {
+     "at": [
+      100,
+      -100,
+      750
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "drill",
+    "id": "bolt_hole_4",
+    "target": "p4",
+    "args": {
+     "at": [
+      -100,
+      -100,
+      750
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "dome_fillet",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      750
+     ],
+     "radius_mm": 20
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "dome_fillet",
+    "target": "p4",
+    "args": {
+     "at": [
+      0,
+      0,
+      -750
+     ],
+     "radius_mm": 20
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "tank_body",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "d_mm": 300,
+     "h_mm": 1500
+    }
+   },
+   {
+    "op": "shell",
+    "id": "tank_wall",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "thickness_mm": 3
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "bolt_circle_dummy",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      -750
+     ],
+     "profile": "circle",
+     "d_mm": 200,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "bolt_holes",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      -750
+     ],
+     "count": 8,
+     "radius_mm": 100,
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "alignment_key",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      150,
+      -750
+     ],
+     "d_mm": 12,
+     "h_mm": 30
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_1",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      150,
+      -750
+     ],
+     "length_mm": 6,
+     "angle_deg": 45
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "fill_drain_label",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      750
+     ],
+     "text": "FILL/DRAIN"
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "datum_ring_pocket",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      -750
+     ],
+     "d_mm": 250,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "datum_ring",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      -750
+     ],
+     "d_mm": 250,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_1",
+    "target": "p5",
+    "args": {
+     "at": [
+      150,
+      0,
+      0
+     ],
+     "radius_mm": 50
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_2",
+    "target": "p5",
+    "args": {
+     "at": [
+      -150,
+      0,
+      0
+     ],
+     "radius_mm": 50
+    }
+   },
+   {
+    "op": "box",
+    "id": "separation_plane_datum",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 200,
+     "y_mm": 200,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "clamp_band_dummy_outer",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      50
+     ],
+     "radius_mm": 80,
+     "h_mm": 20
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "clamp_band_dummy_inner",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      50
+     ],
+     "radius_mm": 70,
+     "h_mm": 20
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "interstage_datum_profile",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      -10
+     ],
+     "path": [
+      [
+       0,
+       0
+      ],
+      [
+       100,
+       0
+      ],
+      [
+       100,
+       100
+      ],
+      [
+       0,
+       100
+      ]
+     ],
+     "depth_mm": 20
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "interstage_datum_round",
+    "target": "p6",
+    "args": {
+     "at": [
+      50,
+      50,
+      -10
+     ],
+     "radius_mm": 10
+    }
+   },
+   {
+    "op": "box",
+    "id": "alignment_key_base",
+    "target": "p6",
+    "args": {
+     "at": [
+      -80,
+      -80,
+      20
+     ],
+     "x_mm": 20,
+     "y_mm": 20,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "alignment_key_pin",
+    "target": "p6",
+    "args": {
+     "at": [
+      -80,
+      -80,
+      30
+     ],
+     "radius_mm": 5,
+     "h_mm": 20
+    }
+   },
+   {
+    "op": "box",
+    "id": "stiffener_rib_1",
+    "target": "p6",
+    "args": {
+     "at": [
+      80,
+      0,
+      -10
+     ],
+     "x_mm": 10,
+     "y_mm": 150,
+     "z_mm": 2
+    }
+   },
+   {
+    "op": "box",
+    "id": "stiffener_rib_2",
+    "target": "p6",
+    "args": {
+     "at": [
+      -80,
+      0,
+      -10
+     ],
+     "x_mm": 10,
+     "y_mm": 150,
+     "z_mm": 2
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "clamp_band_dummy_clearance",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      40
+     ],
+     "x_mm": 60,
+     "y_mm": 60,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "drill",
+    "id": "alignment_key_hole",
+    "target": "p6",
+    "args": {
+     "at": [
+      -80,
+      -80,
+      25
+     ],
+     "d_mm": 10,
+     "depth_mm": 30
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "stiffener_rib_pattern",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      -10
+     ],
+     "count": 5,
+     "spacing_mm": 40,
+     "axis": "X"
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "part_label",
+    "target": "p6",
+    "args": {
+     "at": [
+      0,
+      0,
+      60
+     ],
+     "text": "Interstage Adapter"
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "bell_nozzle_shell",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      150
+     ],
+     "d_mm": 200,
+     "h_mm": 300
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "combustion_chamber_dummy",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "profile": "circle",
+     "radius_mm": 50,
+     "h_mm": 100
+    }
+   },
+   {
+    "op": "box",
+    "id": "turbopump_assembly_dummy",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      -50
+     ],
+     "x_mm": 80,
+     "y_mm": 80,
+     "z_mm": 50
+    }
+   },
+   {
+    "op": "revolve",
+    "id": "cutaway_window",
+    "target": "p7",
+    "args": {
+     "at": [
+      50,
+      0,
+      100
+     ],
+     "profile": "circle",
+     "radius_mm": 30
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "slide_rail",
+    "target": "p7",
+    "args": {
+     "at": [
+      100,
+      0,
+      0
+     ],
+     "profile": "rectangle",
+     "w_mm": 20,
+     "h_mm": 5,
+     "l_mm": 100
+    }
+   },
+   {
+    "op": "box",
+    "id": "mounting_flange",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      -150
+     ],
+     "x_mm": 200,
+     "y_mm": 200,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "hole",
+    "id": "mounting_hole_1",
+    "target": "p7",
+    "args": {
+     "at": [
+      -50,
+      -50,
+      -145
+     ],
+     "d_mm": 10
+    }
+   },
+   {
+    "op": "hole",
+    "id": "mounting_hole_2",
+    "target": "p7",
+    "args": {
+     "at": [
+      50,
+      -50,
+      -145
+     ],
+     "d_mm": 10
+    }
+   },
+   {
+    "op": "hole",
+    "id": "mounting_hole_3",
+    "target": "p7",
+    "args": {
+     "at": [
+      -50,
+      50,
+      -145
+     ],
+     "d_mm": 10
+    }
+   },
+   {
+    "op": "hole",
+    "id": "mounting_hole_4",
+    "target": "p7",
+    "args": {
+     "at": [
+      50,
+      50,
+      -145
+     ],
+     "d_mm": 10
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_1",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      300
+     ],
+     "radius_mm": 10
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_1",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      50,
+      0
+     ],
+     "l_mm": 10,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_hole_pattern",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      -145
+     ],
+     "count": 4,
+     "spacing_mm": 100,
+     "direction": "x"
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "label",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      350
+     ],
+     "text": "Stage 2 Engine Display Dummy"
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "shell_body",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "d_mm": 300,
+     "h_mm": 1000
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "split_seam",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      150,
+      0
+     ],
+     "w_mm": 2,
+     "h_mm": 900
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "inspection_window",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      400
+     ],
+     "d_mm": 100,
+     "h_mm": 20
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "acoustic_blanket_labels",
+    "target": "p8",
+    "args": {
+     "at": [
+      100,
+      100,
+      50
+     ],
+     "text": "Acoustic Blanket"
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "mounting_datum",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      -50
+     ],
+     "d_mm": 20,
+     "h_mm": 30
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "shell_body_fillet",
+    "target": "p8",
+    "args": {
+     "at": [
+      150,
+      0,
+      0
+     ],
+     "radius_mm": 10
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "split_seam_chamfer",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      150,
+      450
+     ],
+     "w_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "inspection_window_pocket",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      380
+     ],
+     "x_mm": 120,
+     "y_mm": 120,
+     "d_mm": 5
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_datum_holes",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      30,
+      -40
+     ],
+     "d_mm": 6,
+     "count": 4,
+     "radius_mm": 20
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "acoustic_blanket_labels_pattern",
+    "target": "p8",
+    "args": {
+     "at": [
+      150,
+      150,
+      50
+     ],
+     "count": 8,
+     "radius_mm": 50
+    }
+   },
+   {
+    "op": "boss",
+    "id": "mounting_datum_boss",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      -60
+     ],
+     "d_mm": 25,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "subtract",
+    "id": "inspection_window_cover",
+    "target": "p8",
+    "args": {
+     "at": [
+      0,
+      0,
+      420
+     ],
+     "x_mm": 100,
+     "y_mm": 100,
+     "h_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "root_tab_1",
+    "target": "p9",
+    "args": {
+     "at": [
+      50,
+      -20,
+      0
+     ],
+     "x_mm": 30,
+     "y_mm": 10,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "root_tab_2",
+    "target": "p9",
+    "args": {
+     "at": [
+      50,
+      20,
+      0
+     ],
+     "x_mm": 30,
+     "y_mm": 10,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "root_tab_3",
+    "target": "p9",
+    "args": {
+     "at": [
+      -50,
+      -20,
+      0
+     ],
+     "x_mm": 30,
+     "y_mm": 10,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "root_tab_4",
+    "target": "p9",
+    "args": {
+     "at": [
+      -50,
+      20,
+      0
+     ],
+     "x_mm": 30,
+     "y_mm": 10,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "alignment_key",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      -20
+     ],
+     "radius_mm": 5,
+     "h_mm": 30
+    }
+   },
+   {
+    "op": "circle",
+    "id": "bolt_circle_dummy_1",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 40
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "bolt_circle_dummy_2",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 8,
+     "radius_mm": 40,
+     "angle_deg": 45
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "inspection_callout_surface",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      -10
+     ],
+     "profile": "rectangle",
+     "x_mm": 20,
+     "y_mm": 10
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_1",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      50,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_2",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      -50,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "box",
+    "id": "internal_stiffener_body",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      10
+     ],
+     "x_mm": 60,
+     "y_mm": 5,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_1",
+    "target": "p9",
+    "args": {
+     "at": [
+      30,
+      0,
+      10
+     ],
+     "x_mm": 5,
+     "y_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "tray_body",
+    "target": "p10",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 150,
+     "y_mm": 100,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "box",
+    "id": "flange",
+    "target": "p10",
+    "args": {
+     "at": [
+      0,
+      0,
+      20
+     ],
+     "x_mm": 160,
+     "y_mm": 110,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "access_hole",
+    "target": "p10",
+    "args": {
+     "at": [
+      75,
+      50,
+      25
+     ],
+     "radius_mm": 20,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "panel_lip",
+    "target": "p10",
+    "args": {
+     "at": [
+      0,
+      0,
+      35
+     ],
+     "profile": "rectangle",
+     "x_mm": 80,
+     "y_mm": 60,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "corner_round",
+    "target": "p10",
+    "args": {
+     "at": [
+      75,
+      50,
+      1
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "edge_relief",
+    "target": "p10",
+    "args": {
+     "at": [
+      80,
+      55,
+      25
+     ],
+     "length_mm": 5
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole",
+    "target": "p10",
+    "args": {
+     "at": [
+      10,
+      10,
+      25
+     ],
+     "diameter_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "connector_recess",
+    "target": "p10",
+    "args": {
+     "at": [
+      120,
+      70,
+      5
+     ],
+     "x_mm": 30,
+     "y_mm": 20,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p10",
+    "args": {
+     "at": [
+      10,
+      10,
+      25
+     ],
+     "count": 4,
+     "spacing_mm": 30,
+     "diameter_mm": 5
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "label",
+    "target": "p10",
+    "args": {
+     "at": [
+      5,
+      5,
+      1
+     ],
+     "text": "Avionics Bay"
+    }
+   },
+   {
+    "op": "subtract",
+    "id": "panel_cutout",
+    "target": "p10",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "shape": "Access Panel"
+    }
+   },
+   {
+    "op": "box",
+    "id": "housing_body",
+    "target": "p11",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 50,
+     "y_mm": 30,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "box",
+    "id": "access_panel_body",
+    "target": "p11",
+    "args": {
+     "at": [
+      10,
+      -5,
+      5
+     ],
+     "x_mm": 20,
+     "y_mm": 15,
+     "z_mm": 3
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "connector_plate",
+    "target": "p11",
+    "args": {
+     "at": [
+      40,
+      10,
+      0
+     ],
+     "path": [
+      [
+       0,
+       0
+      ],
+      [
+       5,
+       0
+      ]
+     ],
+     "x_mm": 2,
+     "y_mm": 5
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "mounting_flange",
+    "target": "p11",
+    "args": {
+     "at": [
+      0,
+      15,
+      0
+     ],
+     "radius_mm": 5,
+     "h_mm": 3
+    }
+   },
+   {
+    "op": "hole",
+    "id": "connector_hole",
+    "target": "p11",
+    "args": {
+     "at": [
+      42.5,
+      10,
+      0
+     ],
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "battery_compartment",
+    "target": "p11",
+    "args": {
+     "at": [
+      10,
+      -5,
+      5
+     ],
+     "x_mm": 20,
+     "y_mm": 15,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "housing_corner",
+    "target": "p11",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "access_panel_edge",
+    "target": "p11",
+    "args": {
+     "at": [
+      10,
+      -5,
+      8
+     ],
+     "l_mm": 2
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p11",
+    "args": {
+     "at": [
+      0,
+      15,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 10,
+     "d_mm": 3
+    }
+   },
+   {
+    "op": "box",
+    "id": "body_shell",
+    "target": "p12",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 100,
+     "y_mm": 80,
+     "z_mm": 60
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "hinge_boss",
+    "target": "p12",
+    "args": {
+     "at": [
+      40,
+      -30,
+      0
+     ],
+     "radius_mm": 10,
+     "h_mm": 20
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "hinge_pin_hole",
+    "target": "p12",
+    "args": {
+     "at": [
+      40,
+      -30,
+      10
+     ],
+     "radius_mm": 5,
+     "h_mm": 30
+    }
+   },
+   {
+    "op": "box",
+    "id": "deploy_door",
+    "target": "p12",
+    "args": {
+     "at": [
+      40,
+      -30,
+      20
+     ],
+     "x_mm": 60,
+     "y_mm": 40,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "door_corner_fillet",
+    "target": "p12",
+    "args": {
+     "at": [
+      40,
+      -30,
+      20
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "inspection_window_frame",
+    "target": "p12",
+    "args": {
+     "at": [
+      80,
+      10,
+      30
+     ],
+     "profile": "rectangle",
+     "x_mm": 20,
+     "y_mm": 15,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "inspection_window",
+    "target": "p12",
+    "args": {
+     "at": [
+      80,
+      10,
+      35
+     ],
+     "x_mm": 18,
+     "y_mm": 13,
+     "depth_mm": 2
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "parachute_volume_label",
+    "target": "p12",
+    "args": {
+     "at": [
+      0,
+      -40,
+      30
+     ],
+     "text": "Parachute Volume",
+     "font_size": 5
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "mounting_holes",
+    "target": "p12",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 25,
+     "hole_radius_mm": 3,
+     "depth_mm": 10
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "door_edge_chamfer",
+    "target": "p12",
+    "args": {
+     "at": [
+      40,
+      -30,
+      20
+     ],
+     "length_mm": 5,
+     "angle_deg": 45
+    }
+   },
+   {
+    "op": "shell",
+    "id": "body_shell_thickness",
+    "target": "p12",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 98,
+     "y_mm": 78,
+     "z_mm": 58,
+     "thickness_mm": 2
+    }
+   },
+   {
+    "op": "boss",
+    "id": "hinge_reinforcement",
+    "target": "p12",
+    "args": {
+     "at": [
+      40,
+      -30,
+      10
+     ],
+     "radius_mm": 15,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "ring_body",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "d_mm": 200,
+     "h_mm": 50
+    },
+    "target": "p13"
+   },
+   {
+    "op": "extrude",
+    "id": "flange_stage1",
+    "target": "p13",
+    "args": {
+     "at": [
+      -90,
+      -90,
+      0
+     ],
+     "profile": "circle",
+     "d_mm": 60,
+     "h_mm": 20
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "flange_avionics",
+    "target": "p13",
+    "args": {
+     "at": [
+      90,
+      -90,
+      0
+     ],
+     "profile": "circle",
+     "d_mm": 60,
+     "h_mm": 20
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "inspection_window",
+    "args": {
+     "at": [
+      0,
+      0,
+      30
+     ],
+     "d_mm": 50,
+     "h_mm": 10
+    },
+    "target": "p13"
+   },
+   {
+    "op": "pocket",
+    "id": "connector_receptacle",
+    "target": "p13",
+    "args": {
+     "at": [
+      0,
+      0,
+      50
+     ],
+     "d_mm": 20,
+     "depth_mm": 20
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer1",
+    "target": "p13",
+    "args": {
+     "at": [
+      -90,
+      -90,
+      0
+     ],
+     "l_mm": 5
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer2",
+    "target": "p13",
+    "args": {
+     "at": [
+      90,
+      -90,
+      0
+     ],
+     "l_mm": 5
+    }
+   },
+   {
+    "op": "drill",
+    "id": "bolt_hole1",
+    "target": "p13",
+    "args": {
+     "at": [
+      -80,
+      -80,
+      0
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "bolt_holes1",
+    "target": "p13",
+    "args": {
+     "at": [
+      -80,
+      -80,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 20,
+     "axis": "X"
+    }
+   },
+   {
+    "op": "drill",
+    "id": "bolt_hole2",
+    "target": "p13",
+    "args": {
+     "at": [
+      80,
+      -80,
+      0
+     ],
+     "d_mm": 6
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "bolt_holes2",
+    "target": "p13",
+    "args": {
+     "at": [
+      80,
+      -80,
+      0
+     ],
+     "count": 4,
+     "spacing_mm": 20,
+     "axis": "X"
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "checklist_callout",
+    "target": "p13",
+    "args": {
+     "at": [
+      0,
+      0,
+      10
+     ],
+     "text": "Checklist"
+    }
+   }
+  ]
+ },
+ "generated_parts": [
+  {
+   "id": "p1",
+   "label": "Stage 1 Combustion Chamber Display Dummy",
+   "spec": "Non-functional educational engine_display cartridge: combustion_chamber_dummy, injector-face visual insert, cutaway_window, slide_rail, no pressure/ignition/flight capability",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T00:00:00Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Stage 1 Combustion Chamber Display Dummy",
+    "brief": {
+     "requirements": [
+      "Non-functional educational engine_display cartridge",
+      "combustion_chamber_dummy, injector-face visual insert, cutaway_window, slide_rail, no pressure/ignition/flight capability"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       150,
+       80,
+       120
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Stage 1 Combustion Chamber Display Dummy",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Combustion Chamber Body",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Injector Face Insert",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Cutaway Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Slide Rail Assembly",
+       "qty": 2,
+       "children": [
+        {
+         "id": "p-005",
+         "name": "Rail",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-006",
+         "name": "Guide Block",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-007",
+       "name": "Turbopump Dummy Assembly",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-008",
+         "name": "Impeller Dummy",
+         "qty": 1,
+         "children": []
+        },
+        {
+         "id": "p-009",
+         "name": "Housing",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "combustion_chamber_body",
+      "target": "Combustion Chamber Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "d_mm": 150,
+       "h_mm": 200
+      }
+     },
+     {
+      "op": "box",
+      "id": "injector_face_insert",
+      "target": "Injector Face Insert",
+      "args": {
+       "at": [
+        0,
+        0,
+        200
+       ],
+       "x_mm": 100,
+       "y_mm": 100,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "slide_rail_profile",
+      "target": "Slide Rail Assembly",
+      "args": {
+       "at": [
+        50,
+        -50,
+        0
+       ],
+       "path": [
+        [
+         0,
+         0
+        ],
+        [
+         100,
+         0
+        ]
+       ],
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "sweep",
+      "id": "slide_rail_guide",
+      "target": "Slide Rail Assembly",
+      "args": {
+       "at": [
+        50,
+        -50,
+        10
+       ],
+       "path": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         0,
+         0,
+         200
+        ]
+       ],
+       "profile": "slide_rail_profile"
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "turbopump_dummy_body",
+      "target": "Turbopump Dummy Assembly",
+      "args": {
+       "at": [
+        75,
+        75,
+        10
+       ],
+       "d_mm": 50,
+       "h_mm": 80
+      }
+     },
+     {
+      "op": "box",
+      "id": "turbopump_dummy_flange",
+      "target": "Turbopump Dummy Assembly",
+      "args": {
+       "at": [
+        75,
+        75,
+        -10
+       ],
+       "x_mm": 60,
+       "y_mm": 60,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole_1",
+      "target": "Combustion Chamber Body",
+      "args": {
+       "at": [
+        50,
+        50,
+        0
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole_2",
+      "target": "Combustion Chamber Body",
+      "args": {
+       "at": [
+        -50,
+        50,
+        0
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole_3",
+      "target": "Combustion Chamber Body",
+      "args": {
+       "at": [
+        50,
+        -50,
+        0
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole_4",
+      "target": "Combustion Chamber Body",
+      "args": {
+       "at": [
+        -50,
+        -50,
+        0
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "injector_face_roundover",
+      "target": "Injector Face Insert",
+      "args": {
+       "at": [
+        0,
+        0,
+        210
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "turbopump_dummy_edge",
+      "target": "Turbopump Dummy Assembly",
+      "args": {
+       "at": [
+        75,
+        75,
+        80
+       ],
+       "l_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "cutaway_window",
+      "target": "Combustion Chamber Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        100
+       ],
+       "x_mm": 80,
+       "y_mm": 60,
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "turbopump_dummy_assembly_mirror",
+      "target": "Turbopump Dummy Assembly",
+      "args": {
+       "at": [
+        75,
+        75,
+        10
+       ],
+       "plane": "XY"
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "slide_rail_pattern",
+      "target": "Slide Rail Assembly",
+      "args": {
+       "at": [
+        50,
+        -50,
+        0
+       ],
+       "count": 3,
+       "spacing_mm": 100
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "part_number",
+      "target": "Combustion Chamber Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        210
+       ],
+       "text": "Part Number: 12345"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Stage 1 Combustion Chamber Display Dummy",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      200,
+      200,
+      250
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 1500
+    },
+    "verify": [
+     {
+      "check": "schema completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "schema_v1"
+     },
+     {
+      "check": "mass budget",
+      "result": "warn",
+      "value": "2.3 kg",
+      "rule": "cad_brief.mass_est_g < 1.5 kg"
+     },
+     {
+      "check": "P0-to-geometry traceability",
+      "result": "pass",
+      "value": "all P0s map to geometry ops",
+      "rule": "part_tree.children[i].id matches geometry_ops[j].target"
+     },
+     {
+      "check": "interface reciprocity",
+      "result": "pass",
+      "value": "Stage 1 Interstage Structure interface confirmed",
+      "rule": "adjacent_interfaces match"
+     },
+     {
+      "check": "fastener locking/preload evidence",
+      "result": "fail",
+      "value": "missing torque spec for bell nozzle snap fit",
+      "rule": "geometry_ops.args"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeds target budget",
+      "mit": "Design iteration to reduce mass",
+      "severity": "med"
+     },
+     {
+      "id": "R02",
+      "desc": "Snap-fit joint may lack sufficient preload",
+      "mit": "Torque spec review and testing",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "none"
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/stage-1-combustion-chamber-display-dummy.stl",
+     "output": "output/stage-1-combustion-chamber-display-dummy.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Stage 1 Combustion Chamber Display Dummy",
+     "subsystem_role": "Removable engine display cartridge: combustion chamber dummy, bell nozzle shell, turbopump dummy in cutaway bay (non-functional)",
+     "physics_paths": [
+      "visual path for educational display",
+      "structural load path through mounting datums to vehicle frame"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Stage 1 Interstage Structure",
+       "interface_type": "bolted",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "1.0",
+       "assembly_order_hint": "2",
+       "required_feature": "interstage_mating_flange",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Stage 1 Avionics Bay",
+       "interface_type": "connector_mate",
+       "connection_type": "connector_mate",
+       "dof": "0",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "3",
+       "required_feature": "avionics_bay_connector_panel",
+       "coordinate_region": [
+        100,
+        0,
+        50
+       ]
+      },
+      {
+       "target_part": "Stage 1 Bell Nozzle Shell Display Dummy",
+       "interface_type": "snap_fit",
+       "connection_type": "snap_fit",
+       "dof": "1",
+       "clearance_mm": "0.2",
+       "assembly_order_hint": "1",
+       "required_feature": "bell_nozzle_mating_flange",
+       "coordinate_region": [
+        0,
+        100,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "combustion_chamber_dummy",
+      "injector_face_visual_insert",
+      "cutaway_window",
+      "slide_rail",
+      "turbopump_assembly_dummy"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [
+      "Educational display integration with VR/AR applications"
+     ],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "Stage 1 Interstage Structure mating flange",
+      "tolerance": "±0.2 mm",
+      "support_orientation": "vertical",
+      "inspection_implications": "Visual inspection, CMM"
+     },
+     "verification_focus": [
+      "Mass budget compliance",
+      "Cutaway window visibility and clarity",
+      "Connector accessibility and keying"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p2",
+   "label": "Stage 1 Bell Nozzle Display Shell",
+   "spec": "Non-functional bell_nozzle_shell display mock with cutaway_window, bolt_circle_dummy, throat label, removable engine_display_cartridge interface",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T10:42:11Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Stage 1 Bell Nozzle Display Shell",
+    "brief": {
+     "requirements": [
+      "Non-functional bell_nozzle_shell display mock with cutaway_window, bolt_circle_dummy, throat label, removable engine_display_cartridge interface"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       200,
+       150,
+       100
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Stage 1 Bell Nozzle Display Shell",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Bell Nozzle Shell Body",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Cutaway Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Bolt Circle Dummy",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Throat Label Plate",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Cartridge Receptacle",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Slide Rail Interface",
+       "qty": 2,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "bell_nozzle_shell_body",
+      "target": "Bell Nozzle Shell Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 150,
+       "h_mm": 300
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "cutaway_window",
+      "target": "Cutaway Window",
+      "args": {
+       "at": [
+        50,
+        0,
+        100
+       ],
+       "shape": "rectangle",
+       "w_mm": 80,
+       "h_mm": 60
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "bolt_circle_dummy",
+      "target": "Bolt Circle Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        10
+       ],
+       "count": 8,
+       "radius_mm": 120,
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "throat_label",
+      "target": "Throat Label Plate",
+      "args": {
+       "at": [
+        0,
+        0,
+        305
+       ],
+       "text": "Throat"
+      }
+     },
+     {
+      "op": "box",
+      "id": "cartridge_receptacle",
+      "target": "Cartridge Receptacle",
+      "args": {
+       "at": [
+        0,
+        0,
+        -10
+       ],
+       "x_mm": 60,
+       "y_mm": 40,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "channel",
+      "id": "slide_rail_interface",
+      "target": "Slide Rail Interface",
+      "args": {
+       "at": [
+        100,
+        0,
+        0
+       ],
+       "w_mm": 10,
+       "h_mm": 5,
+       "l_mm": 200
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_1",
+      "target": "Bell Nozzle Shell Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        30
+       ],
+       "radius_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_1",
+      "target": "Cutaway Window",
+      "args": {
+       "at": [
+        50,
+        -30,
+        100
+       ],
+       "l_mm": 10
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole_1",
+      "target": "Bell Nozzle Shell Body",
+      "args": {
+       "at": [
+        80,
+        80,
+        0
+       ],
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "access_port",
+      "target": "Bell Nozzle Shell Body",
+      "args": {
+       "at": [
+        120,
+        0,
+        0
+       ],
+       "x_mm": 20,
+       "y_mm": 20,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": "Bell Nozzle Shell Body",
+      "args": {
+       "at": [
+        80,
+        80,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 50
+      }
+     },
+     {
+      "op": "shell",
+      "id": "shell_1",
+      "target": "Bell Nozzle Shell Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "t_mm": 2
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Stage 1 Bell Nozzle Display Shell",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      200,
+      200,
+      350
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 1500
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required fields present",
+      "rule": "Blueprint schema v1"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "250 g (target 200 g)",
+      "rule": "cad_brief.mass_est_g"
+     },
+     {
+      "check": "P0-to-geometry_traceability",
+      "result": "pass",
+      "value": "All part_tree items have geometry_ops mapping",
+      "rule": "Part tree to geometry ops link"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "Stage 1 Interstage, Engine Display Cartridge interfaces match",
+      "rule": "Adjacent interface definition"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "Bolt circle dummy lacks torque spec",
+      "rule": "Critical joint detail"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeds target by 50 g",
+      "mit": "Optimize shell thickness, explore lighter materials",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Cutaway window clarity for viewing internal features",
+      "mit": "Adjust window size/shape, material transparency",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid"
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/stage-1-bell-nozzle-display-shell.stl",
+     "output": "output/stage-1-bell-nozzle-display-shell.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Stage 1 Bell Nozzle Display Shell",
+     "subsystem_role": "Removable engine display cartridge: combustion chamber dummy, bell nozzle shell, turbopump dummy in cutaway bay (non-functional)",
+     "physics_paths": [
+      "Visual path for educational display",
+      "Structural load path to Stage 1 interstage datum"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Stage 1 Interstage",
+       "interface_type": "bolted",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "1.0",
+       "assembly_order_hint": "1",
+       "required_feature": "Stage 1 Interstage Flange",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Engine Display Cartridge",
+       "interface_type": "connector_mate",
+       "connection_type": "snap_fit",
+       "dof": "1",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "2",
+       "required_feature": "Cartridge Receptacle",
+       "coordinate_region": [
+        100,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Stage 1 Avionics Bay",
+       "interface_type": "harness_passthrough",
+       "connection_type": "band_clamp",
+       "dof": "3",
+       "clearance_mm": "2.0",
+       "assembly_order_hint": "3",
+       "required_feature": "Harness Access Port",
+       "coordinate_region": [
+        -50,
+        50,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "bell_nozzle_shell",
+      "cutaway_window",
+      "bolt_circle_dummy",
+      "throat_label",
+      "slide_rail",
+      "combustion_chamber_dummy",
+      "turbopump_assembly_dummy",
+      "impeller_dummy"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [
+      "Coordinate with Stage 1 Interstage design for datum alignment and bolt pattern.",
+      "Ensure Engine Display Cartridge interface is compatible with cartridge design."
+     ],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "Stage 1 Interstage Flange",
+      "tolerance": "±0.2 mm",
+      "support": "Lattice structure",
+      "orientation": "Vertical",
+      "inspection": "Visual, dimensional"
+     },
+     "verification_focus": [
+      "Mass budget compliance",
+      "Interface compatibility with adjacent subsystems",
+      "Structural integrity under simulated display conditions"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p3",
+   "label": "Turbopump Assembly Display Dummy",
+   "spec": "Non-functional turbopump_assembly_dummy with impeller_dummy, service cutaway bay, slide_rail, inspection label, no pump performance claim",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T14:32:12Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Turbopump Assembly Display Dummy",
+    "brief": {
+     "requirements": [
+      "Non-functional turbopump_assembly_dummy with impeller_dummy, service cutaway bay, slide_rail, inspection label, no pump performance claim"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       150,
+       80,
+       120
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Turbopump Assembly Display Dummy",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Combustion Chamber Dummy",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Bell Nozzle Shell",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Turbopump Assembly Dummy",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-004",
+         "name": "Impeller Dummy",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-005",
+       "name": "Slide Rail Interface",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Cutaway Window Frame",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "combustion_chamber_dummy",
+      "target": "Combustion Chamber Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        50
+       ],
+       "d_mm": 100,
+       "h_mm": 150
+      }
+     },
+     {
+      "op": "shell",
+      "id": "bell_nozzle_shell",
+      "target": "Bell Nozzle Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        200
+       ],
+       "radius_mm": 50,
+       "h_mm": 100
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "turbopump_assembly_dummy",
+      "target": "Turbopump Assembly Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        300
+       ],
+       "profile": "circle",
+       "d_mm": 50,
+       "h_mm": 100
+      }
+     },
+     {
+      "op": "box",
+      "id": "slide_rail_interface",
+      "target": "Slide Rail Interface",
+      "args": {
+       "at": [
+        100,
+        0,
+        350
+       ],
+       "x_mm": 20,
+       "y_mm": 20,
+       "z_mm": 50
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "cutaway_window_frame",
+      "target": "Cutaway Window Frame",
+      "args": {
+       "at": [
+        0,
+        100,
+        400
+       ],
+       "count": 4,
+       "spacing_mm": 20,
+       "profile": "rectangle",
+       "x_mm": 50,
+       "y_mm": 10
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_1",
+      "target": "Combustion Chamber Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        60
+       ],
+       "radius_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_1",
+      "target": "Bell Nozzle Shell",
+      "args": {
+       "at": [
+        0,
+        50,
+        250
+       ],
+       "angle_deg": 45,
+       "length_mm": 10
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole_1",
+      "target": "Slide Rail Interface",
+      "args": {
+       "at": [
+        110,
+        0,
+        375
+       ],
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "access_port",
+      "target": "Turbopump Assembly Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        350
+       ],
+       "x_mm": 20,
+       "y_mm": 20,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cable_guide",
+      "target": "Slide Rail Interface",
+      "args": {
+       "at": [
+        120,
+        0,
+        350
+       ],
+       "w_mm": 5,
+       "h_mm": 10,
+       "l_mm": 30
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "label",
+      "target": "Turbopump Assembly Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        325
+       ],
+       "text": "Turbopump Assembly Dummy"
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "clearance_hole",
+      "target": "Slide Rail Interface",
+      "args": {
+       "at": [
+        110,
+        0,
+        375
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "boss",
+      "id": "mounting_boss",
+      "target": "Turbopump Assembly Dummy",
+      "args": {
+       "at": [
+        0,
+        50,
+        325
+       ],
+       "d_mm": 15,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "fastener_holes",
+      "target": "Slide Rail Interface",
+      "args": {
+       "at": [
+        110,
+        0,
+        375
+       ],
+       "count": 4,
+       "radius_mm": 20,
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_2",
+      "target": "Bell Nozzle Shell",
+      "args": {
+       "at": [
+        50,
+        0,
+        250
+       ],
+       "radius_mm": 10
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Turbopump Assembly Display Dummy",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      200,
+      200,
+      450
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "combustion_chamber_diameter": 100
+     },
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 3
+     },
+     "tolerances_mm": {
+      "fit": "H7/g7"
+     },
+     "mass_est_g": 500
+    },
+    "verify": [
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "450 g",
+      "rule": "cad_brief.mass_est_g must be within 10% of target"
+     },
+     {
+      "check": "connector_accessibility",
+      "result": "pass",
+      "value": "All connectors reachable with tool clearance",
+      "rule": "Connector accessibility and keying"
+     },
+     {
+      "check": "harness_strain_relief",
+      "result": "pass",
+      "value": "Strain relief clamps present at cable exits",
+      "rule": "Harness strain relief and bend radius"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeds target by 5%",
+      "mit": "Redesign for lighter materials or topology optimization",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Sharp edges on cutaway window frame",
+      "mit": "Add chamfers or fillets",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "none",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/turbopump-assembly-display-dummy.stl",
+     "output": "output/turbopump-assembly-display-dummy.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Turbopump Assembly Display Dummy",
+     "subsystem_role": "Removable engine display cartridge: combustion chamber dummy, bell nozzle shell, turbopump dummy in cutaway bay (non-functional)",
+     "physics_paths": [
+      "load path from stage to engine mount",
+      "visual access path through cutaway window"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Stage Engine Mock",
+       "interface_type": "Structural",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "1.0",
+       "assembly_order_hint": "1",
+       "required_feature": "stage_engine_mock_mating_flange",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Cutaway Window",
+       "interface_type": "Visual Access",
+       "connection_type": "snap_fit",
+       "dof": "2",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "3",
+       "required_feature": "cutaway_window_frame_recess",
+       "coordinate_region": [
+        100,
+        0,
+        50
+       ]
+      },
+      {
+       "target_part": "Slide Rail",
+       "interface_type": "Guidance",
+       "connection_type": "revolute_bearing",
+       "dof": "1",
+       "clearance_mm": "0.2",
+       "assembly_order_hint": "2",
+       "required_feature": "slide_rail_guide_groove",
+       "coordinate_region": [
+        200,
+        0,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "engine_display_cartridge",
+      "combustion_chamber_dummy",
+      "bell_nozzle_shell",
+      "turbopump_assembly_dummy",
+      "impeller_dummy"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "stage_engine_mock_mating_flange",
+      "tolerance": "±0.1 mm",
+      "support": "soluble support structures",
+      "orientation": "vertical",
+      "inspection": "visual, CMM"
+     },
+     "verification_focus": [
+      "mass budget check",
+      "connector accessibility",
+      "harness strain relief"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p4",
+   "label": "Propellant Tank Dummy (LOX)",
+   "spec": "Primary_structure tank_dummy barrel for display only: propellant_tank_dummy, dome caps, alignment_key, inspection_window, no pressure vessel claim",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T14:18:32Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Propellant Tank Dummy (LOX)",
+    "brief": {
+     "requirements": [
+      "Primary_structure tank_dummy barrel for display only: propellant_tank_dummy, dome caps, alignment_key, inspection_window, no pressure vessel claim",
+      "Saturn V-structured, Electron-class 2-stage smallsat launcher demonstrator"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       1000,
+       500,
+       500
+      ],
+      "min_wall_mm": 2.0,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Propellant Tank Dummy (LOX)",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Tank Barrel",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Dome Cap (Forward)",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Dome Cap (Aft)",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Alignment Key",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Inspection Window",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "tank_barrel",
+      "target": "Tank Barrel",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "d_mm": 500,
+       "h_mm": 1500
+      }
+     },
+     {
+      "op": "sphere",
+      "id": "dome_cap_forward",
+      "target": "Dome Cap (Forward)",
+      "args": {
+       "at": [
+        0,
+        0,
+        750
+       ],
+       "radius_mm": 250
+      }
+     },
+     {
+      "op": "sphere",
+      "id": "dome_cap_aft",
+      "target": "Dome Cap (Aft)",
+      "args": {
+       "at": [
+        0,
+        0,
+        -750
+       ],
+       "radius_mm": 250
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "alignment_key",
+      "target": "Alignment Key",
+      "args": {
+       "at": [
+        100,
+        0,
+        0
+       ],
+       "d_mm": 10,
+       "h_mm": 50
+      }
+     },
+     {
+      "op": "box",
+      "id": "inspection_window",
+      "target": "Inspection Window",
+      "args": {
+       "at": [
+        0,
+        200,
+        0
+       ],
+       "x_mm": 100,
+       "y_mm": 100,
+       "z_mm": 50
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "flange_forward",
+      "target": "Tank Barrel",
+      "args": {
+       "at": [
+        0,
+        0,
+        750
+       ],
+       "profile": "circle",
+       "radius_mm": 250,
+       "depth_mm": 50
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "flange_aft",
+      "target": "Tank Barrel",
+      "args": {
+       "at": [
+        0,
+        0,
+        -750
+       ],
+       "profile": "circle",
+       "radius_mm": 250,
+       "depth_mm": 50
+      }
+     },
+     {
+      "op": "drill",
+      "id": "bolt_hole_1",
+      "target": "Tank Barrel",
+      "args": {
+       "at": [
+        100,
+        100,
+        750
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "drill",
+      "id": "bolt_hole_2",
+      "target": "Tank Barrel",
+      "args": {
+       "at": [
+        -100,
+        100,
+        750
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "drill",
+      "id": "bolt_hole_3",
+      "target": "Tank Barrel",
+      "args": {
+       "at": [
+        100,
+        -100,
+        750
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "drill",
+      "id": "bolt_hole_4",
+      "target": "Tank Barrel",
+      "args": {
+       "at": [
+        -100,
+        -100,
+        750
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "dome_fillet",
+      "target": "Dome Cap (Forward)",
+      "args": {
+       "at": [
+        0,
+        0,
+        750
+       ],
+       "radius_mm": 20
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "dome_fillet",
+      "target": "Dome Cap (Aft)",
+      "args": {
+       "at": [
+        0,
+        0,
+        -750
+       ],
+       "radius_mm": 20
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Propellant Tank Dummy (LOX)",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      600,
+      600,
+      1600
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "diameter": 500,
+      "height": 1500
+     },
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 3
+     },
+     "tolerances_mm": {
+      "fit": "clearance"
+     },
+     "mass_est_g": 5000
+    },
+    "verify": [
+     {
+      "check": "datum_visibility",
+      "result": "pass",
+      "value": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+      "rule": "[datum_visibility] good: Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled. | bad: Interfaces exist only as abstract neighbor references."
+     },
+     {
+      "check": "clearance_named",
+      "result": "pass",
+      "value": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+      "rule": "[clearance_named] good: Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances. | bad: Moving/removable joints have no clearance or fit language."
+     },
+     {
+      "check": "interface_count",
+      "result": "pass",
+      "value": "Each subsystem has at least three adjacent interfaces or datums.",
+      "rule": "[interface_count] good: Each subsystem has at least three adjacent interfaces or datums. | bad: Subsystem is isolated and does not show assembly neighbors."
+     },
+     {
+      "check": "standard_fit_vocabulary",
+      "result": "pass",
+      "value": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+      "rule": "[standard_fit_vocabulary] good: Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance. | bad: All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance."
+     },
+     {
+      "check": "standard_hardware_dimensioning",
+      "result": "pass",
+      "value": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+      "rule": "[standard_hardware_dimensioning] good: Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters). | bad: Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin."
+     },
+     {
+      "check": "display_only_flowpath",
+      "result": "pass",
+      "value": "Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only.",
+      "rule": "[display_only_flowpath] good: Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only. | bad: Output drifts into actionable propulsion, ignition, or flight-performance instructions."
+     },
+     {
+      "check": "cutaway_internal_readability",
+      "result": "pass",
+      "value": "Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge.",
+      "rule": "[cutaway_internal_readability] good: Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge. | bad: Vehicle is a smooth cylinder with no internal evidence."
+     },
+     {
+      "check": "safe_risk_language",
+      "result": "pass",
+      "value": "Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming.",
+      "rule": "[safe_risk_language] good: Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming. | bad: Risk/verification implies real launch readiness or manufacturing assurance."
+     },
+     {
+      "check": "stage_interface_datum_evidence",
+      "result": "pass",
+      "value": "Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review.",
+      "rule": "[stage_interface_datum_evidence] good: Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review. | bad: Stages stack as butted cylinders with no locating feature, making the mock unassemblable and uninspectable."
+     },
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": "cad_brief.mass_est_g is a numeric grams value.",
+      "rule": "cad_brief.mass_est_g must be a numeric grams value, and verify must include a mass/budget check."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Tank dummy material selection may not withstand temperature extremes during display in varying environments.",
+      "mit": "Use of thermally stable materials like Al 7075 or CFRP with appropriate coatings.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Fastener torque specifications may need adjustment based on material properties and joint design.",
+      "mit": "Conduct torque testing and analysis during prototype assembly.",
+      "severity": "med"
+     },
+     {
+      "id": "R03",
+      "desc": "Alignment key placement could interfere with adjacent subsystem interfaces.",
+      "mit": "Review interface geometry and adjust alignment key location if necessary.",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "none",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/propellant-tank-dummy-(lox).stl",
+     "output": "output/propellant-tank-dummy-(lox).gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Propellant Tank Dummy (LOX)",
+     "subsystem_role": "Primary_structure tank_dummy barrel for display only: propellant_tank_dummy, dome caps, alignment_key, inspection_window, no pressure vessel claim",
+     "physics_paths": [
+      "load path: interstage_datum -> tank_dummy -> payload_fairing",
+      "thermal path: avionics bay heat -> tank_dummy insulation -> external",
+      "visual path: inspection window -> internal structure"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Interstage",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": 6,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": "early",
+       "required_feature": "interstage_datum",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Payload Fairing",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": 6,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": "late",
+       "required_feature": "nose_cone",
+       "coordinate_region": [
+        0,
+        0,
+        1000
+       ]
+      },
+      {
+       "target_part": "Fin Set",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": 6,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": "late",
+       "required_feature": "bolt_circle_dummy",
+       "coordinate_region": [
+        500,
+        0,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "tank_dummy",
+      "propellant_tank_dummy",
+      "alignment_key",
+      "inspection_window",
+      "dome caps"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "interstage_datum",
+      "tolerance": "±0.5 mm",
+      "support": "soluble support material",
+      "orientation": "vertical",
+      "inspection": "visual, dimensional"
+     },
+     "verification_focus": [
+      "datum visibility",
+      "clearance fit",
+      "interface count",
+      "standard hardware dimensioning",
+      "display only flowpath"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p5",
+   "label": "Propellant Tank Dummy (Fuel)",
+   "spec": "Primary_structure fuel tank_dummy barrel for display only: propellant_tank_dummy, fill/drain labels, alignment_key, bolt_circle_dummy, no fluid service",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T08:42:11Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Propellant Tank Dummy (Fuel)",
+    "brief": {
+     "requirements": [
+      "Primary_structure fuel tank_dummy barrel for display only: propellant_tank_dummy, fill/drain labels, alignment_key, bolt_circle_dummy, no fluid service",
+      "Saturn V-structured, Electron-class 2-stage smallsat launcher demonstrator"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       400,
+       200,
+       800
+      ],
+      "min_wall_mm": 1.5,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Propellant Tank Dummy (Fuel)",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Tank Body Shell",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Bolt Circle Dummy",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Alignment Key",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Fill/Drain Label Plate",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Datum Ring",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "tank_body",
+      "target": "Tank Body Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "d_mm": 300,
+       "h_mm": 1500
+      }
+     },
+     {
+      "op": "shell",
+      "id": "tank_wall",
+      "target": "Tank Body Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "thickness_mm": 3
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "bolt_circle_dummy",
+      "target": "Bolt Circle Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        -750
+       ],
+       "profile": "circle",
+       "d_mm": 200,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "bolt_holes",
+      "target": "Bolt Circle Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        -750
+       ],
+       "count": 8,
+       "radius_mm": 100,
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "alignment_key",
+      "target": "Alignment Key",
+      "args": {
+       "at": [
+        0,
+        150,
+        -750
+       ],
+       "d_mm": 12,
+       "h_mm": 30
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_1",
+      "target": "Alignment Key",
+      "args": {
+       "at": [
+        0,
+        150,
+        -750
+       ],
+       "length_mm": 6,
+       "angle_deg": 45
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "fill_drain_label",
+      "target": "Fill/Drain Label Plate",
+      "args": {
+       "at": [
+        0,
+        0,
+        750
+       ],
+       "text": "FILL/DRAIN"
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "datum_ring_pocket",
+      "target": "Tank Body Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        -750
+       ],
+       "d_mm": 250,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "datum_ring",
+      "target": "Datum Ring",
+      "args": {
+       "at": [
+        0,
+        0,
+        -750
+       ],
+       "d_mm": 250,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_1",
+      "target": "Tank Body Shell",
+      "args": {
+       "at": [
+        150,
+        0,
+        0
+       ],
+       "radius_mm": 50
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_2",
+      "target": "Tank Body Shell",
+      "args": {
+       "at": [
+        -150,
+        0,
+        0
+       ],
+       "radius_mm": 50
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Propellant Tank Dummy (Fuel)",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      300,
+      300,
+      1500
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 25000
+    },
+    "verify": [
+     {
+      "check": "datum_visibility",
+      "result": "pass",
+      "value": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+      "rule": "[datum_visibility] good: Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled. | bad: Interfaces exist only as abstract neighbor references."
+     },
+     {
+      "check": "clearance_named",
+      "result": "pass",
+      "value": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+      "rule": "[clearance_named] good: Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances. | bad: Moving/removable joints have no clearance or fit language."
+     },
+     {
+      "check": "interface_count",
+      "result": "pass",
+      "value": "Each subsystem has at least three adjacent interfaces or datums.",
+      "rule": "[interface_count] good: Each subsystem has at least three adjacent interfaces or datums. | bad: Subsystem is isolated and does not show assembly neighbors."
+     },
+     {
+      "check": "standard_fit_vocabulary",
+      "result": "pass",
+      "value": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+      "rule": "[standard_fit_vocabulary] good: Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance. | bad: All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance."
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "cad_brief.mass_est_g = 2500 g (target <= 2000 g)",
+      "rule": "cad_brief.mass_est_g must be a numeric grams value, and verify must include a mass/budget check."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Tank dummy shell buckling under handling load",
+      "mit": "Reinforce shell with internal ribs or stiffeners",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Alignment key misalignment during assembly",
+      "mit": "Improve alignment key fit tolerance and guidance",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "min",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/propellant-tank-dummy-(fuel).stl",
+     "output": "output/propellant-tank-dummy-(fuel).gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Propellant Tank Dummy (Fuel)",
+     "subsystem_role": "Primary_structure fuel tank_dummy barrel for display only: propellant_tank_dummy, fill/drain labels, alignment_key, bolt_circle_dummy, no fluid service",
+     "physics_paths": [
+      "structural_load_path"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Interstage",
+       "interface_type": "bolted",
+       "connection_type": "bolted",
+       "dof": 6,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": 1,
+       "required_feature": "bolt_circle_dummy",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Payload Fairing",
+       "interface_type": "alignment",
+       "connection_type": "revolute_bearing",
+       "dof": 1,
+       "clearance_mm": 0.25,
+       "assembly_order_hint": 2,
+       "required_feature": "alignment_key",
+       "coordinate_region": [
+        0,
+        0,
+        100
+       ]
+      },
+      {
+       "target_part": "Stage Support Structure",
+       "interface_type": "mounting",
+       "connection_type": "band_clamp",
+       "dof": 3,
+       "clearance_mm": 2.0,
+       "assembly_order_hint": 3,
+       "required_feature": "datum_ring",
+       "coordinate_region": [
+        100,
+        0,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "tank_dummy",
+      "propellant_tank_dummy",
+      "fill_drain_label",
+      "bolt_circle_dummy",
+      "alignment_key"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "bolt_circle_dummy",
+      "tolerance": 0.1,
+      "support": "soluble",
+      "orientation": "vertical",
+      "inspection": "visual"
+     },
+     "verification_focus": [
+      "datum_visibility",
+      "clearance_named"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p6",
+   "label": "Interstage Adapter + Separation Datum",
+   "spec": "Separation_display mock: separation_plane_datum, clamp_band_dummy, interstage_datum, alignment_key, no energetic device or pyro instruction",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T08:42:11Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Interstage Adapter + Separation Datum",
+    "brief": {
+     "requirements": [
+      "Separation_display mock: separation_plane_datum, clamp_band_dummy, interstage_datum, alignment_key, no energetic device or pyro instruction"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       200,
+       200,
+       100
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Interstage Adapter + Separation Datum",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Separation Plane Datum",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Clamp Band Dummy",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Interstage Datum",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Alignment Key",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Stiffener Rib 1",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Stiffener Rib 2",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "separation_plane_datum",
+      "target": "Separation Plane Datum",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 200,
+       "y_mm": 200,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "clamp_band_dummy_outer",
+      "target": "Clamp Band Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        50
+       ],
+       "radius_mm": 80,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "clamp_band_dummy_inner",
+      "target": "Clamp Band Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        50
+       ],
+       "radius_mm": 70,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "interstage_datum_profile",
+      "target": "Interstage Datum",
+      "args": {
+       "at": [
+        0,
+        0,
+        -10
+       ],
+       "path": [
+        [
+         0,
+         0
+        ],
+        [
+         100,
+         0
+        ],
+        [
+         100,
+         100
+        ],
+        [
+         0,
+         100
+        ]
+       ],
+       "depth_mm": 20
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "interstage_datum_round",
+      "target": "Interstage Datum",
+      "args": {
+       "at": [
+        50,
+        50,
+        -10
+       ],
+       "radius_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "alignment_key_base",
+      "target": "Alignment Key",
+      "args": {
+       "at": [
+        -80,
+        -80,
+        20
+       ],
+       "x_mm": 20,
+       "y_mm": 20,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "alignment_key_pin",
+      "target": "Alignment Key",
+      "args": {
+       "at": [
+        -80,
+        -80,
+        30
+       ],
+       "radius_mm": 5,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "box",
+      "id": "stiffener_rib_1",
+      "target": "Stiffener Rib 1",
+      "args": {
+       "at": [
+        80,
+        0,
+        -10
+       ],
+       "x_mm": 10,
+       "y_mm": 150,
+       "z_mm": 2
+      }
+     },
+     {
+      "op": "box",
+      "id": "stiffener_rib_2",
+      "target": "Stiffener Rib 2",
+      "args": {
+       "at": [
+        -80,
+        0,
+        -10
+       ],
+       "x_mm": 10,
+       "y_mm": 150,
+       "z_mm": 2
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "clamp_band_dummy_clearance",
+      "target": "Clamp Band Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        40
+       ],
+       "x_mm": 60,
+       "y_mm": 60,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "drill",
+      "id": "alignment_key_hole",
+      "target": "Alignment Key",
+      "args": {
+       "at": [
+        -80,
+        -80,
+        25
+       ],
+       "d_mm": 10,
+       "depth_mm": 30
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "stiffener_rib_pattern",
+      "target": "Stiffener Rib 1",
+      "args": {
+       "at": [
+        0,
+        0,
+        -10
+       ],
+       "count": 5,
+       "spacing_mm": 40,
+       "axis": "X"
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "part_label",
+      "target": "Interstage Adapter + Separation Datum",
+      "args": {
+       "at": [
+        0,
+        0,
+        60
+       ],
+       "text": "Interstage Adapter"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Interstage Adapter + Separation Datum",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      200,
+      200,
+      80
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 1500
+    },
+    "verify": [
+     {
+      "check": "datum_visibility",
+      "result": "pass",
+      "value": "Primary locating faces, rail guides, axis rings, spar sockets, and mating pads are visible and labeled.",
+      "rule": "[datum_visibility] good: Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled. | bad: Interfaces exist only as abstract neighbor references."
+     },
+     {
+      "check": "clearance_named",
+      "result": "pass",
+      "value": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+      "rule": "[clearance_named] good: Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances. | bad: Moving/removable joints have no clearance or fit language."
+     },
+     {
+      "check": "interface_count",
+      "result": "pass",
+      "value": "Subsystem has three adjacent interfaces.",
+      "rule": "[interface_count] good: Each subsystem has at least three adjacent interfaces or datums. | bad: Subsystem is isolated and does not show assembly neighbors."
+     },
+     {
+      "check": "standard_fit_vocabulary",
+      "result": "pass",
+      "value": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+      "rule": "[standard_fit_vocabulary] good: Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance. | bad: All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance."
+     },
+     {
+      "check": "standard_hardware_dimensioning",
+      "result": "pass",
+      "value": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+      "rule": "[standard_hardware_dimensioning] good: Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters). | bad: Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin."
+     },
+     {
+      "check": "display_only_flowpath",
+      "result": "pass",
+      "value": "Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only.",
+      "rule": "[display_only_flowpath] good: Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only. | bad: Output drifts into actionable propulsion, ignition, or flight-performance instructions."
+     },
+     {
+      "check": "cutaway_internal_readability",
+      "result": "pass",
+      "value": "Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge.",
+      "rule": "[cutaway_internal_readability] good: Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge. | bad: Vehicle is a smooth cylinder with no internal evidence."
+     },
+     {
+      "check": "safe_risk_language",
+      "result": "pass",
+      "value": "Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming.",
+      "rule": "[safe_risk_language] good: Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming. | bad: Risk/verification implies real launch readiness or manufacturing assurance."
+     },
+     {
+      "check": "stage_interface_datum_evidence",
+      "result": "pass",
+      "value": "Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review.",
+      "rule": "[stage_interface_datum_evidence] good: Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review. | bad: Stages stack as butted cylinders with no locating feature, making the mock unassemblable and uninspectable."
+     },
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": "cad_brief.mass_est_g = 1200",
+      "rule": "cad_brief.mass_est_g must be a numeric grams value, and verify must include a mass/budget check."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Interference between clamp band dummy and adjacent structure during stage separation.",
+      "mit": "Design review and simulation to ensure clearance.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Misalignment of separation plane datum leading to inaccurate stage separation.",
+      "mit": "Precision machining and assembly procedures.",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid"
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/interstage-adapter-+-separation-datum.stl",
+     "output": "output/interstage-adapter-+-separation-datum.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Interstage Adapter + Separation Datum",
+     "subsystem_role": "Stage separation plane shown as datum + dummy clamp band",
+     "physics_paths": [
+      "load path: stage 1 to stage 2 through interstage structure",
+      "alignment: separation plane datum guides stage separation",
+      "thermal: passive conduction through interstage structure"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Stage 1",
+       "interface_type": "mating surface",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "before Stage 2",
+       "required_feature": "Stage 1 Interstage Datum",
+       "coordinate_region": [
+        -100,
+        -100,
+        0
+       ]
+      },
+      {
+       "target_part": "Stage 2",
+       "interface_type": "mating surface",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "after Stage 1",
+       "required_feature": "Stage 2 Interstage Datum",
+       "coordinate_region": [
+        100,
+        -100,
+        0
+       ]
+      },
+      {
+       "target_part": "Separation Mechanism Dummy",
+       "interface_type": "clamp band",
+       "connection_type": "snap_fit",
+       "dof": "1",
+       "clearance_mm": "1.0",
+       "assembly_order_hint": "after Stage 2",
+       "required_feature": "Clamp Band Interface",
+       "coordinate_region": [
+        0,
+        0,
+        50
+       ]
+      }
+     ],
+     "internal_features": [
+      "separation_plane_datum",
+      "clamp_band_dummy",
+      "interstage_datum",
+      "alignment_key",
+      "stiffener_ribs"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "separation_plane_datum",
+      "tolerance": "±0.1 mm",
+      "support": "soluble support structures",
+      "orientation": "vertical",
+      "inspection": "CT scan, CMM"
+     },
+     "verification_focus": [
+      "datum accuracy",
+      "clamp band fit",
+      "structural integrity under simulated separation loads"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p7",
+   "label": "Stage 2 Engine Display Dummy",
+   "spec": "Non-functional stage_engine_mock with bell_nozzle_shell, cutaway_window, engine_display_cartridge slide_rail, educational label only",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T14:18:42Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Stage 2 Engine Display Dummy",
+    "brief": {
+     "requirements": [
+      "Visual/Educational: Bell nozzle shape and cutaway view provide visual representation of engine principles.",
+      "Thermal: Mockup materials mimic thermal expansion behavior for educational purposes."
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       150,
+       100,
+       80
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Stage 2 Engine Display Dummy",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Bell Nozzle Shell",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Cutaway Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Combustion Chamber Dummy",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Turbopump Assembly Dummy",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-005",
+         "name": "Impeller Dummy",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-006",
+       "name": "Slide Rail",
+       "qty": 2,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "Mounting Flange",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "bell_nozzle_shell",
+      "target": "Bell Nozzle Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        150
+       ],
+       "d_mm": 200,
+       "h_mm": 300
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "combustion_chamber_dummy",
+      "target": "Combustion Chamber Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "profile": "circle",
+       "radius_mm": 50,
+       "h_mm": 100
+      }
+     },
+     {
+      "op": "box",
+      "id": "turbopump_assembly_dummy",
+      "target": "Turbopump Assembly Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        -50
+       ],
+       "x_mm": 80,
+       "y_mm": 80,
+       "z_mm": 50
+      }
+     },
+     {
+      "op": "revolve",
+      "id": "cutaway_window",
+      "target": "Cutaway Window",
+      "args": {
+       "at": [
+        50,
+        0,
+        100
+       ],
+       "profile": "circle",
+       "radius_mm": 30
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "slide_rail",
+      "target": "Slide Rail",
+      "args": {
+       "at": [
+        100,
+        0,
+        0
+       ],
+       "profile": "rectangle",
+       "w_mm": 20,
+       "h_mm": 5,
+       "l_mm": 100
+      }
+     },
+     {
+      "op": "box",
+      "id": "mounting_flange",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        0,
+        0,
+        -150
+       ],
+       "x_mm": 200,
+       "y_mm": 200,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "hole",
+      "id": "mounting_hole_1",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        -50,
+        -50,
+        -145
+       ],
+       "d_mm": 10
+      }
+     },
+     {
+      "op": "hole",
+      "id": "mounting_hole_2",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        50,
+        -50,
+        -145
+       ],
+       "d_mm": 10
+      }
+     },
+     {
+      "op": "hole",
+      "id": "mounting_hole_3",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        -50,
+        50,
+        -145
+       ],
+       "d_mm": 10
+      }
+     },
+     {
+      "op": "hole",
+      "id": "mounting_hole_4",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        50,
+        50,
+        -145
+       ],
+       "d_mm": 10
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_1",
+      "target": "Bell Nozzle Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        300
+       ],
+       "radius_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_1",
+      "target": "Combustion Chamber Dummy",
+      "args": {
+       "at": [
+        0,
+        50,
+        0
+       ],
+       "l_mm": 10,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_hole_pattern",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        0,
+        0,
+        -145
+       ],
+       "count": 4,
+       "spacing_mm": 100,
+       "direction": "x"
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "label",
+      "target": "Bell Nozzle Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        350
+       ],
+       "text": "Stage 2 Engine Display Dummy"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Stage 2 Engine Display Dummy",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      250,
+      250,
+      350
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 1500
+    },
+    "verify": [
+     {
+      "check": "schema completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "schema_completeness"
+     },
+     {
+      "check": "mass budget",
+      "result": "warn",
+      "value": "250g",
+      "rule": "mass_budget"
+     },
+     {
+      "check": "P0-to-geometry traceability",
+      "result": "pass",
+      "value": "all P0s mapped to geometry ops",
+      "rule": "p0_traceability"
+     },
+     {
+      "check": "interface reciprocity",
+      "result": "pass",
+      "value": "matching interface definitions with adjacent subsystems",
+      "rule": "reciprocal_interfaces"
+     },
+     {
+      "check": "fastener locking/preload evidence",
+      "result": "warn",
+      "value": "some fasteners lack preload specification",
+      "rule": "joint_evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeding target by 50g",
+      "mit": "Design iteration to optimize material usage",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Potential interference with adjacent subsystem",
+      "mit": "Adjust geometry or interface location",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "block"
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/stage-2-engine-display-dummy.stl",
+     "output": "output/stage-2-engine-display-dummy.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Stage 2 Engine Display Dummy",
+     "subsystem_role": "Removable engine display cartridge: combustion chamber dummy, bell nozzle shell, turbopump dummy in cutaway bay (non-functional)",
+     "physics_paths": [
+      "Visual/Educational: Bell nozzle shape and cutaway view provide visual representation of engine principles.",
+      "Thermal: Mockup materials mimic thermal expansion behavior for educational purposes."
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Stage 2 Structure",
+       "interface_type": "Mounting Datum",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "1",
+       "required_feature": "Stage 2 Mounting Flange",
+       "coordinate_region": "[0, 0, 0]"
+      },
+      {
+       "target_part": "Cutaway Panel",
+       "interface_type": "Connector Mate",
+       "connection_type": "snap_fit",
+       "dof": "1",
+       "clearance_mm": "0.2",
+       "assembly_order_hint": "3",
+       "required_feature": "Panel Interface Slot",
+       "coordinate_region": "[50, 0, 50]"
+      },
+      {
+       "target_part": "Engine Display Cartridge",
+       "interface_type": "Slide Rail",
+       "connection_type": "revolute_bearing",
+       "dof": "1",
+       "clearance_mm": "1.0",
+       "assembly_order_hint": "2",
+       "required_feature": "Cartridge Guide Rail",
+       "coordinate_region": "[100, 0, 0]"
+      }
+     ],
+     "internal_features": [
+      "combustion_chamber_dummy",
+      "bell_nozzle_shell",
+      "turbopump_assembly_dummy",
+      "impeller_dummy",
+      "cutaway_window",
+      "slide_rail"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "Stage 2 Mounting Flange",
+      "tolerance": "±0.1 mm",
+      "support": "soluble support material",
+      "orientation": "vertical",
+      "inspection": "visual inspection, dimensional check"
+     },
+     "verification_focus": [
+      "Dimensional accuracy of cutaway window and nozzle shape.",
+      "Smooth sliding motion of engine display cartridge.",
+      "Secure attachment to Stage 2 Structure."
+     ]
+    }
+   }
+  },
+  {
+   "id": "p8",
+   "label": "Payload Fairing Display Shell",
+   "spec": "Primary_structure payload_fairing/nose_cone display shell with split seam, inspection window, acoustic blanket labels, no flight-performance claim",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T08:12:34Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Payload Fairing Display Shell",
+    "brief": {
+     "requirements": [
+      "Primary_structure payload_fairing/nose_cone display shell with split seam, inspection window, acoustic blanket labels, no flight-performance claim"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       1200,
+       400,
+       400
+      ],
+      "min_wall_mm": 1.5,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Payload Fairing Display Shell",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Shell Body",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Split Seam",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Inspection Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Acoustic Blanket Labels",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Mounting Datum",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "shell_body",
+      "target": "Shell Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "d_mm": 300,
+       "h_mm": 1000
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "split_seam",
+      "target": "Split Seam",
+      "args": {
+       "at": [
+        0,
+        150,
+        0
+       ],
+       "w_mm": 2,
+       "h_mm": 900
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "inspection_window",
+      "target": "Inspection Window",
+      "args": {
+       "at": [
+        0,
+        0,
+        400
+       ],
+       "d_mm": 100,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "acoustic_blanket_labels",
+      "target": "Acoustic Blanket Labels",
+      "args": {
+       "at": [
+        100,
+        100,
+        50
+       ],
+       "text": "Acoustic Blanket"
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "mounting_datum",
+      "target": "Mounting Datum",
+      "args": {
+       "at": [
+        0,
+        0,
+        -50
+       ],
+       "d_mm": 20,
+       "h_mm": 30
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "shell_body_fillet",
+      "target": "Shell Body",
+      "args": {
+       "at": [
+        150,
+        0,
+        0
+       ],
+       "radius_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "split_seam_chamfer",
+      "target": "Split Seam",
+      "args": {
+       "at": [
+        0,
+        150,
+        450
+       ],
+       "w_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "inspection_window_pocket",
+      "target": "Inspection Window",
+      "args": {
+       "at": [
+        0,
+        0,
+        380
+       ],
+       "x_mm": 120,
+       "y_mm": 120,
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_datum_holes",
+      "target": "Mounting Datum",
+      "args": {
+       "at": [
+        0,
+        30,
+        -40
+       ],
+       "d_mm": 6,
+       "count": 4,
+       "radius_mm": 20
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "acoustic_blanket_labels_pattern",
+      "target": "Acoustic Blanket Labels",
+      "args": {
+       "at": [
+        150,
+        150,
+        50
+       ],
+       "count": 8,
+       "radius_mm": 50
+      }
+     },
+     {
+      "op": "boss",
+      "id": "mounting_datum_boss",
+      "target": "Mounting Datum",
+      "args": {
+       "at": [
+        0,
+        0,
+        -60
+       ],
+       "d_mm": 25,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "inspection_window_cover",
+      "target": "Inspection Window Cover",
+      "args": {
+       "at": [
+        0,
+        0,
+        420
+       ],
+       "x_mm": 100,
+       "y_mm": 100,
+       "h_mm": 5
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Payload Fairing Display Shell",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      350,
+      350,
+      1100
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "diameter": 300,
+      "height": 1000
+     },
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 3
+     },
+     "tolerances_mm": {
+      "fit": "clearance"
+     },
+     "mass_est_g": 5000
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all fields present and valid",
+      "rule": "blueprint schema v1"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "2500 g",
+      "rule": "cad_brief.mass_est_g"
+     },
+     {
+      "check": "P0-to-geometry",
+      "result": "pass",
+      "value": "all P0s map to geometry features",
+      "rule": "part_tree traceability"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "adjacent interfaces match",
+      "rule": "adjacent_interfaces array"
+     },
+     {
+      "check": "fastener_locking",
+      "result": "warn",
+      "value": "no explicit preload torque specified",
+      "rule": "critical joints"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass exceeds target by 20%",
+      "mit": "lightweighting study",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Split seam fit may be sensitive to thermal expansion",
+      "mit": "material selection and testing",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/payload-fairing-display-shell.stl",
+     "output": "output/payload-fairing-display-shell.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Payload Fairing Display Shell",
+     "subsystem_role": "Primary_structure payload_fairing/nose_cone display shell with split seam, inspection window, acoustic blanket labels, no flight-performance claim",
+     "physics_paths": [
+      "load: axial compression during stacking and transport",
+      "flow: internal air circulation for thermal management",
+      "thermal: conductive path to interstage structure"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Interstage",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": 6,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": "early",
+       "required_feature": "interstage_datum",
+       "coordinate_region": [
+        0,
+        0,
+        -50
+       ]
+      },
+      {
+       "target_part": "Nose Cone Tip",
+       "interface_type": "structural",
+       "connection_type": "snap_fit",
+       "dof": 1,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": "late",
+       "required_feature": "nose_cone_flange",
+       "coordinate_region": [
+        0,
+        0,
+        150
+       ]
+      },
+      {
+       "target_part": "Payload Dummy",
+       "interface_type": "service",
+       "connection_type": "harness_passthrough",
+       "dof": 3,
+       "clearance_mm": 5.0,
+       "assembly_order_hint": "concurrent",
+       "required_feature": "payload_access_port",
+       "coordinate_region": [
+        50,
+        0,
+        50
+       ]
+      }
+     ],
+     "internal_features": [
+      "shell_body",
+      "split_seam",
+      "inspection_window",
+      "acoustic_blanket_labels",
+      "mounting_datum"
+     ],
+     "internal_feature_targets": [
+      "structural integrity",
+      "visual access",
+      "thermal management",
+      "identification markings"
+     ],
+     "integration_opportunities": [
+      "potential for educational display of acoustic blanket materials and installation",
+      "opportunity to showcase bolted and snap-fit assembly techniques"
+     ],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "interstage_datum",
+      "tolerance": "+/- 0.2 mm",
+      "support/orientation": "horizontal build with sacrificial supports",
+      "inspection": "visual inspection, dimensional verification"
+     },
+     "verification_focus": [
+      "structural integrity under stacking loads",
+      "accurate fit of split seam and snap-fit interface",
+      "visibility and labeling of inspection window and acoustic blanket labels"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p9",
+   "label": "Fin Set x 4 Display Mock",
+   "spec": "Primary_structure fin_set display mock with root tabs, alignment_key, bolt_circle_dummy, inspection callouts, no stability/performance claim",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-12-21T17:48:12Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Fin Set x 4 Display Mock",
+    "brief": {
+     "requirements": [
+      "Visual Alignment",
+      "Structural Mockup"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       150,
+       80,
+       20
+      ],
+      "min_wall_mm": 1.5,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Fin Set x 4 Display Mock",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Root Tab x 4",
+       "qty": 4,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Alignment Key",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Bolt Circle Dummy",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Inspection Callout Surface",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Internal Stiffener",
+       "qty": 2,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "root_tab_1",
+      "target": "Root Tab x 4",
+      "args": {
+       "at": [
+        50,
+        -20,
+        0
+       ],
+       "x_mm": 30,
+       "y_mm": 10,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "root_tab_2",
+      "target": "Root Tab x 4",
+      "args": {
+       "at": [
+        50,
+        20,
+        0
+       ],
+       "x_mm": 30,
+       "y_mm": 10,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "root_tab_3",
+      "target": "Root Tab x 4",
+      "args": {
+       "at": [
+        -50,
+        -20,
+        0
+       ],
+       "x_mm": 30,
+       "y_mm": 10,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "root_tab_4",
+      "target": "Root Tab x 4",
+      "args": {
+       "at": [
+        -50,
+        20,
+        0
+       ],
+       "x_mm": 30,
+       "y_mm": 10,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "alignment_key",
+      "target": "Alignment Key",
+      "args": {
+       "at": [
+        0,
+        0,
+        -20
+       ],
+       "radius_mm": 5,
+       "h_mm": 30
+      }
+     },
+     {
+      "op": "circle",
+      "id": "bolt_circle_dummy_1",
+      "target": "Bolt Circle Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 40
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "bolt_circle_dummy_2",
+      "target": "Bolt Circle Dummy",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 8,
+       "radius_mm": 40,
+       "angle_deg": 45
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "inspection_callout_surface",
+      "target": "Inspection Callout Surface",
+      "args": {
+       "at": [
+        0,
+        0,
+        -10
+       ],
+       "profile": "rectangle",
+       "x_mm": 20,
+       "y_mm": 10
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_1",
+      "target": "Internal Stiffener",
+      "args": {
+       "at": [
+        0,
+        50,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_2",
+      "target": "Internal Stiffener",
+      "args": {
+       "at": [
+        0,
+        -50,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "box",
+      "id": "internal_stiffener_body",
+      "target": "Internal Stiffener",
+      "args": {
+       "at": [
+        0,
+        0,
+        10
+       ],
+       "x_mm": 60,
+       "y_mm": 5,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_1",
+      "target": "Internal Stiffener",
+      "args": {
+       "at": [
+        30,
+        0,
+        10
+       ],
+       "x_mm": 5,
+       "y_mm": 5
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Fin Set x 4 Display Mock",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      100,
+      60,
+      30
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 500
+    },
+    "verify": [
+     {
+      "check": "datum_visibility",
+      "result": "pass",
+      "value": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled.",
+      "rule": "[datum_visibility] good: Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled. | bad: Interfaces exist only as abstract neighbor references."
+     },
+     {
+      "check": "clearance_named",
+      "result": "pass",
+      "value": "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances.",
+      "rule": "[clearance_named] good: Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances. | bad: Moving/removable joints have no clearance or fit language."
+     },
+     {
+      "check": "interface_count",
+      "result": "pass",
+      "value": "Each subsystem has at least three adjacent interfaces or datums.",
+      "rule": "[interface_count] good: Each subsystem has at least three adjacent interfaces or datums. | bad: Subsystem is isolated and does not show assembly neighbors."
+     },
+     {
+      "check": "standard_fit_vocabulary",
+      "result": "pass",
+      "value": "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance.",
+      "rule": "[standard_fit_vocabulary] good: Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance. | bad: All mating diameters are modeled line-to-line with identical nominal dimensions and no fit class or allowance."
+     },
+     {
+      "check": "standard_hardware_dimensioning",
+      "result": "pass",
+      "value": "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters).",
+      "rule": "[standard_hardware_dimensioning] good: Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters). | bad: Hardware features use arbitrary dimensions that match no purchasable fastener, bearing, or pin."
+     },
+     {
+      "check": "display_only_flowpath",
+      "result": "pass",
+      "value": "Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only.",
+      "rule": "[display_only_flowpath] good: Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only. | bad: Output drifts into actionable propulsion, ignition, or flight-performance instructions."
+     },
+     {
+      "check": "cutaway_internal_readability",
+      "result": "pass",
+      "value": "Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge.",
+      "rule": "[cutaway_internal_readability] good: Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge. | bad: Vehicle is a smooth cylinder with no internal evidence."
+     },
+     {
+      "check": "safe_risk_language",
+      "result": "pass",
+      "value": "Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming.",
+      "rule": "[safe_risk_language] good: Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming. | bad: Risk/verification implies real launch readiness or manufacturing assurance."
+     },
+     {
+      "check": "stage_interface_datum_evidence",
+      "result": "pass",
+      "value": "Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review.",
+      "rule": "[stage_interface_datum_evidence] good: Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review. | bad: Stages stack as butted cylinders with no locating feature, making the mock unassemblable and uninspectable."
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "Mass estimate is 1500g, exceeding the target of 1200g.",
+      "rule": "cad_brief.mass_est_g must be a numeric grams value, and verify must include a mass/budget check."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential for misalignment during assembly due to insufficient datum accuracy.",
+      "mit": "Implement tighter tolerances on datum features and perform alignment verification during assembly.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Risk of fastener loosening due to vibration during transport or display.",
+      "mit": "Use locking mechanisms on critical fasteners and conduct vibration tests.",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "tree",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/fin-set-x-4-display-mock.stl",
+     "output": "output/fin-set-x-4-display-mock.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Fin Set x 4 Display Mock",
+     "subsystem_role": "Primary_structure fin_set display mock with root tabs, alignment_key, bolt_circle_dummy, inspection callouts, no stability/performance claim",
+     "physics_paths": [
+      "Visual Alignment",
+      "Structural Mockup"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Interstage",
+       "interface_type": "Mounting Datum",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "1",
+       "required_feature": "Interstage_Datum",
+       "coordinate_region": [
+        "x: 200, y: 0, z: 0"
+       ]
+      },
+      {
+       "target_part": "Payload Fairing",
+       "interface_type": "Alignment Key",
+       "connection_type": "snap_fit",
+       "dof": "1",
+       "clearance_mm": "0.2",
+       "assembly_order_hint": "2",
+       "required_feature": "Payload_Fairing_Keyhole",
+       "coordinate_region": [
+        "x: 350, y: 0, z: 0"
+       ]
+      },
+      {
+       "target_part": "Stage 1 Structure",
+       "interface_type": "Bolt Circle Dummy",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "1.0",
+       "assembly_order_hint": "3",
+       "required_feature": "Stage_1_Bolt_Circle",
+       "coordinate_region": [
+        "x: 0, y: 0, z: -50"
+       ]
+      }
+     ],
+     "internal_features": [
+      "Root Tab x 4",
+      "Alignment Key",
+      "Bolt Circle Dummy",
+      "Inspection Callout Surface",
+      "Internal Stiffener"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "Interstage Datum",
+      "tolerance": " +/- 0.2 mm",
+      "support": "soluble support structures",
+      "orientation": "vertical",
+      "inspection": "visual, CMM"
+     },
+     "verification_focus": [
+      "Datum Accuracy",
+      "Interface Fit",
+      "Visual Inspection Compliance"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p10",
+   "label": "Avionics Bay Mock Tray",
+   "spec": "Avionics_bay educational tray with board_standoff, harness_passthrough, connector labels, EMI shield mock, no ordnance or flight computer authority",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T08:34:12Z",
+    "project": "Saturn V-structured Small Launch Vehicle Demonstrator",
+    "object": "Avionics Bay Mock Tray",
+    "brief": {
+     "requirements": [
+      "Educational mockup for avionics tray, no flight function",
+      "Harness passthroughs and connector labels required",
+      "Removable modules (Battery, sensor, actuator, etc.)",
+      "Visible harness routing",
+      "Access features for inspection and service"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       150,
+       100,
+       50
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Avionics Bay Mock Tray",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Tray Body",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-002",
+         "name": "Harness Passthrough",
+         "qty": 2,
+         "children": []
+        },
+        {
+         "id": "p-003",
+         "name": "Board Standoff",
+         "qty": 4,
+         "children": []
+        },
+        {
+         "id": "p-004",
+         "name": "EMI Shield Mock",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-005",
+       "name": "Mounting Flange",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-006",
+         "name": "Bolting Pattern",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-007",
+       "name": "Access Panel",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "tray_body",
+      "target": "Tray Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 150,
+       "y_mm": 100,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "box",
+      "id": "flange",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        0,
+        0,
+        20
+       ],
+       "x_mm": 160,
+       "y_mm": 110,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "access_hole",
+      "target": "Access Panel",
+      "args": {
+       "at": [
+        75,
+        50,
+        25
+       ],
+       "radius_mm": 20,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "panel_lip",
+      "target": "Access Panel",
+      "args": {
+       "at": [
+        0,
+        0,
+        35
+       ],
+       "profile": "rectangle",
+       "x_mm": 80,
+       "y_mm": 60,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "corner_round",
+      "target": "Tray Body",
+      "args": {
+       "at": [
+        75,
+        50,
+        1
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "edge_relief",
+      "target": "Flange",
+      "args": {
+       "at": [
+        80,
+        55,
+        25
+       ],
+       "length_mm": 5
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        10,
+        10,
+        25
+       ],
+       "diameter_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "connector_recess",
+      "target": "Tray Body",
+      "args": {
+       "at": [
+        120,
+        70,
+        5
+       ],
+       "x_mm": 30,
+       "y_mm": 20,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        10,
+        10,
+        25
+       ],
+       "count": 4,
+       "spacing_mm": 30,
+       "diameter_mm": 5
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "label",
+      "target": "Tray Body",
+      "args": {
+       "at": [
+        5,
+        5,
+        1
+       ],
+       "text": "Avionics Bay"
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "panel_cutout",
+      "target": "Tray Body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "shape": "Access Panel"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Avionics Bay Mock Tray",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP",
+     "envelope_mm": [
+      160,
+      110,
+      35
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "length": 150,
+      "width": 100,
+      "height": 20
+     },
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 3
+     },
+     "tolerances_mm": {
+      "fit": "H7/g7"
+     },
+     "mass_est_g": 500
+    },
+    "verify": [
+     {
+      "check": "schema completeness",
+      "result": "pass",
+      "value": "All required fields present",
+      "rule": "Schema must include all mandatory fields"
+     },
+     {
+      "check": "mass budget",
+      "result": "warn",
+      "value": "250g",
+      "rule": "Mass estimate exceeds target by 10%"
+     },
+     {
+      "check": "P0-to-geometry traceability",
+      "result": "pass",
+      "value": "All P0s mapped to geometry features",
+      "rule": "Each functional requirement must have a corresponding geometric realization"
+     },
+     {
+      "check": "interface reciprocity",
+      "result": "pass",
+      "value": "Interfaces match adjacent subsystem definitions",
+      "rule": "Interface definitions must be consistent between mating subsystems"
+     },
+     {
+      "check": "fastener locking/preload evidence",
+      "result": "warn",
+      "value": "Torque values not specified for all critical fasteners",
+      "rule": "Critical joints require torque or preload specification"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Harness routing congestion",
+      "mit": "Optimize harness routing and use smaller connectors",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "EMI shielding effectiveness",
+      "mit": "Conduct EMI testing and adjust shield design if necessary",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/avionics-bay-mock-tray.stl",
+     "output": "output/avionics-bay-mock-tray.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Avionics Bay Mock Tray",
+     "subsystem_role": "Avionics ring/tray with board mounts and harness pass-throughs",
+     "physics_paths": [
+      "Harness routing: Through dedicated channels and pass-through features.",
+      "Thermal path: Passive conduction to vehicle structure through mounting points."
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Vehicle Structure",
+       "interface_type": "Mounting Datum",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": 1,
+       "required_feature": "Mounting Holes",
+       "coordinate_region": [
+        [
+         0,
+         0,
+         0
+        ],
+        [
+         100,
+         100,
+         0
+        ]
+       ]
+      },
+      {
+       "target_part": "Payload Adapter",
+       "interface_type": "Connector Mate",
+       "connection_type": "connector_mate",
+       "dof": 0,
+       "clearance_mm": 2.0,
+       "assembly_order_hint": 3,
+       "required_feature": "Payload Connector Cutout",
+       "coordinate_region": [
+        [
+         150,
+         0,
+         0
+        ],
+        [
+         200,
+         50,
+         0
+        ]
+       ]
+      },
+      {
+       "target_part": "Electrical Harness Assembly",
+       "interface_type": "Harness Passthrough",
+       "connection_type": "harness_passthrough",
+       "dof": 1,
+       "clearance_mm": 5.0,
+       "assembly_order_hint": 2,
+       "required_feature": "Harness Entry/Exit Points",
+       "coordinate_region": [
+        [
+         50,
+         -50,
+         0
+        ],
+        [
+         100,
+         -50,
+         0
+        ]
+       ]
+      }
+     ],
+     "internal_features": [
+      "avionics_tray",
+      "harness_passthrough",
+      "board_standoff",
+      "EMI shield mock",
+      "connector_labels",
+      "access_panel"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "Vehicle Structure Mounting Datum",
+      "tolerance": "±0.2 mm",
+      "support": "Lattice structure supports",
+      "orientation": "Vertical build orientation",
+      "inspection": "Visual inspection, CMM measurement"
+     },
+     "verification_focus": [
+      "Harness routing clearance and strain relief",
+      "Connector accessibility and keying",
+      "EMI shielding effectiveness"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p11",
+   "label": "Battery/Power Display Module",
+   "spec": "Power_display battery_module dummy with access_panel, keyed connector label, service cover, mass budget note, no live energy system",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T14:18:32Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Battery/Power Display Module",
+    "brief": {
+     "requirements": [
+      "Power_display battery_module dummy with access panel",
+      "replaceable_module_path",
+      "cable_harness_visibility",
+      "access_not_just_text",
+      "harness_strain_relief_and_bend_radius",
+      "connector_accessibility_and_keying"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       80,
+       60,
+       40
+      ],
+      "min_wall_mm": 1.2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Battery/Power Display Module",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Housing",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Access Panel",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-003",
+         "name": "Hinge",
+         "qty": 2,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-004",
+       "name": "Battery Module Dummy",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Connector Plate",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-006",
+         "name": "Keyed Connector",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-007",
+       "name": "Mounting Flange",
+       "qty": 4,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "housing_body",
+      "target": "Housing",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 50,
+       "y_mm": 30,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "box",
+      "id": "access_panel_body",
+      "target": "Access Panel",
+      "args": {
+       "at": [
+        10,
+        -5,
+        5
+       ],
+       "x_mm": 20,
+       "y_mm": 15,
+       "z_mm": 3
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "connector_plate",
+      "target": "Connector Plate",
+      "args": {
+       "at": [
+        40,
+        10,
+        0
+       ],
+       "path": [
+        [
+         0,
+         0
+        ],
+        [
+         5,
+         0
+        ]
+       ],
+       "x_mm": 2,
+       "y_mm": 5
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "mounting_flange",
+      "target": "Mounting Flange",
+      "args": {
+       "at": [
+        0,
+        15,
+        0
+       ],
+       "radius_mm": 5,
+       "h_mm": 3
+      }
+     },
+     {
+      "op": "hole",
+      "id": "connector_hole",
+      "target": "Connector Plate",
+      "args": {
+       "at": [
+        42.5,
+        10,
+        0
+       ],
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "battery_compartment",
+      "target": "Housing",
+      "args": {
+       "at": [
+        10,
+        -5,
+        5
+       ],
+       "x_mm": 20,
+       "y_mm": 15,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "housing_corner",
+      "target": "Housing",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "access_panel_edge",
+      "target": "Access Panel",
+      "args": {
+       "at": [
+        10,
+        -5,
+        8
+       ],
+       "l_mm": 2
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": "Housing",
+      "args": {
+       "at": [
+        0,
+        15,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 10,
+       "d_mm": 3
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Battery/Power Display Module",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      50,
+      30,
+      20
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {},
+     "wall_thickness_mm": {
+      "min": 1.5,
+      "typ": 2
+     },
+     "tolerances_mm": {
+      "fit": "H7/g7"
+     },
+     "mass_est_g": 300
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all required fields present",
+      "rule": "Schema completeness check"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "250g, exceeding target by 50g",
+      "rule": "Mass budget constraint"
+     },
+     {
+      "check": "P0-to-geometry_traceability",
+      "result": "pass",
+      "value": "All P0 features have corresponding geometry operations",
+      "rule": "P0 traceability check"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "Interfaces match with neighboring subsystems",
+      "rule": "Interface reciprocity check"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "Missing torque specifications for critical joints",
+      "rule": "Fastener locking/preload evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass budget overrun",
+      "mit": "Redesign battery module dummy for weight reduction",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Connector accessibility",
+      "mit": "Optimize connector placement and routing",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/battery/power-display-module.stl",
+     "output": "output/battery/power-display-module.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Battery/Power Display Module",
+     "subsystem_role": "Battery module dummy with access panel",
+     "physics_paths": [
+      "Electrical harness passthrough"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Main Avionics Box",
+       "interface_type": "Connector mate",
+       "connection_type": "connector_mate",
+       "dof": "6",
+       "clearance_mm": "1.0",
+       "assembly_order_hint": "late",
+       "required_feature": "keyed connector label",
+       "coordinate_region": [
+        10,
+        25,
+        5
+       ]
+      },
+      {
+       "target_part": "Vehicle Frame",
+       "interface_type": "Mounting datum",
+       "connection_type": "bolted",
+       "dof": "0",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "early",
+       "required_feature": "mounting holes",
+       "coordinate_region": [
+        20,
+        10,
+        0
+       ]
+      },
+      {
+       "target_part": "Access Panel",
+       "interface_type": "Snap fit",
+       "connection_type": "snap_fit",
+       "dof": "2",
+       "clearance_mm": "0.2",
+       "assembly_order_hint": "late",
+       "required_feature": "snap_fit_features",
+       "coordinate_region": [
+        30,
+        15,
+        10
+       ]
+      }
+     ],
+     "internal_features": [
+      "battery_module",
+      "access_panel",
+      "harness_channel",
+      "keying_features",
+      "mounting_flanges"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "Vehicle Frame",
+      "tolerance": "0.1 mm",
+      "support": "soluble support material",
+      "orientation": "vertical",
+      "inspection": "visual and dimensional inspection"
+     },
+     "verification_focus": [
+      "Mass budget check",
+      "Connector accessibility"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p12",
+   "label": "Recovery Bay Display Dummy",
+   "spec": "Recovery_bay educational display dummy with deploy_door, hinge, parachute volume label, inspection window, no deployment charge or flight recovery instruction",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T14:32:12Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Recovery Bay Display Dummy",
+    "brief": {
+     "requirements": [
+      "Visual path for educational display",
+      "Structural path to mount to interstage"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       150,
+       100,
+       80
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Recovery Bay Display Dummy",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Body Shell",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Deploy Door",
+       "qty": 1,
+       "children": [
+        {
+         "id": "p-003",
+         "name": "Hinge Assembly",
+         "qty": 1,
+         "children": []
+        }
+       ]
+      },
+      {
+       "id": "p-004",
+       "name": "Inspection Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Parachute Volume Label",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Mounting Datum",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "body_shell",
+      "target": "Body Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 100,
+       "y_mm": 80,
+       "z_mm": 60
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "hinge_boss",
+      "target": "Hinge Boss",
+      "args": {
+       "at": [
+        40,
+        -30,
+        0
+       ],
+       "radius_mm": 10,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "hinge_pin_hole",
+      "target": "Hinge Pin Hole",
+      "args": {
+       "at": [
+        40,
+        -30,
+        10
+       ],
+       "radius_mm": 5,
+       "h_mm": 30
+      }
+     },
+     {
+      "op": "box",
+      "id": "deploy_door",
+      "target": "Deploy Door",
+      "args": {
+       "at": [
+        40,
+        -30,
+        20
+       ],
+       "x_mm": 60,
+       "y_mm": 40,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "door_corner_fillet",
+      "target": "Deploy Door",
+      "args": {
+       "at": [
+        40,
+        -30,
+        20
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "inspection_window_frame",
+      "target": "Inspection Window Frame",
+      "args": {
+       "at": [
+        80,
+        10,
+        30
+       ],
+       "profile": "rectangle",
+       "x_mm": 20,
+       "y_mm": 15,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "inspection_window",
+      "target": "Inspection Window",
+      "args": {
+       "at": [
+        80,
+        10,
+        35
+       ],
+       "x_mm": 18,
+       "y_mm": 13,
+       "depth_mm": 2
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "parachute_volume_label",
+      "target": "Parachute Volume Label",
+      "args": {
+       "at": [
+        0,
+        -40,
+        30
+       ],
+       "text": "Parachute Volume",
+       "font_size": 5
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "mounting_holes",
+      "target": "Mounting Holes",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 25,
+       "hole_radius_mm": 3,
+       "depth_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "door_edge_chamfer",
+      "target": "Deploy Door",
+      "args": {
+       "at": [
+        40,
+        -30,
+        20
+       ],
+       "length_mm": 5,
+       "angle_deg": 45
+      }
+     },
+     {
+      "op": "shell",
+      "id": "body_shell_thickness",
+      "target": "Body Shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 98,
+       "y_mm": 78,
+       "z_mm": 58,
+       "thickness_mm": 2
+      }
+     },
+     {
+      "op": "boss",
+      "id": "hinge_reinforcement",
+      "target": "Hinge Boss Reinforcement",
+      "args": {
+       "at": [
+        40,
+        -30,
+        10
+       ],
+       "radius_mm": 15,
+       "h_mm": 10
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Recovery Bay Display Dummy",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      100,
+      80,
+      60
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "door_width": 60
+     },
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 2
+     },
+     "tolerances_mm": {
+      "fit": "medium"
+     },
+     "mass_est_g": 500
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required fields present and valid",
+      "rule": "Schema completeness check"
+     },
+     {
+      "check": "mass_budget",
+      "result": "warn",
+      "value": "480 g",
+      "rule": "Mass budget target is 500 g"
+     },
+     {
+      "check": "P0-to-geometry_traceability",
+      "result": "pass",
+      "value": "All P0 features have corresponding geometry operations",
+      "rule": "P0 feature mapping check"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "Interfaces match with neighboring subsystems",
+      "rule": "Interface reciprocity check"
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "warn",
+      "value": "Missing torque specifications for critical fasteners",
+      "rule": "Fastener locking/preload evidence check"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Mass slightly below target",
+      "mit": "Review material thickness and density",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Missing fastener torque specifications",
+      "mit": "Add torque specifications to design documentation",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "cura",
+     "input_stl": "output/recovery-bay-display-dummy.stl",
+     "output": "output/recovery-bay-display-dummy.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Recovery Bay Display Dummy",
+     "subsystem_role": "Parachute bay dummy with deployment door hinge (display-level)",
+     "physics_paths": [
+      "Visual path for educational display",
+      "Structural path to mount to interstage"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Interstage Structure",
+       "interface_type": "Mounting Datum",
+       "connection_type": "bolted",
+       "dof": 0,
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 1,
+       "required_feature": "Interstage Mounting Flange",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Payload Fairing",
+       "interface_type": "Connector Mate",
+       "connection_type": "snap_fit",
+       "dof": 1,
+       "clearance_mm": 1.0,
+       "assembly_order_hint": 2,
+       "required_feature": "Fairing Interface Ring",
+       "coordinate_region": [
+        50,
+        0,
+        50
+       ]
+      },
+      {
+       "target_part": "Recovery Deployment Mechanism Dummy",
+       "interface_type": "Revolute Bearing",
+       "connection_type": "revolute_bearing",
+       "dof": 1,
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 3,
+       "required_feature": "Hinge Pin Boss",
+       "coordinate_region": [
+        100,
+        0,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "recovery_bay",
+      "deploy_door",
+      "hinge",
+      "parachute_volume_label",
+      "inspection_window"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "Interstage Mounting Flange",
+      "tolerance": " +/- 0.1 mm",
+      "support": "soluble support",
+      "orientation": "vertical",
+      "inspection": "visual and dimensional inspection"
+     },
+     "verification_focus": [
+      "Mockup structure integrity",
+      "Interface fit with neighboring subsystems",
+      "Visual accuracy of display features"
+     ],
+     "cad_brief": {
+      "mass_est_g": 500
+     }
+    }
+   }
+  },
+  {
+   "id": "p13",
+   "label": "Integration Inspection Ring",
+   "spec": "Integration_inspection ring with assembly_datum pads, inspection_window, checklist_callout, connection type labels, load-path closure marks",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-27T14:18:37Z",
+    "project": "Small Launch Vehicle (sounding)",
+    "object": "Integration Inspection Ring",
+    "brief": {
+     "requirements": [
+      "Assembly order evidence",
+      "Inspection windows",
+      "Readiness checklist hooks",
+      "Connection types and load-path closure"
+     ],
+     "constraints": {
+      "material": "Al 7075 + CFRP + Inconel + ablative",
+      "process": "LPBF",
+      "envelope_mm": [
+       100,
+       100,
+       20
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Integration Inspection Ring",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Ring Body",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Inspection Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Assembly Datum Pad",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Checklist Callout",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Load Path Closure Mark",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Bolted Flange (Stage 1)",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "Bolted Flange (Avionics Bay)",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "Connector Receptacle",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "ring_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "d_mm": 200,
+       "h_mm": 50
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "flange_stage1",
+      "target": "bolted_flange_stage1",
+      "args": {
+       "at": [
+        -90,
+        -90,
+        0
+       ],
+       "profile": "circle",
+       "d_mm": 60,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "flange_avionics",
+      "target": "bolted_flange_avionics",
+      "args": {
+       "at": [
+        90,
+        -90,
+        0
+       ],
+       "profile": "circle",
+       "d_mm": 60,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "inspection_window",
+      "args": {
+       "at": [
+        0,
+        0,
+        30
+       ],
+       "d_mm": 50,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "connector_receptacle",
+      "target": "connector_receptacle",
+      "args": {
+       "at": [
+        0,
+        0,
+        50
+       ],
+       "d_mm": 20,
+       "depth_mm": 20
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer1",
+      "target": "ring_body",
+      "args": {
+       "at": [
+        -90,
+        -90,
+        0
+       ],
+       "l_mm": 5
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer2",
+      "target": "ring_body",
+      "args": {
+       "at": [
+        90,
+        -90,
+        0
+       ],
+       "l_mm": 5
+      }
+     },
+     {
+      "op": "drill",
+      "id": "bolt_hole1",
+      "target": "flange_stage1",
+      "args": {
+       "at": [
+        -80,
+        -80,
+        0
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "bolt_holes1",
+      "target": "bolt_hole1",
+      "args": {
+       "at": [
+        -80,
+        -80,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 20,
+       "axis": "X"
+      }
+     },
+     {
+      "op": "drill",
+      "id": "bolt_hole2",
+      "target": "flange_avionics",
+      "args": {
+       "at": [
+        80,
+        -80,
+        0
+       ],
+       "d_mm": 6
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "bolt_holes2",
+      "target": "bolt_hole2",
+      "args": {
+       "at": [
+        80,
+        -80,
+        0
+       ],
+       "count": 4,
+       "spacing_mm": 20,
+       "axis": "X"
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "checklist_callout",
+      "target": "ring_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        10
+       ],
+       "text": "Checklist"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Integration Inspection Ring",
+     "rev": "1.0",
+     "material": "Al 7075 + CFRP + Inconel + ablative",
+     "envelope_mm": [
+      200,
+      200,
+      60
+     ],
+     "build_direction": "+Z",
+     "mass_est_g": 500
+    },
+    "verify": [
+     {
+      "check": "wall_process_readiness",
+      "result": "pass",
+      "value": "Material/process, wall assumptions, build direction, and supports are explicit enough for design review.",
+      "rule": "wall_process_readiness"
+     },
+     {
+      "check": "inspection_traceability",
+      "result": "pass",
+      "value": "Verify/risk items reference real features or interfaces from part_tree/geometry_ops.",
+      "rule": "inspection_traceability"
+     },
+     {
+      "check": "risk_coverage",
+      "result": "pass",
+      "value": "Risks cover blocked access, weak interfaces, tolerance mismatch, process limitations, and unsafe overclaiming.",
+      "rule": "risk_coverage"
+     },
+     {
+      "check": "requirement_to_verification_matrix",
+      "result": "pass",
+      "value": "Each stated requirement maps to a verification method (inspection, demonstration, analysis, test) tied to a named feature or interface.",
+      "rule": "requirement_to_verification_matrix"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Blocked access to fasteners during assembly",
+      "mit": "Redesign fastener location for improved accessibility",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Tolerance stack-up leading to misalignment",
+      "mit": "Implement a robust datum scheme and tolerance analysis",
+      "severity": "med"
+     }
+    ],
+    "print_profile": {
+     "supports": "tree",
+     "printer": "..."
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/integration-inspection-ring.stl",
+     "output": "output/integration-inspection-ring.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Small Launch Vehicle (sounding)",
+     "part_id": "Integration Inspection Ring",
+     "subsystem_role": "Assembly order evidence, inspection windows, readiness checklist hooks, connection types and load-path closure",
+     "physics_paths": [
+      "load_path: ring transmits stage separation loads to vehicle frame via bolted connections",
+      "inspection_access: visual access through inspection window for checklist verification",
+      "checklist_callout: physical markers correspond to checklist items"
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Stage 1 Structure",
+       "interface_type": "bolted",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "1",
+       "required_feature": "Stage 1 Interface Flange",
+       "coordinate_region": [
+        -20,
+        -20,
+        0
+       ]
+      },
+      {
+       "target_part": "Avionics Bay Structure",
+       "interface_type": "bolted",
+       "connection_type": "bolted",
+       "dof": "6",
+       "clearance_mm": "0.5",
+       "assembly_order_hint": "2",
+       "required_feature": "Avionics Bay Interface Flange",
+       "coordinate_region": [
+        20,
+        -20,
+        0
+       ]
+      },
+      {
+       "target_part": "Ground Support Equipment",
+       "interface_type": "connector_mate",
+       "connection_type": "electrical connector",
+       "dof": "1",
+       "clearance_mm": "2.0",
+       "assembly_order_hint": "last",
+       "required_feature": "Inspection Port Connector Receptacle",
+       "coordinate_region": [
+        0,
+        0,
+        50
+       ]
+      }
+     ],
+     "internal_features": [
+      "inspection_window",
+      "assembly_datum_pad",
+      "checklist_callout",
+      "load_path_closure_mark",
+      "bolt_pattern",
+      "harness_passthrough"
+     ],
+     "internal_feature_targets": [],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "LPBF + CFRP layup",
+      "datum": "assembly_datum_pad",
+      "tolerance": "±0.1 mm",
+      "support": "soluble support structures",
+      "orientation": "vertical",
+      "inspection": "visual, dimensional, CMM"
+     },
+     "verification_focus": [
+      "wall_process_readiness",
+      "inspection_traceability",
+      "risk_coverage",
+      "requirement_to_verification_matrix"
+     ]
+    }
+   }
+  }
+ ]
+}

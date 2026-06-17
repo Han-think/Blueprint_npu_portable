@@ -1,0 +1,136 @@
+{
+  "schema": "blueprint_subsystem_pack_v1",
+  "seed": "small_launch_vehicle",
+  "pass": "PASS-1",
+  "subsystem": {
+    "id": "avionics_bay",
+    "discipline": "electronics",
+    "function": "Avionics ring/tray with board mounts and harness pass-throughs",
+    "evidence_features": [
+      "avionics_tray",
+      "harness_passthrough",
+      "board_standoff"
+    ],
+    "criteria_refs": [
+      "electronics_routing",
+      "service_access"
+    ]
+  },
+  "instruction": "Design only this subsystem: P0 plan, part_tree children, 12-24 coordinate-bearing geometry_ops. Every evidence_feature must appear. Do not modify other subsystems or the global envelope.",
+  "criteria": [
+    {
+      "id": "service_access",
+      "title": "Service Access and Maintainability",
+      "criteria": [
+        {
+          "criterion": "replaceable_module_path",
+          "weight": 13,
+          "good": "Battery, sensor, actuator, cartridge, payload, cable, or joint modules remain removable without full teardown.",
+          "bad": "Functional modules are fused into a closed body.",
+          "signals": [
+            "removable",
+            "slide-in",
+            "snap-in",
+            "single-pin",
+            "tool-less",
+            "service_access"
+          ],
+          "loop_feedback": "Separate the critical service module and add a visible removal path, latch, pin, or slide rail."
+        },
+        {
+          "criterion": "cable_harness_visibility",
+          "weight": 8,
+          "good": "Harnesses, tubes, or service channels are routed through visible raceways or protected channels.",
+          "bad": "Cables are buried inside closed links or shells with no inspection feature.",
+          "signals": [
+            "harness_channel",
+            "cable_raceway",
+            "channel",
+            "inspection_window"
+          ],
+          "loop_feedback": "Add external or inspectable harness channels with strain relief and access covers."
+        },
+        {
+          "criterion": "access_not_just_text",
+          "weight": 9,
+          "good": "Access is represented by geometry: hatch, pocket, channel, fastener pattern, slot, window, or removable cover.",
+          "bad": "Access is claimed only in prose.",
+          "signals": [
+            "pocket",
+            "channel",
+            "drill",
+            "slot",
+            "hatch",
+            "cover",
+            "window"
+          ],
+          "loop_feedback": "Convert service-access text into physical geometry_ops: cover, pocket, slot, window, and fastener pattern."
+        },
+        {
+          "criterion": "harness_strain_relief_and_bend_radius",
+          "weight": 9,
+          "good": "Every cable exit shows strain relief geometry (clamp, grommet, tie point) and routing respects a stated minimum bend radius away from moving joints and sharp edges.",
+          "bad": "Cables exit bare holes, cross hinge lines unsupported, or bend around sharp printed edges with no relief feature.",
+          "signals": [
+            "strain_relief",
+            "grommet",
+            "cable_clamp",
+            "bend_radius",
+            "tie_point",
+            "edge_protection"
+          ],
+          "loop_feedback": "Add strain-relief clamps or grommets at every cable exit, state a minimum bend radius, and reroute harnesses away from hinge lines and sharp edges.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        },
+        {
+          "criterion": "connector_accessibility_and_keying",
+          "weight": 8,
+          "good": "Connectors are reachable without disassembling structure, have finger/tool clearance, and mention keying or labeling to prevent mis-mating.",
+          "bad": "Connectors face closed walls, sit in unreachable pockets, or identical adjacent connectors have no keying or label.",
+          "signals": [
+            "connector_clearance",
+            "keying",
+            "label",
+            "mate_demate",
+            "access_pocket"
+          ],
+          "loop_feedback": "Reorient connectors toward access openings, add finger clearance pockets, and engrave keying/ID labels next to each connector.",
+          "source_refs": [
+            "sources/public/nasa-std-87394a_w_change_4_0.pdf"
+          ]
+        }
+      ]
+    }
+  ],
+  "citable_sources": [
+    {
+      "title": "NASA Systems Engineering Handbook SP-2016-6105 Rev2",
+      "target_topics": [
+        "requirements",
+        "interface management",
+        "verification_validation",
+        "risk",
+        "decision analysis"
+      ]
+    },
+    {
+      "title": "NASA-STD-8739.4A Workmanship: Cable/Harness/Wiring",
+      "target_topics": [
+        "harness routing",
+        "strain relief",
+        "connector workmanship",
+        "inspection"
+      ]
+    },
+    {
+      "title": "McMaster-Carr Catalog 123",
+      "target_topics": [
+        "standard fastener/bearing/hardware dimensions",
+        "part naming vocabulary"
+      ]
+    }
+  ],
+  "boundary_note": "All subsystems are educational display mockups; no propulsion, ignition, or flight-performance design."
+}

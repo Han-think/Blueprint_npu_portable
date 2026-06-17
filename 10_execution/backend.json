@@ -1,0 +1,71 @@
+{
+  "schema_version": "bp-npu-backend-1",
+  "mode": "file_first_local_validation",
+  "note": "This file records the intended local runtime. The package includes a static server plus schema validation helper, but it does not install, start, download, or bundle a model runtime.",
+  "preferred_backend": "lmstudio_local",
+  "backends": {
+    "lmstudio_local": {
+      "type": "openai_compatible_api",
+      "runtime_status": "external_runtime_expected",
+      "host": "http://127.0.0.1:1234/v1",
+      "default_model_family": "openai-gpt-oss-20b-abliterated-uncensored-neo-imatrix",
+      "workspace_contract_version": "blueprint_folder_bound_engineering_agent_v1",
+      "context_pack_version": "blueprint_engineering_context_pack_v1",
+      "description": "LM Studio local server bound to this Blueprint workspace. Used as the primary local reasoning/generation provider; Ollama remains fallback.",
+      "endpoints": {
+        "models": "/v1/models",
+        "chat_completions": "/v1/chat/completions",
+        "responses": "/v1/responses"
+      },
+      "structured_output": {
+        "preferred": true,
+        "mode": "response_format.json_schema",
+        "fallback": "plain JSON extraction and retry"
+      },
+      "candidate_models": [
+        "openai-gpt-oss-20b-abliterated-uncensored-neo-imatrix",
+        "gpt-oss-20b"
+      ],
+      "safety_boundary_note": "This workspace uses the local model for educational mock assembly and design-review evidence only. Uncensored/abliterated model ids must still obey the workspace safety boundary.",
+      "options": {
+        "temperature": 0.35,
+        "max_tokens": 2200
+      }
+    },
+    "ollama_ipex_portable": {
+      "type": "ollama_api",
+      "runtime_status": "external_runtime_expected",
+      "release_basis": {
+        "project": "ipex-llm",
+        "tag": "v2.3.0-nightly",
+        "release_url": "https://github.com/ipex-llm/ipex-llm/releases/tag/v2.3.0-nightly",
+        "windows_asset": "ollama-ipex-llm-2.3.0b20250725-win.zip",
+        "ubuntu_asset": "ollama-ipex-llm-2.3.0b20250725-ubuntu.tgz",
+        "ollama_compatibility_note": "Release notes state that ollama-ipex-llm portable zip supports Ollama v0.9.3 starting from 2.3.0b20250630."
+      },
+      "acceleration_target": "Intel GPU/iGPU/Arc through IPEX-LLM portable Ollama; NPU/OpenVINO is separate future evaluation.",
+      "host": "http://127.0.0.1:11434",
+      "portable_root": "C:/Ollama-IPEX",
+      "ollama_exe": "C:/Ollama-IPEX/ollama.exe",
+      "default_model": "qwen3:8b",
+      "candidate_models": [
+        "qwen3:8b",
+        "qwen2.5:7b",
+        "qwen3:4b",
+        "llama3.1:8b",
+        "gemma3:4b"
+      ],
+      "options": {
+        "num_ctx": 8192,
+        "temperature": 0.35,
+        "top_p": 0.9,
+        "repeat_penalty": 1.08
+      }
+    },
+    "browser_demo": {
+      "type": "static_html",
+      "enabled": true,
+      "description": "HTML files can be opened directly for static reading/demo mode. Minimal.html can also be served through server/serve.py for schema validation while calling Ollama directly."
+    }
+  }
+}
