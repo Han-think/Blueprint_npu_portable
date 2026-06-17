@@ -408,6 +408,11 @@ def generate_with_retry(system, user, stage, temp_base, max_retries=2):
         temp = max(0.15, temp_base * (0.65 ** attempt))
         try:
             text = lm_call(system, user + note, temp)
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="replace")
+            print(f"    HTTP {e.code}: {body[:300]}", flush=True)
+            note = f"\n\nERROR: {e}. Output corrected JSON only."
+            continue
         except Exception as e:
             note = f"\n\nERROR: {e}. Output corrected JSON only."
             continue
