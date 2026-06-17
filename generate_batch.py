@@ -563,13 +563,18 @@ def run_candidate(seed, vehicle, gen_seed, log):
     log(f"  exported -> {run_dir} ({exp['parts']} parts, {exp['joints']} joints)")
 
     # 2) CAD audit (run_full_pipeline subprocess)
-    try:
-        subprocess.run([sys.executable, "run_full_pipeline.py", seed, "--dir", run_dir],
-                       cwd=str(CAD_DIR), timeout=1200, capture_output=True, text=True)
-    except Exception as e:
-        log(f"  audit pipeline error: {e}")
+    skip_audit = os.environ.get("BP_SKIP_AUDIT", "").lower() in ("1", "true", "yes")
+    if skip_audit:
+        log(f"  (CAD audit skipped — BP_SKIP_AUDIT=1)")
+        interference, analysis, resolution = {}, {}, {}
+    else:
+        try:
+            subprocess.run([sys.executable, "run_full_pipeline.py", seed, "--dir", run_dir],
+                           cwd=str(CAD_DIR), timeout=1200, capture_output=True, text=True)
+        except Exception as e:
+            log(f"  audit pipeline error: {e}")
+        interference, analysis, resolution = read_reports(seed)
 
-    interference, analysis, resolution = read_reports(seed)
     decision, why = auto_decision(len(vehicle["parts"]), parts_ok, interference, analysis, resolution)
     log(f"  AUTO-{decision.upper()}: {why}")
 
