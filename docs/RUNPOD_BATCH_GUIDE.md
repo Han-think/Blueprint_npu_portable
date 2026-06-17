@@ -1,100 +1,115 @@
 # RunPod 배치 생성 가이드
 
 generate_batch.py를 유료 GPU 서버(RunPod 등)에서 돌릴 때의 환경 셋업,
-vLLM 전환, 병렬 워커 설정을 다룬다.
+vLLM 전환, 병렬 워커 설정, LoRA 학습까지 다룬다.
+
+---
+
+## 0. 원샷 복붙 스크립트 (vLLM, 검증 완료)
+
+> Pod 생성 후 터미널 열고 아래를 **순서대로 복붙**하면 끝.
+> 템플릿: **RunPod PyTorch 2.4.0** / GPU: **A40 48GB** / 디스크: 50GB+
+
+```bash
+# ── Step 1: 코드 클론 ──
+cd /workspace
+git clone https://github.com/Han-think/Blueprint_npu_portable.git
+cd Blueprint_npu_portable
+
+# ── Step 2: vLLM 서버 기동 ──
+# ⚠️ --max-model-len 16384 필수! (8192면 400 에러 남)
+nohup vllm serve Qwen/Qwen2.5-14B-Instruct \
+    --host 0.0.0.0 --port 8000 \
+    --max-model-len 16384 \
+    --gpu-memory-utilization 0.90 \
+    > /workspace/vllm.log 2>&1 &
+
+# ── Step 3: 서버 올라올 때까지 대기 ──
+tail -f /workspace/vllm.log
+# "Application startup complete" 뜨면 Ctrl+C
+```
+
+```bash
+# ── Step 4: 배치 생성 시작 ──
+cd /workspace/Blueprint_npu_portable
+BP_LM_URL=http://127.0.0.1:8000/v1 \
+BP_LM_MODEL=Qwen/Qwen2.5-14B-Instruct \
+BP_WORKERS=3 \
+nohup python generate_batch.py --seeds all --per-seed 50 \
+    >> /workspace/gen.log 2>&1 &
+
+# ── Step 5: 30초 후 로그 확인 ──
+sleep 30 && tail -20 /workspace/gen.log
+```
+
+```bash
+# ── Step 6: 완료 후 Git push ──
+cd /workspace/Blueprint_npu_portable
+git add 30_model/curation/
+git commit -m "batch: 300 candidates via vLLM Qwen2.5-14B"
+git push
+```
 
 ---
 
 ## 1. 검증된 버전 조합 (A40 48GB 기준)
 
-### Option A: Ollama (간단, 직렬)
+### Option A: Ollama (간단, 직렬) — 비추천
 
 | 구성 요소 | 버전 | 비고 |
 |-----------|------|------|
 | CUDA Driver | ≥ 12.1 | RunPod 기본 이미지 대부분 충족 |
-| Ollama | latest | `curl -fsSL https://ollama.com/install.sh \| sh` |
-| 모델 | qwen2.5:27b 등 | `ollama pull qwen2.5:27b` |
-
-설치 순서:
-```bash
-# 1. Ollama 설치
-curl -fsSL https://ollama.com/install.sh | sh
-
-# 2. 백그라운드 실행
-nohup ollama serve > /workspace/ollama.log 2>&1 &
-sleep 5
-
-# 3. 모델 다운로드
-ollama pull qwen2.5:27b
-
-# 4. 확인
-curl http://127.0.0.1:11434/api/tags
-```
+| Ollama | latest | `curl -fsSL https://ollama.com/install.sh \| sh` (zstd 필요: `apt-get install -y zstd`) |
+| 모델 | qwen2.5-coder:32b | `ollama pull qwen2.5-coder:32b` (qwen2.5:27b는 존재하지 않음!) |
 
 **한계:** Ollama는 직렬 서버 — 동시 요청을 보내도 내부적으로 순차 처리.
-BP_WORKERS 올려도 이득 없음. 빠르게 하려면 vLLM으로 전환해야 함.
+BP_WORKERS 올려도 이득 없음. **candidate당 ~25분, GPU 사용률 14%.** 돈 낭비.
 
----
+### Option B: vLLM (배치 처리, 빠름) — ✅ 추천
 
-### Option B: vLLM (배치 처리, 빠름)
+vLLM은 동시 요청을 GPU 배치로 묶어 처리 → WORKERS와 함께 쓰면 **5~10배 빠름**.
 
-vLLM은 동시 요청을 GPU 배치로 묶어 처리 → WORKERS와 함께 쓰면 2~4배 빠름.
-**단, 버전 조합을 정확히 맞춰야 한다.**
+#### 검증 조합 (2026-06-17 실전 검증)
 
-#### 검증 조합 (2026-06 기준)
-
-| 구성 요소 | 버전 | 설치 |
+| 구성 요소 | 버전 | 비고 |
 |-----------|------|------|
-| CUDA Toolkit | **12.4** | RunPod 템플릿 선택 시 확인 |
-| Python | **3.10** | `python3 --version` |
-| PyTorch | **2.5.1+cu124** | 아래 순서대로 설치 |
-| vLLM | **0.6.x** (0.6.6 권장) | PyTorch 먼저 설치 후 |
+| RunPod 템플릿 | **PyTorch 2.4.0** | 가장 안정적 |
+| Python | **3.11** | 템플릿 기본 포함 |
+| PyTorch | **2.4.0+cu124** | 템플릿 기본 포함 (건드리지 말 것!) |
+| vLLM | **0.23.0** | `pip install vllm` (자동으로 맞는 버전 설치) |
+| 모델 | **Qwen/Qwen2.5-14B-Instruct** | ~27.5GB VRAM. A40에 딱 맞음 |
 
-> CUDA 12.1 이미지에서는 vLLM 0.5.x + PyTorch 2.4.x 조합을 시도할 것.
-> CUDA 11.8은 vLLM 미지원 — 피할 것.
+> ⚠️ **Qwen2.5-27B는 A40에서 OOM** — 14B를 쓸 것.
+> ⚠️ PyTorch를 직접 설치/교체하면 높은 확률로 꼬임. 템플릿 기본 PyTorch 유지.
 
-#### 설치 순서 (반드시 이 순서대로)
+#### vLLM 서버 기동
 
 ```bash
-# ── 0. 현재 CUDA 버전 확인 ──
-nvidia-smi   # 우상단 "CUDA Version" 확인
-nvcc --version  # toolkit 버전
-
-# ── 1. 기존 PyTorch 제거 (충돌 방지) ──
-pip uninstall torch torchvision torchaudio -y
-
-# ── 2. CUDA 12.4 맞춤 PyTorch 설치 ──
-pip install torch==2.5.1 torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cu124
-
-# ── 3. PyTorch-CUDA 연결 확인 (필수!) ──
-python3 -c "import torch; print(torch.cuda.is_available(), torch.version.cuda)"
-# True 12.4 가 나와야 함. False면 다음 단계 진행 금지.
-
-# ── 4. vLLM 설치 ──
-pip install vllm==0.6.6
-
-# ── 5. vLLM 서버 기동 ──
-nohup vllm serve Qwen/Qwen2.5-27B-Instruct \
-    --host 0.0.0.0 --port 11434 \
-    --max-model-len 8192 \
+nohup vllm serve Qwen/Qwen2.5-14B-Instruct \
+    --host 0.0.0.0 --port 8000 \
+    --max-model-len 16384 \
     --gpu-memory-utilization 0.90 \
     > /workspace/vllm.log 2>&1 &
 
-# ── 6. 서버 준비 대기 (모델 로딩 수 분 소요) ──
-sleep 60
-curl http://127.0.0.1:11434/v1/models
+tail -f /workspace/vllm.log
+# "Application startup complete" 나올 때까지 대기 (첫 실행: 모델 다운로드 포함 ~10분)
+# CUDA graph 컴파일 포함 시 추가 수 분 소요
 ```
+
+> ⚠️ **`--max-model-len 16384` 필수!**
+> generate_batch.py가 `max_tokens=8000`을 요청함. 프롬프트 토큰까지 합치면 8192 초과.
+> 8192로 하면 **400 Bad Request** 폭탄 맞음. (실전에서 검증된 함정)
 
 #### vLLM 안 될 때 디버깅
 
 | 증상 | 원인 / 해결 |
 |------|-------------|
-| `CUDA error: no kernel image` | PyTorch cu 버전과 실제 CUDA 불일치 → 1~2번 재실행 |
-| `ImportError: libcudart.so` | CUDA toolkit 미설치 → RunPod 템플릿 교체 |
-| `torch.cuda.is_available() = False` | PyTorch가 CPU 빌드로 설치됨 → `--index-url` 확인 |
-| `OutOfMemoryError` | `--gpu-memory-utilization 0.85`로 낮추거나 `--max-model-len 4096` |
-| `vllm` 설치 중 빌드 에러 | Python 3.10 확인, `pip install --upgrade pip setuptools wheel` 후 재시도 |
+| `maximum context length is 8192` (400) | `--max-model-len 16384` 누락 → 재시작 |
+| `OutOfMemoryError` / `Free memory ... less than desired` | GPU에 이전 프로세스 잔존 → `nvidia-smi --query-compute-apps=pid --format=csv,noheader \| xargs -r kill -9` 후 재시작 |
+| 27B 모델 OOM | A40 48GB에 bf16 27B 안 올라감 → 14B로 변경 |
+| vLLM PID가 1번 (컨테이너 메인) | vLLM 전용 템플릿에서 kill하면 컨테이너 죽음 → PyTorch 템플릿 사용 |
+| `torch.cuda.is_available() = False` | PyTorch가 CPU 빌드 → 템플릿 기본 PyTorch 유지, 직접 설치 금지 |
+| Pod restart 후 코드 사라짐 | `/workspace`는 유지되지만 확인 필요. `git clone` 다시 |
 
 ---
 
@@ -105,45 +120,50 @@ curl http://127.0.0.1:11434/v1/models
 | 변수 | 기본값 | 설명 |
 |------|--------|------|
 | `BP_LM_URL` | `http://127.0.0.1:1234/v1` | LLM 서버 엔드포인트 |
-| `BP_LM_MODEL` | (빈 문자열 = 서버 기본) | 모델 지정 |
+| `BP_LM_MODEL` | (빈 문자열 = 서버 기본) | 모델 지정 (vLLM: `Qwen/Qwen2.5-14B-Instruct`) |
+| `BP_LM_API_KEY` | (빈 문자열) | API 키 (Gemma 템플릿 등에서 필요) |
 | `BP_WORKERS` | `1` | 서브시스템 동시 생성 워커 수 |
 
-### Ollama로 실행 (직렬, WORKERS=1)
+### vLLM으로 실행 (배치, WORKERS=3) — ✅ 추천
 
 ```bash
-export BP_LM_URL=http://127.0.0.1:11434/v1
-export BP_WORKERS=1
-
-nohup python generate_batch.py --seeds all --per-seed 8 \
+BP_LM_URL=http://127.0.0.1:8000/v1 \
+BP_LM_MODEL=Qwen/Qwen2.5-14B-Instruct \
+BP_WORKERS=3 \
+nohup python generate_batch.py --seeds all --per-seed 50 \
     >> /workspace/gen.log 2>&1 &
 ```
 
-### vLLM으로 실행 (배치, WORKERS=3~4)
+> WORKERS 가이드 (A40 48GB):
+> - 14B 모델 → **3** (검증됨, GPU 100%, ~54 tokens/s)
+> - 7~8B 모델 → 4~6
+> - 너무 높이면 OOM. 3부터 시작.
+
+### Ollama로 실행 (직렬, WORKERS=1) — 느림
 
 ```bash
-export BP_LM_URL=http://127.0.0.1:11434/v1
-export BP_WORKERS=3    # A40 48GB + 27B 모델 기준 3~4 적정
-
+BP_LM_URL=http://127.0.0.1:11434/v1 \
+BP_WORKERS=1 \
 nohup python generate_batch.py --seeds all --per-seed 8 \
     >> /workspace/gen.log 2>&1 &
 ```
-
-> WORKERS 가이드: A40 48GB에서 27B 모델 → 3~4 / 7~8B 모델 → 4~6
-> 너무 높이면 OOM 발생. 2부터 시작해서 올릴 것.
 
 ---
 
 ## 3. 모니터링
 
 ```bash
+# 진행률 (가장 유용)
+cat 30_model/curation/batch_checkpoint.json
+
 # 실시간 로그
 tail -f /workspace/gen.log
 
-# 진행률 (done/총개수)
-cat /workspace/30_model/curation/batch_checkpoint.json
+# vLLM 서버 로그 (throughput, 에러 확인)
+tail -f /workspace/vllm.log
 
 # 프로세스 생존 확인
-pgrep -f generate_batch
+ps aux | grep generate_batch
 ```
 
 ---
@@ -151,11 +171,14 @@ pgrep -f generate_batch
 ## 4. 중단 & 이어하기
 
 ```bash
-# 중단 (Ctrl+C 또는)
+# 중단
 kill $(pgrep -f generate_batch)
 
 # 이어하기 — checkpoint에서 재개
-nohup python generate_batch.py --seeds all --per-seed 8 --resume \
+BP_LM_URL=http://127.0.0.1:8000/v1 \
+BP_LM_MODEL=Qwen/Qwen2.5-14B-Instruct \
+BP_WORKERS=3 \
+nohup python generate_batch.py --seeds all --per-seed 50 --resume \
     >> /workspace/gen.log 2>&1 &
 ```
 
@@ -164,11 +187,63 @@ checkpoint는 candidate 1개 완료될 때마다 자동 저장됨.
 
 ---
 
-## 5. 비용 추정 (RunPod 기준)
+## 5. 완료 후: Git push & LoRA 학습
 
-| 구성 | candidate당 시간 | 48개 총 시간 | A40 $0.46/hr 기준 |
-|------|-----------------|-------------|-------------------|
-| Ollama + WORKERS=1 | ~25분 | ~20시간 | ~$9.2 |
-| vLLM + WORKERS=3 | ~7분 | ~5.5시간 | ~$2.5 |
+### 5-1. 결과 Git push
 
-→ vLLM 전환 시 **비용 약 3.5배 절감**.
+```bash
+cd /workspace/Blueprint_npu_portable
+git add 30_model/curation/
+git commit -m "batch: 300 candidates via vLLM Qwen2.5-14B"
+git push
+```
+
+### 5-2. LoRA 학습 (같은 Pod에서 바로)
+
+배치 완료 후 vLLM을 죽이고 GPU를 학습용으로 전환:
+
+```bash
+# 1. vLLM 종료 (GPU 메모리 해제)
+pkill -f vllm
+sleep 5
+nvidia-smi  # 메모리 해제 확인
+
+# 2. 학습 의존성 설치
+pip install transformers peft datasets bitsandbytes accelerate trl
+
+# 3. LoRA 학습 (300개 이상이면 시험 학습 가능)
+cd /workspace/Blueprint_npu_portable
+python 30_model/train_lora.py --train
+
+# 4. 결과 push
+git add 30_model/lora_out/
+git commit -m "lora: trial adapter from 300 candidates"
+git push
+```
+
+> 학습 게이트: 300 rows = 시험 LoRA, 1000 rows = 본격 LoRA
+> A40 48GB + QLoRA + 300 rows → **약 30분~1시간**, 추가 비용 ~$0.50
+
+---
+
+## 6. 비용 추정 (RunPod A40 $0.46/hr)
+
+| 구성 | candidate당 시간 | 300개 총 시간 | 비용 |
+|------|-----------------|-------------|------|
+| Ollama + WORKERS=1 | ~25분 | ~125시간 | ~$57.5 |
+| **vLLM + WORKERS=3** | **~2분** | **~3~4시간** | **~$1.5~2.0** |
+| LoRA 학습 (300 rows) | — | ~0.5~1시간 | ~$0.25~0.50 |
+
+→ vLLM 전환 시 **비용 약 30배 절감**. 셋팅 삽질 포함해도 $10 이내.
+
+---
+
+## 7. 삽질 방지 체크리스트
+
+- [ ] RunPod 템플릿: **PyTorch 2.4.0** (vLLM 전용 템플릿 ❌ — PID 1 문제)
+- [ ] 디스크: **50GB 이상** (모델 + 코드 + 결과)
+- [ ] `--max-model-len 16384` 확인 (8192 ❌)
+- [ ] 모델: Qwen2.5-**14B** (27B는 OOM)
+- [ ] PyTorch 건드리지 않기 (템플릿 기본 유지)
+- [ ] `BP_WORKERS=3` (Ollama에서는 효과 없음, vLLM 전용)
+- [ ] nohup + `>>` 로 실행 (창 닫아도 안전)
