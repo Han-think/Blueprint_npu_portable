@@ -486,28 +486,53 @@ def read_reports(seed):
     return interference, analysis, resolution
 
 
-def auto_decision(parts_total, parts_ok, interference, analysis, resolution):
+SEED_FOS_THRESHOLDS = {
+    "cubesat":              {"reject_below": 1.5,  "keep_min": 3.0,  "good": 10.0, "excellent": 25.0},
+    "robot_arm":            {"reject_below": 0.05, "keep_min": 0.15, "good": 0.5,  "excellent": 3.0},
+    "tiltrotor":            {"reject_below": 0.1,  "keep_min": 0.6,  "good": 3.0,  "excellent": 10.0},
+    "small_launch_vehicle": {"reject_below": 0.05, "keep_min": 0.5,  "good": 2.5,  "excellent": 10.0},
+    "long_range_recon_wing":{"reject_below": 0.2,  "keep_min": 0.5,  "good": 1.0,  "excellent": 1.8},
+    "haptic_glove":         {"reject_below": 0.05, "keep_min": 0.8,  "good": 5.0,  "excellent": 20.0},
+}
+SEED_FOS_DEFAULT = {"reject_below": 0.1, "keep_min": 1.5, "good": 5.0, "excellent": 15.0}
+
+
+def fos_grade(fos, thresholds):
+    if fos >= thresholds["excellent"]:
+        return "A"
+    if fos >= thresholds["good"]:
+        return "B"
+    if fos >= thresholds["keep_min"]:
+        return "C"
+    return None
+
+
+def auto_decision(parts_total, parts_ok, interference, analysis, resolution,
+                  seed_name=""):
     blocked = (interference.get("counts") or {}).get("blocked_pairs", 0)
     low_res = resolution.get("low_res_parts") or []
     sizing = analysis.get("sizing") or {}
     fos = sizing.get("solver_fos", sizing.get("worst_fos"))
     status = analysis.get("status")
-    # REJECT는 '모델이 책임지는 결함'만: 무효/불완전/LOW-RES(ops 부족).
-    # blocked_pairs는 우리 조립 배치(코드)가 만든 간섭이라 모델 설계 품질이 아님 →
-    # 자동 reject가 아니라 HOLD(사람 검토)로 분류한다(정직: 배치 탓임을 명시).
+    th = SEED_FOS_THRESHOLDS.get(seed_name, SEED_FOS_DEFAULT)
     reasons = []
     if parts_ok < parts_total:
         reasons.append(f"incomplete: {parts_ok}/{parts_total} parts got a blueprint")
     if low_res:
         reasons.append(f"LOW-RES parts {low_res} (model gave too few ops)")
     if reasons:
-        return "reject", "; ".join(reasons)
-    if status == "ok" and isinstance(fos, (int, float)) and fos >= 1.5:
-        note = f"FoS {fos}, analysis ok"
+        return "reject", "; ".join(reasons), None
+    if not isinstance(fos, (int, float)):
+        return "hold", f"mid: blocked {blocked}, FoS {fos}, status {status}", None
+    if fos < th["reject_below"]:
+        return "reject", f"FoS {fos} below structural minimum {th['reject_below']} for {seed_name}", None
+    grade = fos_grade(fos, th)
+    if status == "ok" and grade:
+        note = f"FoS {fos} [grade {grade}], analysis ok"
         if blocked and blocked > 0:
             note += f" · blocked {blocked} (our placement, not design - review layout)"
-        return "keep", note
-    return "hold", f"mid: blocked {blocked}, FoS {fos}, status {status}"
+        return "keep", note, grade
+    return "hold", f"mid: blocked {blocked}, FoS {fos}, status {status}", None
 
 
 # ── 한 후보(어셈블리) 생성 + audit + 게이트 + persist ────────────────────────
@@ -575,7 +600,8 @@ def run_candidate(seed, vehicle, gen_seed, log):
             log(f"  audit pipeline error: {e}")
         interference, analysis, resolution = read_reports(seed)
 
-    decision, why = auto_decision(len(vehicle["parts"]), parts_ok, interference, analysis, resolution)
+    decision, why, grade = auto_decision(len(vehicle["parts"]), parts_ok, interference, analysis, resolution,
+                                         seed_name=seed)
     log(f"  AUTO-{decision.upper()}: {why}")
 
     # 3) corpus 적재 (실제 messages + payload)
@@ -589,6 +615,7 @@ def run_candidate(seed, vehicle, gen_seed, log):
         "engineering_scorecard": {"score": (analysis.get("score") if isinstance(analysis.get("score"), (int, float)) else None),
                                   "blocked_pairs": (interference.get("counts") or {}).get("blocked_pairs", 0),
                                   "sizing_fos": (analysis.get("sizing") or {}).get("solver_fos"),
+                                  "grade": grade,
                                   "auto_reason": why},
         "messages": [
             {"role": "system", "content": "You are Blueprint XPU. Given a vehicle assembly brief, output a "
