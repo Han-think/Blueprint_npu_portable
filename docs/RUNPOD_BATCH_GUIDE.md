@@ -34,7 +34,8 @@ tail -f /workspace/vllm.log
 cd /workspace/Blueprint_npu_portable
 BP_LM_URL=http://127.0.0.1:8000/v1 \
 BP_LM_MODEL=Qwen/Qwen2.5-14B-Instruct \
-BP_WORKERS=3 \
+BP_WORKERS=12 \
+BP_SKIP_AUDIT=1 \
 nohup python generate_batch.py --seeds all --per-seed 50 \
     >> /workspace/gen.log 2>&1 &
 
@@ -124,20 +125,31 @@ tail -f /workspace/vllm.log
 | `BP_LM_API_KEY` | (빈 문자열) | API 키 (Gemma 템플릿 등에서 필요) |
 | `BP_WORKERS` | `1` | 서브시스템 동시 생성 워커 수 |
 
-### vLLM으로 실행 (배치, WORKERS=3) — ✅ 추천
+### vLLM으로 실행 (배치, WORKERS=12) — ✅ 추천
 
 ```bash
 BP_LM_URL=http://127.0.0.1:8000/v1 \
 BP_LM_MODEL=Qwen/Qwen2.5-14B-Instruct \
-BP_WORKERS=3 \
+BP_WORKERS=12 \
+BP_SKIP_AUDIT=1 \
 nohup python generate_batch.py --seeds all --per-seed 50 \
     >> /workspace/gen.log 2>&1 &
 ```
 
-> WORKERS 가이드 (A40 48GB):
-> - 14B 모델 → **3** (검증됨, GPU 100%, ~54 tokens/s)
-> - 7~8B 모델 → 4~6
-> - 너무 높이면 OOM. 3부터 시작.
+> **WORKERS 가이드 (A40 48GB, 14B 모델):**
+>
+> | WORKERS | tokens/s | GPU 사용률 | 비고 |
+> |---------|----------|-----------|------|
+> | 3 | ~54 | 100% | 안전 기본값 |
+> | 5 | ~85 | 100% | |
+> | 7 | ~120 | 100% | |
+> | 10 | ~165 | 100% | |
+> | **12** | **~199** | **100%** | **최적 (서브시스템 12~13개와 일치)** |
+> | 15+ | ~199 | 100% | 추가 이득 없음 (GPU 배치 포화) |
+>
+> - WORKERS=12가 서브시스템 수(12~13개)와 일치 → 한 candidate의 모든 서브시스템을 동시 생성
+> - `BP_SKIP_AUDIT=1`: RunPod에서 build123d(CAD) 설치 불필요. 로컬에서 audit 재판정
+> - 7~8B 모델 → WORKERS=15~20까지 가능
 
 ### Ollama로 실행 (직렬, WORKERS=1) — 느림
 
@@ -177,7 +189,8 @@ kill $(pgrep -f generate_batch)
 # 이어하기 — checkpoint에서 재개
 BP_LM_URL=http://127.0.0.1:8000/v1 \
 BP_LM_MODEL=Qwen/Qwen2.5-14B-Instruct \
-BP_WORKERS=3 \
+BP_WORKERS=12 \
+BP_SKIP_AUDIT=1 \
 nohup python generate_batch.py --seeds all --per-seed 50 --resume \
     >> /workspace/gen.log 2>&1 &
 ```
@@ -187,18 +200,54 @@ checkpoint는 candidate 1개 완료될 때마다 자동 저장됨.
 
 ---
 
-## 5. 완료 후: Git push & LoRA 학습
+## 5. 완료 후: 로컬 CAD audit → Git push → LoRA 학습
 
-### 5-1. 결과 Git push
+### 5-1. RunPod 결과 다운로드
+
+`BP_SKIP_AUDIT=1`로 돌렸으므로 CAD audit은 로컬에서 재판정한다.
 
 ```bash
+# RunPod에서: 결과 압축 & 다운로드
 cd /workspace/Blueprint_npu_portable
-git add 30_model/curation/
-git commit -m "batch: 300 candidates via vLLM Qwen2.5-14B"
+tar czf /workspace/batch_results.tar.gz 20_dataset/seeds_generated/ 30_model/curation/
+# Pod 웹 터미널에서 다운로드하거나 scp
+```
+
+### 5-2. 로컬 CAD audit 재판정
+
+build123d가 설치된 로컬에서 전체 audit 실행:
+
+```bash
+# 풀 audit (320개 × ~13초 ≈ 70분)
+python run_local_audit.py
+
+# 특정 seed만
+python run_local_audit.py --seed robot_arm
+
+# 결과 확인
+python batch_monitor.py
+```
+
+> **seed별 차등 FoS 기준 (auto_decision):**
+> - cubesat: keep ≥ 3.0, good ≥ 10, excellent ≥ 25
+> - robot_arm: keep ≥ 0.15, good ≥ 0.5, excellent ≥ 3.0
+> - tiltrotor: keep ≥ 0.6, good ≥ 3.0, excellent ≥ 10
+> - small_launch_vehicle: keep ≥ 0.5, good ≥ 2.5, excellent ≥ 10
+> - long_range_recon_wing: keep ≥ 0.5, good ≥ 1.0, excellent ≥ 1.8
+> - haptic_glove: keep ≥ 0.8, good ≥ 5.0, excellent ≥ 20
+>
+> Keep 내에서 Grade A/B/C 등급으로 상대 품질 구분.
+> LoRA 학습 시 A ×3, B ×2, C ×1로 가중 반복.
+
+### 5-3. Git push
+
+```bash
+git add 20_dataset/seeds_generated/ 30_model/curation/
+git commit -m "batch: N candidates via vLLM Qwen2.5-14B (audit complete)"
 git push
 ```
 
-### 5-2. LoRA 학습 (같은 Pod에서 바로)
+### 5-4. LoRA 학습 (RunPod에서)
 
 배치 완료 후 vLLM을 죽이고 GPU를 학습용으로 전환:
 
@@ -211,8 +260,11 @@ nvidia-smi  # 메모리 해제 확인
 # 2. 학습 의존성 설치
 pip install transformers peft datasets bitsandbytes accelerate trl
 
-# 3. LoRA 학습 (300개 이상이면 시험 학습 가능)
+# 3. gate check (현재 keep+reject 수 확인)
 cd /workspace/Blueprint_npu_portable
+python 30_model/train_lora.py
+
+# 4. LoRA 학습 (keep+reject >= 300이면 시험 학습 가능)
 python 30_model/train_lora.py --train
 
 # 4. 결과 push
@@ -221,7 +273,12 @@ git commit -m "lora: trial adapter from 300 candidates"
 git push
 ```
 
-> 학습 게이트: 300 rows = 시험 LoRA, 1000 rows = 본격 LoRA
+> **학습 게이트:** keep+reject 합산 기준
+> - 300 rows = 시험 LoRA (현재 271 keep + 12 reject = 283, **17개 부족**)
+> - 1000 rows = 본격 LoRA
+>
+> **Grade 가중치:** A등급 ×3, B등급 ×2, C등급 ×1 반복 학습 (고품질 예제 강조)
+>
 > A40 48GB + QLoRA + 300 rows → **약 30분~1시간**, 추가 비용 ~$0.50
 
 ---
@@ -231,10 +288,11 @@ git push
 | 구성 | candidate당 시간 | 300개 총 시간 | 비용 |
 |------|-----------------|-------------|------|
 | Ollama + WORKERS=1 | ~25분 | ~125시간 | ~$57.5 |
-| **vLLM + WORKERS=3** | **~2분** | **~3~4시간** | **~$1.5~2.0** |
+| vLLM + WORKERS=3 | ~2분 | ~10시간 | ~$4.6 |
+| **vLLM + WORKERS=12** | **~50초** | **~4.5시간** | **~$2.0** |
 | LoRA 학습 (300 rows) | — | ~0.5~1시간 | ~$0.25~0.50 |
 
-→ vLLM 전환 시 **비용 약 30배 절감**. 셋팅 삽질 포함해도 $10 이내.
+→ vLLM + WORKERS=12 → **Ollama 대비 ~60배 빠름**. 실전 검증 완료 (199 tokens/s).
 
 ---
 
@@ -245,5 +303,6 @@ git push
 - [ ] `--max-model-len 16384` 확인 (8192 ❌)
 - [ ] 모델: Qwen2.5-**14B** (27B는 OOM)
 - [ ] PyTorch 건드리지 않기 (템플릿 기본 유지)
-- [ ] `BP_WORKERS=3` (Ollama에서는 효과 없음, vLLM 전용)
+- [ ] `BP_WORKERS=12` (14B 최적, Ollama에서는 효과 없음)
+- [ ] `BP_SKIP_AUDIT=1` (RunPod에서 CAD audit 스킵 → 로컬에서 재판정)
 - [ ] nohup + `>>` 로 실행 (창 닫아도 안전)

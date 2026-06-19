@@ -91,39 +91,54 @@ def record_to_messages(row):
 def corpus_summary(rows):
     keep = sum(1 for r in rows if str(r.get("decision")).lower() == "keep")
     reject = sum(1 for r in rows if str(r.get("decision")).lower() == "reject")
+    hold = sum(1 for r in rows if str(r.get("decision")).lower() == "hold")
+    grades = {"A": 0, "B": 0, "C": 0}
     by_seed = {}
     for r in rows:
         s = row_seed(r)
         by_seed[s] = by_seed.get(s, 0) + 1
-    return {"total": len(rows), "keep": keep, "reject": reject, "by_seed": by_seed}
+        g = (r.get("engineering_scorecard") or {}).get("grade")
+        if g in grades:
+            grades[g] += 1
+    return {"total": len(rows), "keep": keep, "reject": reject, "hold": hold,
+            "grades": grades, "by_seed": by_seed}
+
+
+GRADE_REPEAT = {"A": 3, "B": 2, "C": 1}
 
 
 def to_chat_example(row):
-    """keep = 정답 메시지. reject = '회피' 신호로 시스템에 부정 라벨. messages 없으면 레코드에서 유도."""
+    """keep = 정답 메시지 (grade별 반복 가중치). reject = 회피 학습."""
     msgs = record_to_messages(row)
     decision = str(row.get("decision")).lower()
+    grade = (row.get("engineering_scorecard") or {}).get("grade")
     if decision == "reject":
-        # reject는 회피 학습: system 에 '이 패턴은 reject됨' 표식 추가
         msgs = [{"role": "system",
                  "content": (msgs[0]["content"] if msgs and msgs[0]["role"] == "system" else "")
                  + "\n[CURATION] The following assistant output was REJECTED by engineering review — avoid this pattern."}] + \
                [m for m in msgs if m["role"] != "system"]
-    return {"messages": msgs}
+    repeat = GRADE_REPEAT.get(grade, 1) if decision == "keep" else 1
+    return {"messages": msgs, "grade": grade, "repeat": repeat}
 
 
 def gate_check(rows, force):
     s = corpus_summary(rows)
-    print(f"[corpus] total {s['total']} | keep {s['keep']} | reject {s['reject']} | by_seed {s['by_seed']}")
-    if s["total"] >= FULL_THRESHOLD:
-        print(f"[gate] >= full threshold ({FULL_THRESHOLD}) — ready for a real run.")
+    g = s["grades"]
+    print(f"[corpus] total {s['total']} | keep {s['keep']} (A:{g['A']} B:{g['B']} C:{g['C']}) "
+          f"| reject {s['reject']} | hold {s['hold']}")
+    print(f"[corpus] by_seed {s['by_seed']}")
+    trainable = s["keep"] + s["reject"]
+    if trainable >= FULL_THRESHOLD:
+        print(f"[gate] {trainable} trainable rows >= full threshold ({FULL_THRESHOLD}) — ready for a real run.")
         return True
-    if s["total"] >= TRIAL_THRESHOLD:
-        print(f"[gate] >= trial threshold ({TRIAL_THRESHOLD}) — OK for a smoke-test LoRA.")
+    if trainable >= TRIAL_THRESHOLD:
+        print(f"[gate] {trainable} trainable rows >= trial threshold ({TRIAL_THRESHOLD}) — OK for a smoke-test LoRA.")
         return True
     if force:
-        print(f"[gate] below trial ({s['total']}/{TRIAL_THRESHOLD}) but --force given.")
+        print(f"[gate] below trial ({trainable}/{TRIAL_THRESHOLD}) but --force given.")
         return True
-    print(f"[gate] NOT ENOUGH DATA: {s['total']}/{TRIAL_THRESHOLD} (trial). Keep curating (good/bad). No training.")
+    print(f"[gate] NOT ENOUGH DATA: {trainable}/{TRIAL_THRESHOLD} (trial). "
+          f"Need {TRIAL_THRESHOLD - trainable} more keep/reject rows.")
     return False
 
 
@@ -140,10 +155,18 @@ def train(rows, base_model):
               f"bitsandbytes accelerate trl  ({e})")
         return 1
 
-    examples = [to_chat_example(r) for r in rows if record_to_messages(r)]
-    if not examples:
+    trainable = [r for r in rows if str(r.get("decision")).lower() in ("keep", "reject")
+                 and record_to_messages(r)]
+    if not trainable:
         print("[data] no trainable examples could be built from the corpus (check --inspect).")
         return 1
+    examples = []
+    for r in trainable:
+        ex = to_chat_example(r)
+        for _ in range(ex.pop("repeat", 1)):
+            examples.append({"messages": ex["messages"]})
+    print(f"[data] {len(trainable)} rows → {len(examples)} training examples "
+          f"(grade-A ×3, B ×2, C ×1)")
     ds = Dataset.from_list(examples)
 
     tok = AutoTokenizer.from_pretrained(base_model)
