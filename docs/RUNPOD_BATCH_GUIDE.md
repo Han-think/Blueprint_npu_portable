@@ -296,7 +296,45 @@ git push
 
 ---
 
-## 7. 삽질 방지 체크리스트
+## 7. 2차 배치: 품질 개선 프롬프트 변형 + 갭 분석
+
+### 갭 분석 (어디가 부족한지 확인)
+
+```bash
+python generate_batch.py --gap-analysis
+```
+
+seed별 keep/reject/hold 수, grade A/B/C 분포, 부족한 곳을 자동 추천.
+
+### 프롬프트 변형 (다양성 확보)
+
+2차 배치부터 `PROMPT_VARIANTS`가 자동 적용된다. seed당 4-5개 시나리오를
+라운드로빈으로 순환하여 동일 seed라도 다른 설계 의도의 결과물을 생산한다.
+
+```bash
+# 예: cubesat 5개 → 5개 variant 각 1회씩 적용
+BP_LM_URL=http://127.0.0.1:8000/v1 \
+BP_LM_MODEL=Qwen/Qwen2.5-14B-Instruct \
+BP_WORKERS=12 BP_SKIP_AUDIT=1 \
+python generate_batch.py --seeds cubesat --per-seed 5
+```
+
+### 아티팩트 점검 (교사모델 반복 패턴 확인)
+
+```bash
+python 30_model/train_lora.py --check-artifacts
+```
+
+seed별 프롬프트 고유성, assistant 응답 패턴 반복률, geometry_ops 분포를 출력한다.
+
+### 검증셋 분리
+
+train_lora.py가 seed별 마지막 2개 keep을 자동으로 val holdout으로 분리한다.
+`--train` 시 eval loss가 50 step마다 출력되므로 과적합을 모니터링할 수 있다.
+
+---
+
+## 8. 삽질 방지 체크리스트
 
 - [ ] RunPod 템플릿: **PyTorch 2.4.0** (vLLM 전용 템플릿 ❌ — PID 1 문제)
 - [ ] 디스크: **50GB 이상** (모델 + 코드 + 결과)

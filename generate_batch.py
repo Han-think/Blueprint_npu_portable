@@ -79,6 +79,8 @@ P0_PLAN_SYS = (
     "- Include physics_paths that explain load, flow, thermal, motion, pressure, electrical/data, or human/service access paths.\n"
     "- Include manufacturing_strategy with process, datum, tolerance, support/orientation, and inspection implications.\n"
     "- Coordinate hints must be plausible local regions or [x_mm, y_mm, z_mm] arrays.\n"
+    "- For each adjacent_interface, include stack_up_mm (cumulative tolerance from assembly datum to mating face) "
+    "and fit_class (e.g. H7/h6, LC2, LT3).\n"
     "- Keep strings concise. Use real feature names, not generic placeholders."
 )
 
@@ -121,7 +123,10 @@ S2_SYS = (
     "- include physical service/inspection evidence as geometry: removable cover, pocket, channel, hatch/window, port, callout engrave\n"
     "- for every critical joint, include locking/preload evidence in geometry or cad_brief\n"
     "- cad_brief.rev must match pattern \\d+\\.\\d+(\\.\\d+)?\n"
-    "- cad_brief requires: name, rev, material, envelope_mm ([x,y,z] numbers), build_direction, mass_est_g"
+    "- cad_brief requires: name, rev, material, envelope_mm ([x,y,z] numbers), build_direction, mass_est_g\n"
+    "- cad_brief must include assembly_sequence: ordered list of "
+    "{step, action (install|fasten|align|press|route), target, tool, torque_Nm_or_force_N, datum}. "
+    "Include disassembly_sequence for field-serviceable parts."
 )
 
 S3_SYS = (
@@ -134,7 +139,11 @@ S3_SYS = (
     "- risk array must have at most 5 items\n"
     "- Each risk item needs: id, desc, mit\n"
     "- Include checks for schema completeness, mass budget, P0-to-geometry traceability, interface reciprocity, "
-    "and fastener locking/preload evidence."
+    "and fastener locking/preload evidence.\n"
+    "- verify must include a boundary_conditions object: "
+    "fixture_points [{at:[x,y,z], type:fixed|pinned|roller}], "
+    "thermal_zones [{at:[x,y,z], W_or_degC:number, role:source|sink}], "
+    "pressure_faces [{face:string, Pa:number}] for downstream CFD/FEA."
 )
 
 S4_SYS = (
@@ -292,15 +301,28 @@ RULES = (
     "connection_type + DOF + clearance_mm + required_feature so the neighbor can declare the same joint family back.\n"
     "Budget rule: cad_brief.mass_est_g must be a numeric grams value, and verify must include a mass/budget check.\n"
     "Joint evidence rule: critical joints need visible insert/washer/locking/preload evidence and torque_Nm or preload intent.\n"
-    "Training-quality rule: make part_tree children and geometry_ops mutually traceable by id/name."
+    "Training-quality rule: make part_tree children and geometry_ops mutually traceable by id/name.\n"
+    "Analysis-ready rule: verify must include a boundary_conditions object with "
+    "fixture_points (list of {at:[x,y,z], type:fixed|pinned|roller}), "
+    "thermal_zones (list of {at:[x,y,z], W_or_degC:number, role:source|sink}), "
+    "and pressure_faces (list of {face:string, Pa:number}). "
+    "These are coordinate-referenced so downstream CFD/FEA can set BCs directly.\n"
+    "Assembly sequence rule: cad_brief must include assembly_sequence (ordered list of "
+    "{step:int, action:install|fasten|align|press|route, target:string, tool:string, "
+    "torque_Nm_or_force_N:number, datum:string}) and disassembly_sequence for field-serviceable parts.\n"
+    "Tolerance stack-up rule: for each adjacent_interface in the subsystem plan, "
+    "include stack_up_mm (cumulative tolerance from assembly datum to mating face) and fit_class (e.g. H7/h6, LC2)."
 )
 
 
-def build_part_brief(vehicle, part, micro_clause):
+def build_part_brief(vehicle, part, micro_clause, variant=""):
+    desc = vehicle['desc']
+    if variant:
+        desc = f"{desc}\n{variant}"
     return (
         f"Subsystem module: {part['label']} (fixed BOM item inside {vehicle['label']})\n"
         f"Spec: {part['spec']}\n"
-        f"Vehicle context: {vehicle['desc']}\n"
+        f"Vehicle context: {desc}\n"
         f"Suggested material: {vehicle.get('material','PETG')}, process: {vehicle.get('process','FDM')}\n"
         f"{micro_clause}\n{RULES}"
     )
@@ -431,7 +453,7 @@ def generate_with_retry(system, user, stage, temp_base, max_retries=2):
 
 
 # ── 한 서브시스템 생성 (P0->S1->S2->S3->S4 병합) ─────────────────────────────
-def synthesize_subsystem(vehicle, part, seed, log):
+def synthesize_subsystem(vehicle, part, seed, log, variant=""):
     skeleton = load_pack(seed, "skeleton.json")
     matched = match_subsystem_for_part(skeleton, part) if skeleton else None
     micro_clause = ""
@@ -440,7 +462,7 @@ def synthesize_subsystem(vehicle, part, seed, log):
         if mp:
             micro_clause = "\n" + micro_pack_clause(mp) + "\n"
             log(f"    micro-pack <- {matched['id']} ({matched.get('discipline')})")
-    part_brief = build_part_brief(vehicle, part, micro_clause)
+    part_brief = build_part_brief(vehicle, part, micro_clause, variant=variant)
 
     plan = generate_with_retry(P0_PLAN_SYS, p0_plan_prompt(part_brief, vehicle, part), "p0", 0.45)
     staged = part_brief + (f"\nSubsystem planning output:\n{json.dumps(plan, ensure_ascii=False)}\n" if plan else "")
@@ -484,6 +506,49 @@ def read_reports(seed):
     analysis = rj("analysis_report.json")
     resolution = rj("geometry_resolution.json")
     return interference, analysis, resolution
+
+
+# ── 프롬프트 변형 (2차 배치용: seed당 다양한 설계 시나리오) ──────────────────
+PROMPT_VARIANTS = {
+    "cubesat": [
+        "",
+        "Mission variant: polar orbit Earth-observation, -40°C thermal design emphasis, radiation-hardened components",
+        "Mission variant: LEO IoT communication demonstrator, antenna subsystem priority, low-power design",
+        "Mission variant: technology education kit, design for disassembly and classroom demonstration",
+        "Mission variant: deep-space CubeSat relay, high-gain antenna, extended thermal range +-120°C",
+    ],
+    "robot_arm": [
+        "",
+        "Application variant: food-grade hygienic design, IP67 sealed joints, NSF-compliant materials",
+        "Application variant: collaborative robot mode, compliant joints, collision absorption, rounded edges",
+        "Application variant: welding cell deployment, heat-shielded links, spark-resistant cable routing",
+        "Application variant: cleanroom semiconductor handling, ESD-safe, particle-free joint seals",
+    ],
+    "tiltrotor": [
+        "",
+        "Mission variant: maritime surveillance, salt-fog resistant, flotation-equipped landing gear",
+        "Mission variant: urban delivery, noise-constrained rotors, redundant tilt servos, obstacle avoidance pod",
+        "Mission variant: high-altitude mapping (4000m+), thin-air optimized props, pressurized avionics bay",
+    ],
+    "small_launch_vehicle": [
+        "",
+        "Display variant: university teaching model, labeled cross-sections, transparent inspection windows",
+        "Display variant: museum exhibit scale, reinforced for public handling, LED-lit internal features",
+        "Display variant: engineering trade-study mock, swappable engine and tank dummy modules",
+    ],
+    "long_range_recon_wing": [
+        "",
+        "Mission variant: agricultural survey, multispectral sensor bay, low-altitude dust tolerance",
+        "Mission variant: offshore wind farm inspection, salt-air resistant, high-wind launch capable",
+        "Mission variant: wildfire monitoring, heat-resistant belly, real-time video relay, FLIR bay",
+    ],
+    "haptic_glove": [
+        "",
+        "Application variant: surgical training simulator, high-precision fingertip force, sterilizable shell",
+        "Application variant: industrial teleop for hazmat, ruggedized exo-links, chemical-resistant TPU",
+        "Application variant: VR gaming consumer product, lightweight (< 400g), quick-swap finger cartridges",
+    ],
+}
 
 
 SEED_FOS_THRESHOLDS = {
@@ -536,9 +601,13 @@ def auto_decision(parts_total, parts_ok, interference, analysis, resolution,
 
 
 # ── 한 후보(어셈블리) 생성 + audit + 게이트 + persist ────────────────────────
-def run_candidate(seed, vehicle, gen_seed, log):
+def run_candidate(seed, vehicle, gen_seed, log, variant_idx=0):
+    variants = PROMPT_VARIANTS.get(seed, [""])
+    variant = variants[variant_idx % len(variants)] if variants else ""
     run_meta = {"seed": gen_seed, "model": LM_MODEL or "lmstudio", "generator": "generate_batch.py",
-                "started": now_iso()}
+                "started": now_iso(), "variant_idx": variant_idx % len(variants)}
+    if variant:
+        log(f"  variant[{variant_idx % len(variants)}]: {variant[:80]}")
     t0 = time.time()
     parts = vehicle["parts"]
     # 팩 prewarm: 스레드 진입 전 단일 스레드에서 캐시 채움(캐시 레이스 방지).
@@ -553,7 +622,7 @@ def run_candidate(seed, vehicle, gen_seed, log):
         i, part = item
         log(f"  [{i+1}/{len(parts)}] {part['label']}")
         try:
-            bp, _plan, n_ops = synthesize_subsystem(vehicle, part, seed, log)
+            bp, _plan, n_ops = synthesize_subsystem(vehicle, part, seed, log, variant=variant)
             ok = n_ops >= 1 and bool((bp.get("part_tree") or {}).get("children"))
         except Exception as e:
             log(f"    ! {part['label']} failed: {e}")
@@ -621,7 +690,8 @@ def run_candidate(seed, vehicle, gen_seed, log):
             {"role": "system", "content": "You are Blueprint XPU. Given a vehicle assembly brief, output a "
              "schema_v6 multi-subsystem blueprint as raw JSON (part_tree + coordinate-bearing geometry_ops + "
              "cad_brief + verify + risk per subsystem). No prose."},
-            {"role": "user", "content": f"Design brief: {vehicle['desc']}\nSeed: {seed}\n"
+            {"role": "user", "content": f"Design brief: {vehicle['desc']}"
+             f"{chr(10) + variant if variant else ''}\nSeed: {seed}\n"
              f"Decompose into these subsystems and output the assembly blueprint JSON: "
              f"{', '.join(p['label'] for p in vehicle['parts'])}"},
             {"role": "assistant", "content": json.dumps(composite, ensure_ascii=False)},
@@ -646,6 +716,61 @@ def save_ckpt(ck):
     CKPT_FILE.write_text(json.dumps(ck, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+CURATION_LOG = REPO / "30_model" / "curation" / "curation_log.jsonl"
+
+
+def _run_gap_analysis():
+    if not CURATION_LOG.exists():
+        print("[gap] no curation_log.jsonl found"); return 1
+    rows = []
+    for line in CURATION_LOG.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            try: rows.append(json.loads(line))
+            except Exception: pass
+
+    by_seed = {}
+    for r in rows:
+        s = r.get("seed", "unknown")
+        if s not in by_seed:
+            by_seed[s] = {"keep": 0, "reject": 0, "hold": 0, "A": 0, "B": 0, "C": 0}
+        d = str(r.get("decision", "")).lower()
+        if d in by_seed[s]:
+            by_seed[s][d] += 1
+        g = (r.get("engineering_scorecard") or {}).get("grade")
+        if g in ("A", "B", "C"):
+            by_seed[s][g] += 1
+
+    total_keep = sum(v["keep"] for v in by_seed.values())
+    total_reject = sum(v["reject"] for v in by_seed.values())
+    trainable = total_keep + total_reject
+    print(f"\n[gap] corpus: {len(rows)} total, {trainable} trainable (keep {total_keep} + reject {total_reject})")
+    print(f"[gap] gate: {trainable}/300 trial")
+    if trainable < 300:
+        print(f"[gap] NEED {300 - trainable} more keep/reject rows\n")
+
+    print(f"{'seed':<25} {'keep':>5} {'rej':>4} {'hold':>4} | {'A':>3} {'B':>3} {'C':>3} | A%")
+    print("-" * 62)
+    recs = []
+    for s in SEED_LIST:
+        v = by_seed.get(s, {"keep": 0, "reject": 0, "hold": 0, "A": 0, "B": 0, "C": 0})
+        a_pct = (v["A"] / v["keep"] * 100) if v["keep"] else 0
+        print(f"{s:<25} {v['keep']:>5} {v['reject']:>4} {v['hold']:>4} | {v['A']:>3} {v['B']:>3} {v['C']:>3} | {a_pct:>4.0f}%")
+        if a_pct < 20:
+            recs.append(f"  > {s}: grade-A only {a_pct:.0f}% - needs higher-quality variants")
+        if v["keep"] < total_keep / len(SEED_LIST) * 0.8:
+            recs.append(f"  > {s}: underrepresented ({v['keep']} keep vs avg {total_keep // len(SEED_LIST)})")
+
+    n_variants = len(PROMPT_VARIANTS.get(SEED_LIST[0], [""]))
+    print(f"\n[gap] prompt variants per seed: {n_variants} (use all for diversity)")
+    if recs:
+        print("\n[gap] recommendations:")
+        for r in recs:
+            print(r)
+    else:
+        print("\n[gap] seed balance looks good")
+    return 0
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", default="all", help="all | comma list (e.g. cubesat,robot_arm)")
@@ -653,6 +778,7 @@ def main(argv):
     ap.add_argument("--per-seed", type=int, default=0, help="candidates per seed (overrides --n)")
     ap.add_argument("--resume", action="store_true", help="continue from batch_checkpoint.json")
     ap.add_argument("--inspect-vehicle", default="", help="print the BOM for a seed and exit")
+    ap.add_argument("--gap-analysis", action="store_true", help="analyze corpus gaps and recommend targeted production")
     a = ap.parse_args(argv[1:])
 
     vehicles = json.loads(VEHICLES_FILE.read_text(encoding="utf-8"))
@@ -660,6 +786,8 @@ def main(argv):
         v = vehicles.get(a.inspect_vehicle)
         print(json.dumps(v, ensure_ascii=False, indent=2) if v else f"no vehicle for seed {a.inspect_vehicle}")
         return 0
+    if a.gap_analysis:
+        return _run_gap_analysis()
 
     seeds = SEED_LIST if a.seeds == "all" else [s.strip() for s in a.seeds.split(",") if s.strip()]
     seeds = [s for s in seeds if s in vehicles]
@@ -681,12 +809,16 @@ def main(argv):
     start = ck["done"] if a.resume else 0
     print(f"[batch] LM {LM_URL} · seeds {seeds} · {len(queue)} candidates · start at {start}")
     tally = {"keep": 0, "reject": 0, "hold": 0}
+    variant_counters = {s: 0 for s in seeds}
     for idx in range(start, len(queue)):
         seed = queue[idx]
         gen_seed = random.randint(1, 2_000_000)
-        print(f"\n[{idx+1}/{len(queue)}] seed={seed} gen_seed={gen_seed}")
+        vi = variant_counters.get(seed, 0)
+        variant_counters[seed] = vi + 1
+        print(f"\n[{idx+1}/{len(queue)}] seed={seed} gen_seed={gen_seed} variant={vi % len(PROMPT_VARIANTS.get(seed, ['']))}")
         try:
-            decision = run_candidate(seed, vehicles[seed], gen_seed, lambda m: print(m, flush=True))
+            decision = run_candidate(seed, vehicles[seed], gen_seed, lambda m: print(m, flush=True),
+                                     variant_idx=vi)
             if decision in tally:
                 tally[decision] += 1
         except KeyboardInterrupt:

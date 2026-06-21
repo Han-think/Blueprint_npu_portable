@@ -121,11 +121,34 @@ def to_chat_example(row):
     return {"messages": msgs, "grade": grade, "repeat": repeat}
 
 
+VAL_PER_SEED = 2
+
+
+def split_train_val(rows):
+    """Seed-stratified split: last VAL_PER_SEED keep rows per seed → val, rest → train."""
+    by_seed = {}
+    for r in rows:
+        s = row_seed(r)
+        by_seed.setdefault(s, []).append(r)
+    train, val = [], []
+    for s, seed_rows in by_seed.items():
+        keeps = [r for r in seed_rows if str(r.get("decision")).lower() == "keep"]
+        others = [r for r in seed_rows if str(r.get("decision")).lower() != "keep"]
+        if len(keeps) > VAL_PER_SEED:
+            val.extend(keeps[-VAL_PER_SEED:])
+            train.extend(keeps[:-VAL_PER_SEED])
+        else:
+            train.extend(keeps)
+        train.extend(others)
+    return train, val
+
+
 def gate_check(rows, force):
     s = corpus_summary(rows)
     g = s["grades"]
+    _, val = split_train_val(rows)
     print(f"[corpus] total {s['total']} | keep {s['keep']} (A:{g['A']} B:{g['B']} C:{g['C']}) "
-          f"| reject {s['reject']} | hold {s['hold']}")
+          f"| reject {s['reject']} | hold {s['hold']} | val holdout {len(val)}")
     print(f"[corpus] by_seed {s['by_seed']}")
     trainable = s["keep"] + s["reject"]
     if trainable >= FULL_THRESHOLD:
@@ -155,8 +178,10 @@ def train(rows, base_model):
               f"bitsandbytes accelerate trl  ({e})")
         return 1
 
-    trainable = [r for r in rows if str(r.get("decision")).lower() in ("keep", "reject")
+    train_rows, val_rows = split_train_val(rows)
+    trainable = [r for r in train_rows if str(r.get("decision")).lower() in ("keep", "reject")
                  and record_to_messages(r)]
+    val_eligible = [r for r in val_rows if record_to_messages(r)]
     if not trainable:
         print("[data] no trainable examples could be built from the corpus (check --inspect).")
         return 1
@@ -165,9 +190,11 @@ def train(rows, base_model):
         ex = to_chat_example(r)
         for _ in range(ex.pop("repeat", 1)):
             examples.append({"messages": ex["messages"]})
+    val_examples = [{"messages": to_chat_example(r)["messages"]} for r in val_eligible]
     print(f"[data] {len(trainable)} rows → {len(examples)} training examples "
-          f"(grade-A ×3, B ×2, C ×1)")
+          f"(grade-A ×3, B ×2, C ×1) + {len(val_examples)} val")
     ds = Dataset.from_list(examples)
+    ds_val = Dataset.from_list(val_examples) if val_examples else None
 
     tok = AutoTokenizer.from_pretrained(base_model)
     bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
@@ -182,18 +209,73 @@ def train(rows, base_model):
     def fmt(ex):
         return {"text": tok.apply_chat_template(ex["messages"], tokenize=False, add_generation_prompt=False)}
     ds = ds.map(fmt)
+    if ds_val:
+        ds_val = ds_val.map(fmt)
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    eval_strategy = "steps" if ds_val else "no"
     args = TrainingArguments(output_dir=str(OUT_DIR), num_train_epochs=2,
                              per_device_train_batch_size=1, gradient_accumulation_steps=8,
                              learning_rate=2e-4, fp16=True, logging_steps=10, save_steps=200,
+                             eval_strategy=eval_strategy, eval_steps=50,
                              report_to=[])
-    trainer = SFTTrainer(model=model, args=args, train_dataset=ds, dataset_text_field="text",
+    trainer = SFTTrainer(model=model, args=args, train_dataset=ds,
+                         eval_dataset=ds_val,
+                         dataset_text_field="text",
                          max_seq_length=4096, tokenizer=tok)
     trainer.train()
     trainer.save_model(str(OUT_DIR / "adapter"))
     print(f"[done] LoRA adapter → {OUT_DIR / 'adapter'}  (merge/convert to GGUF for Ollama/LM Studio)")
     return 0
+
+
+def check_artifacts(rows):
+    """Detect teacher-model repetitive patterns in keep rows."""
+    keeps = [r for r in rows if str(r.get("decision")).lower() == "keep"]
+    if not keeps:
+        print("[artifacts] no keep rows"); return
+
+    by_seed = {}
+    for r in keeps:
+        s = row_seed(r)
+        by_seed.setdefault(s, []).append(r)
+
+    print(f"[artifacts] analyzing {len(keeps)} keep rows across {len(by_seed)} seeds\n")
+    for seed, seed_rows in sorted(by_seed.items()):
+        msgs_list = [record_to_messages(r) for r in seed_rows]
+        msgs_list = [m for m in msgs_list if m]
+
+        # 1) user prompt uniqueness
+        user_texts = [m[1]["content"][:200] if len(m) > 1 else "" for m in msgs_list]
+        unique_prompts = len(set(user_texts))
+
+        # 2) assistant response opening (first 100 chars)
+        openings = [m[2]["content"][:100] if len(m) > 2 else "" for m in msgs_list]
+        from collections import Counter
+        top_openings = Counter(openings).most_common(3)
+
+        # 3) geometry_ops count distribution
+        op_counts = []
+        for r in seed_rows:
+            payload = r.get("payload") or {}
+            parts = payload.get("parts") or []
+            for p in parts:
+                bp = p.get("blueprint") or {}
+                n = len(bp.get("geometry_ops") or [])
+                if n > 0:
+                    op_counts.append(n)
+        avg_ops = sum(op_counts) / len(op_counts) if op_counts else 0
+        ops_unique = len(set(op_counts))
+
+        print(f"  {seed} ({len(seed_rows)} rows):")
+        print(f"    unique user prompts: {unique_prompts}/{len(seed_rows)}"
+              f"{'  << LOW' if unique_prompts <= 2 else ''}")
+        print(f"    top assistant openings:")
+        for opening, cnt in top_openings:
+            pct = cnt / len(msgs_list) * 100
+            print(f"      {pct:4.0f}% ({cnt}x): {opening[:60]}...")
+        print(f"    geometry_ops/part: avg {avg_ops:.1f}, {ops_unique} distinct counts")
+        print()
 
 
 def main():
@@ -202,9 +284,13 @@ def main():
     ap.add_argument("--force", action="store_true", help="train below trial threshold")
     ap.add_argument("--base", default=DEFAULT_BASE, help="student base model (HF id)")
     ap.add_argument("--inspect", action="store_true", help="dump first corpus row + a built example, then exit")
+    ap.add_argument("--check-artifacts", action="store_true", help="detect teacher-model repetitive patterns")
     a = ap.parse_args()
 
     rows = load_rows()
+    if a.check_artifacts:
+        check_artifacts(rows)
+        return 0
     if a.inspect:
         if not rows:
             print(f"corpus empty: {CORPUS} (0 rows). Curate keep/reject in the UI to accrue rows.")
