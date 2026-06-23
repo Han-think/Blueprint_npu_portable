@@ -204,7 +204,7 @@ def lm_call(system, user, temperature=0.4):
             {"role": "user", "content": user},
         ],
         "temperature": temperature,
-        "max_tokens": 6000,
+        "max_tokens": 3000,
         "stream": False,
     }
     if LM_MODEL:
@@ -279,8 +279,32 @@ def load_existing_ids():
     return ids
 
 
+def _compact_cad_brief(cb):
+    """Extract only key fields from cad_brief to save tokens."""
+    if not cb:
+        return {}
+    return {k: cb[k] for k in ("material", "process", "tolerance_mm", "finish",
+                                "assembly_sequence", "fit_class") if k in cb}
+
+
+def _compact_verify(v):
+    """Keep first 2 verify items, strip verbose fields."""
+    if not v:
+        return []
+    items = v[:2] if isinstance(v, list) else [v]
+    out = []
+    for item in items:
+        if isinstance(item, dict):
+            out.append({k: item[k] for k in ("check", "result", "value", "limit",
+                                               "boundary_conditions") if k in item})
+        else:
+            out.append(item)
+    return out
+
+
 def blueprint_summary(row):
-    """Extract a compact blueprint representation for the LLM input."""
+    """Extract a compact blueprint representation for the LLM input.
+    Keeps total prompt under ~6000 tokens so LLM has room to respond."""
     payload = row.get("payload") or {}
     parts = payload.get("parts") or []
     vehicle = payload.get("vehicle") or {}
@@ -288,14 +312,14 @@ def blueprint_summary(row):
     summary_parts = []
     for p in parts[:13]:
         bp = p.get("blueprint") or {}
+        children = (bp.get("part_tree") or {}).get("children") or []
         summary_parts.append({
             "label": p.get("label", ""),
-            "part_tree": bp.get("part_tree", {}),
+            "child_count": len(children),
             "geometry_ops_count": len(bp.get("geometry_ops") or []),
-            "geometry_ops_sample": (bp.get("geometry_ops") or [])[:5],
-            "cad_brief": bp.get("cad_brief", {}),
-            "verify": bp.get("verify", []),
-            "risk": bp.get("risk", []),
+            "cad_brief": _compact_cad_brief(bp.get("cad_brief", {})),
+            "verify": _compact_verify(bp.get("verify", [])),
+            "risk": (bp.get("risk") or [])[:2],
         })
 
     return {
