@@ -31,6 +31,8 @@ import os
 import random
 import sys
 import time
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent
@@ -372,10 +374,14 @@ def generate_reverse_analysis(row, task_key, log):
     return rev_row
 
 
+_write_lock = threading.Lock()
+
+
 def persist_reverse_row(rev_row):
     REVERSE_LOG.parent.mkdir(parents=True, exist_ok=True)
-    with REVERSE_LOG.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(rev_row, ensure_ascii=False) + "\n")
+    with _write_lock:
+        with REVERSE_LOG.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(rev_row, ensure_ascii=False) + "\n")
 
 
 # ── 통계 ──────────────────────────────────────────────────────────────────
@@ -416,6 +422,8 @@ def main():
                     help="all | comma list (structural,thermal,dfa,fmea,cost,weight,tolerance)")
     ap.add_argument("--seed", default="", help="filter to specific seed")
     ap.add_argument("--max", type=int, default=50, help="max analyses to generate")
+    ap.add_argument("--workers", type=int, default=int(os.environ.get("BP_WORKERS", "6")),
+                    help="parallel workers (default: BP_WORKERS or 6)")
     ap.add_argument("--dry-run", action="store_true", help="list targets without generating")
     ap.add_argument("--stats", action="store_true", help="show current reverse_log stats")
     a = ap.parse_args()
@@ -454,24 +462,39 @@ def main():
         return 0
 
     tally = {t: 0 for t in tasks}
+    _tally_lock = threading.Lock()
+    done_count = [0]
     t0 = time.time()
-    for i, (task, row) in enumerate(queue):
-        elapsed = time.time() - t0
-        rate = (i / elapsed) if elapsed > 0 and i > 0 else 0
-        eta_s = int((len(queue) - i) / rate) if rate > 0 else 0
+    workers = min(a.workers, len(queue))
+    print(f"[reverse] workers: {workers}")
 
-        print(f"\n[{i+1}/{len(queue)}] {task} <- {row.get('seed')}/{row.get('id','')[:25]}  "
-              f"({rate*60:.0f}/hr, ETA {eta_s//60}m{eta_s%60}s)")
+    def _run_one(idx, task, row):
         try:
             rev = generate_reverse_analysis(row, task, lambda m: print(m, flush=True))
             if rev:
                 persist_reverse_row(rev)
-                tally[task] += 1
-                print(f"  OK: {task} analysis saved")
+                with _tally_lock:
+                    tally[task] += 1
+                    done_count[0] += 1
+                    n = done_count[0]
+                elapsed = time.time() - t0
+                rate = n / elapsed if elapsed > 0 else 0
+                eta_s = int((len(queue) - n) / rate) if rate > 0 else 0
+                print(f"  [{n}/{len(queue)}] OK: {task} <- {row.get('seed','')[:10]}  "
+                      f"({rate*60:.0f}/hr, ETA {eta_s//60}m{eta_s%60}s)")
             else:
-                print(f"  SKIP: no valid analysis output")
+                with _tally_lock:
+                    done_count[0] += 1
+                print(f"  [{done_count[0]}/{len(queue)}] SKIP: {task}")
         except Exception as e:
-            print(f"  ERROR: {e}")
+            with _tally_lock:
+                done_count[0] += 1
+            print(f"  [{done_count[0]}/{len(queue)}] ERROR: {task} - {e}")
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [pool.submit(_run_one, i, task, row) for i, (task, row) in enumerate(queue)]
+        for f in as_completed(futures):
+            pass
 
     total = sum(tally.values())
     print(f"\n{'='*50}")
