@@ -51,7 +51,7 @@ CKPT_FILE = REPO / "30_model" / "curation" / "batch_checkpoint.json"
 LM_URL = os.environ.get("BP_LM_URL", "http://127.0.0.1:1234/v1").rstrip("/")
 LM_MODEL = os.environ.get("BP_LM_MODEL", "")
 LM_API_KEY = os.environ.get("BP_LM_API_KEY", "")
-NUM_PREDICT = 8000
+NUM_PREDICT = 12000
 # 한 후보의 서브시스템을 동시에 생성하는 워커 수. vLLM처럼 배치 처리하는 서버에서 1>이면
 # 동시 요청 → 배치 → 큰 속도이득. Ollama(직렬 서버)면 1로 두는 게 무난(이득 없음).
 WORKERS = int(os.environ.get("BP_WORKERS", "1"))
@@ -93,12 +93,23 @@ S1_SYS = (
     "- ts must be a valid ISO 8601 datetime string\n"
     "- brief.constraints.process must be exactly one of: FDM, SLA, LPBF, DED, BinderJet\n"
     "- part_tree must have: id (string), name (string), qty (integer >= 1), children (array)\n"
-    "- For assembly-subsystem design, decompose the subsystem into 5-9 meaningful internal child features when possible.\n"
+    "- MANDATORY: decompose the subsystem into exactly 5-9 meaningful internal child features. "
+    "Fewer than 5 children is ALWAYS rejected. Each child becomes a separate manufactured feature that will "
+    "receive its own geometry_ops in the next stage.\n"
     "- Every P0 internal_feature_target from the supplied subsystem plan must appear as a named part_tree child or synonym.\n"
-    "- Include children for service access, inspection window/callout, primary datum, fastener/insert/washer feature, "
-    "and harness/connector path when relevant.\n"
-    "- Child features should be physical/functional features, not vague labels.\n"
-    "- Avoid one-piece or shallow part_tree outputs; sparse part_tree will be rejected as training-poor."
+    "- Required child categories (include ALL that apply to this subsystem):\n"
+    "  * primary body/shell/housing (the main structural shape)\n"
+    "  * interface flange or mounting bracket (how it connects to neighbors)\n"
+    "  * fastener pattern / insert / bolt circle\n"
+    "  * internal channel, duct, or fluid path\n"
+    "  * rib, stiffener, or structural reinforcement\n"
+    "  * seal, gasket, or environmental barrier\n"
+    "  * sensor pocket, avionics bay, or electronics cavity\n"
+    "  * service access panel, inspection window, or maintenance port\n"
+    "  * harness/cable/pipe routing path\n"
+    "- Child features must be physical/functional, not vague labels. Name them specifically "
+    "(e.g. 'bearing_seat' not 'feature_1', 'coolant_channel' not 'internal_feature').\n"
+    "- Avoid one-piece or shallow part_tree; sparse trees are rejected as training-poor."
 )
 
 S2_SYS = (
@@ -107,20 +118,25 @@ S2_SYS = (
     "Rules:\n"
     "- geometry_ops[].op must be exactly one of: cylinder box sphere shell extrude revolve sweep loft fillet chamfer "
     "drill boss pocket pattern_polar pattern_linear channel engrave mirror union subtract intersect\n"
-    "- geometry_ops must contain 12 to 24 operations for generated assembly subsystem parts\n"
-    "- include at least: 1 main body op, 3 interface/mounting ops, 3 subtract/drill/pocket/channel ops, 2 fillet/chamfer "
-    "ops, 1 pattern op when repeated fasteners/holes exist, and 1 label/engrave op\n"
-    "- every important sub-part from the part_tree should be represented by at least one geometry operation\n"
-    "- every P0 internal_feature_target and every important part_tree child must map to at least one geometry_ops[].id "
-    "or geometry_ops[].target using the same meaningful words\n"
-    "- every geometry op that creates or modifies a physical feature must include args.at as [x_mm, y_mm, z_mm] in "
-    "millimeters, centered on the vehicle/subsystem local datum\n"
-    "- every op should include useful dimensions such as x_mm/y_mm/z_mm, d_mm/h_mm, radius_mm, depth_mm, w_mm/l_mm, "
-    "or count/radius_mm for patterns\n"
-    "- coordinate placement must be physically distributed across the subsystem, not all [0,0,0]\n"
-    "- avoid generic box-first layouts unless the real subsystem is rectangular; rockets/nozzles/tanks/airframes/rotors/"
-    "gears must use curved or swept operations such as cylinder, revolve, loft, sweep, pattern_polar, channel\n"
-    "- include physical service/inspection evidence as geometry: removable cover, pocket, channel, hatch/window, port, callout engrave\n"
+    "- CRITICAL MINIMUM: every part_tree child must have AT LEAST 4 geometry_ops referencing it by target name. "
+    "With N children, produce at least N*4 total ops (e.g. 7 children = 28+ ops). "
+    "A child with only 1 op (like just 'nominal-part-body') triggers AUTOMATIC REJECTION as LOW-RES.\n"
+    "- Per-child op recipe (minimum 4 each):\n"
+    "  * 1 body/shape op: box, cylinder, shell, extrude, revolve, loft, or sweep\n"
+    "  * 1 subtract op: drill, pocket, channel, or subtract\n"
+    "  * 1 interface op: boss, pattern_polar, pattern_linear, or engrave\n"
+    "  * 1 finish op: fillet, chamfer, or mirror\n"
+    "  * Additional ops as needed to reach 4-8 per child\n"
+    "- every P0 internal_feature_target and every part_tree child must map to geometry_ops[].target "
+    "using the same name. Zero unmapped children allowed.\n"
+    "- every geometry op must include args.at as [x_mm, y_mm, z_mm] in millimeters, centered on the "
+    "vehicle/subsystem local datum. Coordinates must be physically distributed - no two children at identical coords.\n"
+    "- every op must include real dimensions: x_mm/y_mm/z_mm, d_mm/h_mm, radius_mm, depth_mm, w_mm/l_mm, "
+    "or count/radius_mm for patterns. No zero or placeholder dimensions.\n"
+    "- geometry must match the physical form: rockets/nozzles/tanks use cylinder/revolve/loft, "
+    "airframes/rotors use sweep/loft/pattern_polar, gears use pattern_polar, "
+    "housings use box+pocket+drill, linkages use cylinder+boss+channel.\n"
+    "- include physical service evidence as geometry: removable cover, inspection pocket, channel, port, engrave\n"
     "- for every critical joint, include locking/preload evidence in geometry or cad_brief\n"
     "- cad_brief.rev must match pattern \\d+\\.\\d+(\\.\\d+)?\n"
     "- cad_brief requires: name, rev, material, envelope_mm ([x,y,z] numbers), build_direction, mass_est_g\n"
@@ -193,11 +209,17 @@ def s1_user_prompt(brief, hint=""):
 
 def s2_user_prompt(brief, merged):
     mat = (((merged.get("brief") or {}).get("constraints") or {}).get("material")) or "PETG"
-    parts = ", ".join(n.get("name", "") for n in ((merged.get("part_tree") or {}).get("children") or []))
+    children = (merged.get("part_tree") or {}).get("children") or []
+    parts = ", ".join(n.get("name", "") for n in children)
+    n_children = len(children)
+    min_ops = max(20, n_children * 4)
     return (
         f"Design brief: {brief}\n\nStage 1 context - object: \"{merged.get('object','')}\", material: {mat}\n"
-        f"Parts: {parts}\n\n"
-        'Output JSON with "geometry_ops" (12-24 ops, each {op,id,target?,args:{at:[x,y,z], plus dims like '
+        f"Parts ({n_children} children): {parts}\n\n"
+        f"MANDATORY: produce at least {min_ops} geometry_ops ({n_children} children x 4 ops minimum each). "
+        f"Every child listed above MUST have 4+ ops targeting it by name. "
+        f"Children with <4 ops = LOW-RES = REJECTED.\n\n"
+        'Output JSON with "geometry_ops" (each {op,id,target,args:{at:[x,y,z], plus dims like '
         'x_mm/y_mm/z_mm,d_mm/h_mm,radius_mm,depth_mm,w_mm/l_mm,count}}) and "cad_brief" '
         '{name,rev:"1.0",material,envelope_mm:[x,y,z],build_direction:"+Z",key_dims_mm:{},'
         'wall_thickness_mm:{min,typ},tolerances_mm:{fit},mass_est_g}.'
@@ -292,16 +314,24 @@ RULES = (
     "Granularity rule: decompose this subsystem into 5-9 meaningful internal child features in part_tree when possible "
     "(shell/body, flange/interface, fastener pattern, channel/duct, rib/stiffener, seal/gasket, sensor/avionics pocket, "
     "service access, mounting datum, harness/pipe interface).\n"
-    "Geometry rule: represent those internal features with 12-24 explicit coordinate-bearing geometry_ops, not prose. "
-    "Every physical feature must include args.at [x,y,z] and real dimensions, distributed across the local subsystem "
-    "volume; do not stack all features at the origin.\n"
+    "CRITICAL - Per-child geometry rule: EVERY part_tree child MUST have AT LEAST 4 dedicated geometry_ops that "
+    "reference it by id or target name. Parts with fewer than 4 ops are classified LOW-RES and the entire candidate "
+    "is REJECTED. With 5-9 children this means 20-36+ total ops minimum. Do NOT concentrate ops on one child and "
+    "leave others sparse. Distribute ops proportionally: primary body child gets 5-8 ops, each secondary child gets 4-6 ops.\n"
+    "Op diversity per child: each child's ops must include at minimum: 1 body/shape op (box/cylinder/shell/extrude/revolve/loft), "
+    "1 subtract/negative op (drill/pocket/channel/subtract), 1 interface/mounting op (boss/pattern_polar/pattern_linear), "
+    "and 1 finish op (fillet/chamfer/engrave). A child with only 'nominal-part-body' is ALWAYS rejected.\n"
+    "Coordinate distribution rule: geometry_ops args.at [x,y,z] must be physically distributed across the local subsystem "
+    "volume. No two children's ops may share identical coordinates. Each child's ops must span at least 2 distinct "
+    "coordinate regions within the subsystem envelope.\n"
     "Interface rule: include at least three adjacent-module interfaces or mounting datums and at least three "
     "negative/service features such as holes, pockets, ducts, channels, ports, or access cuts.\n"
     "Reciprocal interface rule: name exact neighboring subsystem labels when they mate, and choose "
     "connection_type + DOF + clearance_mm + required_feature so the neighbor can declare the same joint family back.\n"
     "Budget rule: cad_brief.mass_est_g must be a numeric grams value, and verify must include a mass/budget check.\n"
     "Joint evidence rule: critical joints need visible insert/washer/locking/preload evidence and torque_Nm or preload intent.\n"
-    "Training-quality rule: make part_tree children and geometry_ops mutually traceable by id/name.\n"
+    "Training-quality rule: make part_tree children and geometry_ops mutually traceable by id/name. "
+    "Every child id that appears in part_tree must appear as a target in geometry_ops at least 4 times.\n"
     "Analysis-ready rule: verify must include a boundary_conditions object with "
     "fixture_points (list of {at:[x,y,z], type:fixed|pinned|roller}), "
     "thermal_zones (list of {at:[x,y,z], W_or_degC:number, role:source|sink}), "
@@ -311,7 +341,11 @@ RULES = (
     "{step:int, action:install|fasten|align|press|route, target:string, tool:string, "
     "torque_Nm_or_force_N:number, datum:string}) and disassembly_sequence for field-serviceable parts.\n"
     "Tolerance stack-up rule: for each adjacent_interface in the subsystem plan, "
-    "include stack_up_mm (cumulative tolerance from assembly datum to mating face) and fit_class (e.g. H7/h6, LC2)."
+    "include stack_up_mm (cumulative tolerance from assembly datum to mating face) and fit_class (e.g. H7/h6, LC2).\n"
+    "Dimensional realism rule: all dimensions must be physically plausible for the subsystem scale. "
+    "A CubeSat part is 50-100mm, a robot arm link is 80-400mm, a tiltrotor blade is 200-1500mm. "
+    "Wall thickness, hole diameters, fillet radii must match the stated material and process "
+    "(FDM min wall 1.2mm, SLA 0.5mm, CNC 0.8mm). No zero-dimension or placeholder values."
 )
 
 
@@ -370,17 +404,25 @@ def stage_issues(stage, obj):
         ch = (obj.get("part_tree") or {}).get("children") or []
         if not obj.get("brief") or not obj.get("part_tree"):
             iss.append("requires brief and part_tree")
-        if len(ch) < 2:
-            iss.append("requires >=2 child features")
+        if len(ch) < 5:
+            iss.append(f"requires >=5 child features in part_tree (got {len(ch)}) - decompose subsystem fully")
     elif stage == "s2":
         ops = obj.get("geometry_ops") or []
         coord = sum(1 for o in ops if isinstance((o or {}).get("args", {}).get("at"), list))
-        if len(ops) < 8:
-            iss.append("requires >=8 geometry operations")
-        if coord < 5:
-            iss.append("requires coordinate-bearing ops (args.at)")
+        if len(ops) < 16:
+            iss.append(f"requires >=16 geometry operations (got {len(ops)})")
+        if coord < 10:
+            iss.append(f"requires >=10 coordinate-bearing ops with args.at (got {coord})")
         if not isinstance(obj.get("cad_brief"), dict):
             iss.append("requires cad_brief")
+        targets = {}
+        for o in ops:
+            t = (o or {}).get("target") or (o or {}).get("id") or ""
+            if t:
+                targets[t] = targets.get(t, 0) + 1
+        sparse = [t for t, c in targets.items() if c < 2 and t not in ("asm-001",)]
+        if len(sparse) > len(targets) // 2:
+            iss.append(f"too many under-defined targets ({len(sparse)} with <2 ops) - distribute ops across all children")
     elif stage == "s3":
         if len(obj.get("verify") or []) < 2:
             iss.append("requires verify checks")
