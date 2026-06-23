@@ -96,7 +96,11 @@ def update_curation_log(seed, run_dir, decision, why, fos, score, grade=None):
             continue
 
     if updated:
-        CURATION_LOG.write_text("\n".join(rows) + "\n", encoding="utf-8")
+        tmp = CURATION_LOG.with_suffix(".tmp")
+        with tmp.open("w", encoding="utf-8", newline="\n") as f:
+            for row in rows:
+                f.write(row + "\n")
+        tmp.replace(CURATION_LOG)
     return updated
 
 

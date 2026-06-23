@@ -136,7 +136,7 @@ def to_chat_example(row):
     if decision == "reject":
         msgs = [{"role": "system",
                  "content": (msgs[0]["content"] if msgs and msgs[0]["role"] == "system" else "")
-                 + "\n[CURATION] The following assistant output was REJECTED by engineering review — avoid this pattern."}] + \
+                 + "\n[CURATION] The following assistant output was REJECTED by engineering review - avoid this pattern."}] + \
                [m for m in msgs if m["role"] != "system"]
     repeat = GRADE_REPEAT.get(grade, 1) if decision == "keep" else 1
     return {"messages": msgs, "grade": grade, "repeat": repeat}
@@ -176,10 +176,10 @@ def gate_check(rows, force):
     print(f"[corpus] by_seed {s['by_seed']}")
     trainable = s["keep"] + s["reject"]
     if trainable >= FULL_THRESHOLD:
-        print(f"[gate] {trainable} trainable rows >= full threshold ({FULL_THRESHOLD}) — ready for a real run.")
+        print(f"[gate] {trainable} trainable rows >= full threshold ({FULL_THRESHOLD}) - ready for a real run.")
         return True
     if trainable >= TRIAL_THRESHOLD:
-        print(f"[gate] {trainable} trainable rows >= trial threshold ({TRIAL_THRESHOLD}) — OK for a smoke-test LoRA.")
+        print(f"[gate] {trainable} trainable rows >= trial threshold ({TRIAL_THRESHOLD}) - OK for a smoke-test LoRA.")
         return True
     if force:
         print(f"[gate] below trial ({trainable}/{TRIAL_THRESHOLD}) but --force given.")
