@@ -281,6 +281,39 @@ git push
 >
 > A40 48GB + QLoRA + 300 rows → **약 30분~1시간**, 추가 비용 ~$0.50
 
+### 5-5. 역설계 분석 데이터 생성 (순방향 배치 완료 후)
+
+기존 keep 블루프린트를 입력으로 7종 역설계 분석 학습 데이터를 생성한다.
+순방향(생성) + 역방향(분석) 데이터가 합쳐져야 진짜 설계 전문 모델이 된다.
+
+```bash
+# vLLM 서버 유지한 상태에서 역분석 생성
+cd /workspace/Blueprint_npu_portable
+BP_LM_URL=http://127.0.0.1:8000/v1 \
+BP_LM_MODEL=Qwen/Qwen2.5-14B-Instruct \
+python generate_reverse.py --tasks all --max 100
+
+# 특정 태스크만
+python generate_reverse.py --tasks structural,thermal --seed cubesat --max 20
+
+# 통계 확인
+python generate_reverse.py --stats
+```
+
+> **7종 역설계 태스크:**
+>
+> | 태스크 | 분석 내용 |
+> |--------|----------|
+> | structural | 구조 취약점 + FEA 메시 힌트 + 보강 제안 |
+> | thermal | 열경로 병목 + CFD 셋업 + 냉각 개선 |
+> | dfa | 조립 효율 + Boothroyd 점수 + 부품 통합 |
+> | fmea | 고장 모드 + RPN + 검사 계획 |
+> | cost | 원가 동인 + VE 제안 + make/buy 분석 |
+> | weight | 경량화 기회 + 토폴로지 존 + AM 전환 |
+> | tolerance | 공차 체인 + 스택업 + GD&T 콜아웃 |
+>
+> train_lora.py가 reverse_log.jsonl을 자동으로 학습 데이터에 포함함.
+
 ---
 
 ## 6. 비용 추정 (RunPod A40 $0.46/hr)

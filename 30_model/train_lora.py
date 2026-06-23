@@ -32,6 +32,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 CORPUS = REPO / "30_model" / "curation" / "curation_log.jsonl"
+REVERSE_LOG = REPO / "30_model" / "curation" / "reverse_log.jsonl"
 OUT_DIR = REPO / "30_model" / "lora_out"
 
 TRIAL_THRESHOLD = 300
@@ -51,6 +52,19 @@ def load_rows():
             rows.append(json.loads(line))
         except Exception:
             pass
+    return rows
+
+
+def load_reverse_rows():
+    if not REVERSE_LOG.exists():
+        return []
+    rows = []
+    for line in REVERSE_LOG.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            try:
+                rows.append(json.loads(line))
+            except Exception:
+                pass
     return rows
 
 
@@ -88,7 +102,7 @@ def record_to_messages(row):
     ]
 
 
-def corpus_summary(rows):
+def corpus_summary(rows, reverse_rows=None):
     keep = sum(1 for r in rows if str(r.get("decision")).lower() == "keep")
     reject = sum(1 for r in rows if str(r.get("decision")).lower() == "reject")
     hold = sum(1 for r in rows if str(r.get("decision")).lower() == "hold")
@@ -100,8 +114,15 @@ def corpus_summary(rows):
         g = (r.get("engineering_scorecard") or {}).get("grade")
         if g in grades:
             grades[g] += 1
+    rev_count = len(reverse_rows) if reverse_rows else 0
+    rev_tasks = {}
+    if reverse_rows:
+        for r in reverse_rows:
+            t = r.get("task", "?")
+            rev_tasks[t] = rev_tasks.get(t, 0) + 1
     return {"total": len(rows), "keep": keep, "reject": reject, "hold": hold,
-            "grades": grades, "by_seed": by_seed}
+            "grades": grades, "by_seed": by_seed,
+            "reverse": rev_count, "reverse_tasks": rev_tasks}
 
 
 GRADE_REPEAT = {"A": 3, "B": 2, "C": 1}
@@ -144,11 +165,14 @@ def split_train_val(rows):
 
 
 def gate_check(rows, force):
-    s = corpus_summary(rows)
+    rev_rows = load_reverse_rows()
+    s = corpus_summary(rows, rev_rows)
     g = s["grades"]
     _, val = split_train_val(rows)
     print(f"[corpus] total {s['total']} | keep {s['keep']} (A:{g['A']} B:{g['B']} C:{g['C']}) "
           f"| reject {s['reject']} | hold {s['hold']} | val holdout {len(val)}")
+    if s["reverse"]:
+        print(f"[corpus] reverse: {s['reverse']} analyses {s['reverse_tasks']}")
     print(f"[corpus] by_seed {s['by_seed']}")
     trainable = s["keep"] + s["reject"]
     if trainable >= FULL_THRESHOLD:
@@ -190,9 +214,17 @@ def train(rows, base_model):
         ex = to_chat_example(r)
         for _ in range(ex.pop("repeat", 1)):
             examples.append({"messages": ex["messages"]})
+    # reverse analysis examples (역설계 분석 데이터)
+    rev_rows = load_reverse_rows()
+    rev_count = 0
+    for r in rev_rows:
+        msgs = r.get("messages")
+        if msgs and len(msgs) >= 3:
+            examples.append({"messages": msgs})
+            rev_count += 1
     val_examples = [{"messages": to_chat_example(r)["messages"]} for r in val_eligible]
-    print(f"[data] {len(trainable)} rows → {len(examples)} training examples "
-          f"(grade-A ×3, B ×2, C ×1) + {len(val_examples)} val")
+    print(f"[data] {len(trainable)} forward + {rev_count} reverse -> {len(examples)} training examples "
+          f"(grade-A x3, B x2, C x1) + {len(val_examples)} val")
     ds = Dataset.from_list(examples)
     ds_val = Dataset.from_list(val_examples) if val_examples else None
 
