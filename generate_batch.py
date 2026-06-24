@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import threading
 import datetime as _dt
 import json
 import os
@@ -849,27 +850,64 @@ def main(argv):
 
     ck = load_ckpt() if a.resume else {"done": 0, "by_seed": {}}
     start = ck["done"] if a.resume else 0
-    print(f"[batch] LM {LM_URL} · seeds {seeds} · {len(queue)} candidates · start at {start}")
+    batch_parallel = int(os.environ.get("BP_BATCH_PARALLEL", "1"))
+    print(f"[batch] LM {LM_URL} · seeds {seeds} · {len(queue)} candidates · start at {start} · batch_parallel {batch_parallel}")
     tally = {"keep": 0, "reject": 0, "hold": 0}
+    _tally_lock = threading.Lock()
+    _ck_lock = threading.Lock()
     variant_counters = {s: 0 for s in seeds}
-    for idx in range(start, len(queue)):
-        seed = queue[idx]
-        gen_seed = random.randint(1, 2_000_000)
-        vi = variant_counters.get(seed, 0)
-        variant_counters[seed] = vi + 1
-        print(f"\n[{idx+1}/{len(queue)}] seed={seed} gen_seed={gen_seed} variant={vi % len(PROMPT_VARIANTS.get(seed, ['']))}")
-        try:
-            decision = run_candidate(seed, vehicles[seed], gen_seed, lambda m: print(m, flush=True),
-                                     variant_idx=vi)
-            if decision in tally:
-                tally[decision] += 1
-        except KeyboardInterrupt:
-            print("\n[batch] interrupted — checkpoint saved"); save_ckpt(ck); return 130
-        except Exception as e:
-            print(f"  candidate error: {e}")
-        ck["done"] = idx + 1
-        ck["by_seed"][seed] = ck["by_seed"].get(seed, 0) + 1
-        save_ckpt(ck)
+    for s in seeds:
+        variant_counters[s] = ck["by_seed"].get(s, 0) if a.resume else 0
+
+    remaining = list(range(start, len(queue)))
+
+    if batch_parallel > 1 and len(remaining) > 1:
+        def _run_one(idx):
+            seed = queue[idx]
+            with _ck_lock:
+                vi = variant_counters.get(seed, 0)
+                variant_counters[seed] = vi + 1
+            gen_seed = random.randint(1, 2_000_000)
+            tag = f"[{idx+1}/{len(queue)}]"
+            print(f"\n{tag} seed={seed} gen_seed={gen_seed} variant={vi % len(PROMPT_VARIANTS.get(seed, ['']))}")
+            try:
+                decision = run_candidate(seed, vehicles[seed], gen_seed,
+                                         lambda m: print(f"  {tag} {m}", flush=True),
+                                         variant_idx=vi)
+                with _tally_lock:
+                    if decision in tally:
+                        tally[decision] += 1
+            except Exception as e:
+                print(f"  {tag} candidate error: {e}")
+            with _ck_lock:
+                ck["done"] = max(ck.get("done", 0), idx + 1)
+                ck["by_seed"][seed] = ck["by_seed"].get(seed, 0) + 1
+                save_ckpt(ck)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=batch_parallel) as pool:
+            try:
+                list(pool.map(_run_one, remaining))
+            except KeyboardInterrupt:
+                print("\n[batch] interrupted — checkpoint saved"); save_ckpt(ck); return 130
+    else:
+        for idx in remaining:
+            seed = queue[idx]
+            gen_seed = random.randint(1, 2_000_000)
+            vi = variant_counters.get(seed, 0)
+            variant_counters[seed] = vi + 1
+            print(f"\n[{idx+1}/{len(queue)}] seed={seed} gen_seed={gen_seed} variant={vi % len(PROMPT_VARIANTS.get(seed, ['']))}")
+            try:
+                decision = run_candidate(seed, vehicles[seed], gen_seed, lambda m: print(m, flush=True),
+                                         variant_idx=vi)
+                if decision in tally:
+                    tally[decision] += 1
+            except KeyboardInterrupt:
+                print("\n[batch] interrupted — checkpoint saved"); save_ckpt(ck); return 130
+            except Exception as e:
+                print(f"  candidate error: {e}")
+            ck["done"] = idx + 1
+            ck["by_seed"][seed] = ck["by_seed"].get(seed, 0) + 1
+            save_ckpt(ck)
     print(f"\n[batch] done · keep {tally['keep']} / reject {tally['reject']} / hold {tally['hold']}")
     return 0
 

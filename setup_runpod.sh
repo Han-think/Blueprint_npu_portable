@@ -44,6 +44,10 @@ while ! grep -q "Application startup complete" /workspace/vllm.log 2>/dev/null; 
 done
 kill $TAIL_PID 2>/dev/null || true
 
+echo "=== [CLEANUP] HF blobs 정리 (모델은 이미 VRAM에 로드됨) ==="
+rm -rf /root/.cache/huggingface/hub/models--*/blobs/ 2>/dev/null || true
+echo "디스크 여유: $(df -h / | tail -1 | awk '{print $4}')"
+
 echo ""
 echo "============================================"
 echo "  vLLM 서버 준비 완료!"
