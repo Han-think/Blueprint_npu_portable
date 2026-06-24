@@ -10,7 +10,9 @@
       "finger_cartridge",
       "hinge_pin",
       "thimble_socket",
-      "linkage_bar"
+      "linkage_bar",
+      "finger_clearance",
+      "per_finger_label"
     ],
     "criteria_refs": [
       "haptic_glove",
@@ -147,6 +149,48 @@
           ]
         }
       ]
+    },
+    {
+      "id": "datum_tolerance",
+      "title": "Datum & Tolerance Management",
+      "criteria": [
+        {
+          "criterion": "primary_datum_evidence",
+          "weight": 8,
+          "good": "A primary datum feature (flat, bore, or pin) is explicitly named and placed.",
+          "bad": "No datum reference — assembly alignment is uncontrolled."
+        },
+        {
+          "criterion": "interface_fit_class",
+          "weight": 8,
+          "good": "Adjacent interfaces include fit_class (H7/h6, LC2) and stack_up_mm.",
+          "bad": "Interfaces have no tolerance or fit specification."
+        },
+        {
+          "criterion": "assembly_sequence_defined",
+          "weight": 10,
+          "good": "cad_brief includes ordered assembly_sequence with tool, torque, datum per step.",
+          "bad": "No assembly order — build sequence is ambiguous."
+        }
+      ]
+    },
+    {
+      "id": "seed_op_signature",
+      "title": "haptic_glove Geometry Signature",
+      "criteria": [
+        {
+          "criterion": "expected_op_variety",
+          "weight": 10,
+          "good": "Uses seed-characteristic ops: chamfer, subtract, pocket, drill. Subtractive features (drill/pocket/channel) and finishing (fillet/chamfer) both present.",
+          "bad": "Only basic box/cylinder ops. Missing subtractive or finishing features typical for this seed."
+        },
+        {
+          "criterion": "dimensional_realism",
+          "weight": 10,
+          "good": "Dimensions match haptic_glove scale: 150-250mm palm, 60-100mm per finger segment. Wall thickness, hole diameters, fillet radii are physically plausible.",
+          "bad": "Dimensions are placeholder (all 10mm) or unrealistic for the subsystem scale."
+        }
+      ]
     }
   ],
   "citable_sources": [
@@ -178,5 +222,6 @@
         "mechanism vocabulary"
       ]
     }
-  ]
+  ],
+  "boundary_note": "Subsystem scale: 150-250mm palm, 60-100mm per finger segment. Environment: human contact, skin-safe, 20-35C, sweat/moisture. Design loads: finger force 2-10N, cable tension 5-30N, 100k+ flex cycles. Mechanism: include joint travel range, preload, and cycle life in cad_brief."
 }

@@ -9,7 +9,10 @@
     "evidence_features": [
       "assembly_datum",
       "harness_raceway",
-      "service_hatch"
+      "service_hatch",
+      "service_access_window",
+      "harness_path",
+      "service_access_hole"
     ],
     "criteria_refs": [
       "datum_tolerance",
@@ -373,6 +376,55 @@
           "loop_feedback": "Merge interfaces that exist for no service/motion/manufacture/load reason; keep a split only when it earns its joint."
         }
       ]
+    },
+    {
+      "id": "geometry_grounding",
+      "title": "P0 to Geometry Grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "weight": 14,
+          "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+          "bad": "P0 lists features but geometry_ops are generic boxes at the origin."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "weight": 12,
+          "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+          "bad": "Geometry is stacked at [0,0,0] or lacks coordinates."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "weight": 10,
+          "good": "Uses drill, pocket, boss, channel, pattern_polar, fillet, chamfer — not just boxes.",
+          "bad": "Only box and cylinder ops with no subtractive or finishing features."
+        },
+        {
+          "criterion": "per_child_geometry_density",
+          "weight": 15,
+          "good": "Every part_tree child has 4+ dedicated geometry_ops (body+subtract+interface+finish).",
+          "bad": "Some children have 0-1 ops (LOW-RES). All detail concentrated on primary body."
+        }
+      ]
+    },
+    {
+      "id": "seed_op_signature",
+      "title": "long_range_recon_wing Geometry Signature",
+      "criteria": [
+        {
+          "criterion": "expected_op_variety",
+          "weight": 10,
+          "good": "Uses seed-characteristic ops: chamfer, subtract, drill, channel. Subtractive features (drill/pocket/channel) and finishing (fillet/chamfer) both present.",
+          "bad": "Only basic box/cylinder ops. Missing subtractive or finishing features typical for this seed."
+        },
+        {
+          "criterion": "dimensional_realism",
+          "weight": 10,
+          "good": "Dimensions match long_range_recon_wing scale: 800-3000mm wingspan, 100-250mm chord. Wall thickness, hole diameters, fillet radii are physically plausible.",
+          "bad": "Dimensions are placeholder (all 10mm) or unrealistic for the subsystem scale."
+        }
+      ]
     }
-  ]
+  ],
+  "boundary_note": "Subsystem scale: 800-3000mm wingspan, 100-250mm chord. Environment: outdoor flight, -10 to +45C, dust/humidity. Design loads: wing bending 3g, servo 2-8Nm, catapult launch 15g."
 }

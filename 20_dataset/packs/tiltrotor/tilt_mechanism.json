@@ -10,7 +10,8 @@
       "tilt_axis",
       "bearing_seat",
       "servo_linkage",
-      "clearance_arc"
+      "clearance_arc",
+      "servo_mount"
     ],
     "criteria_refs": [
       "tiltrotor",
@@ -142,6 +143,48 @@
           "loop_feedback": "Add named tilt-bearing fittings into the wing spar path and removable motor/servo covers on each nacelle."
         }
       ]
+    },
+    {
+      "id": "datum_tolerance",
+      "title": "Datum & Tolerance Management",
+      "criteria": [
+        {
+          "criterion": "primary_datum_evidence",
+          "weight": 8,
+          "good": "A primary datum feature (flat, bore, or pin) is explicitly named and placed.",
+          "bad": "No datum reference — assembly alignment is uncontrolled."
+        },
+        {
+          "criterion": "interface_fit_class",
+          "weight": 8,
+          "good": "Adjacent interfaces include fit_class (H7/h6, LC2) and stack_up_mm.",
+          "bad": "Interfaces have no tolerance or fit specification."
+        },
+        {
+          "criterion": "assembly_sequence_defined",
+          "weight": 10,
+          "good": "cad_brief includes ordered assembly_sequence with tool, torque, datum per step.",
+          "bad": "No assembly order — build sequence is ambiguous."
+        }
+      ]
+    },
+    {
+      "id": "seed_op_signature",
+      "title": "tiltrotor Geometry Signature",
+      "criteria": [
+        {
+          "criterion": "expected_op_variety",
+          "weight": 10,
+          "good": "Uses seed-characteristic ops: chamfer, pocket, drill, subtract. Subtractive features (drill/pocket/channel) and finishing (fillet/chamfer) both present.",
+          "bad": "Only basic box/cylinder ops. Missing subtractive or finishing features typical for this seed."
+        },
+        {
+          "criterion": "dimensional_realism",
+          "weight": 10,
+          "good": "Dimensions match tiltrotor scale: 200-1500mm wingspan, 50-300mm fuselage dia. Wall thickness, hole diameters, fillet radii are physically plausible.",
+          "bad": "Dimensions are placeholder (all 10mm) or unrealistic for the subsystem scale."
+        }
+      ]
     }
   ],
   "citable_sources": [
@@ -164,5 +207,6 @@
         "mechanism vocabulary"
       ]
     }
-  ]
+  ],
+  "boundary_note": "Subsystem scale: 200-1500mm wingspan, 50-300mm fuselage dia. Environment: outdoor flight, -20 to +50C, rain/dust/salt. Design loads: rotor thrust 20-200N, tilt servo 5-30Nm, 3g maneuvering. Mechanism: include joint travel range, preload, and cycle life in cad_brief."
 }

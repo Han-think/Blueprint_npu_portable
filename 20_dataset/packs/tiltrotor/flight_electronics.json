@@ -19,7 +19,12 @@
       "receiver",
       "power_channel",
       "signal_channel",
-      "tilt_joint_slack_loop"
+      "tilt_joint_slack_loop",
+      "tilt_axis",
+      "motor_esc_pocket",
+      "hinge_piano_wire",
+      "motor_pocket",
+      "piano_wire_hinge"
     ],
     "criteria_refs": [
       "electronics_routing",
@@ -74,6 +79,78 @@
           "loop_feedback": "Mount each board on standoffs with stated keep-out clearance and orient connector edges toward access openings."
         }
       ]
+    },
+    {
+      "id": "geometry_grounding",
+      "title": "P0 to Geometry Grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "weight": 14,
+          "good": "P0 internal_feature_targets appear as part_tree children and geometry_ops ids or targets.",
+          "bad": "P0 lists features but geometry_ops are generic boxes at the origin."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "weight": 12,
+          "good": "Most geometry_ops include args.at coordinates distributed across the local subsystem volume.",
+          "bad": "Geometry is stacked at [0,0,0] or lacks coordinates."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "weight": 10,
+          "good": "Uses drill, pocket, boss, channel, pattern_polar, fillet, chamfer — not just boxes.",
+          "bad": "Only box and cylinder ops with no subtractive or finishing features."
+        },
+        {
+          "criterion": "per_child_geometry_density",
+          "weight": 15,
+          "good": "Every part_tree child has 4+ dedicated geometry_ops (body+subtract+interface+finish).",
+          "bad": "Some children have 0-1 ops (LOW-RES). All detail concentrated on primary body."
+        }
+      ]
+    },
+    {
+      "id": "datum_tolerance",
+      "title": "Datum & Tolerance Management",
+      "criteria": [
+        {
+          "criterion": "primary_datum_evidence",
+          "weight": 8,
+          "good": "A primary datum feature (flat, bore, or pin) is explicitly named and placed.",
+          "bad": "No datum reference — assembly alignment is uncontrolled."
+        },
+        {
+          "criterion": "interface_fit_class",
+          "weight": 8,
+          "good": "Adjacent interfaces include fit_class (H7/h6, LC2) and stack_up_mm.",
+          "bad": "Interfaces have no tolerance or fit specification."
+        },
+        {
+          "criterion": "assembly_sequence_defined",
+          "weight": 10,
+          "good": "cad_brief includes ordered assembly_sequence with tool, torque, datum per step.",
+          "bad": "No assembly order — build sequence is ambiguous."
+        }
+      ]
+    },
+    {
+      "id": "seed_op_signature",
+      "title": "tiltrotor Geometry Signature",
+      "criteria": [
+        {
+          "criterion": "expected_op_variety",
+          "weight": 10,
+          "good": "Uses seed-characteristic ops: chamfer, pocket, drill, subtract. Subtractive features (drill/pocket/channel) and finishing (fillet/chamfer) both present.",
+          "bad": "Only basic box/cylinder ops. Missing subtractive or finishing features typical for this seed."
+        },
+        {
+          "criterion": "dimensional_realism",
+          "weight": 10,
+          "good": "Dimensions match tiltrotor scale: 200-1500mm wingspan, 50-300mm fuselage dia. Wall thickness, hole diameters, fillet radii are physically plausible.",
+          "bad": "Dimensions are placeholder (all 10mm) or unrealistic for the subsystem scale."
+        }
+      ]
     }
   ],
   "citable_sources": [
@@ -122,5 +199,6 @@
         "part naming vocabulary"
       ]
     }
-  ]
+  ],
+  "boundary_note": "Subsystem scale: 200-1500mm wingspan, 50-300mm fuselage dia. Environment: outdoor flight, -20 to +50C, rain/dust/salt. Design loads: rotor thrust 20-200N, tilt servo 5-30Nm, 3g maneuvering."
 }

@@ -12,7 +12,9 @@
       "burn_wire_note",
       "separation_spring_plate",
       "pusher_contact",
-      "kill_switch_arm"
+      "kill_switch_arm",
+      "antenna_slot",
+      "solar_panel_face"
     ],
     "criteria_refs": [
       "geometry_grounding",
@@ -84,6 +86,48 @@
           ]
         }
       ]
+    },
+    {
+      "id": "datum_tolerance",
+      "title": "Datum & Tolerance Management",
+      "criteria": [
+        {
+          "criterion": "primary_datum_evidence",
+          "weight": 8,
+          "good": "A primary datum feature (flat, bore, or pin) is explicitly named and placed.",
+          "bad": "No datum reference — assembly alignment is uncontrolled."
+        },
+        {
+          "criterion": "interface_fit_class",
+          "weight": 8,
+          "good": "Adjacent interfaces include fit_class (H7/h6, LC2) and stack_up_mm.",
+          "bad": "Interfaces have no tolerance or fit specification."
+        },
+        {
+          "criterion": "assembly_sequence_defined",
+          "weight": 10,
+          "good": "cad_brief includes ordered assembly_sequence with tool, torque, datum per step.",
+          "bad": "No assembly order — build sequence is ambiguous."
+        }
+      ]
+    },
+    {
+      "id": "seed_op_signature",
+      "title": "cubesat Geometry Signature",
+      "criteria": [
+        {
+          "criterion": "expected_op_variety",
+          "weight": 10,
+          "good": "Uses seed-characteristic ops: chamfer, boss, drill, subtract. Subtractive features (drill/pocket/channel) and finishing (fillet/chamfer) both present.",
+          "bad": "Only basic box/cylinder ops. Missing subtractive or finishing features typical for this seed."
+        },
+        {
+          "criterion": "dimensional_realism",
+          "weight": 10,
+          "good": "Dimensions match cubesat scale: 100x100x340mm (3U CubeSat). Wall thickness, hole diameters, fillet radii are physically plausible.",
+          "bad": "Dimensions are placeholder (all 10mm) or unrealistic for the subsystem scale."
+        }
+      ]
     }
   ],
   "citable_sources": [
@@ -115,5 +159,6 @@
         "mechanism vocabulary"
       ]
     }
-  ]
+  ],
+  "boundary_note": "Subsystem scale: 100x100x340mm (3U CubeSat). Environment: LEO vacuum, -40 to +80C thermal cycling, radiation. Design loads: launch vibration 20g, deployment shock, solar pressure."
 }
