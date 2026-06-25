@@ -229,6 +229,25 @@
           ]
         }
       ]
+    },
+    {
+      "id": "seed_op_signature",
+      "title": "cubesat Geometry Signature",
+      "criteria": [
+        {
+          "criterion": "expected_op_variety",
+          "weight": 10,
+          "good": "Uses seed-characteristic ops: chamfer, boss, drill, subtract. Subtractive features (drill/pocket/channel) and finishing (fillet/chamfer) both present.",
+          "bad": "Only basic box/cylinder ops. Missing subtractive or finishing features typical for this seed."
+        },
+        {
+          "criterion": "dimensional_realism",
+          "weight": 10,
+          "good": "Dimensions match cubesat scale: 100x100x340mm (3U CubeSat). Wall thickness, hole diameters, fillet radii are physically plausible.",
+          "bad": "Dimensions are placeholder (all 10mm) or unrealistic for the subsystem scale."
+        }
+      ]
     }
-  ]
+  ],
+  "boundary_note": "Subsystem scale: 100x100x340mm (3U CubeSat). Environment: LEO vacuum, -40 to +80C thermal cycling, radiation. Design loads: launch vibration 20g, deployment shock, solar pressure. Structural: include fixture_points with [x,y,z] and type (fixed/pinned) in verify.boundary_conditions."
 }

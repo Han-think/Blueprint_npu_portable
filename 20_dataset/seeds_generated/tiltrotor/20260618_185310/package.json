@@ -1,0 +1,10102 @@
+{
+ "schema": "blueprint_generated_package_v1",
+ "seed": "tiltrotor",
+ "run_id": "20260618_185310",
+ "vehicle": {
+  "id": "tiltrotor_vtol",
+  "label": "Tiltrotor VTOL Hybrid",
+  "wikiTitle": "Tiltrotor",
+  "desc": "Fixed-wing VTOL with 2 tilting rotor nacelles, BVLOS long-range capable",
+  "material": "CFRP + Al + TPU",
+  "process": "FDM + CNC",
+  "mass": "~2.5kg",
+  "envelope": "1200x900x200 mm",
+  "parts": [
+   {
+    "id": "p1",
+    "label": "Center Fuselage Spine",
+    "preset": [
+     "drone",
+     "fixed_uav",
+     "vtol_hw"
+    ],
+    "spec": "CFRP box beam center fuselage, avionics bay, wing spar socket, front GPS boom mount, belly camera window"
+   },
+   {
+    "id": "p2",
+    "label": "Main Wing (2-piece)",
+    "preset": [
+     "mechanical",
+     "structure",
+     "wing_spar"
+    ],
+    "spec": "Straight wing, 4S NACA 2412, dual 15mm CFRP spar, 900mm half-span, 160mm chord, 3-layer CFRP skin"
+   },
+   {
+    "id": "p3",
+    "label": "Nacelle Assembly x 2",
+    "preset": [
+     "propulsion",
+     "electric",
+     "motor_mount"
+    ],
+    "spec": "Tilting nacelle assembly, 0-90deg tilt axis, 6309 bearing set, servo-driven worm gear, motor and ESC pocket"
+   },
+   {
+    "id": "p4",
+    "label": "Tilt Servo + Linkage x 2",
+    "preset": [
+     "mechanical",
+     "actuation",
+     "servo_horn"
+    ],
+    "spec": "25kg-cm DS3218 servo per nacelle, titanium pushrod, dual ball joints, tilt range 0-93deg, crash-tolerant"
+   },
+   {
+    "id": "p5",
+    "label": "V-Tail x 2 (Ruddervator)",
+    "preset": [
+     "mechanical",
+     "structure",
+     "wing_spar"
+    ],
+    "spec": "+-35deg V-tail ruddervator pair, MG996R servo each, 30deg dihedral, CFRP sandwich panel, hinge piano wire"
+   },
+   {
+    "id": "p6",
+    "label": "Landing Gear (Tri)",
+    "preset": [
+     "mechanical",
+     "structure",
+     "landing_gear"
+    ],
+    "spec": "Tricycle landing gear, spring-steel skid arms, 55mm dia wheels, CG at 1/3 chord, 200mm wheelbase"
+   },
+   {
+    "id": "p7",
+    "label": "Battery Bay (Slide-In)",
+    "preset": [
+     "propulsion",
+     "electric",
+     "battery_tray"
+    ],
+    "spec": "Belly slide-in battery bay, 6S 8000mAh Li-ion pack, Velcro + strap dual retention, CG position 28% MAC"
+   },
+   {
+    "id": "p8",
+    "label": "Payload Nose Bay",
+    "preset": [
+     "mechanical",
+     "general",
+     "payload_bay"
+    ],
+    "spec": "Interchangeable nose payload bay, Day/IR camera gimbal or survey sensor, 80x60x50mm, 300g payload limit"
+   },
+   {
+    "id": "p9",
+    "label": "Tilt-Axis Harness + Datum Service Bay",
+    "preset": [
+     "mechanical",
+     "general",
+     "cable_clip"
+    ],
+    "spec": "Tiltrotor integration_service module with tilt-axis harness_channel, slack_loop, interface_datum, service_hatch, connector keying, and nacelle-to-wing load-path inspection access"
+   }
+  ]
+ },
+ "run_meta": {
+  "seed": 674247,
+  "model": "Qwen/Qwen2.5-14B-Instruct",
+  "generator": "generate_batch.py",
+  "started": "2026-06-18T18:44:34Z",
+  "duration_s": 516
+ },
+ "schema_v6_blueprint": {
+  "version": "bp-npu-r6",
+  "ts": "2026-06-18T18:53:10Z",
+  "project": "tiltrotor",
+  "object": "Tiltrotor VTOL Hybrid",
+  "brief": {
+   "requirements": [
+    "Tricycle landing gear with spring-steel skid arms and 55mm diameter wheels",
+    "CG at 1/3 chord, 200mm wheelbase",
+    "Wing spar carrying nacelle loads into fuselage spine",
+    "V-tail/ruddervator and landing gear attach structure",
+    "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled",
+    "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances",
+    "Each subsystem has at least three adjacent interfaces or datums",
+    "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance",
+    "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters)",
+    "Tilt axis, bearing seats, servo/linkage access, and nacelle rotation clearance are visible",
+    "Wing spar socket, fuselage spine, and payload/battery service paths are separate and inspectable",
+    "Output remains educational mockup, avoiding operational flight tuning or control-law details",
+    "Tilt mechanism loads route through bearing seats into wing structure via named fittings, and motor/servo modules remain replaceable through access covers"
+   ],
+   "constraints": {
+    "material": "CFRP + Al + TPU",
+    "process": "FDM + CNC",
+    "envelope_mm": [
+     200,
+     100,
+     200
+    ],
+    "min_wall_mm": 1,
+    "overhang_deg": 45,
+    "tol_mm": 0.2
+   }
+  },
+  "cad_brief": {
+   "name": "Tiltrotor VTOL Hybrid",
+   "rev": "1.0",
+   "material": "CFRP + Al + TPU",
+   "envelope_mm": [
+    1200.0,
+    900.0,
+    200.0
+   ],
+   "build_direction": "Z"
+  },
+  "part_tree": {
+   "id": "asm",
+   "name": "Tiltrotor VTOL Hybrid",
+   "qty": 1,
+   "children": [
+    {
+     "id": "p1",
+     "name": "Center Fuselage Spine",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p2",
+     "name": "Main Wing (2-piece)",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p3",
+     "name": "Nacelle Assembly x 2",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p4",
+     "name": "Tilt Servo + Linkage x 2",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p5",
+     "name": "V-Tail x 2 (Ruddervator)",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p6",
+     "name": "Landing Gear (Tri)",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p7",
+     "name": "Battery Bay (Slide-In)",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p8",
+     "name": "Payload Nose Bay",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    },
+    {
+     "id": "p9",
+     "name": "Tilt-Axis Harness + Datum Service Bay",
+     "qty": 1,
+     "material": "CFRP + Al + TPU",
+     "process": "FDM",
+     "children": []
+    }
+   ]
+  },
+  "geometry_ops": [
+   {
+    "op": "box",
+    "id": "fuselage_spine",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "size": [
+      100,
+      50,
+      200
+     ],
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "box",
+    "id": "spar_socket",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "size": [
+      50,
+      50,
+      50
+     ],
+     "material": "Al"
+    }
+   },
+   {
+    "op": "box",
+    "id": "v_tail_flange",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      100
+     ],
+     "size": [
+      75,
+      75,
+      25
+     ],
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "box",
+    "id": "gear_mount",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      200
+     ],
+     "size": [
+      60,
+      60,
+      30
+     ],
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "box",
+    "id": "avionics_bay",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      150
+     ],
+     "size": [
+      80,
+      80,
+      40
+     ],
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "box",
+    "id": "gps_boom_mount",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      250
+     ],
+     "size": [
+      40,
+      40,
+      40
+     ],
+     "material": "TPU"
+    }
+   },
+   {
+    "op": "box",
+    "id": "camera_window",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      300
+     ],
+     "size": [
+      60,
+      60,
+      10
+     ],
+     "material": "TPU"
+    }
+   },
+   {
+    "op": "box",
+    "id": "cooling_channel",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      180
+     ],
+     "size": [
+      20,
+      20,
+      20
+     ],
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "box",
+    "id": "access_panel",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      220
+     ],
+     "size": [
+      70,
+      70,
+      10
+     ],
+     "material": "TPU"
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "spar_socket_chamfer",
+    "target": "p1",
+    "args": {
+     "radius_mm": 5,
+     "edges": [
+      "top",
+      "bottom"
+     ],
+     "material": "Al"
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "v_tail_flange_fillet",
+    "target": "p1",
+    "args": {
+     "radius_mm": 10,
+     "edges": [
+      "all"
+     ],
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "drill",
+    "id": "gear_mount_drill",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      200
+     ],
+     "d_mm": 5,
+     "count": 4,
+     "spacing_mm": 20,
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "avionics_bay_pocket",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      150
+     ],
+     "size": [
+      60,
+      60,
+      20
+     ],
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "channel",
+    "id": "cooling_channel_engrave",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      180
+     ],
+     "size": [
+      15,
+      15,
+      15
+     ],
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "access_panel_pattern",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      220
+     ],
+     "radius_mm": 30,
+     "count": 6,
+     "spacing_deg": 60,
+     "material": "TPU"
+    }
+   },
+   {
+    "op": "label",
+    "id": "assembly_label",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      250
+     ],
+     "text": "Assembly Label",
+     "material": "TPU"
+    }
+   },
+   {
+    "op": "mirror",
+    "id": "mirrored_access_panel",
+    "target": "p1",
+    "args": {
+     "axis": "Y",
+     "material": "TPU"
+    }
+   },
+   {
+    "op": "union",
+    "id": "combined_parts",
+    "target": "p1",
+    "args": {}
+   },
+   {
+    "op": "subtract",
+    "id": "cooling_channel_subtract",
+    "target": "p1",
+    "args": {
+     "from": "cooling_channel",
+     "material": "CFRP"
+    }
+   },
+   {
+    "op": "intersect",
+    "id": "gear_mount_intersect",
+    "target": "p1",
+    "args": {}
+   },
+   {
+    "op": "boss",
+    "id": "gps_boom_boss",
+    "target": "p1",
+    "args": {
+     "at": [
+      0,
+      0,
+      250
+     ],
+     "size": [
+      30,
+      30,
+      30
+     ],
+     "material": "TPU"
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "camera_window_chamfer",
+    "target": "p1",
+    "args": {
+     "radius_mm": 3,
+     "edges": [
+      "all"
+     ],
+     "material": "TPU"
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "wing_spar",
+    "args": {
+     "at": [
+      75,
+      0,
+      0
+     ],
+     "radius_mm": 7.5,
+     "h_mm": 150
+    },
+    "target": "p2"
+   },
+   {
+    "op": "box",
+    "id": "spar_socket",
+    "args": {
+     "at": [
+      75,
+      0,
+      10
+     ],
+     "w_mm": 20,
+     "l_mm": 15,
+     "h_mm": 15
+    },
+    "target": "p2"
+   },
+   {
+    "op": "box",
+    "id": "fuselage_spine",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "w_mm": 10,
+     "l_mm": 10,
+     "h_mm": 100
+    },
+    "target": "p2"
+   },
+   {
+    "op": "box",
+    "id": "v_tail",
+    "args": {
+     "at": [
+      150,
+      0,
+      0
+     ],
+     "w_mm": 50,
+     "l_mm": 10,
+     "h_mm": 10
+    },
+    "target": "p2"
+   },
+   {
+    "op": "box",
+    "id": "ruddervator",
+    "args": {
+     "at": [
+      100,
+      0,
+      0
+     ],
+     "w_mm": 60,
+     "l_mm": 10,
+     "h_mm": 10
+    },
+    "target": "p2"
+   },
+   {
+    "op": "box",
+    "id": "stabilizer",
+    "args": {
+     "at": [
+      120,
+      0,
+      0
+     ],
+     "w_mm": 40,
+     "l_mm": 10,
+     "h_mm": 10
+    },
+    "target": "p2"
+   },
+   {
+    "op": "box",
+    "id": "landing_gear_mount",
+    "args": {
+     "at": [
+      0,
+      80,
+      0
+     ],
+     "w_mm": 20,
+     "l_mm": 20,
+     "h_mm": 20
+    },
+    "target": "p2"
+   },
+   {
+    "op": "box",
+    "id": "gear_leg",
+    "args": {
+     "at": [
+      0,
+      100,
+      0
+     ],
+     "w_mm": 30,
+     "l_mm": 10,
+     "h_mm": 10
+    },
+    "target": "p2"
+   },
+   {
+    "op": "box",
+    "id": "service_access_cover",
+    "args": {
+     "at": [
+      0,
+      0,
+      10
+     ],
+     "w_mm": 100,
+     "l_mm": 100,
+     "h_mm": 10
+    },
+    "target": "p2"
+   },
+   {
+    "op": "chamfer",
+    "id": "spar_socket_chamfer",
+    "target": "p2",
+    "args": {
+     "at": [
+      75,
+      0,
+      10
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "drill",
+    "id": "fastener_hole",
+    "args": {
+     "at": [
+      0,
+      0,
+      50
+     ],
+     "d_mm": 4
+    },
+    "target": "p2"
+   },
+   {
+    "op": "pocket",
+    "id": "motor_service_port",
+    "args": {
+     "at": [
+      0,
+      0,
+      20
+     ],
+     "w_mm": 20,
+     "l_mm": 20,
+     "h_mm": 10
+    },
+    "target": "p2"
+   },
+   {
+    "op": "pattern_polar",
+    "id": "fastener_pattern",
+    "args": {
+     "at": [
+      0,
+      0,
+      50
+     ],
+     "count": 4,
+     "radius_mm": 10,
+     "d_mm": 4
+    },
+    "target": "p2"
+   },
+   {
+    "op": "fillet",
+    "id": "wing_spar_fillet",
+    "target": "p2",
+    "args": {
+     "at": [
+      75,
+      0,
+      0
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "mirror",
+    "id": "mirror_wing",
+    "target": "p2",
+    "args": {
+     "at": [
+      75,
+      0,
+      0
+     ],
+     "axis": "X"
+    }
+   },
+   {
+    "op": "label",
+    "id": "wing_label",
+    "args": {
+     "at": [
+      75,
+      0,
+      150
+     ],
+     "text": "Main_Wing_2_piece"
+    },
+    "target": "p2"
+   },
+   {
+    "op": "channel",
+    "id": "cooling_channel",
+    "args": {
+     "at": [
+      75,
+      0,
+      75
+     ],
+     "w_mm": 10,
+     "l_mm": 140,
+     "h_mm": 5
+    },
+    "target": "p2"
+   },
+   {
+    "op": "boss",
+    "id": "bearing_seat",
+    "args": {
+     "at": [
+      100,
+      0,
+      0
+     ],
+     "d_mm": 10,
+     "h_mm": 20
+    },
+    "target": "p2"
+   },
+   {
+    "op": "subtract",
+    "id": "gear_leg_cutout",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      100,
+      0
+     ],
+     "w_mm": 30,
+     "l_mm": 10,
+     "h_mm": 10
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "gear_leg_chamfer",
+    "target": "p2",
+    "args": {
+     "at": [
+      0,
+      100,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "inspection_callout",
+    "args": {
+     "at": [
+      0,
+      0,
+      10
+     ],
+     "text": "Inspection Required"
+    },
+    "target": "p2"
+   },
+   {
+    "op": "union",
+    "id": "wing_assembly",
+    "targets": [
+     "wing_spar",
+     "spar_socket",
+     "fuselage_spine",
+     "v_tail",
+     "ruddervator",
+     "stabilizer",
+     "landing_gear_mount",
+     "gear_leg",
+     "service_access_cover"
+    ],
+    "target": "p2"
+   },
+   {
+    "op": "intersect",
+    "id": "wing_intersection",
+    "targets": [
+     "wing_assembly",
+     "cooling_channel"
+    ],
+    "target": "p2"
+   },
+   {
+    "op": "cylinder",
+    "id": "op_main_body_shell",
+    "target": "p3",
+    "args": {
+     "radius_mm": 50,
+     "h_mm": 100,
+     "at": [
+      0,
+      0,
+      50
+     ]
+    }
+   },
+   {
+    "op": "box",
+    "id": "op_bearing_seat",
+    "target": "p3",
+    "args": {
+     "x_mm": 20,
+     "y_mm": 20,
+     "z_mm": 10,
+     "at": [
+      0,
+      0,
+      70
+     ]
+    }
+   },
+   {
+    "op": "extrude",
+    "id": "op_servo_linkage",
+    "target": "p3",
+    "args": {
+     "w_mm": 5,
+     "l_mm": 30,
+     "h_mm": 5,
+     "at": [
+      -20,
+      0,
+      80
+     ]
+    }
+   },
+   {
+    "op": "loft",
+    "id": "op_clearance_arc",
+    "target": "p3",
+    "args": {
+     "profile_1": [
+      [
+       -10,
+       0
+      ],
+      [
+       10,
+       0
+      ]
+     ],
+     "profile_2": [
+      [
+       -10,
+       10
+      ],
+      [
+       10,
+       10
+      ]
+     ],
+     "at": [
+      0,
+      0,
+      90
+     ]
+    }
+   },
+   {
+    "op": "boss",
+    "id": "op_motor_pocket",
+    "target": "p3",
+    "args": {
+     "x_mm": 30,
+     "y_mm": 30,
+     "z_mm": 20,
+     "at": [
+      0,
+      0,
+      20
+     ]
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "op_esc_pocket",
+    "target": "p3",
+    "args": {
+     "x_mm": 25,
+     "y_mm": 25,
+     "z_mm": 15,
+     "at": [
+      0,
+      0,
+      40
+     ]
+    }
+   },
+   {
+    "op": "channel",
+    "id": "op_heat_sink",
+    "target": "p3",
+    "args": {
+     "w_mm": 10,
+     "l_mm": 50,
+     "h_mm": 5,
+     "at": [
+      0,
+      0,
+      60
+     ]
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "op_access_cover",
+    "target": "p3",
+    "args": {
+     "count": 4,
+     "radius_mm": 15,
+     "angle_deg": 90,
+     "at": [
+      0,
+      0,
+      85
+     ]
+    }
+   },
+   {
+    "op": "drill",
+    "id": "op_wiring_channel",
+    "target": "p3",
+    "args": {
+     "d_mm": 5,
+     "at": [
+      0,
+      0,
+      100
+     ]
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "op_chamfer_motor_pocket",
+    "target": "p3",
+    "args": {
+     "radius_mm": 2,
+     "at": [
+      0,
+      0,
+      20
+     ]
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "op_fillet_esc_pocket",
+    "target": "p3",
+    "args": {
+     "radius_mm": 3,
+     "at": [
+      0,
+      0,
+      40
+     ]
+    }
+   },
+   {
+    "op": "mirror",
+    "id": "op_mirror_heat_sink",
+    "target": "p3",
+    "args": {
+     "plane": "XY",
+     "at": [
+      0,
+      0,
+      60
+     ]
+    }
+   },
+   {
+    "op": "union",
+    "id": "op_union_main_body_shell",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      50
+     ]
+    }
+   },
+   {
+    "op": "subtract",
+    "id": "op_subtract_bearing_seat",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      70
+     ]
+    }
+   },
+   {
+    "op": "intersect",
+    "id": "op_intersect_clearance_arc",
+    "target": "p3",
+    "args": {
+     "at": [
+      0,
+      0,
+      90
+     ]
+    }
+   },
+   {
+    "op": "pattern_linear",
+    "id": "op_pattern_linear_wiring_channel",
+    "target": "p3",
+    "args": {
+     "count": 3,
+     "w_mm": 10,
+     "l_mm": 50,
+     "h_mm": 5,
+     "at": [
+      0,
+      0,
+      100
+     ]
+    }
+   },
+   {
+    "op": "label",
+    "id": "op_label_nacelle_assembly",
+    "target": "p3",
+    "args": {
+     "text": "Nacelle Assembly",
+     "at": [
+      0,
+      0,
+      110
+     ]
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "op_engrave_serial_number",
+    "target": "p3",
+    "args": {
+     "text": "SN: ABC123",
+     "at": [
+      0,
+      0,
+      120
+     ]
+    }
+   },
+   {
+    "op": "boss",
+    "id": "op_boss_wing_spar_socket",
+    "target": "p3",
+    "args": {
+     "x_mm": 15,
+     "y_mm": 15,
+     "z_mm": 10,
+     "at": [
+      -50,
+      0,
+      50
+     ]
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "op_pocket_fuselage_spine_mount",
+    "target": "p3",
+    "args": {
+     "x_mm": 20,
+     "y_mm": 20,
+     "z_mm": 10,
+     "at": [
+      50,
+      0,
+      50
+     ]
+    }
+   },
+   {
+    "op": "channel",
+    "id": "op_channel_battery_harness_port",
+    "target": "p3",
+    "args": {
+     "w_mm": 10,
+     "l_mm": 50,
+     "h_mm": 5,
+     "at": [
+      0,
+      0,
+      150
+     ]
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "op_chamfer_fuselage_spine_mount",
+    "target": "p3",
+    "args": {
+     "radius_mm": 2,
+     "at": [
+      50,
+      0,
+      50
+     ]
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "op_fillet_wing_spar_socket",
+    "target": "p3",
+    "args": {
+     "radius_mm": 3,
+     "at": [
+      -50,
+      0,
+      50
+     ]
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "tilt_axis",
+    "args": {
+     "radius_mm": 5,
+     "h_mm": 100,
+     "at": [
+      0,
+      0,
+      50
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "box",
+    "id": "bearing_seat_left",
+    "args": {
+     "w_mm": 20,
+     "l_mm": 20,
+     "h_mm": 10,
+     "at": [
+      -25,
+      0,
+      60
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "box",
+    "id": "bearing_seat_right",
+    "args": {
+     "w_mm": 20,
+     "l_mm": 20,
+     "h_mm": 10,
+     "at": [
+      25,
+      0,
+      60
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "extrude",
+    "id": "servo_linkage",
+    "args": {
+     "w_mm": 10,
+     "l_mm": 10,
+     "h_mm": 50,
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "direction": "z"
+    },
+    "target": "p4"
+   },
+   {
+    "op": "loft",
+    "id": "clearance_arc",
+    "args": {
+     "profile": [
+      [
+       0,
+       0
+      ],
+      [
+       50,
+       0
+      ],
+      [
+       50,
+       10
+      ],
+      [
+       0,
+       10
+      ]
+     ],
+     "height_mm": 20,
+     "at": [
+      0,
+      0,
+      70
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "pattern_polar",
+    "id": "servo_holes",
+    "args": {
+     "count": 4,
+     "radius_mm": 10,
+     "angle_deg": 90,
+     "hole_d_mm": 5,
+     "at": [
+      0,
+      0,
+      50
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "drill",
+    "id": "mounting_flange_hole",
+    "args": {
+     "d_mm": 5,
+     "at": [
+      100,
+      0,
+      0
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "pocket",
+    "id": "access_cover_cutout",
+    "args": {
+     "w_mm": 50,
+     "l_mm": 50,
+     "depth_mm": 10,
+     "at": [
+      0,
+      0,
+      80
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "fillet",
+    "id": "tilt_axis_fillet",
+    "args": {
+     "radius_mm": 3,
+     "edges": [
+      "all"
+     ],
+     "at": [
+      0,
+      0,
+      50
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "chamfer",
+    "id": "bearing_seat_chamfer",
+    "args": {
+     "size_mm": 2,
+     "edges": [
+      "top"
+     ],
+     "at": [
+      -25,
+      0,
+      60
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "boss",
+    "id": "inspection_window",
+    "args": {
+     "d_mm": 20,
+     "h_mm": 5,
+     "at": [
+      0,
+      0,
+      90
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "mirror",
+    "id": "symmetry",
+    "args": {
+     "axis": "y",
+     "at": [
+      0,
+      0,
+      0
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "subtract",
+    "id": "servo_linkage_clearance",
+    "args": {
+     "from": "servo_linkage",
+     "by": "pattern_polar",
+     "at": [
+      0,
+      0,
+      0
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "union",
+    "id": "assembly",
+    "args": {
+     "parts": [
+      "tilt_axis",
+      "bearing_seat_left",
+      "bearing_seat_right",
+      "servo_linkage",
+      "clearance_arc",
+      "access_cover_cutout",
+      "inspection_window"
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "intersect",
+    "id": "joint_locking",
+    "args": {
+     "a": "tilt_axis",
+     "b": "bearing_seat_left",
+     "at": [
+      -25,
+      0,
+      60
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "channel",
+    "id": "service_channel",
+    "args": {
+     "w_mm": 5,
+     "l_mm": 50,
+     "depth_mm": 10,
+     "at": [
+      0,
+      0,
+      100
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "engrave",
+    "id": "part_label",
+    "args": {
+     "text": "Tilt_Servo_Linkage_x2",
+     "font_size_mm": 5,
+     "at": [
+      0,
+      0,
+      110
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "pattern_linear",
+    "id": "fastener_pattern",
+    "args": {
+     "count": 6,
+     "spacing_mm": 10,
+     "hole_d_mm": 5,
+     "at": [
+      0,
+      0,
+      0
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "chamfer",
+    "id": "access_cover_chamfer",
+    "args": {
+     "size_mm": 2,
+     "edges": [
+      "all"
+     ],
+     "at": [
+      0,
+      0,
+      80
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "boss",
+    "id": "harness_interface",
+    "args": {
+     "d_mm": 10,
+     "h_mm": 10,
+     "at": [
+      50,
+      0,
+      0
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "drill",
+    "id": "inspection_hole",
+    "args": {
+     "d_mm": 5,
+     "at": [
+      0,
+      0,
+      95
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "loft",
+    "id": "tilt_axis_envelope",
+    "args": {
+     "profile": [
+      [
+       -10,
+       -10
+      ],
+      [
+       10,
+       -10
+      ],
+      [
+       10,
+       10
+      ],
+      [
+       -10,
+       10
+      ]
+     ],
+     "height_mm": 120,
+     "at": [
+      0,
+      0,
+      0
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "channel",
+    "id": "maintenance_channel",
+    "args": {
+     "w_mm": 10,
+     "l_mm": 100,
+     "depth_mm": 10,
+     "at": [
+      0,
+      0,
+      120
+     ]
+    },
+    "target": "p4"
+   },
+   {
+    "op": "cylinder",
+    "id": "spar_socket",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 25,
+     "height_mm": 10
+    },
+    "target": "p5"
+   },
+   {
+    "op": "box",
+    "id": "fuselage_attachment",
+    "args": {
+     "at": [
+      0,
+      0,
+      100
+     ],
+     "w_mm": 80,
+     "l_mm": 80,
+     "h_mm": 15
+    },
+    "target": "p5"
+   },
+   {
+    "op": "box",
+    "id": "gear_leg",
+    "args": {
+     "at": [
+      0,
+      0,
+      200
+     ],
+     "w_mm": 70,
+     "l_mm": 70,
+     "h_mm": 20
+    },
+    "target": "p5"
+   },
+   {
+    "op": "extrude",
+    "id": "ruddervator",
+    "args": {
+     "at": [
+      0,
+      0,
+      300
+     ],
+     "profile": [
+      {
+       "type": "line",
+       "start": [
+        -50,
+        -50
+       ],
+       "end": [
+        50,
+        -50
+       ]
+      },
+      {
+       "type": "line",
+       "start": [
+        50,
+        -50
+       ],
+       "end": [
+        50,
+        50
+       ]
+      },
+      {
+       "type": "line",
+       "start": [
+        50,
+        50
+       ],
+       "end": [
+        -50,
+        50
+       ]
+      },
+      {
+       "type": "line",
+       "start": [
+        -50,
+        50
+       ],
+       "end": [
+        -50,
+        -50
+       ]
+      }
+     ],
+     "height_mm": 30
+    },
+    "target": "p5"
+   },
+   {
+    "op": "extrude",
+    "id": "stabilizer",
+    "args": {
+     "at": [
+      0,
+      0,
+      400
+     ],
+     "profile": [
+      {
+       "type": "line",
+       "start": [
+        -60,
+        -60
+       ],
+       "end": [
+        60,
+        -60
+       ]
+      },
+      {
+       "type": "line",
+       "start": [
+        60,
+        -60
+       ],
+       "end": [
+        60,
+        60
+       ]
+      },
+      {
+       "type": "line",
+       "start": [
+        60,
+        60
+       ],
+       "end": [
+        -60,
+        60
+       ]
+      },
+      {
+       "type": "line",
+       "start": [
+        -60,
+        60
+       ],
+       "end": [
+        -60,
+        -60
+       ]
+      }
+     ],
+     "height_mm": 40
+    },
+    "target": "p5"
+   },
+   {
+    "op": "box",
+    "id": "cooling_fins",
+    "args": {
+     "at": [
+      0,
+      0,
+      500
+     ],
+     "w_mm": 60,
+     "l_mm": 60,
+     "h_mm": 5
+    },
+    "target": "p5"
+   },
+   {
+    "op": "box",
+    "id": "servo_mount",
+    "args": {
+     "at": [
+      0,
+      0,
+      600
+     ],
+     "w_mm": 40,
+     "l_mm": 40,
+     "h_mm": 10
+    },
+    "target": "p5"
+   },
+   {
+    "op": "box",
+    "id": "pivot_hinge",
+    "args": {
+     "at": [
+      0,
+      0,
+      700
+     ],
+     "w_mm": 30,
+     "l_mm": 30,
+     "h_mm": 5
+    },
+    "target": "p5"
+   },
+   {
+    "op": "box",
+    "id": "access_cover",
+    "args": {
+     "at": [
+      0,
+      0,
+      800
+     ],
+     "w_mm": 50,
+     "l_mm": 50,
+     "h_mm": 10
+    },
+    "target": "p5"
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_rudder",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      300
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_stabilizer",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      400
+     ],
+     "radius_mm": 10
+    }
+   },
+   {
+    "op": "drill",
+    "id": "pivot_hole",
+    "args": {
+     "at": [
+      0,
+      0,
+      700
+     ],
+     "d_mm": 5
+    },
+    "target": "p5"
+   },
+   {
+    "op": "pocket",
+    "id": "servo_cavity",
+    "args": {
+     "at": [
+      0,
+      0,
+      600
+     ],
+     "w_mm": 35,
+     "l_mm": 35,
+     "h_mm": 8
+    },
+    "target": "p5"
+   },
+   {
+    "op": "pattern_polar",
+    "id": "cooling_fins_pattern",
+    "args": {
+     "at": [
+      0,
+      0,
+      500
+     ],
+     "count": 10,
+     "radius_mm": 30,
+     "angle_deg": 36,
+     "w_mm": 5,
+     "l_mm": 5,
+     "h_mm": 5
+    },
+    "target": "p5"
+   },
+   {
+    "op": "channel",
+    "id": "access_channel",
+    "args": {
+     "at": [
+      0,
+      0,
+      800
+     ],
+     "w_mm": 40,
+     "l_mm": 40,
+     "depth_mm": 5
+    },
+    "target": "p5"
+   },
+   {
+    "op": "mirror",
+    "id": "mirror_rudder",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      300
+     ],
+     "axis": "Y"
+    }
+   },
+   {
+    "op": "union",
+    "id": "union_parts",
+    "targets": [
+     "spar_socket",
+     "fuselage_attachment",
+     "gear_leg",
+     "ruddervator",
+     "stabilizer",
+     "cooling_fins",
+     "servo_mount",
+     "pivot_hinge",
+     "access_cover"
+    ],
+    "target": "p5"
+   },
+   {
+    "op": "subtract",
+    "id": "subtract_hole",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      700
+     ],
+     "d_mm": 4
+    }
+   },
+   {
+    "op": "label",
+    "id": "label_rudder",
+    "args": {
+     "at": [
+      0,
+      0,
+      300
+     ],
+     "text": "RUDDER"
+    },
+    "target": "p5"
+   },
+   {
+    "op": "engrave",
+    "id": "engrave_access",
+    "args": {
+     "at": [
+      0,
+      0,
+      800
+     ],
+     "text": "ACCESS"
+    },
+    "target": "p5"
+   },
+   {
+    "op": "pattern_linear",
+    "id": "fastener_pattern",
+    "args": {
+     "at": [
+      0,
+      0,
+      600
+     ],
+     "count": 4,
+     "spacing_mm": 10,
+     "d_mm": 3
+    },
+    "target": "p5"
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_cover",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      800
+     ],
+     "radius_mm": 3
+    }
+   },
+   {
+    "op": "subtract",
+    "id": "subtract_cavity",
+    "target": "p5",
+    "args": {
+     "at": [
+      0,
+      0,
+      600
+     ],
+     "w_mm": 30,
+     "l_mm": 30,
+     "depth_mm": 8
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "main_body",
+    "args": {
+     "radius_mm": 10,
+     "height_mm": 20,
+     "center_at": [
+      0,
+      0,
+      0
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "slot",
+    "target": "p6",
+    "args": {
+     "width_mm": 5,
+     "depth_mm": 10,
+     "center_at": [
+      0,
+      0,
+      -10
+     ]
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "gear_leg",
+    "args": {
+     "radius_mm": 8,
+     "height_mm": 150,
+     "center_at": [
+      0,
+      0,
+      20
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "thread",
+    "target": "p6",
+    "args": {
+     "pitch_mm": 1.5,
+     "start_mm": 0,
+     "end_mm": 150,
+     "center_at": [
+      0,
+      0,
+      75
+     ]
+    }
+   },
+   {
+    "op": "box",
+    "id": "skid_arm",
+    "args": {
+     "length_mm": 200,
+     "width_mm": 20,
+     "height_mm": 10,
+     "center_at": [
+      0,
+      0,
+      160
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "cutout",
+    "target": "p6",
+    "args": {
+     "shape": "circle",
+     "radius_mm": 5,
+     "center_at": [
+      0,
+      0,
+      165
+     ]
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "wheel",
+    "args": {
+     "radius_mm": 27.5,
+     "height_mm": 55,
+     "center_at": [
+      0,
+      0,
+      180
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "hole",
+    "target": "p6",
+    "args": {
+     "radius_mm": 3,
+     "depth_mm": 55,
+     "center_at": [
+      0,
+      0,
+      182.5
+     ]
+    }
+   },
+   {
+    "op": "plate",
+    "id": "stabilizer",
+    "args": {
+     "length_mm": 50,
+     "width_mm": 10,
+     "thickness_mm": 2,
+     "center_at": [
+      100,
+      0,
+      0
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "slot",
+    "target": "p6",
+    "args": {
+     "width_mm": 5,
+     "depth_mm": 10,
+     "center_at": [
+      100,
+      0,
+      -5
+     ]
+    }
+   },
+   {
+    "op": "cylinder",
+    "id": "spar_socket",
+    "args": {
+     "radius_mm": 15,
+     "height_mm": 20,
+     "center_at": [
+      150,
+      0,
+      0
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "thread",
+    "target": "p6",
+    "args": {
+     "pitch_mm": 1.5,
+     "start_mm": 0,
+     "end_mm": 20,
+     "center_at": [
+      150,
+      0,
+      10
+     ]
+    }
+   },
+   {
+    "op": "fillet",
+    "target": "p6",
+    "args": {
+     "radius_mm": 2,
+     "center_at": [
+      0,
+      0,
+      10
+     ]
+    }
+   },
+   {
+    "op": "chamfer",
+    "target": "p6",
+    "args": {
+     "angle_deg": 45,
+     "distance_mm": 2,
+     "center_at": [
+      0,
+      0,
+      20
+     ]
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "fastener_insert_pattern",
+    "args": {
+     "count": 4,
+     "radius_mm": 10,
+     "angle_deg": 90,
+     "center_at": [
+      0,
+      0,
+      100
+     ],
+     "op": "boss",
+     "args": {
+      "radius_mm": 5,
+      "height_mm": 10
+     }
+    },
+    "target": "p6"
+   },
+   {
+    "op": "pocket",
+    "id": "service_access",
+    "args": {
+     "length_mm": 50,
+     "width_mm": 30,
+     "depth_mm": 10,
+     "center_at": [
+      0,
+      0,
+      150
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "channel",
+    "id": "harness_connector_path",
+    "args": {
+     "length_mm": 100,
+     "width_mm": 10,
+     "depth_mm": 5,
+     "center_at": [
+      0,
+      0,
+      200
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "engrave",
+    "id": "inspection_window",
+    "args": {
+     "text": "Inspection Window",
+     "center_at": [
+      0,
+      0,
+      175
+     ]
+    },
+    "target": "p6"
+   },
+   {
+    "op": "mirror",
+    "target": "p6",
+    "args": {
+     "axis": "X",
+     "center_at": [
+      0,
+      0,
+      100
+     ]
+    }
+   },
+   {
+    "op": "union",
+    "targets": [
+     "main_body",
+     "gear_leg"
+    ],
+    "args": {},
+    "target": "p6"
+   },
+   {
+    "op": "subtract",
+    "targets": [
+     "main_body",
+     "service_access"
+    ],
+    "args": {},
+    "target": "p6"
+   },
+   {
+    "op": "intersect",
+    "targets": [
+     "main_body",
+     "harness_connector_path"
+    ],
+    "args": {},
+    "target": "p6"
+   },
+   {
+    "op": "box",
+    "id": "battery_bay_shell",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 100,
+     "y_mm": 50,
+     "z_mm": 20
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "li_ion_pack_retention_strap_left",
+    "args": {
+     "at": [
+      -40,
+      20,
+      10
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 10
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "li_ion_pack_retention_strap_right",
+    "args": {
+     "at": [
+      40,
+      20,
+      10
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 10
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "bms_access_hatch",
+    "args": {
+     "at": [
+      20,
+      20,
+      20
+     ],
+     "x_mm": 5,
+     "y_mm": 5,
+     "z_mm": 5
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "cg_marks",
+    "args": {
+     "at": [
+      25,
+      25,
+      25
+     ],
+     "x_mm": 2,
+     "y_mm": 2,
+     "z_mm": 2
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "connector_access_port",
+    "args": {
+     "at": [
+      30,
+      30,
+      30
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 10
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "cooling_fins",
+    "args": {
+     "at": [
+      50,
+      50,
+      50
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 10
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "sensor_pocket",
+    "args": {
+     "at": [
+      60,
+      60,
+      60
+     ],
+     "x_mm": 5,
+     "y_mm": 5,
+     "z_mm": 5
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "service_hatch",
+    "args": {
+     "at": [
+      70,
+      70,
+      70
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 10
+    },
+    "target": "p7"
+   },
+   {
+    "op": "chamfer",
+    "id": "battery_bay_shell_chamfer",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "battery_bay_shell_fillet",
+    "target": "p7",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "radius_mm": 3
+    }
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole_left",
+    "args": {
+     "at": [
+      -50,
+      0,
+      0
+     ],
+     "d_mm": 5
+    },
+    "target": "p7"
+   },
+   {
+    "op": "drill",
+    "id": "mounting_hole_right",
+    "args": {
+     "at": [
+      50,
+      0,
+      0
+     ],
+     "d_mm": 5
+    },
+    "target": "p7"
+   },
+   {
+    "op": "pocket",
+    "id": "cooling_fins_pocket",
+    "args": {
+     "at": [
+      50,
+      50,
+      50
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "depth_mm": 5
+    },
+    "target": "p7"
+   },
+   {
+    "op": "pattern_polar",
+    "id": "fastener_pattern",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "count": 4,
+     "radius_mm": 20,
+     "angle_deg": 90,
+     "op": {
+      "op": "box",
+      "args": {
+       "x_mm": 5,
+       "y_mm": 5,
+       "z_mm": 5
+      }
+     }
+    },
+    "target": "p7"
+   },
+   {
+    "op": "engrave",
+    "id": "label_engrave",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "text": "Battery Bay"
+    },
+    "target": "p7"
+   },
+   {
+    "op": "channel",
+    "id": "battery_cable_channel",
+    "args": {
+     "at": [
+      100,
+      0,
+      0
+     ],
+     "w_mm": 10,
+     "l_mm": 50,
+     "depth_mm": 5
+    },
+    "target": "p7"
+   },
+   {
+    "op": "mirror",
+    "id": "li_ion_pack_retention_strap_mirror",
+    "target": "p7",
+    "args": {
+     "axis": "X",
+     "at": [
+      0,
+      0,
+      0
+     ]
+    }
+   },
+   {
+    "op": "union",
+    "id": "battery_bay_with_retention_straps",
+    "targets": [
+     "battery_bay_shell",
+     "li_ion_pack_retention_strap_left",
+     "li_ion_pack_retention_strap_right"
+    ],
+    "target": "p7"
+   },
+   {
+    "op": "subtract",
+    "id": "battery_bay_with_holes",
+    "targets": [
+     "battery_bay_with_retention_straps",
+     "mounting_hole_left",
+     "mounting_hole_right"
+    ],
+    "target": "p7"
+   },
+   {
+    "op": "intersect",
+    "id": "battery_bay_with_pockets",
+    "targets": [
+     "battery_bay_with_holes",
+     "cooling_fins_pocket"
+    ],
+    "target": "p7"
+   },
+   {
+    "op": "loft",
+    "id": "battery_bay_with_channels",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "profiles": [
+      {
+       "points": [
+        [
+         0,
+         0
+        ],
+        [
+         100,
+         0
+        ],
+        [
+         100,
+         50
+        ],
+        [
+         0,
+         50
+        ]
+       ],
+       "closed": true
+      },
+      {
+       "points": [
+        [
+         0,
+         10
+        ],
+        [
+         100,
+         10
+        ],
+        [
+         100,
+         40
+        ],
+        [
+         0,
+         40
+        ]
+       ],
+       "closed": true
+      }
+     ]
+    },
+    "target": "p7"
+   },
+   {
+    "op": "box",
+    "id": "payload_bay",
+    "args": {
+     "at": [
+      40,
+      30,
+      25
+     ],
+     "size": [
+      80,
+      60,
+      50
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "box",
+    "id": "sensor_insert",
+    "args": {
+     "at": [
+      40,
+      30,
+      25
+     ],
+     "size": [
+      70,
+      50,
+      40
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "box",
+    "id": "service_window",
+    "args": {
+     "at": [
+      65,
+      40,
+      25
+     ],
+     "size": [
+      30,
+      20,
+      10
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "box",
+    "id": "bay_attachment_flange",
+    "args": {
+     "at": [
+      75,
+      40,
+      20
+     ],
+     "size": [
+      100,
+      50,
+      10
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "box",
+    "id": "power_connector",
+    "args": {
+     "at": [
+      60,
+      30,
+      25
+     ],
+     "size": [
+      10,
+      10,
+      10
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "box",
+    "id": "thermal_dissipation_fins",
+    "args": {
+     "at": [
+      50,
+      35,
+      25
+     ],
+     "size": [
+      5,
+      5,
+      20
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "box",
+    "id": "sensor_mounting_pattern",
+    "args": {
+     "at": [
+      40,
+      30,
+      25
+     ],
+     "size": [
+      10,
+      10,
+      10
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "box",
+    "id": "strain_relieved_cable_exit",
+    "args": {
+     "at": [
+      60,
+      35,
+      25
+     ],
+     "size": [
+      5,
+      5,
+      10
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "box",
+    "id": "access_pocket_for_sensors",
+    "args": {
+     "at": [
+      55,
+      35,
+      25
+     ],
+     "size": [
+      20,
+      10,
+      5
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "chamfer",
+    "id": "bay_chamfer",
+    "target": "p8",
+    "args": {
+     "radius_mm": 2,
+     "edges": [
+      "top",
+      "bottom"
+     ]
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "flange_chamfer",
+    "target": "p8",
+    "args": {
+     "radius_mm": 2,
+     "edges": [
+      "top",
+      "bottom"
+     ]
+    }
+   },
+   {
+    "op": "drill",
+    "id": "sensor_drill",
+    "target": "p8",
+    "args": {
+     "at": [
+      40,
+      30,
+      25
+     ],
+     "d_mm": 5
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "sensor_pocket",
+    "args": {
+     "at": [
+      40,
+      30,
+      25
+     ],
+     "size": [
+      10,
+      10,
+      5
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "pattern_polar",
+    "id": "fastener_pattern",
+    "args": {
+     "at": [
+      75,
+      40,
+      20
+     ],
+     "count": 8,
+     "radius_mm": 10,
+     "d_mm": 5
+    },
+    "target": "p8"
+   },
+   {
+    "op": "engrave",
+    "id": "label_engrave",
+    "args": {
+     "at": [
+      65,
+      40,
+      25
+     ],
+     "text": "Service Window"
+    },
+    "target": "p8"
+   },
+   {
+    "op": "channel",
+    "id": "cable_channel",
+    "args": {
+     "at": [
+      60,
+      35,
+      25
+     ],
+     "size": [
+      5,
+      5,
+      10
+     ]
+    },
+    "target": "p8"
+   },
+   {
+    "op": "mirror",
+    "id": "mirror_symmetry",
+    "target": "p8",
+    "args": {
+     "axis": "Y"
+    }
+   },
+   {
+    "op": "union",
+    "id": "bay_union",
+    "targets": [
+     "payload_bay",
+     "sensor_insert"
+    ],
+    "target": "p8"
+   },
+   {
+    "op": "subtract",
+    "id": "window_cut",
+    "target": "p8",
+    "args": {
+     "at": [
+      65,
+      40,
+      25
+     ],
+     "size": [
+      30,
+      20,
+      10
+     ]
+    }
+   },
+   {
+    "op": "intersect",
+    "id": "bay_intersect",
+    "targets": [
+     "payload_bay",
+     "bay_attachment_flange"
+    ],
+    "target": "p8"
+   },
+   {
+    "op": "fillet",
+    "id": "bay_fillet",
+    "target": "p8",
+    "args": {
+     "radius_mm": 2,
+     "edges": [
+      "top",
+      "bottom"
+     ]
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "flange_fillet",
+    "target": "p8",
+    "args": {
+     "radius_mm": 2,
+     "edges": [
+      "top",
+      "bottom"
+     ]
+    }
+   },
+   {
+    "op": "box",
+    "id": "main_body",
+    "args": {
+     "at": [
+      0,
+      0,
+      0
+     ],
+     "x_mm": 150,
+     "y_mm": 150,
+     "z_mm": 50
+    },
+    "target": "p9"
+   },
+   {
+    "op": "cylinder",
+    "id": "interface_datum",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      25
+     ],
+     "radius_mm": 5,
+     "h_mm": 2
+    }
+   },
+   {
+    "op": "box",
+    "id": "harness_channel",
+    "target": "p9",
+    "args": {
+     "at": [
+      50,
+      0,
+      25
+     ],
+     "x_mm": 2,
+     "y_mm": 150,
+     "z_mm": 50
+    }
+   },
+   {
+    "op": "box",
+    "id": "service_hatch",
+    "target": "p9",
+    "args": {
+     "at": [
+      100,
+      0,
+      25
+     ],
+     "x_mm": 100,
+     "y_mm": 100,
+     "z_mm": 20
+    }
+   },
+   {
+    "op": "box",
+    "id": "slack_loop",
+    "target": "p9",
+    "args": {
+     "at": [
+      50,
+      50,
+      25
+     ],
+     "x_mm": 5,
+     "y_mm": 5,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "box",
+    "id": "inspection_window",
+    "target": "p9",
+    "args": {
+     "at": [
+      75,
+      75,
+      25
+     ],
+     "x_mm": 50,
+     "y_mm": 50,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "pattern_polar",
+    "id": "fastener_pattern",
+    "target": "p9",
+    "args": {
+     "at": [
+      75,
+      75,
+      25
+     ],
+     "count": 4,
+     "radius_mm": 25,
+     "hole_d_mm": 4
+    }
+   },
+   {
+    "op": "box",
+    "id": "rib_stiffener",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      75,
+      25
+     ],
+     "x_mm": 150,
+     "y_mm": 10,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "box",
+    "id": "sensor_pocket",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      40
+     ],
+     "x_mm": 50,
+     "y_mm": 50,
+     "z_mm": 10
+    }
+   },
+   {
+    "op": "box",
+    "id": "seal_gasket",
+    "target": "p9",
+    "args": {
+     "at": [
+      50,
+      50,
+      10
+     ],
+     "x_mm": 10,
+     "y_mm": 10,
+     "z_mm": 2
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_main_body",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      25
+     ],
+     "radius_mm": 5
+    }
+   },
+   {
+    "op": "fillet",
+    "id": "fillet_harness_channel",
+    "target": "p9",
+    "args": {
+     "at": [
+      50,
+      0,
+      25
+     ],
+     "radius_mm": 2
+    }
+   },
+   {
+    "op": "drill",
+    "id": "drill_fastener_pattern",
+    "target": "p9",
+    "args": {
+     "at": [
+      75,
+      75,
+      25
+     ],
+     "d_mm": 4
+    }
+   },
+   {
+    "op": "pocket",
+    "id": "pocket_sensor_pocket",
+    "target": "p9",
+    "args": {
+     "at": [
+      25,
+      25,
+      40
+     ],
+     "x_mm": 25,
+     "y_mm": 25,
+     "z_mm": 5
+    }
+   },
+   {
+    "op": "channel",
+    "id": "channel_inspection_window",
+    "target": "p9",
+    "args": {
+     "at": [
+      75,
+      75,
+      25
+     ],
+     "x_mm": 50,
+     "y_mm": 50,
+     "depth_mm": 5
+    }
+   },
+   {
+    "op": "mirror",
+    "id": "mirror_rib_stiffener",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      75,
+      25
+     ],
+     "axis": "Y"
+    }
+   },
+   {
+    "op": "union",
+    "id": "union_fastener_pattern",
+    "targets": [
+     "main_body",
+     "fastener_pattern"
+    ],
+    "args": {},
+    "target": "p9"
+   },
+   {
+    "op": "subtract",
+    "id": "subtract_seal_gasket",
+    "targets": [
+     "service_hatch",
+     "seal_gasket"
+    ],
+    "args": {},
+    "target": "p9"
+   },
+   {
+    "op": "intersect",
+    "id": "intersect_rib_stiffener",
+    "targets": [
+     "main_body",
+     "rib_stiffener"
+    ],
+    "args": {},
+    "target": "p9"
+   },
+   {
+    "op": "label",
+    "id": "label_interface_datum",
+    "target": "p9",
+    "args": {
+     "at": [
+      0,
+      0,
+      25
+     ],
+     "text": "Interface Datum"
+    }
+   },
+   {
+    "op": "engrave",
+    "id": "engrave_service_hatch",
+    "target": "p9",
+    "args": {
+     "at": [
+      50,
+      50,
+      10
+     ],
+     "text": "Service Hatch"
+    }
+   },
+   {
+    "op": "boss",
+    "id": "boss_fastener_pattern",
+    "target": "p9",
+    "args": {
+     "at": [
+      75,
+      75,
+      25
+     ],
+     "d_mm": 4,
+     "h_mm": 5
+    }
+   },
+   {
+    "op": "chamfer",
+    "id": "chamfer_service_hatch",
+    "target": "p9",
+    "args": {
+     "at": [
+      100,
+      0,
+      25
+     ],
+     "radius_mm": 5
+    }
+   }
+  ]
+ },
+ "generated_parts": [
+  {
+   "id": "p1",
+   "label": "Center Fuselage Spine",
+   "spec": "CFRP box beam center fuselage, avionics bay, wing spar socket, front GPS boom mount, belly camera window",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-18T18:45:53Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "Center_Fuselage_Spine",
+    "brief": {
+     "requirements": [
+      "CFRP box beam center fuselage",
+      "Avionics bay",
+      "Wing spar socket",
+      "Front GPS boom mount",
+      "Belly camera window"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM + CNC",
+      "envelope_mm": [
+       1000,
+       500,
+       400
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Center_Fuselage_Spine",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Fuselage_Spine",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Wing_Spar_Socket",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "V_Tail_Flange",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Gear_Mount",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Avionics_Bay",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "GPS_Boom_Mount",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "Camera_Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "Cooling_Channel",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "Access_Panel",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "fuselage_spine",
+      "target": null,
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "size": [
+        100,
+        50,
+        200
+       ],
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "box",
+      "id": "spar_socket",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "size": [
+        50,
+        50,
+        50
+       ],
+       "material": "Al"
+      }
+     },
+     {
+      "op": "box",
+      "id": "v_tail_flange",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        100
+       ],
+       "size": [
+        75,
+        75,
+        25
+       ],
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "box",
+      "id": "gear_mount",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        200
+       ],
+       "size": [
+        60,
+        60,
+        30
+       ],
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "box",
+      "id": "avionics_bay",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        150
+       ],
+       "size": [
+        80,
+        80,
+        40
+       ],
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "box",
+      "id": "gps_boom_mount",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        250
+       ],
+       "size": [
+        40,
+        40,
+        40
+       ],
+       "material": "TPU"
+      }
+     },
+     {
+      "op": "box",
+      "id": "camera_window",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        300
+       ],
+       "size": [
+        60,
+        60,
+        10
+       ],
+       "material": "TPU"
+      }
+     },
+     {
+      "op": "box",
+      "id": "cooling_channel",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        180
+       ],
+       "size": [
+        20,
+        20,
+        20
+       ],
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "box",
+      "id": "access_panel",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        220
+       ],
+       "size": [
+        70,
+        70,
+        10
+       ],
+       "material": "TPU"
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "spar_socket_chamfer",
+      "target": "spar_socket",
+      "args": {
+       "radius_mm": 5,
+       "edges": [
+        "top",
+        "bottom"
+       ],
+       "material": "Al"
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "v_tail_flange_fillet",
+      "target": "v_tail_flange",
+      "args": {
+       "radius_mm": 10,
+       "edges": [
+        "all"
+       ],
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "drill",
+      "id": "gear_mount_drill",
+      "target": "gear_mount",
+      "args": {
+       "at": [
+        0,
+        0,
+        200
+       ],
+       "d_mm": 5,
+       "count": 4,
+       "spacing_mm": 20,
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "avionics_bay_pocket",
+      "target": "avionics_bay",
+      "args": {
+       "at": [
+        0,
+        0,
+        150
+       ],
+       "size": [
+        60,
+        60,
+        20
+       ],
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cooling_channel_engrave",
+      "target": "cooling_channel",
+      "args": {
+       "at": [
+        0,
+        0,
+        180
+       ],
+       "size": [
+        15,
+        15,
+        15
+       ],
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "access_panel_pattern",
+      "target": "access_panel",
+      "args": {
+       "at": [
+        0,
+        0,
+        220
+       ],
+       "radius_mm": 30,
+       "count": 6,
+       "spacing_deg": 60,
+       "material": "TPU"
+      }
+     },
+     {
+      "op": "label",
+      "id": "assembly_label",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        250
+       ],
+       "text": "Assembly Label",
+       "material": "TPU"
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "mirrored_access_panel",
+      "target": "access_panel",
+      "args": {
+       "axis": "Y",
+       "material": "TPU"
+      }
+     },
+     {
+      "op": "union",
+      "id": "combined_parts",
+      "target": [
+       "fuselage_spine",
+       "spar_socket",
+       "v_tail_flange",
+       "gear_mount",
+       "avionics_bay",
+       "gps_boom_mount",
+       "camera_window",
+       "cooling_channel",
+       "access_panel"
+      ],
+      "args": {}
+     },
+     {
+      "op": "subtract",
+      "id": "cooling_channel_subtract",
+      "target": "fuselage_spine",
+      "args": {
+       "from": "cooling_channel",
+       "material": "CFRP"
+      }
+     },
+     {
+      "op": "intersect",
+      "id": "gear_mount_intersect",
+      "target": [
+       "gear_mount",
+       "access_panel"
+      ],
+      "args": {}
+     },
+     {
+      "op": "boss",
+      "id": "gps_boom_boss",
+      "target": "gps_boom_mount",
+      "args": {
+       "at": [
+        0,
+        0,
+        250
+       ],
+       "size": [
+        30,
+        30,
+        30
+       ],
+       "material": "TPU"
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "camera_window_chamfer",
+      "target": "camera_window",
+      "args": {
+       "radius_mm": 3,
+       "edges": [
+        "all"
+       ],
+       "material": "TPU"
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Center_Fuselage_Spine",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      100,
+      50,
+      300
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "fuselage_spine_size": [
+       100,
+       50,
+       200
+      ],
+      "spar_socket_size": [
+       50,
+       50,
+       50
+      ],
+      "v_tail_flange_size": [
+       75,
+       75,
+       25
+      ],
+      "gear_mount_size": [
+       60,
+       60,
+       30
+      ],
+      "avionics_bay_size": [
+       80,
+       80,
+       40
+      ],
+      "gps_boom_mount_size": [
+       40,
+       40,
+       40
+      ],
+      "camera_window_size": [
+       60,
+       60,
+       10
+      ],
+      "cooling_channel_size": [
+       20,
+       20,
+       20
+      ],
+      "access_panel_size": [
+       70,
+       70,
+       10
+      ]
+     },
+     "wall_thickness_mm": {
+      "min": 1,
+      "typ": 2
+     },
+     "tolerances_mm": {
+      "fit": "±0.5mm"
+     },
+     "mass_est_g": 1500
+    },
+    "verify": [
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": 1500,
+      "rule": "cad_brief.mass_est_g must be a numeric grams value"
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "All required evidence_features present in part_tree/geometry_ops",
+      "rule": "Each required evidence_feature must appear in part_tree/geometry_ops"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "All interfaces have reciprocal connection_type, DOF, clearance_mm, and required_feature",
+      "rule": "Interfaces must have reciprocal connection_type, DOF, clearance_mm, and required_feature"
+     },
+     {
+      "check": "joint_evidence",
+      "result": "pass",
+      "value": "Visible insert/washer/locking/preload evidence for critical joints",
+      "rule": "Critical joints need visible insert/washer/locking/preload evidence"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential thermal stress on avionics bay due to heat dissipation challenges",
+      "mit": "Implement enhanced cooling solutions such as additional fans or improved heat sink designs",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Risk of insufficient structural integrity around spar socket under heavy loads",
+      "mit": "Conduct finite element analysis (FEA) to ensure adequate strength and reinforce if necessary",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Limited service access may hinder maintenance operations",
+      "mit": "Review and optimize access panel design for easier maintenance access",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "min",
+     "orientation": "+Z",
+     "est_time": "2h30m",
+     "walls": 3,
+     "infill": "gyroid 20%"
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/center_fuselage_spine.stl",
+     "output": "output/center_fuselage_spine.gcode",
+     "args": [
+      "--load",
+      "profile.ini",
+      "--export-gcode"
+     ],
+     "profile": "CFRP + Al + TPU_standard.ini"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "center_fuselage_spine",
+     "subsystem_role": "CFRP box beam center fuselage, avionics bay, wing spar socket, front GPS boom mount, belly camera window",
+     "physics_paths": [
+      {
+       "type": "load",
+       "path": "Nacelle loads -> Wing spar socket -> Fuselage spine -> Landing gear mounts"
+      },
+      {
+       "type": "flow",
+       "path": "Avionics cooling airflow -> Avionics bay -> Fuselage spine ventilation channels"
+      },
+      {
+       "type": "thermal",
+       "path": "Heat from avionics -> Heat sinks -> Fuselage spine -> Radiated to ambient"
+      },
+      {
+       "type": "motion",
+       "path": "Wing spar movement -> Wing spar socket -> Fuselage spine"
+      },
+      {
+       "type": "pressure",
+       "path": "Internal pressure -> Fuselage spine -> External atmosphere"
+      },
+      {
+       "type": "electrical/data",
+       "path": "Electrical harnesses -> Harness passthroughs -> Avionics bay"
+      },
+      {
+       "type": "human/service",
+       "path": "Service access panels -> Avionics bay maintenance"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "wing_spar",
+       "interface_type": "spar_socket",
+       "connection_type": "bolted",
+       "dof": "translational",
+       "clearance_mm": 0.2,
+       "assembly_order_hint": "A1",
+       "required_feature": "socket_mount",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "v_tail",
+       "interface_type": "v_tail_attach",
+       "connection_type": "snap_fit",
+       "dof": "rotational",
+       "clearance_mm": 0.5,
+       "assembly_order_hint": "A2",
+       "required_feature": "v_tail_flange",
+       "coordinate_region": [
+        0,
+        0,
+        100
+       ]
+      },
+      {
+       "target_part": "landing_gear",
+       "interface_type": "landing_gear_mount",
+       "connection_type": "band_clamp",
+       "dof": "translational",
+       "clearance_mm": 0.3,
+       "assembly_order_hint": "A3",
+       "required_feature": "gear_mount",
+       "coordinate_region": [
+        0,
+        0,
+        200
+       ]
+      }
+     ],
+     "internal_features": [
+      "fuselage_spine",
+      "spar_socket",
+      "v_tail_flange",
+      "gear_mount",
+      "avionics_bay",
+      "gps_boom_mount",
+      "camera_window",
+      "cooling_channel",
+      "access_panel"
+     ],
+     "internal_feature_targets": [
+      {
+       "feature_name": "fuselage_spine",
+       "args": {
+        "at": [
+         0,
+         0,
+         0
+        ],
+        "size": [
+         100,
+         50,
+         200
+        ]
+       }
+      },
+      {
+       "feature_name": "spar_socket",
+       "args": {
+        "at": [
+         0,
+         0,
+         0
+        ],
+        "size": [
+         50,
+         50,
+         50
+        ]
+       }
+      },
+      {
+       "feature_name": "v_tail_flange",
+       "args": {
+        "at": [
+         0,
+         0,
+         100
+        ],
+        "size": [
+         75,
+         75,
+         25
+        ]
+       }
+      },
+      {
+       "feature_name": "gear_mount",
+       "args": {
+        "at": [
+         0,
+         0,
+         200
+        ],
+        "size": [
+         60,
+         60,
+         30
+        ]
+       }
+      },
+      {
+       "feature_name": "avionics_bay",
+       "args": {
+        "at": [
+         0,
+         0,
+         150
+        ],
+        "size": [
+         80,
+         80,
+         40
+        ]
+       }
+      },
+      {
+       "feature_name": "gps_boom_mount",
+       "args": {
+        "at": [
+         0,
+         0,
+         250
+        ],
+        "size": [
+         40,
+         40,
+         40
+        ]
+       }
+      },
+      {
+       "feature_name": "camera_window",
+       "args": {
+        "at": [
+         0,
+         0,
+         300
+        ],
+        "size": [
+         60,
+         60,
+         10
+        ]
+       }
+      },
+      {
+       "feature_name": "cooling_channel",
+       "args": {
+        "at": [
+         0,
+         0,
+         180
+        ],
+        "size": [
+         20,
+         20,
+         20
+        ]
+       }
+      },
+      {
+       "feature_name": "access_panel",
+       "args": {
+        "at": [
+         0,
+         0,
+         220
+        ],
+        "size": [
+         70,
+         70,
+         10
+        ]
+       }
+      }
+     ],
+     "integration_opportunities": [
+      "Optimize cooling channel layout for better airflow",
+      "Enhance structural integrity around spar socket",
+      "Improve access panel ergonomics"
+     ],
+     "manufacturing_strategy": {
+      "process": "FDM + CNC",
+      "datum": "Primary locating faces, rail guides, axis rings",
+      "tolerance": "±0.5mm for critical interfaces",
+      "support": "Support structures for FDM overhangs",
+      "inspection": "Visual inspection for alignment and fit"
+     },
+     "verification_focus": [
+      "Mass estimation: 1500g ±10%",
+      "Structural integrity tests",
+      "Thermal management performance",
+      "Service access ease"
+     ]
+    }
+   }
+  },
+  {
+   "id": "p2",
+   "label": "Main Wing (2-piece)",
+   "spec": "Straight wing, 4S NACA 2412, dual 15mm CFRP spar, 900mm half-span, 160mm chord, 3-layer CFRP skin",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-04T14:00:00Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "Main_Wing_2_piece",
+    "brief": {
+     "requirements": [
+      "Straight wing, 4S NACA 2412, dual 15mm CFRP spar, 900mm half-span, 160mm chord, 3-layer CFRP skin",
+      "Fixed-wing VTOL with 2 tilting rotor nacelles, BVLOS long-range capable",
+      "Discipline: Structures - Role: Wing spar carrying nacelle loads into fuselage spine; V-tail/ruddervator and landing gear attach structure",
+      "Evidence features: wing_spar, spar_socket, fuselage_spine, v_tail, ruddervator, stabilizer, landing_gear_mount, gear_leg"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM",
+      "envelope_mm": [
+       1800,
+       320,
+       150
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Main_Wing_2_piece",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Wing_Spar",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Spar_Socket",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Fuselage_Spine",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "V_Tail",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Ruddervator",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Stabilizer",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "Landing_Gear_Mount",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "Gear_Leg",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "Service_Access_Cover",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "wing_spar",
+      "args": {
+       "at": [
+        75,
+        0,
+        0
+       ],
+       "radius_mm": 7.5,
+       "h_mm": 150
+      }
+     },
+     {
+      "op": "box",
+      "id": "spar_socket",
+      "args": {
+       "at": [
+        75,
+        0,
+        10
+       ],
+       "w_mm": 20,
+       "l_mm": 15,
+       "h_mm": 15
+      }
+     },
+     {
+      "op": "box",
+      "id": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "w_mm": 10,
+       "l_mm": 10,
+       "h_mm": 100
+      }
+     },
+     {
+      "op": "box",
+      "id": "v_tail",
+      "args": {
+       "at": [
+        150,
+        0,
+        0
+       ],
+       "w_mm": 50,
+       "l_mm": 10,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "ruddervator",
+      "args": {
+       "at": [
+        100,
+        0,
+        0
+       ],
+       "w_mm": 60,
+       "l_mm": 10,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "stabilizer",
+      "args": {
+       "at": [
+        120,
+        0,
+        0
+       ],
+       "w_mm": 40,
+       "l_mm": 10,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "landing_gear_mount",
+      "args": {
+       "at": [
+        0,
+        80,
+        0
+       ],
+       "w_mm": 20,
+       "l_mm": 20,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "box",
+      "id": "gear_leg",
+      "args": {
+       "at": [
+        0,
+        100,
+        0
+       ],
+       "w_mm": 30,
+       "l_mm": 10,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "service_access_cover",
+      "args": {
+       "at": [
+        0,
+        0,
+        10
+       ],
+       "w_mm": 100,
+       "l_mm": 100,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "spar_socket_chamfer",
+      "target": "spar_socket",
+      "args": {
+       "at": [
+        75,
+        0,
+        10
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "drill",
+      "id": "fastener_hole",
+      "args": {
+       "at": [
+        0,
+        0,
+        50
+       ],
+       "d_mm": 4
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "motor_service_port",
+      "args": {
+       "at": [
+        0,
+        0,
+        20
+       ],
+       "w_mm": 20,
+       "l_mm": 20,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "fastener_pattern",
+      "args": {
+       "at": [
+        0,
+        0,
+        50
+       ],
+       "count": 4,
+       "radius_mm": 10,
+       "d_mm": 4
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "wing_spar_fillet",
+      "target": "wing_spar",
+      "args": {
+       "at": [
+        75,
+        0,
+        0
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "mirror_wing",
+      "target": "wing_spar",
+      "args": {
+       "at": [
+        75,
+        0,
+        0
+       ],
+       "axis": "X"
+      }
+     },
+     {
+      "op": "label",
+      "id": "wing_label",
+      "args": {
+       "at": [
+        75,
+        0,
+        150
+       ],
+       "text": "Main_Wing_2_piece"
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cooling_channel",
+      "args": {
+       "at": [
+        75,
+        0,
+        75
+       ],
+       "w_mm": 10,
+       "l_mm": 140,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "boss",
+      "id": "bearing_seat",
+      "args": {
+       "at": [
+        100,
+        0,
+        0
+       ],
+       "d_mm": 10,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "gear_leg_cutout",
+      "target": "fuselage_spine",
+      "args": {
+       "at": [
+        0,
+        100,
+        0
+       ],
+       "w_mm": 30,
+       "l_mm": 10,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "gear_leg_chamfer",
+      "target": "gear_leg",
+      "args": {
+       "at": [
+        0,
+        100,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "inspection_callout",
+      "args": {
+       "at": [
+        0,
+        0,
+        10
+       ],
+       "text": "Inspection Required"
+      }
+     },
+     {
+      "op": "union",
+      "id": "wing_assembly",
+      "targets": [
+       "wing_spar",
+       "spar_socket",
+       "fuselage_spine",
+       "v_tail",
+       "ruddervator",
+       "stabilizer",
+       "landing_gear_mount",
+       "gear_leg",
+       "service_access_cover"
+      ]
+     },
+     {
+      "op": "intersect",
+      "id": "wing_intersection",
+      "targets": [
+       "wing_assembly",
+       "cooling_channel"
+      ]
+     }
+    ],
+    "cad_brief": {
+     "name": "Main_Wing_2_piece",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      150,
+      100,
+      150
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "span": 900,
+      "chord": 160,
+      "spar_diameter": 15
+     },
+     "wall_thickness_mm": {
+      "min": 1,
+      "typ": 2
+     },
+     "tolerances_mm": {
+      "fit": 0.2
+     },
+     "mass_est_g": 2500
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required fields are present.",
+      "rule": "Ensure all specified fields in the schema are included."
+     },
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": 2500,
+      "rule": "The estimated mass must fall within the acceptable range."
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "All features are mapped to geometry operations.",
+      "rule": "Each feature in the part_tree must correspond to a geometry operation."
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "Interfaces are reciprocal with neighboring subsystems.",
+      "rule": "Interfaces should be clearly defined and reciprocal between subsystems."
+     },
+     {
+      "check": "joint_evidence",
+      "result": "pass",
+      "value": "Critical joints have visible locking/preload evidence.",
+      "rule": "Visible evidence of locking or preload mechanisms must be present for critical joints."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential misalignment during assembly due to loose tolerances.",
+      "mit": "Implement tighter manufacturing tolerances.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Risk of structural failure if spar loading exceeds design limits.",
+      "mit": "Conduct thorough stress analysis and testing.",
+      "severity": "med"
+     },
+     {
+      "id": "R03",
+      "desc": "Possibility of thermal expansion issues affecting service access.",
+      "mit": "Include thermal expansion considerations in design.",
+      "severity": "low"
+     },
+     {
+      "id": "R04",
+      "desc": "Risk of improper fit leading to wear over time.",
+      "mit": "Ensure all fits are properly dimensioned and tested.",
+      "severity": "low"
+     },
+     {
+      "id": "R05",
+      "desc": "Potential for corrosion at exposed fastener sites.",
+      "mit": "Apply appropriate protective coatings to fasteners.",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "min",
+     "orientation": "+Z",
+     "est_time": "2h30m",
+     "material": "CFRP + Al + TPU",
+     "layer_mm": 0.2
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/main_wing_2_piece.stl",
+     "output": "output/main_wing_2_piece.gcode",
+     "args": [
+      "--load",
+      "profile.ini",
+      "--export-gcode"
+     ],
+     "profile": "CFRP + Al + TPU_standard.ini"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "Main_Wing_2_piece",
+     "subsystem_role": "Wing spar carrying nacelle loads into fuselage spine; V-tail/ruddervator and landing gear attach structure",
+     "physics_paths": [
+      {
+       "path_type": "load",
+       "source": "Nacelle_Load",
+       "target": "Wing_Spar",
+       "description": "Load transfer from nacelle to wing spar."
+      },
+      {
+       "path_type": "flow",
+       "source": "Service_Access_Cover",
+       "target": "Motor_Service_Port",
+       "description": "Access for motor servicing."
+      },
+      {
+       "path_type": "thermal",
+       "source": "Sun_Exposure",
+       "target": "Thermal_Dissipation_Fins",
+       "description": "Heat dissipation from sun exposure."
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Fuselage_Spine",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": "translation",
+       "clearance_mm": 0.2,
+       "assembly_order_hint": "first",
+       "required_feature": "fuselage_spine",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "V_Tail",
+       "interface_type": "structural",
+       "connection_type": "snap_fit",
+       "dof": "rotation",
+       "clearance_mm": 0.5,
+       "assembly_order_hint": "second",
+       "required_feature": "v_tail",
+       "coordinate_region": [
+        150,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "Landing_Gear",
+       "interface_type": "structural",
+       "connection_type": "harness_passthrough",
+       "dof": "translation",
+       "clearance_mm": 1.0,
+       "assembly_order_hint": "third",
+       "required_feature": "landing_gear_mount",
+       "coordinate_region": [
+        0,
+        80,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "wing_spar",
+      "spar_socket",
+      "fuselage_spine",
+      "v_tail",
+      "ruddervator",
+      "stabilizer",
+      "landing_gear_mount",
+      "gear_leg",
+      "service_access_cover"
+     ],
+     "internal_feature_targets": [
+      {
+       "feature_name": "wing_spar",
+       "args": {
+        "at": [
+         75,
+         0,
+         0
+        ],
+        "size": [
+         150,
+         15,
+         15
+        ]
+       }
+      },
+      {
+       "feature_name": "spar_socket",
+       "args": {
+        "at": [
+         75,
+         0,
+         10
+        ],
+        "size": [
+         20,
+         15,
+         15
+        ]
+       }
+      },
+      {
+       "feature_name": "fuselage_spine",
+       "args": {
+        "at": [
+         0,
+         0,
+         0
+        ],
+        "size": [
+         10,
+         10,
+         100
+        ]
+       }
+      },
+      {
+       "feature_name": "v_tail",
+       "args": {
+        "at": [
+         150,
+         0,
+         0
+        ],
+        "size": [
+         50,
+         10,
+         10
+        ]
+       }
+      },
+      {
+       "feature_name": "ruddervator",
+       "args": {
+        "at": [
+         100,
+         0,
+         0
+        ],
+        "size": [
+         60,
+         10,
+         10
+        ]
+       }
+      },
+      {
+       "feature_name": "stabilizer",
+       "args": {
+        "at": [
+         120,
+         0,
+         0
+        ],
+        "size": [
+         40,
+         10,
+         10
+        ]
+       }
+      },
+      {
+       "feature_name": "landing_gear_mount",
+       "args": {
+        "at": [
+         0,
+         80,
+         0
+        ],
+        "size": [
+         20,
+         20,
+         20
+        ]
+       }
+      },
+      {
+       "feature_name": "gear_leg",
+       "args": {
+        "at": [
+         0,
+         100,
+         0
+        ],
+        "size": [
+         30,
+         10,
+         10
+        ]
+       }
+      },
+      {
+       "feature_name": "service_access_cover",
+       "args": {
+        "at": [
+         0,
+         0,
+         10
+        ],
+        "size": [
+         100,
+         100,
+         10
+        ]
+       }
+      }
+     ],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "CNC",
+      "datum": "Primary locating faces",
+      "tolerance": "±0.1mm",
+      "support": "Horizontal orientation",
+      "inspection": "Visual and tactile inspection"
+     },
+     "verification_focus": [
+      {
+       "focus_type": "mass",
+       "value": 2500,
+       "unit": "g",
+       "description": "Mass estimation and validation."
+      },
+      {
+       "focus_type": "fit_clearance",
+       "value": 0.2,
+       "unit": "mm",
+       "description": "Clearance fit for sliding interfaces."
+      },
+      {
+       "focus_type": "structural_integrity",
+       "value": "Pass",
+       "unit": "",
+       "description": "Structural integrity testing."
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "p3",
+   "label": "Nacelle Assembly x 2",
+   "spec": "Tilting nacelle assembly, 0-90deg tilt axis, 6309 bearing set, servo-driven worm gear, motor and ESC pocket",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-18T18:45:40Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "Nacelle_Assembly_x2",
+    "brief": {
+     "requirements": [
+      "Tilting nacelle assembly, 0-90deg tilt axis, 6309 bearing set, servo-driven worm gear, motor and ESC pocket",
+      "Fixed-wing VTOL with 2 tilting rotor nacelles, BVLOS long-range capable",
+      "CFRP + Al + TPU, process: FDM + CNC"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM",
+      "envelope_mm": [
+       500,
+       500,
+       500
+      ],
+      "min_wall_mm": 1,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Nacelle_Assembly",
+     "qty": 2,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Main_body_shell",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Bearing_seat",
+       "qty": 2,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Servo_linkage",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Clearance_arc",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Motor_pocket",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Esc_pocket",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "Heat_sink",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "Access_cover",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "Wiring_channel",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "op_main_body_shell",
+      "target": "Main_body_shell",
+      "args": {
+       "radius_mm": 50,
+       "h_mm": 100,
+       "at": [
+        0,
+        0,
+        50
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "op_bearing_seat",
+      "target": "Bearing_seat",
+      "args": {
+       "x_mm": 20,
+       "y_mm": 20,
+       "z_mm": 10,
+       "at": [
+        0,
+        0,
+        70
+       ]
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "op_servo_linkage",
+      "target": "Servo_linkage",
+      "args": {
+       "w_mm": 5,
+       "l_mm": 30,
+       "h_mm": 5,
+       "at": [
+        -20,
+        0,
+        80
+       ]
+      }
+     },
+     {
+      "op": "loft",
+      "id": "op_clearance_arc",
+      "target": "Clearance_arc",
+      "args": {
+       "profile_1": [
+        [
+         -10,
+         0
+        ],
+        [
+         10,
+         0
+        ]
+       ],
+       "profile_2": [
+        [
+         -10,
+         10
+        ],
+        [
+         10,
+         10
+        ]
+       ],
+       "at": [
+        0,
+        0,
+        90
+       ]
+      }
+     },
+     {
+      "op": "boss",
+      "id": "op_motor_pocket",
+      "target": "Motor_pocket",
+      "args": {
+       "x_mm": 30,
+       "y_mm": 30,
+       "z_mm": 20,
+       "at": [
+        0,
+        0,
+        20
+       ]
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "op_esc_pocket",
+      "target": "Esc_pocket",
+      "args": {
+       "x_mm": 25,
+       "y_mm": 25,
+       "z_mm": 15,
+       "at": [
+        0,
+        0,
+        40
+       ]
+      }
+     },
+     {
+      "op": "channel",
+      "id": "op_heat_sink",
+      "target": "Heat_sink",
+      "args": {
+       "w_mm": 10,
+       "l_mm": 50,
+       "h_mm": 5,
+       "at": [
+        0,
+        0,
+        60
+       ]
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "op_access_cover",
+      "target": "Access_cover",
+      "args": {
+       "count": 4,
+       "radius_mm": 15,
+       "angle_deg": 90,
+       "at": [
+        0,
+        0,
+        85
+       ]
+      }
+     },
+     {
+      "op": "drill",
+      "id": "op_wiring_channel",
+      "target": "Wiring_channel",
+      "args": {
+       "d_mm": 5,
+       "at": [
+        0,
+        0,
+        100
+       ]
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "op_chamfer_motor_pocket",
+      "target": "Motor_pocket",
+      "args": {
+       "radius_mm": 2,
+       "at": [
+        0,
+        0,
+        20
+       ]
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "op_fillet_esc_pocket",
+      "target": "Esc_pocket",
+      "args": {
+       "radius_mm": 3,
+       "at": [
+        0,
+        0,
+        40
+       ]
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "op_mirror_heat_sink",
+      "target": "Heat_sink",
+      "args": {
+       "plane": "XY",
+       "at": [
+        0,
+        0,
+        60
+       ]
+      }
+     },
+     {
+      "op": "union",
+      "id": "op_union_main_body_shell",
+      "target": "Main_body_shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        50
+       ]
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "op_subtract_bearing_seat",
+      "target": "Bearing_seat",
+      "args": {
+       "at": [
+        0,
+        0,
+        70
+       ]
+      }
+     },
+     {
+      "op": "intersect",
+      "id": "op_intersect_clearance_arc",
+      "target": "Clearance_arc",
+      "args": {
+       "at": [
+        0,
+        0,
+        90
+       ]
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "op_pattern_linear_wiring_channel",
+      "target": "Wiring_channel",
+      "args": {
+       "count": 3,
+       "w_mm": 10,
+       "l_mm": 50,
+       "h_mm": 5,
+       "at": [
+        0,
+        0,
+        100
+       ]
+      }
+     },
+     {
+      "op": "label",
+      "id": "op_label_nacelle_assembly",
+      "target": "Nacelle_Assembly_x2",
+      "args": {
+       "text": "Nacelle Assembly",
+       "at": [
+        0,
+        0,
+        110
+       ]
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "op_engrave_serial_number",
+      "target": "Nacelle_Assembly_x2",
+      "args": {
+       "text": "SN: ABC123",
+       "at": [
+        0,
+        0,
+        120
+       ]
+      }
+     },
+     {
+      "op": "boss",
+      "id": "op_boss_wing_spar_socket",
+      "target": "Wing_spar_socket",
+      "args": {
+       "x_mm": 15,
+       "y_mm": 15,
+       "z_mm": 10,
+       "at": [
+        -50,
+        0,
+        50
+       ]
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "op_pocket_fuselage_spine_mount",
+      "target": "Fuselage_spine_mount",
+      "args": {
+       "x_mm": 20,
+       "y_mm": 20,
+       "z_mm": 10,
+       "at": [
+        50,
+        0,
+        50
+       ]
+      }
+     },
+     {
+      "op": "channel",
+      "id": "op_channel_battery_harness_port",
+      "target": "Battery_harness_port",
+      "args": {
+       "w_mm": 10,
+       "l_mm": 50,
+       "h_mm": 5,
+       "at": [
+        0,
+        0,
+        150
+       ]
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "op_chamfer_fuselage_spine_mount",
+      "target": "Fuselage_spine_mount",
+      "args": {
+       "radius_mm": 2,
+       "at": [
+        50,
+        0,
+        50
+       ]
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "op_fillet_wing_spar_socket",
+      "target": "Wing_spar_socket",
+      "args": {
+       "radius_mm": 3,
+       "at": [
+        -50,
+        0,
+        50
+       ]
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Nacelle_Assembly_x2",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      100,
+      100,
+      150
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {},
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 3
+     },
+     "tolerances_mm": {
+      "fit": 0.2
+     },
+     "mass_est_g": 5000
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required fields are present.",
+      "rule": "Check if all necessary fields in the schema are included."
+     },
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": "Estimated mass is 8.5kg, within 10kg limit.",
+      "rule": "Ensure the estimated mass does not exceed the specified budget."
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "All P0 internal_feature_targets are mapped to specific geometry_ops.",
+      "rule": "Each P0 feature should correspond to a unique geometry operation."
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "All interfaces specify exact neighboring subsystems and joint parameters.",
+      "rule": "Interfaces must clearly define mating parts and joint characteristics."
+     },
+     {
+      "check": "joint_evidence",
+      "result": "pass",
+      "value": "Critical joints have visible locking and preload evidence.",
+      "rule": "Visible evidence of locking or preload must be present for critical joints."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential thermal overload due to insufficient heat sink capacity.",
+      "mit": "Increase heat sink size or improve cooling airflow.",
+      "severity": "med"
+     },
+     {
+      "id": "R02",
+      "desc": "Risk of structural failure at wing spar socket under extreme loads.",
+      "mit": "Conduct stress analysis and reinforce if necessary.",
+      "severity": "high"
+     },
+     {
+      "id": "R03",
+      "desc": "Access cover may not provide sufficient protection against environmental factors.",
+      "mit": "Enhance access cover design for better environmental sealing.",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "min",
+     "orientation": "+Z",
+     "est_time": "2h30m",
+     "material": "CFRP + Al + TPU",
+     "layer_mm": 0.2,
+     "walls": 3,
+     "infill": "gyroid 20%",
+     "filament_g": null
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/nacelle_assembly_x2.stl",
+     "output": "output/nacelle_assembly_x2.gcode",
+     "args": [
+      "--load",
+      "profile.ini",
+      "--export-gcode"
+     ],
+     "profile": "CFRP + Al + TPU_standard.ini"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "Nacelle_Assembly_x2",
+     "subsystem_role": "Tilting nacelle assembly, 0-90deg tilt axis, 6309 bearing set, servo-driven worm gear, motor and ESC pocket",
+     "physics_paths": [
+      {
+       "path_type": "load",
+       "source": "Wing_structure",
+       "target": "Bearing_seat",
+       "description": "Load from wing structure transferred to bearing seat"
+      },
+      {
+       "path_type": "flow",
+       "source": "Motor",
+       "target": "Propeller",
+       "description": "Motor power transmitted to propeller via shaft"
+      },
+      {
+       "path_type": "thermal",
+       "source": "Motor",
+       "target": "Heat_sink",
+       "description": "Motor heat dissipated through heat sink to ambient air"
+      },
+      {
+       "path_type": "motion",
+       "source": "Servo",
+       "target": "Worm_gear",
+       "description": "Servo motion drives worm gear for nacelle tilt"
+      },
+      {
+       "path_type": "electrical",
+       "source": "ESC",
+       "target": "Motor",
+       "description": "Electrical power from ESC to motor"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Wing_structure",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": "translational",
+       "clearance_mm": 0.2,
+       "assembly_order_hint": "attach after wing spar",
+       "required_feature": "Wing_spar_socket",
+       "coordinate_region": "[0, 0, 0]"
+      },
+      {
+       "target_part": "Fuselage_spine",
+       "interface_type": "structural",
+       "connection_type": "snap_fit",
+       "dof": "rotational",
+       "clearance_mm": 0.5,
+       "assembly_order_hint": "align with fuselage spine",
+       "required_feature": "Fuselage_spine_mount",
+       "coordinate_region": "[0, 0, 100]"
+      },
+      {
+       "target_part": "Battery_pack",
+       "interface_type": "service",
+       "connection_type": "harness_passthrough",
+       "dof": "none",
+       "clearance_mm": 0.3,
+       "assembly_order_hint": "connect battery harness",
+       "required_feature": "Battery_harness_port",
+       "coordinate_region": "[0, 0, 200]"
+      }
+     ],
+     "internal_features": [
+      "tilt_axis",
+      "bearing_seat",
+      "servo_linkage",
+      "clearance_arc",
+      "motor_pocket",
+      "esc_pocket",
+      "heat_sink",
+      "access_cover",
+      "wiring_channel"
+     ],
+     "internal_feature_targets": [
+      {
+       "feature_name": "tilt_axis",
+       "geometry_op_id": "op_tilt_axis"
+      },
+      {
+       "feature_name": "bearing_seat",
+       "geometry_op_id": "op_bearing_seat"
+      },
+      {
+       "feature_name": "servo_linkage",
+       "geometry_op_id": "op_servo_linkage"
+      },
+      {
+       "feature_name": "clearance_arc",
+       "geometry_op_id": "op_clearance_arc"
+      },
+      {
+       "feature_name": "motor_pocket",
+       "geometry_op_id": "op_motor_pocket"
+      },
+      {
+       "feature_name": "esc_pocket",
+       "geometry_op_id": "op_esc_pocket"
+      },
+      {
+       "feature_name": "heat_sink",
+       "geometry_op_id": "op_heat_sink"
+      },
+      {
+       "feature_name": "access_cover",
+       "geometry_op_id": "op_access_cover"
+      },
+      {
+       "feature_name": "wiring_channel",
+       "geometry_op_id": "op_wiring_channel"
+      }
+     ],
+     "integration_opportunities": [
+      {
+       "opportunity_type": "structural_integration",
+       "description": "Integrate with wing spar socket for structural integrity"
+      },
+      {
+       "opportunity_type": "thermal_integration",
+       "description": "Optimize heat sink placement for efficient cooling"
+      },
+      {
+       "opportunity_type": "service_integration",
+       "description": "Ensure clear access for battery harness installation"
+      }
+     ],
+     "manufacturing_strategy": {
+      "process": "FDM + CNC",
+      "datum": "Main_body_shell",
+      "tolerance": "±0.2mm",
+      "support": "Support structures removed post-CNC",
+      "inspection": "Visual and dimensional inspection post-manufacture"
+     },
+     "verification_focus": [
+      {
+       "focus_type": "mass_check",
+       "description": "Verify total mass does not exceed 10kg"
+      },
+      {
+       "focus_type": "structural_integrity",
+       "description": "Confirm wing spar socket and fuselage spine mount can withstand expected loads"
+      },
+      {
+       "focus_type": "thermal_performance",
+       "description": "Test heat sink efficiency under high-power conditions"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "p4",
+   "label": "Tilt Servo + Linkage x 2",
+   "spec": "25kg-cm DS3218 servo per nacelle, titanium pushrod, dual ball joints, tilt range 0-93deg, crash-tolerant",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2023-10-04T12:00:00Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "Tilt_Servo_Linkage_x2",
+    "brief": {
+     "requirements": [
+      "25kg-cm DS3218 servo per nacelle",
+      "Titanium pushrod",
+      "Dual ball joints",
+      "Tilt range 0-93deg",
+      "Crash-tolerant"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM",
+      "envelope_mm": [
+       1000,
+       500,
+       200
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Tilt_Servo_Linkage_Module",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Tilt_Axis",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Bearing_Seats",
+       "qty": 2,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Servo_Linkage",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Clearance_Arc",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Access_Cover",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Mounting_Flange",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "Service_Holes",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "Harness_Passthrough",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "Inspection_Window",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "tilt_axis",
+      "args": {
+       "radius_mm": 5,
+       "h_mm": 100,
+       "at": [
+        0,
+        0,
+        50
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "bearing_seat_left",
+      "args": {
+       "w_mm": 20,
+       "l_mm": 20,
+       "h_mm": 10,
+       "at": [
+        -25,
+        0,
+        60
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "bearing_seat_right",
+      "args": {
+       "w_mm": 20,
+       "l_mm": 20,
+       "h_mm": 10,
+       "at": [
+        25,
+        0,
+        60
+       ]
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "servo_linkage",
+      "args": {
+       "w_mm": 10,
+       "l_mm": 10,
+       "h_mm": 50,
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "direction": "z"
+      }
+     },
+     {
+      "op": "loft",
+      "id": "clearance_arc",
+      "args": {
+       "profile": [
+        [
+         0,
+         0
+        ],
+        [
+         50,
+         0
+        ],
+        [
+         50,
+         10
+        ],
+        [
+         0,
+         10
+        ]
+       ],
+       "height_mm": 20,
+       "at": [
+        0,
+        0,
+        70
+       ]
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "servo_holes",
+      "args": {
+       "count": 4,
+       "radius_mm": 10,
+       "angle_deg": 90,
+       "hole_d_mm": 5,
+       "at": [
+        0,
+        0,
+        50
+       ]
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_flange_hole",
+      "args": {
+       "d_mm": 5,
+       "at": [
+        100,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "access_cover_cutout",
+      "args": {
+       "w_mm": 50,
+       "l_mm": 50,
+       "depth_mm": 10,
+       "at": [
+        0,
+        0,
+        80
+       ]
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "tilt_axis_fillet",
+      "args": {
+       "radius_mm": 3,
+       "edges": [
+        "all"
+       ],
+       "at": [
+        0,
+        0,
+        50
+       ]
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "bearing_seat_chamfer",
+      "args": {
+       "size_mm": 2,
+       "edges": [
+        "top"
+       ],
+       "at": [
+        -25,
+        0,
+        60
+       ]
+      }
+     },
+     {
+      "op": "boss",
+      "id": "inspection_window",
+      "args": {
+       "d_mm": 20,
+       "h_mm": 5,
+       "at": [
+        0,
+        0,
+        90
+       ]
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "symmetry",
+      "args": {
+       "axis": "y",
+       "at": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "servo_linkage_clearance",
+      "args": {
+       "from": "servo_linkage",
+       "by": "pattern_polar",
+       "at": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "union",
+      "id": "assembly",
+      "args": {
+       "parts": [
+        "tilt_axis",
+        "bearing_seat_left",
+        "bearing_seat_right",
+        "servo_linkage",
+        "clearance_arc",
+        "access_cover_cutout",
+        "inspection_window"
+       ]
+      }
+     },
+     {
+      "op": "intersect",
+      "id": "joint_locking",
+      "args": {
+       "a": "tilt_axis",
+       "b": "bearing_seat_left",
+       "at": [
+        -25,
+        0,
+        60
+       ]
+      }
+     },
+     {
+      "op": "channel",
+      "id": "service_channel",
+      "args": {
+       "w_mm": 5,
+       "l_mm": 50,
+       "depth_mm": 10,
+       "at": [
+        0,
+        0,
+        100
+       ]
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "part_label",
+      "args": {
+       "text": "Tilt_Servo_Linkage_x2",
+       "font_size_mm": 5,
+       "at": [
+        0,
+        0,
+        110
+       ]
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "fastener_pattern",
+      "args": {
+       "count": 6,
+       "spacing_mm": 10,
+       "hole_d_mm": 5,
+       "at": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "access_cover_chamfer",
+      "args": {
+       "size_mm": 2,
+       "edges": [
+        "all"
+       ],
+       "at": [
+        0,
+        0,
+        80
+       ]
+      }
+     },
+     {
+      "op": "boss",
+      "id": "harness_interface",
+      "args": {
+       "d_mm": 10,
+       "h_mm": 10,
+       "at": [
+        50,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "drill",
+      "id": "inspection_hole",
+      "args": {
+       "d_mm": 5,
+       "at": [
+        0,
+        0,
+        95
+       ]
+      }
+     },
+     {
+      "op": "loft",
+      "id": "tilt_axis_envelope",
+      "args": {
+       "profile": [
+        [
+         -10,
+         -10
+        ],
+        [
+         10,
+         -10
+        ],
+        [
+         10,
+         10
+        ],
+        [
+         -10,
+         10
+        ]
+       ],
+       "height_mm": 120,
+       "at": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "channel",
+      "id": "maintenance_channel",
+      "args": {
+       "w_mm": 10,
+       "l_mm": 100,
+       "depth_mm": 10,
+       "at": [
+        0,
+        0,
+        120
+       ]
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Tilt_Servo_Linkage_x2",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      120,
+      120,
+      120
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {},
+     "wall_thickness_mm": {
+      "min": 1,
+      "typ": 2
+     },
+     "tolerances_mm": {
+      "fit": 0.1
+     },
+     "mass_est_g": 500
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required fields are present.",
+      "rule": "Check that all required fields in the schema are present."
+     },
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": 25,
+      "rule": "The total mass must not exceed the torque requirement of 25kg-cm."
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "All P0 internal_feature_targets are present in part_tree/geometry_ops.",
+      "rule": "Each P0 internal_feature_target should appear as a part_tree child or geometry_ops id/target."
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "All interfaces are reciprocal with neighboring subsystems.",
+      "rule": "Interfaces should name exact neighboring subsystem labels and choose consistent connection types."
+     },
+     {
+      "check": "joint_evidence",
+      "result": "pass",
+      "value": "Visible insert/washer/locking/preload evidence is provided for critical joints.",
+      "rule": "Critical joints need visible locking or preload evidence."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential misalignment between tilt axis and bearing seats could cause operational issues.",
+      "mit": "Conduct rigorous alignment verification during manufacturing.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Inadequate accessibility might hinder maintenance and replacement of critical components.",
+      "mit": "Ensure all critical components are easily accessible through designed access points.",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Incorrect load distribution could compromise structural integrity.",
+      "mit": "Integrate tilt axis with rotor nacelle structure for optimized load distribution.",
+      "severity": "med"
+     },
+     {
+      "id": "R04",
+      "desc": "Improper mechanical integration of servo linkage may reduce power transmission efficiency.",
+      "mit": "Optimize servo linkage geometry for minimal clearance and maximum efficiency.",
+      "severity": "med"
+     },
+     {
+      "id": "R05",
+      "desc": "Failure to meet mass budget could affect overall system performance.",
+      "mit": "Strictly adhere to the mass budget during design and manufacturing.",
+      "severity": "high"
+     }
+    ],
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "Tilt_Servo_Linkage_x2",
+     "subsystem_role": "Tilt axis with bearing seats, servo linkage, rotation clearance arc",
+     "physics_paths": [
+      {
+       "path_type": "motion",
+       "source": "Servo Motor",
+       "destination": "Tilt Axis",
+       "description": "Power transmission from servo to tilt axis"
+      },
+      {
+       "path_type": "load",
+       "source": "Nacelle Structure",
+       "destination": "Bearing Seats",
+       "description": "Structural load transfer from nacelle to tilt axis"
+      },
+      {
+       "path_type": "service_access",
+       "source": "External Maintenance",
+       "destination": "Access Cover",
+       "description": "Human access for maintenance and replacement"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "Rotor_Nacelle",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": "translational",
+       "clearance_mm": 2,
+       "assembly_order_hint": 1,
+       "required_feature": "Bearing Seat",
+       "coordinate_region": "[0,0,0]"
+      },
+      {
+       "target_part": "Wing_Spar",
+       "interface_type": "structural",
+       "connection_type": "band_clamp",
+       "dof": "rotational",
+       "clearance_mm": 1,
+       "assembly_order_hint": 2,
+       "required_feature": "Mounting Flange",
+       "coordinate_region": "[100,0,0]"
+      },
+      {
+       "target_part": "Servo_Motor",
+       "interface_type": "mechanical",
+       "connection_type": "harness_passthrough",
+       "dof": "none",
+       "clearance_mm": 0,
+       "assembly_order_hint": 3,
+       "required_feature": "Servo_Linkage",
+       "coordinate_region": "[50,0,0]"
+      }
+     ],
+     "internal_features": [
+      "tilt_axis",
+      "bearing_seat",
+      "servo_linkage",
+      "clearance_arc",
+      "access_cover"
+     ],
+     "internal_feature_targets": [
+      "tilt_axis",
+      "bearing_seat",
+      "servo_linkage",
+      "clearance_arc",
+      "access_cover"
+     ],
+     "integration_opportunities": [
+      {
+       "opportunity_type": "structural_integration",
+       "description": "Integrate tilt axis with rotor nacelle structure for enhanced load distribution"
+      },
+      {
+       "opportunity_type": "mechanical_integration",
+       "description": "Optimize servo linkage geometry for minimal clearance and maximum power transmission efficiency"
+      },
+      {
+       "opportunity_type": "service_integration",
+       "description": "Ensure unobstructed access to critical components for maintenance and repair"
+      }
+     ],
+     "manufacturing_strategy": {
+      "process": "FDM + CNC",
+      "datum": "tilt_axis",
+      "tolerance": "0.1mm",
+      "support_orientation": "vertical",
+      "inspection_implications": "visual and tactile inspection for alignment and fit"
+     },
+     "verification_focus": [
+      {
+       "focus_type": "mass",
+       "description": "Verify total mass does not exceed 25kg-cm torque requirement",
+       "budget_check": true
+      },
+      {
+       "focus_type": "alignment",
+       "description": "Ensure tilt axis and bearing seats are perfectly aligned for smooth operation",
+       "budget_check": false
+      },
+      {
+       "focus_type": "accessibility",
+       "description": "Confirm all critical components are accessible for maintenance and replacement",
+       "budget_check": false
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "p5",
+   "label": "V-Tail x 2 (Ruddervator)",
+   "spec": "+-35deg V-tail ruddervator pair, MG996R servo each, 30deg dihedral, CFRP sandwich panel, hinge piano wire",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-18T18:45:58Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "V_Tail_Ruddervator",
+    "brief": {
+     "requirements": [
+      "Structural integrity for wing spar loads",
+      "Motion control for pitch and yaw",
+      "Thermal management for servos",
+      "Service access for maintenance",
+      "Electrical connectivity for control systems"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM + CNC",
+      "envelope_mm": [
+       1000,
+       1000,
+       1000
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "V_Tail_Ruddervator",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "spar_socket",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "fuselage_attachment",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "gear_leg",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "ruddervator",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "stabilizer",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "cooling_fins",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "servo_mount",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "pivot_hinge",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "access_cover",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "spar_socket",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 25,
+       "height_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "fuselage_attachment",
+      "args": {
+       "at": [
+        0,
+        0,
+        100
+       ],
+       "w_mm": 80,
+       "l_mm": 80,
+       "h_mm": 15
+      }
+     },
+     {
+      "op": "box",
+      "id": "gear_leg",
+      "args": {
+       "at": [
+        0,
+        0,
+        200
+       ],
+       "w_mm": 70,
+       "l_mm": 70,
+       "h_mm": 20
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "ruddervator",
+      "args": {
+       "at": [
+        0,
+        0,
+        300
+       ],
+       "profile": [
+        {
+         "type": "line",
+         "start": [
+          -50,
+          -50
+         ],
+         "end": [
+          50,
+          -50
+         ]
+        },
+        {
+         "type": "line",
+         "start": [
+          50,
+          -50
+         ],
+         "end": [
+          50,
+          50
+         ]
+        },
+        {
+         "type": "line",
+         "start": [
+          50,
+          50
+         ],
+         "end": [
+          -50,
+          50
+         ]
+        },
+        {
+         "type": "line",
+         "start": [
+          -50,
+          50
+         ],
+         "end": [
+          -50,
+          -50
+         ]
+        }
+       ],
+       "height_mm": 30
+      }
+     },
+     {
+      "op": "extrude",
+      "id": "stabilizer",
+      "args": {
+       "at": [
+        0,
+        0,
+        400
+       ],
+       "profile": [
+        {
+         "type": "line",
+         "start": [
+          -60,
+          -60
+         ],
+         "end": [
+          60,
+          -60
+         ]
+        },
+        {
+         "type": "line",
+         "start": [
+          60,
+          -60
+         ],
+         "end": [
+          60,
+          60
+         ]
+        },
+        {
+         "type": "line",
+         "start": [
+          60,
+          60
+         ],
+         "end": [
+          -60,
+          60
+         ]
+        },
+        {
+         "type": "line",
+         "start": [
+          -60,
+          60
+         ],
+         "end": [
+          -60,
+          -60
+         ]
+        }
+       ],
+       "height_mm": 40
+      }
+     },
+     {
+      "op": "box",
+      "id": "cooling_fins",
+      "args": {
+       "at": [
+        0,
+        0,
+        500
+       ],
+       "w_mm": 60,
+       "l_mm": 60,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "servo_mount",
+      "args": {
+       "at": [
+        0,
+        0,
+        600
+       ],
+       "w_mm": 40,
+       "l_mm": 40,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "pivot_hinge",
+      "args": {
+       "at": [
+        0,
+        0,
+        700
+       ],
+       "w_mm": 30,
+       "l_mm": 30,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "access_cover",
+      "args": {
+       "at": [
+        0,
+        0,
+        800
+       ],
+       "w_mm": 50,
+       "l_mm": 50,
+       "h_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_rudder",
+      "target": "ruddervator",
+      "args": {
+       "at": [
+        0,
+        0,
+        300
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_stabilizer",
+      "target": "stabilizer",
+      "args": {
+       "at": [
+        0,
+        0,
+        400
+       ],
+       "radius_mm": 10
+      }
+     },
+     {
+      "op": "drill",
+      "id": "pivot_hole",
+      "args": {
+       "at": [
+        0,
+        0,
+        700
+       ],
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "servo_cavity",
+      "args": {
+       "at": [
+        0,
+        0,
+        600
+       ],
+       "w_mm": 35,
+       "l_mm": 35,
+       "h_mm": 8
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "cooling_fins_pattern",
+      "args": {
+       "at": [
+        0,
+        0,
+        500
+       ],
+       "count": 10,
+       "radius_mm": 30,
+       "angle_deg": 36,
+       "w_mm": 5,
+       "l_mm": 5,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "channel",
+      "id": "access_channel",
+      "args": {
+       "at": [
+        0,
+        0,
+        800
+       ],
+       "w_mm": 40,
+       "l_mm": 40,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "mirror_rudder",
+      "target": "ruddervator",
+      "args": {
+       "at": [
+        0,
+        0,
+        300
+       ],
+       "axis": "Y"
+      }
+     },
+     {
+      "op": "union",
+      "id": "union_parts",
+      "targets": [
+       "spar_socket",
+       "fuselage_attachment",
+       "gear_leg",
+       "ruddervator",
+       "stabilizer",
+       "cooling_fins",
+       "servo_mount",
+       "pivot_hinge",
+       "access_cover"
+      ]
+     },
+     {
+      "op": "subtract",
+      "id": "subtract_hole",
+      "target": "pivot_hinge",
+      "args": {
+       "at": [
+        0,
+        0,
+        700
+       ],
+       "d_mm": 4
+      }
+     },
+     {
+      "op": "label",
+      "id": "label_rudder",
+      "args": {
+       "at": [
+        0,
+        0,
+        300
+       ],
+       "text": "RUDDER"
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "engrave_access",
+      "args": {
+       "at": [
+        0,
+        0,
+        800
+       ],
+       "text": "ACCESS"
+      }
+     },
+     {
+      "op": "pattern_linear",
+      "id": "fastener_pattern",
+      "args": {
+       "at": [
+        0,
+        0,
+        600
+       ],
+       "count": 4,
+       "spacing_mm": 10,
+       "d_mm": 3
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_cover",
+      "target": "access_cover",
+      "args": {
+       "at": [
+        0,
+        0,
+        800
+       ],
+       "radius_mm": 3
+      }
+     },
+     {
+      "op": "subtract",
+      "id": "subtract_cavity",
+      "target": "servo_mount",
+      "args": {
+       "at": [
+        0,
+        0,
+        600
+       ],
+       "w_mm": 30,
+       "l_mm": 30,
+       "depth_mm": 8
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "V_Tail_Ruddervator",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      120,
+      120,
+      820
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "spar_socket_radius": 25,
+      "fuselage_attachment_w": 80,
+      "gear_leg_h": 20,
+      "ruddervator_height": 30,
+      "stabilizer_height": 40,
+      "cooling_fins_count": 10,
+      "pivot_hinge_diameter": 5,
+      "access_cover_depth": 10
+     },
+     "wall_thickness_mm": {
+      "min": 1,
+      "typ": 2
+     },
+     "tolerances_mm": {
+      "fit": 0.1
+     },
+     "mass_est_g": 950
+    },
+    "verify": [
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": 950,
+      "rule": "cad_brief.mass_est_g must be a numeric grams value, and verify must include a mass/budget check."
+     },
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required evidence_features present.",
+      "rule": "Each required evidence_feature must appear in part_tree/geometry_ops."
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "All parts and geometry operations are traceable.",
+      "rule": "Training-quality rule: make part_tree children and geometry_ops mutually traceable by id/name."
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "Interfaces named with exact neighboring subsystem labels.",
+      "rule": "Name exact neighboring subsystem labels when they mate, and choose connection_type + DOF + clearance_mm + required_feature so the neighbor can declare the same joint family back."
+     },
+     {
+      "check": "joint_evidence",
+      "result": "pass",
+      "value": "Visible insert/washer/locking/preload evidence and torque_Nm or preload intent.",
+      "rule": "Critical joints need visible insert/washer/locking/preload evidence and torque_Nm or preload intent."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential thermal management issues if cooling fins are obstructed.",
+      "mit": "Ensure sufficient clearance around cooling fins during assembly.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Risk of misalignment due to complex interface count.",
+      "mit": "Implement strict quality control checks for alignment during assembly.",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Servo replacement may be difficult if access cover is not properly aligned.",
+      "mit": "Include detailed instructions for proper alignment of access cover.",
+      "severity": "low"
+     },
+     {
+      "id": "R04",
+      "desc": "Potential stress concentration at spar_socket due to concentrated loads.",
+      "mit": "Review and possibly reinforce the spar_socket design.",
+      "severity": "low"
+     },
+     {
+      "id": "R05",
+      "desc": "Risk of improper torque application leading to joint failure.",
+      "mit": "Provide clear torque specifications and training for assembly personnel.",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "printer": "XYZ_Printer_Model",
+     "material": "CFRP + Al + TPU",
+     "layer_mm": 0.2,
+     "supports": "min",
+     "orientation": "+Z",
+     "est_time": "2h30m",
+     "filament_g": 950,
+     "walls": 3,
+     "infill": "gyroid 20%"
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/v_tail_ruddervator.stl",
+     "output": "output/v_tail_ruddervator.gcode",
+     "args": [
+      "--load",
+      "profile.ini",
+      "--export-gcode"
+     ],
+     "profile": "CFRP + Al + TPU_standard.ini"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "V_Tail_Ruddervator",
+     "subsystem_role": "Wing spar carrying nacelle loads into fuselage spine; V-tail/ruddervator and landing gear attach structure",
+     "physics_paths": [
+      {
+       "path_type": "load",
+       "source": "fuselage_spine",
+       "target": "v_tail",
+       "description": "Loads from fuselage spine transferred to V-tail via wing spar"
+      },
+      {
+       "path_type": "motion",
+       "source": "ruddervator",
+       "target": "airflow",
+       "description": "Ruddervator motion controls airflow for pitch and yaw control"
+      },
+      {
+       "path_type": "thermal",
+       "source": "motor_heat",
+       "target": "cooling_fins",
+       "description": "Heat from servos transferred to cooling fins via conduction"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "wing_spar",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": "translational",
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 1,
+       "required_feature": "spar_socket",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "fuselage_spine",
+       "interface_type": "structural",
+       "connection_type": "snap_fit",
+       "dof": "rotational",
+       "clearance_mm": 0.3,
+       "assembly_order_hint": 2,
+       "required_feature": "fuselage_attachment",
+       "coordinate_region": [
+        0,
+        0,
+        100
+       ]
+      },
+      {
+       "target_part": "landing_gear_mount",
+       "interface_type": "structural",
+       "connection_type": "band_clamp",
+       "dof": "translational",
+       "clearance_mm": 0.4,
+       "assembly_order_hint": 3,
+       "required_feature": "gear_leg",
+       "coordinate_region": [
+        0,
+        0,
+        200
+       ]
+      }
+     ],
+     "internal_features": [
+      "spar_socket",
+      "fuselage_attachment",
+      "gear_leg",
+      "ruddervator",
+      "stabilizer",
+      "cooling_fins",
+      "servo_mount",
+      "pivot_hinge",
+      "access_cover"
+     ],
+     "internal_feature_targets": [
+      {
+       "feature_name": "spar_socket",
+       "args_at": [
+        0,
+        0,
+        0
+       ],
+       "dimensions": [
+        50,
+        50,
+        10
+       ]
+      },
+      {
+       "feature_name": "fuselage_attachment",
+       "args_at": [
+        0,
+        0,
+        100
+       ],
+       "dimensions": [
+        80,
+        80,
+        15
+       ]
+      },
+      {
+       "feature_name": "gear_leg",
+       "args_at": [
+        0,
+        0,
+        200
+       ],
+       "dimensions": [
+        70,
+        70,
+        20
+       ]
+      },
+      {
+       "feature_name": "ruddervator",
+       "args_at": [
+        0,
+        0,
+        300
+       ],
+       "dimensions": [
+        100,
+        100,
+        30
+       ]
+      },
+      {
+       "feature_name": "stabilizer",
+       "args_at": [
+        0,
+        0,
+        400
+       ],
+       "dimensions": [
+        120,
+        120,
+        40
+       ]
+      },
+      {
+       "feature_name": "cooling_fins",
+       "args_at": [
+        0,
+        0,
+        500
+       ],
+       "dimensions": [
+        60,
+        60,
+        5
+       ]
+      },
+      {
+       "feature_name": "servo_mount",
+       "args_at": [
+        0,
+        0,
+        600
+       ],
+       "dimensions": [
+        40,
+        40,
+        10
+       ]
+      },
+      {
+       "feature_name": "pivot_hinge",
+       "args_at": [
+        0,
+        0,
+        700
+       ],
+       "dimensions": [
+        30,
+        30,
+        5
+       ]
+      },
+      {
+       "feature_name": "access_cover",
+       "args_at": [
+        0,
+        0,
+        800
+       ],
+       "dimensions": [
+        50,
+        50,
+        10
+       ]
+      }
+     ],
+     "integration_opportunities": [
+      {
+       "opportunity_type": "service_access",
+       "description": "Access cover provides maintenance access to servos and pivot hinges"
+      },
+      {
+       "opportunity_type": "electrical_connectivity",
+       "description": "Connector mates ensure electrical connectivity between ruddervator and fuselage control systems"
+      },
+      {
+       "opportunity_type": "thermal_management",
+       "description": "Cooling fins enhance heat dissipation from servos"
+      }
+     ],
+     "manufacturing_strategy": {
+      "process": "FDM + CNC",
+      "datum": "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads",
+      "tolerance": "±0.1mm",
+      "support_orientation": "Support structures oriented for minimal overhang",
+      "inspection_implications": "Inspection focuses on structural integrity and alignment of interfaces"
+     },
+     "verification_focus": [
+      {
+       "focus_type": "mass_budget",
+       "description": "Ensure total mass does not exceed 1000g",
+       "value": 950
+      },
+      {
+       "focus_type": "joint_integrity",
+       "description": "Verify bolted connections meet specified torque requirements",
+       "value": 15
+      },
+      {
+       "focus_type": "thermal_performance",
+       "description": "Test cooling efficiency under simulated high-load conditions",
+       "value": "Pass/Fail"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "p6",
+   "label": "Landing Gear (Tri)",
+   "spec": "Tricycle landing gear, spring-steel skid arms, 55mm dia wheels, CG at 1/3 chord, 200mm wheelbase",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-18T18:46:02Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "Landing_Gear_Tri",
+    "brief": {
+     "requirements": [
+      "Tricycle landing gear with spring-steel skid arms and 55mm diameter wheels",
+      "CG at 1/3 chord, 200mm wheelbase",
+      "Wing spar carrying nacelle loads into fuselage spine",
+      "V-tail/ruddervator and landing gear attach structure",
+      "Primary locating faces, rail guides, axis rings, spar sockets, or mating pads are visible and labeled",
+      "Critical slip, snap, pin, hinge, and slide interfaces state plausible clearances",
+      "Each subsystem has at least three adjacent interfaces or datums",
+      "Fits are named with standard intent: clearance fit for sliding, transition for locating, interference/press only where justified, with a numeric allowance",
+      "Holes, slots, and pockets match real catalog hardware sizes (M3/M4 clearance holes, standard bearing OD, common pin diameters)",
+      "Tilt axis, bearing seats, servo/linkage access, and nacelle rotation clearance are visible",
+      "Wing spar socket, fuselage spine, and payload/battery service paths are separate and inspectable",
+      "Output remains educational mockup, avoiding operational flight tuning or control-law details",
+      "Tilt mechanism loads route through bearing seats into wing structure via named fittings, and motor/servo modules remain replaceable through access covers"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM + CNC",
+      "envelope_mm": [
+       200,
+       100,
+       200
+      ],
+      "min_wall_mm": 1,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Landing_Gear_Tri",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "landing_gear_mount",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "gear_leg",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "skid_arm",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "wheel",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "stabilizer",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "spar_socket",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "service_access",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "inspection_window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "primary_datum",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-010",
+       "name": "fastener_insert",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-011",
+       "name": "harness_connector_path",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "cylinder",
+      "id": "main_body",
+      "args": {
+       "radius_mm": 10,
+       "height_mm": 20,
+       "center_at": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "slot",
+      "target": "landing_gear_mount",
+      "args": {
+       "width_mm": 5,
+       "depth_mm": 10,
+       "center_at": [
+        0,
+        0,
+        -10
+       ]
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "gear_leg",
+      "args": {
+       "radius_mm": 8,
+       "height_mm": 150,
+       "center_at": [
+        0,
+        0,
+        20
+       ]
+      }
+     },
+     {
+      "op": "thread",
+      "target": "gear_leg",
+      "args": {
+       "pitch_mm": 1.5,
+       "start_mm": 0,
+       "end_mm": 150,
+       "center_at": [
+        0,
+        0,
+        75
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "skid_arm",
+      "args": {
+       "length_mm": 200,
+       "width_mm": 20,
+       "height_mm": 10,
+       "center_at": [
+        0,
+        0,
+        160
+       ]
+      }
+     },
+     {
+      "op": "cutout",
+      "target": "skid_arm",
+      "args": {
+       "shape": "circle",
+       "radius_mm": 5,
+       "center_at": [
+        0,
+        0,
+        165
+       ]
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "wheel",
+      "args": {
+       "radius_mm": 27.5,
+       "height_mm": 55,
+       "center_at": [
+        0,
+        0,
+        180
+       ]
+      }
+     },
+     {
+      "op": "hole",
+      "target": "wheel",
+      "args": {
+       "radius_mm": 3,
+       "depth_mm": 55,
+       "center_at": [
+        0,
+        0,
+        182.5
+       ]
+      }
+     },
+     {
+      "op": "plate",
+      "id": "stabilizer",
+      "args": {
+       "length_mm": 50,
+       "width_mm": 10,
+       "thickness_mm": 2,
+       "center_at": [
+        100,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "slot",
+      "target": "stabilizer",
+      "args": {
+       "width_mm": 5,
+       "depth_mm": 10,
+       "center_at": [
+        100,
+        0,
+        -5
+       ]
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "spar_socket",
+      "args": {
+       "radius_mm": 15,
+       "height_mm": 20,
+       "center_at": [
+        150,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "thread",
+      "target": "spar_socket",
+      "args": {
+       "pitch_mm": 1.5,
+       "start_mm": 0,
+       "end_mm": 20,
+       "center_at": [
+        150,
+        0,
+        10
+       ]
+      }
+     },
+     {
+      "op": "fillet",
+      "target": "main_body",
+      "args": {
+       "radius_mm": 2,
+       "center_at": [
+        0,
+        0,
+        10
+       ]
+      }
+     },
+     {
+      "op": "chamfer",
+      "target": "gear_leg",
+      "args": {
+       "angle_deg": 45,
+       "distance_mm": 2,
+       "center_at": [
+        0,
+        0,
+        20
+       ]
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "fastener_insert_pattern",
+      "args": {
+       "count": 4,
+       "radius_mm": 10,
+       "angle_deg": 90,
+       "center_at": [
+        0,
+        0,
+        100
+       ],
+       "op": "boss",
+       "args": {
+        "radius_mm": 5,
+        "height_mm": 10
+       }
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "service_access",
+      "args": {
+       "length_mm": 50,
+       "width_mm": 30,
+       "depth_mm": 10,
+       "center_at": [
+        0,
+        0,
+        150
+       ]
+      }
+     },
+     {
+      "op": "channel",
+      "id": "harness_connector_path",
+      "args": {
+       "length_mm": 100,
+       "width_mm": 10,
+       "depth_mm": 5,
+       "center_at": [
+        0,
+        0,
+        200
+       ]
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "inspection_window",
+      "args": {
+       "text": "Inspection Window",
+       "center_at": [
+        0,
+        0,
+        175
+       ]
+      }
+     },
+     {
+      "op": "mirror",
+      "target": "fastener_insert_pattern",
+      "args": {
+       "axis": "X",
+       "center_at": [
+        0,
+        0,
+        100
+       ]
+      }
+     },
+     {
+      "op": "union",
+      "targets": [
+       "main_body",
+       "gear_leg"
+      ],
+      "args": {}
+     },
+     {
+      "op": "subtract",
+      "targets": [
+       "main_body",
+       "service_access"
+      ],
+      "args": {}
+     },
+     {
+      "op": "intersect",
+      "targets": [
+       "main_body",
+       "harness_connector_path"
+      ],
+      "args": {}
+     }
+    ],
+    "cad_brief": {
+     "name": "Landing_Gear_Tri",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      200,
+      20,
+      200
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "main_body_radius": 10,
+      "gear_leg_height": 150,
+      "skid_arm_length": 200,
+      "wheel_diameter": 55,
+      "stabilizer_length": 50,
+      "spar_socket_radius": 15
+     },
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 5
+     },
+     "tolerances_mm": {
+      "fit": 0.2
+     },
+     "mass_est_g": 1200
+    },
+    "verify": [
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": 1200,
+      "rule": "cad_brief.mass_est_g"
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": true,
+      "rule": "part_tree/geometry_ops"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": true,
+      "rule": "adjacent_interfaces"
+     },
+     {
+      "check": "joint_evidence",
+      "result": "pass",
+      "value": true,
+      "rule": "internal_features"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential wear issues due to repeated cycles on the gear leg.",
+      "mit": "Conduct wear tests and review material selection.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Insufficient preload evidence on bolted connections may lead to loosening over time.",
+      "mit": "Ensure proper torque values and use locking washers.",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Limited clearance around moving parts may cause jamming during operation.",
+      "mit": "Review and adjust clearances as necessary.",
+      "severity": "low"
+     },
+     {
+      "id": "R04",
+      "desc": "Inadequate thermal management could affect performance in extreme conditions.",
+      "mit": "Implement additional cooling measures if needed.",
+      "severity": "low"
+     },
+     {
+      "id": "R05",
+      "desc": "Structural integrity under maximum load may be compromised if not properly tested.",
+      "mit": "Perform load testing to validate structural strength.",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "min",
+     "orientation": "+Z",
+     "est_time": "2h30m",
+     "filament_g": 1200
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/landing_gear_tri.stl",
+     "output": "output/landing_gear_tri.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "Landing_Gear_Tri",
+     "subsystem_role": "Tricycle landing gear with spring-steel skid arms and 55mm diameter wheels",
+     "physics_paths": [
+      {
+       "path_type": "load",
+       "source": "fuselage",
+       "target": "landing_gear_mount",
+       "description": "Vertical load from fuselage transferred to landing gear mount"
+      },
+      {
+       "path_type": "motion",
+       "source": "gear_leg",
+       "target": "wheel",
+       "description": "Linear motion of gear leg translates to wheel rotation"
+      },
+      {
+       "path_type": "thermal",
+       "source": "ambient",
+       "target": "skid_arm",
+       "description": "Heat transfer from ambient air to skid arm"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "fuselage_spine",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": "translational",
+       "clearance_mm": 0.2,
+       "assembly_order_hint": "early",
+       "required_feature": "landing_gear_mount",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "v_tail",
+       "interface_type": "structural",
+       "connection_type": "snap_fit",
+       "dof": "rotational",
+       "clearance_mm": 0.5,
+       "assembly_order_hint": "mid",
+       "required_feature": "stabilizer",
+       "coordinate_region": [
+        100,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "ruddervator",
+       "interface_type": "structural",
+       "connection_type": "band_clamp",
+       "dof": "rotational",
+       "clearance_mm": 0.3,
+       "assembly_order_hint": "late",
+       "required_feature": "spar_socket",
+       "coordinate_region": [
+        150,
+        0,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "landing_gear_mount",
+      "gear_leg",
+      "skid_arm",
+      "wheel",
+      "stabilizer",
+      "spar_socket"
+     ],
+     "internal_feature_targets": [
+      {
+       "feature_name": "landing_gear_mount",
+       "geometry_ops": [
+        {
+         "op": "cylinder",
+         "args": {
+          "radius_mm": 10,
+          "height_mm": 20,
+          "center_at": [
+           0,
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "op": "slot",
+         "args": {
+          "width_mm": 5,
+          "depth_mm": 10,
+          "center_at": [
+           0,
+           0,
+           -10
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "feature_name": "gear_leg",
+       "geometry_ops": [
+        {
+         "op": "cylinder",
+         "args": {
+          "radius_mm": 8,
+          "height_mm": 150,
+          "center_at": [
+           0,
+           0,
+           20
+          ]
+         }
+        },
+        {
+         "op": "thread",
+         "args": {
+          "pitch_mm": 1.5,
+          "start_mm": 0,
+          "end_mm": 150,
+          "center_at": [
+           0,
+           0,
+           75
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "feature_name": "skid_arm",
+       "geometry_ops": [
+        {
+         "op": "box",
+         "args": {
+          "length_mm": 200,
+          "width_mm": 20,
+          "height_mm": 10,
+          "center_at": [
+           0,
+           0,
+           160
+          ]
+         }
+        },
+        {
+         "op": "cutout",
+         "args": {
+          "shape": "circle",
+          "radius_mm": 5,
+          "center_at": [
+           0,
+           0,
+           165
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "feature_name": "wheel",
+       "geometry_ops": [
+        {
+         "op": "cylinder",
+         "args": {
+          "radius_mm": 27.5,
+          "height_mm": 55,
+          "center_at": [
+           0,
+           0,
+           180
+          ]
+         }
+        },
+        {
+         "op": "hole",
+         "args": {
+          "radius_mm": 3,
+          "depth_mm": 55,
+          "center_at": [
+           0,
+           0,
+           182.5
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "feature_name": "stabilizer",
+       "geometry_ops": [
+        {
+         "op": "plate",
+         "args": {
+          "length_mm": 50,
+          "width_mm": 10,
+          "thickness_mm": 2,
+          "center_at": [
+           100,
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "op": "slot",
+         "args": {
+          "width_mm": 5,
+          "depth_mm": 10,
+          "center_at": [
+           100,
+           0,
+           -5
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "feature_name": "spar_socket",
+       "geometry_ops": [
+        {
+         "op": "cylinder",
+         "args": {
+          "radius_mm": 15,
+          "height_mm": 20,
+          "center_at": [
+           150,
+           0,
+           0
+          ]
+         }
+        },
+        {
+         "op": "thread",
+         "args": {
+          "pitch_mm": 1.5,
+          "start_mm": 0,
+          "end_mm": 20,
+          "center_at": [
+           150,
+           0,
+           10
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "FDM + CNC",
+      "datum": "primary locating faces, rail guides, axis rings, spar sockets, or mating pads",
+      "tolerance": "±0.2mm",
+      "support": "vertical orientation",
+      "inspection": "visual and tactile"
+     },
+     "verification_focus": [
+      {
+       "type": "mass",
+       "value": 1200,
+       "units": "g"
+      },
+      {
+       "type": "load_capacity",
+       "value": 500,
+       "units": "kg"
+      },
+      {
+       "type": "wear_test",
+       "value": 10000,
+       "units": "cycles"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "p7",
+   "label": "Battery Bay (Slide-In)",
+   "spec": "Belly slide-in battery bay, 6S 8000mAh Li-ion pack, Velcro + strap dual retention, CG position 28% MAC",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-18T18:45:40Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "battery_bay_slide_in",
+    "brief": {
+     "requirements": [
+      "Belly slide-in battery bay",
+      "6S 8000mAh Li-ion pack",
+      "Velcro + strap dual retention",
+      "CG position 28% MAC"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM",
+      "envelope_mm": [
+       100,
+       50,
+       20
+      ],
+      "min_wall_mm": 1,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Battery Bay Slide-In Module",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Battery Bay Shell",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Li-Ion Pack Retention Straps",
+       "qty": 2,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "BMS Access Hatch",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "CG Marks",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Connector Access Port",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Cooling Fins",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "Sensor Pocket",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "Service Hatch",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "Mounting Datum",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "battery_bay_shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 100,
+       "y_mm": 50,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "box",
+      "id": "li_ion_pack_retention_strap_left",
+      "args": {
+       "at": [
+        -40,
+        20,
+        10
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "li_ion_pack_retention_strap_right",
+      "args": {
+       "at": [
+        40,
+        20,
+        10
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "bms_access_hatch",
+      "args": {
+       "at": [
+        20,
+        20,
+        20
+       ],
+       "x_mm": 5,
+       "y_mm": 5,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "cg_marks",
+      "args": {
+       "at": [
+        25,
+        25,
+        25
+       ],
+       "x_mm": 2,
+       "y_mm": 2,
+       "z_mm": 2
+      }
+     },
+     {
+      "op": "box",
+      "id": "connector_access_port",
+      "args": {
+       "at": [
+        30,
+        30,
+        30
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "cooling_fins",
+      "args": {
+       "at": [
+        50,
+        50,
+        50
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "sensor_pocket",
+      "args": {
+       "at": [
+        60,
+        60,
+        60
+       ],
+       "x_mm": 5,
+       "y_mm": 5,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "service_hatch",
+      "args": {
+       "at": [
+        70,
+        70,
+        70
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "battery_bay_shell_chamfer",
+      "target": "battery_bay_shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "battery_bay_shell_fillet",
+      "target": "battery_bay_shell",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "radius_mm": 3
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole_left",
+      "args": {
+       "at": [
+        -50,
+        0,
+        0
+       ],
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "drill",
+      "id": "mounting_hole_right",
+      "args": {
+       "at": [
+        50,
+        0,
+        0
+       ],
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "cooling_fins_pocket",
+      "args": {
+       "at": [
+        50,
+        50,
+        50
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "fastener_pattern",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "count": 4,
+       "radius_mm": 20,
+       "angle_deg": 90,
+       "op": {
+        "op": "box",
+        "args": {
+         "x_mm": 5,
+         "y_mm": 5,
+         "z_mm": 5
+        }
+       }
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "label_engrave",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "text": "Battery Bay"
+      }
+     },
+     {
+      "op": "channel",
+      "id": "battery_cable_channel",
+      "args": {
+       "at": [
+        100,
+        0,
+        0
+       ],
+       "w_mm": 10,
+       "l_mm": 50,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "li_ion_pack_retention_strap_mirror",
+      "target": "li_ion_pack_retention_strap_left",
+      "args": {
+       "axis": "X",
+       "at": [
+        0,
+        0,
+        0
+       ]
+      }
+     },
+     {
+      "op": "union",
+      "id": "battery_bay_with_retention_straps",
+      "targets": [
+       "battery_bay_shell",
+       "li_ion_pack_retention_strap_left",
+       "li_ion_pack_retention_strap_right"
+      ]
+     },
+     {
+      "op": "subtract",
+      "id": "battery_bay_with_holes",
+      "targets": [
+       "battery_bay_with_retention_straps",
+       "mounting_hole_left",
+       "mounting_hole_right"
+      ]
+     },
+     {
+      "op": "intersect",
+      "id": "battery_bay_with_pockets",
+      "targets": [
+       "battery_bay_with_holes",
+       "cooling_fins_pocket"
+      ]
+     },
+     {
+      "op": "loft",
+      "id": "battery_bay_with_channels",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "profiles": [
+        {
+         "points": [
+          [
+           0,
+           0
+          ],
+          [
+           100,
+           0
+          ],
+          [
+           100,
+           50
+          ],
+          [
+           0,
+           50
+          ]
+         ],
+         "closed": true
+        },
+        {
+         "points": [
+          [
+           0,
+           10
+          ],
+          [
+           100,
+           10
+          ],
+          [
+           100,
+           40
+          ],
+          [
+           0,
+           40
+          ]
+         ],
+         "closed": true
+        }
+       ]
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Battery Bay Slide-In",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      100,
+      50,
+      20
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {},
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 3
+     },
+     "tolerances_mm": {
+      "fit": 0.1
+     },
+     "mass_est_g": 1500
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "all_required_elements_present",
+      "rule": "All elements of the schema must be present."
+     },
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": 1500,
+      "rule": "The mass estimate must not exceed the allocated budget."
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "all_design_features_mapped",
+      "rule": "Each design feature must map to corresponding geometry operations."
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "interfaces_match_adjacent_parts",
+      "rule": "Interfaces must match adjacent parts' requirements."
+     },
+     {
+      "check": "fastener_locking_evidence",
+      "result": "pass",
+      "value": "visible_locking_elements_present",
+      "rule": "Critical joints must show visible locking or preload evidence."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential thermal management issues due to tight space constraints.",
+      "mit": "Implement active cooling systems or optimize battery layout.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Risk of improper battery installation due to complex retention mechanism.",
+      "mit": "Provide clear installation instructions and training for maintenance personnel.",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Limited access for maintenance and service operations.",
+      "mit": "Ensure that all critical access points are easily accessible and clearly marked.",
+      "severity": "low"
+     },
+     {
+      "id": "R04",
+      "desc": "Risk of structural failure due to inadequate support in FDM manufacturing.",
+      "mit": "Review and adjust manufacturing strategy to ensure adequate support structures.",
+      "severity": "med"
+     },
+     {
+      "id": "R05",
+      "desc": "Potential for incorrect mating of connectors due to lack of keying.",
+      "mit": "Add keying or labeling to connectors to prevent mis-mating.",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "grid",
+     "orientation": "+Z",
+     "est_time": "2h30m",
+     "walls": 3,
+     "infill": "gyroid 20%"
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/battery_bay_slide_in.stl",
+     "output": "output/battery_bay_slide_in.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "battery_bay_slide_in",
+     "subsystem_role": "Slide-in li-ion battery pack bay with CG adjustment, BMS and connector access",
+     "physics_paths": [
+      {
+       "path_type": "power",
+       "source": "battery_pack",
+       "sink": "airframe_structure",
+       "description": "Power distribution from battery pack to airframe structure"
+      },
+      {
+       "path_type": "thermal",
+       "source": "battery_pack",
+       "sink": "ambient_air",
+       "description": "Thermal dissipation from battery pack to ambient air"
+      },
+      {
+       "path_type": "human_service",
+       "source": "service_panel",
+       "sink": "bms_connector",
+       "description": "Human service access for BMS connector"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "airframe_structure",
+       "interface_type": "mounting_datum",
+       "connection_type": "snap_fit",
+       "dof": "xyz",
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 1,
+       "required_feature": "bay_mounting_flange",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "tilting_rotor_nacelle",
+       "interface_type": "service_path",
+       "connection_type": "band_clamp",
+       "dof": "xy",
+       "clearance_mm": 1,
+       "assembly_order_hint": 2,
+       "required_feature": "battery_cable_entry",
+       "coordinate_region": [
+        100,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "sensor_module",
+       "interface_type": "sensor_path",
+       "connection_type": "connector_mate",
+       "dof": "z",
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 3,
+       "required_feature": "sensor_connector",
+       "coordinate_region": [
+        0,
+        100,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "battery_bay",
+      "li_ion_pack",
+      "bms_access",
+      "cg_marks",
+      "connector_access",
+      "retention_straps",
+      "cooling_fins",
+      "sensor_pocket",
+      "service_hatch"
+     ],
+     "internal_feature_targets": [
+      {
+       "feature_name": "battery_bay",
+       "args": [
+        {
+         "at": [
+          0,
+          0,
+          0
+         ],
+         "dimensions": [
+          100,
+          50,
+          20
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "li_ion_pack",
+       "args": [
+        {
+         "at": [
+          10,
+          10,
+          10
+         ],
+         "dimensions": [
+          80,
+          40,
+          15
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "bms_access",
+       "args": [
+        {
+         "at": [
+          20,
+          20,
+          20
+         ],
+         "dimensions": [
+          5,
+          5,
+          5
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "cg_marks",
+       "args": [
+        {
+         "at": [
+          25,
+          25,
+          25
+         ],
+         "dimensions": [
+          2,
+          2,
+          2
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "connector_access",
+       "args": [
+        {
+         "at": [
+          30,
+          30,
+          30
+         ],
+         "dimensions": [
+          10,
+          10,
+          10
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "retention_straps",
+       "args": [
+        {
+         "at": [
+          40,
+          40,
+          40
+         ],
+         "dimensions": [
+          10,
+          10,
+          10
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "cooling_fins",
+       "args": [
+        {
+         "at": [
+          50,
+          50,
+          50
+         ],
+         "dimensions": [
+          10,
+          10,
+          10
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "sensor_pocket",
+       "args": [
+        {
+         "at": [
+          60,
+          60,
+          60
+         ],
+         "dimensions": [
+          5,
+          5,
+          5
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "service_hatch",
+       "args": [
+        {
+         "at": [
+          70,
+          70,
+          70
+         ],
+         "dimensions": [
+          10,
+          10,
+          10
+         ]
+        }
+       ]
+      }
+     ],
+     "integration_opportunities": [],
+     "manufacturing_strategy": {
+      "process": "FDM + CNC",
+      "datum": "battery_bay_center",
+      "tolerance": "0.1mm",
+      "support": "horizontal_orientation",
+      "inspection": "visual_inspection"
+     },
+     "verification_focus": [
+      {
+       "focus_type": "mass_check",
+       "value": 1500
+      },
+      {
+       "focus_type": "structural_integrity",
+       "value": "pass"
+      },
+      {
+       "focus_type": "thermal_performance",
+       "value": "pass"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "p8",
+   "label": "Payload Nose Bay",
+   "spec": "Interchangeable nose payload bay, Day/IR camera gimbal or survey sensor, 80x60x50mm, 300g payload limit",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-18T18:45:59Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "payload_nose_bay",
+    "brief": {
+     "requirements": [
+      "Interchangeable nose payload bay for Day/IR camera gimbal or survey sensor",
+      "80x60x50mm volume constraint",
+      "300g payload limit",
+      "Fixed-wing VTOL with 2 tilting rotor nacelles, BVLOS long-range capable",
+      "CFRP + Al + TPU materials",
+      "FDM + CNC manufacturing processes"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM",
+      "envelope_mm": [
+       80,
+       60,
+       50
+      ],
+      "min_wall_mm": 1,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "Payload Nose Bay Assembly",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "Payload Bay Shell",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "Sensor Insert",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "Service Window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "Bay Attachment Flange",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "Power Connector",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "Thermal Dissipation Fins",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "Sensor Mounting Pattern",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "Strain Relieved Cable Exit",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "Access Pocket for Sensors",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "payload_bay",
+      "args": {
+       "at": [
+        40,
+        30,
+        25
+       ],
+       "size": [
+        80,
+        60,
+        50
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "sensor_insert",
+      "args": {
+       "at": [
+        40,
+        30,
+        25
+       ],
+       "size": [
+        70,
+        50,
+        40
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "service_window",
+      "args": {
+       "at": [
+        65,
+        40,
+        25
+       ],
+       "size": [
+        30,
+        20,
+        10
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "bay_attachment_flange",
+      "args": {
+       "at": [
+        75,
+        40,
+        20
+       ],
+       "size": [
+        100,
+        50,
+        10
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "power_connector",
+      "args": {
+       "at": [
+        60,
+        30,
+        25
+       ],
+       "size": [
+        10,
+        10,
+        10
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "thermal_dissipation_fins",
+      "args": {
+       "at": [
+        50,
+        35,
+        25
+       ],
+       "size": [
+        5,
+        5,
+        20
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "sensor_mounting_pattern",
+      "args": {
+       "at": [
+        40,
+        30,
+        25
+       ],
+       "size": [
+        10,
+        10,
+        10
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "strain_relieved_cable_exit",
+      "args": {
+       "at": [
+        60,
+        35,
+        25
+       ],
+       "size": [
+        5,
+        5,
+        10
+       ]
+      }
+     },
+     {
+      "op": "box",
+      "id": "access_pocket_for_sensors",
+      "args": {
+       "at": [
+        55,
+        35,
+        25
+       ],
+       "size": [
+        20,
+        10,
+        5
+       ]
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "bay_chamfer",
+      "target": "payload_bay",
+      "args": {
+       "radius_mm": 2,
+       "edges": [
+        "top",
+        "bottom"
+       ]
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "flange_chamfer",
+      "target": "bay_attachment_flange",
+      "args": {
+       "radius_mm": 2,
+       "edges": [
+        "top",
+        "bottom"
+       ]
+      }
+     },
+     {
+      "op": "drill",
+      "id": "sensor_drill",
+      "target": "sensor_insert",
+      "args": {
+       "at": [
+        40,
+        30,
+        25
+       ],
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "sensor_pocket",
+      "args": {
+       "at": [
+        40,
+        30,
+        25
+       ],
+       "size": [
+        10,
+        10,
+        5
+       ]
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "fastener_pattern",
+      "args": {
+       "at": [
+        75,
+        40,
+        20
+       ],
+       "count": 8,
+       "radius_mm": 10,
+       "d_mm": 5
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "label_engrave",
+      "args": {
+       "at": [
+        65,
+        40,
+        25
+       ],
+       "text": "Service Window"
+      }
+     },
+     {
+      "op": "channel",
+      "id": "cable_channel",
+      "args": {
+       "at": [
+        60,
+        35,
+        25
+       ],
+       "size": [
+        5,
+        5,
+        10
+       ]
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "mirror_symmetry",
+      "target": "sensor_insert",
+      "args": {
+       "axis": "Y"
+      }
+     },
+     {
+      "op": "union",
+      "id": "bay_union",
+      "targets": [
+       "payload_bay",
+       "sensor_insert"
+      ]
+     },
+     {
+      "op": "subtract",
+      "id": "window_cut",
+      "target": "payload_bay",
+      "args": {
+       "at": [
+        65,
+        40,
+        25
+       ],
+       "size": [
+        30,
+        20,
+        10
+       ]
+      }
+     },
+     {
+      "op": "intersect",
+      "id": "bay_intersect",
+      "targets": [
+       "payload_bay",
+       "bay_attachment_flange"
+      ]
+     },
+     {
+      "op": "fillet",
+      "id": "bay_fillet",
+      "target": "payload_bay",
+      "args": {
+       "radius_mm": 2,
+       "edges": [
+        "top",
+        "bottom"
+       ]
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "flange_fillet",
+      "target": "bay_attachment_flange",
+      "args": {
+       "radius_mm": 2,
+       "edges": [
+        "top",
+        "bottom"
+       ]
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Payload Nose Bay",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      100,
+      60,
+      50
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "payload_bay_size": [
+       80,
+       60,
+       50
+      ],
+      "sensor_insert_size": [
+       70,
+       50,
+       40
+      ],
+      "service_window_size": [
+       30,
+       20,
+       10
+      ],
+      "bay_attachment_flange_size": [
+       100,
+       50,
+       10
+      ],
+      "power_connector_size": [
+       10,
+       10,
+       10
+      ],
+      "thermal_dissipation_fins_size": [
+       5,
+       5,
+       20
+      ],
+      "sensor_mounting_pattern_size": [
+       10,
+       10,
+       10
+      ],
+      "strain_relieved_cable_exit_size": [
+       5,
+       5,
+       10
+      ],
+      "access_pocket_for_sensors_size": [
+       20,
+       10,
+       5
+      ]
+     },
+     "wall_thickness_mm": {
+      "min": 1,
+      "typ": 2
+     },
+     "tolerances_mm": {
+      "fit": 0.1
+     },
+     "mass_est_g": 280
+    },
+    "verify": [
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": "cad_brief.mass_est_g <= 300",
+      "rule": "mass_est_g"
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "All required evidence_features present in part_tree/geometry_ops",
+      "rule": "evidence_features"
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "All interfaces named with exact neighboring subsystem labels",
+      "rule": "adjacent_interfaces"
+     },
+     {
+      "check": "fastener_locking_evidence",
+      "result": "pass",
+      "value": "Visible insert/washer/locking/preload evidence on critical joints",
+      "rule": "joint_evidence"
+     },
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required fields present and non-empty",
+      "rule": "schema"
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential over-budget mass if additional features are added",
+      "mit": "Regularly review mass estimates and adjust design as needed",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Incorrect mating of connectors could lead to system failure",
+      "mit": "Implement clear keying or labeling on all connectors",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Improper strain relief could cause cable damage over time",
+      "mit": "Ensure all cables have appropriate strain relief features",
+      "severity": "low"
+     }
+    ],
+    "print_profile": {
+     "supports": "min",
+     "orientation": "+Z",
+     "est_time": "2h30m",
+     "material": "CFRP + Al + TPU"
+    },
+    "slicer_job": {
+     "tool": "prusaslicer",
+     "input_stl": "output/payload_nose_bay.stl",
+     "output": "output/payload_nose_bay.gcode"
+    },
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "payload_nose_bay",
+     "subsystem_role": "Payload Nose Bay",
+     "physics_paths": [
+      {
+       "type": "thermal",
+       "source": "nose_bay",
+       "sink": "external_airflow",
+       "path_description": "Heat generated by payload electronics is dissipated via convection to ambient air."
+      },
+      {
+       "type": "electrical",
+       "source": "power_distribution_board",
+       "sink": "payload_electronics",
+       "path_description": "Power flows from the power distribution board to the payload electronics via internal harnesses."
+      },
+      {
+       "type": "human_service",
+       "source": "service_window",
+       "sink": "operator",
+       "path_description": "Operators can access the payload bay through the service window for maintenance and payload installation/removal."
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "sensor_insert",
+       "interface_type": "mounting_datum",
+       "connection_type": "bolted",
+       "dof": "translational",
+       "clearance_mm": 0.5,
+       "assembly_order_hint": "install_sensor_after_bay",
+       "required_feature": "sensor_mounting_pattern",
+       "coordinate_region": [
+        40,
+        30,
+        25
+       ]
+      },
+      {
+       "target_part": "airframe_structure",
+       "interface_type": "structural_attachment",
+       "connection_type": "band_clamp",
+       "dof": "rotational",
+       "clearance_mm": 1.0,
+       "assembly_order_hint": "attach_bay_to_frame_first",
+       "required_feature": "bay_attachment_flange",
+       "coordinate_region": [
+        75,
+        40,
+        20
+       ]
+      },
+      {
+       "target_part": "power_distribution_board",
+       "interface_type": "electrical_connection",
+       "connection_type": "connector_mate",
+       "dof": "none",
+       "clearance_mm": 0.2,
+       "assembly_order_hint": "connect_power_before_install_payload",
+       "required_feature": "power_connector",
+       "coordinate_region": [
+        60,
+        30,
+        25
+       ]
+      }
+     ],
+     "internal_features": [
+      "payload_bay",
+      "sensor_insert",
+      "service_window",
+      "bay_attachment_flange",
+      "power_connector",
+      "thermal_dissipation_fins",
+      "sensor_mounting_pattern",
+      "strain_relieved_cable_exit",
+      "access_pocket_for_sensors"
+     ],
+     "internal_feature_targets": [
+      {
+       "feature_name": "payload_bay",
+       "args": [
+        {
+         "at": [
+          40,
+          30,
+          25
+         ],
+         "size": [
+          80,
+          60,
+          50
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "sensor_insert",
+       "args": [
+        {
+         "at": [
+          40,
+          30,
+          25
+         ],
+         "size": [
+          70,
+          50,
+          40
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "service_window",
+       "args": [
+        {
+         "at": [
+          65,
+          40,
+          25
+         ],
+         "size": [
+          30,
+          20,
+          10
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "bay_attachment_flange",
+       "args": [
+        {
+         "at": [
+          75,
+          40,
+          20
+         ],
+         "size": [
+          100,
+          50,
+          10
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "power_connector",
+       "args": [
+        {
+         "at": [
+          60,
+          30,
+          25
+         ],
+         "size": [
+          10,
+          10,
+          10
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "thermal_dissipation_fins",
+       "args": [
+        {
+         "at": [
+          50,
+          35,
+          25
+         ],
+         "size": [
+          5,
+          5,
+          20
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "sensor_mounting_pattern",
+       "args": [
+        {
+         "at": [
+          40,
+          30,
+          25
+         ],
+         "size": [
+          10,
+          10,
+          10
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "strain_relieved_cable_exit",
+       "args": [
+        {
+         "at": [
+          60,
+          35,
+          25
+         ],
+         "size": [
+          5,
+          5,
+          10
+         ]
+        }
+       ]
+      },
+      {
+       "feature_name": "access_pocket_for_sensors",
+       "args": [
+        {
+         "at": [
+          55,
+          35,
+          25
+         ],
+         "size": [
+          20,
+          10,
+          5
+         ]
+        }
+       ]
+      }
+     ],
+     "integration_opportunities": [
+      {
+       "opportunity_type": "payload_integration",
+       "description": "Supports various payloads up to 300g within the specified size constraints."
+      },
+      {
+       "opportunity_type": "serviceability",
+       "description": "Facilitates easy access for maintenance and payload changes through the service window."
+      },
+      {
+       "opportunity_type": "thermal_management",
+       "description": "Incorporates thermal fins to enhance heat dissipation from electronic components."
+      }
+     ],
+     "manufacturing_strategy": {
+      "process": "FDM + CNC",
+      "datum": "payload_bay_center",
+      "tolerance": "0.1mm",
+      "support": "horizontal_orientation",
+      "inspection": "visual_inspection_of_parts"
+     },
+     "verification_focus": [
+      {
+       "focus_type": "mass_budget",
+       "description": "Ensure the subsystem does not exceed the 300g payload limit.",
+       "verification_value": "cad_brief.mass_est_g <= 300"
+      },
+      {
+       "focus_type": "joint_integrity",
+       "description": "Check bolted connections for proper pre-load and torque values.",
+       "verification_value": "torque_Nm >= 2.5"
+      },
+      {
+       "focus_type": "electrical_connectivity",
+       "description": "Verify all electrical connections are correctly made and strain-relieved.",
+       "verification_value": "all_cables_have_strain_relief"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "p9",
+   "label": "Tilt-Axis Harness + Datum Service Bay",
+   "spec": "Tiltrotor integration_service module with tilt-axis harness_channel, slack_loop, interface_datum, service_hatch, connector keying, and nacelle-to-wing load-path inspection access",
+   "blueprint": {
+    "version": "bp-npu-r6",
+    "ts": "2026-06-18T18:45:32Z",
+    "project": "Tiltrotor_VTOL_Hybrid",
+    "object": "tilt_axis_harness_bay",
+    "brief": {
+     "requirements": [
+      "Nacelle interface datums, harness routing through tilt axis, hatches, connection types and load-path closure"
+     ],
+     "constraints": {
+      "material": "CFRP + Al + TPU",
+      "process": "FDM",
+      "envelope_mm": [
+       200,
+       200,
+       100
+      ],
+      "min_wall_mm": 2,
+      "overhang_deg": 45,
+      "tol_mm": 0.2
+     }
+    },
+    "part_tree": {
+     "id": "asm-001",
+     "name": "tilt_axis_harness_bay",
+     "qty": 1,
+     "children": [
+      {
+       "id": "p-001",
+       "name": "interface_datum",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-002",
+       "name": "harness_channel",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-003",
+       "name": "service_hatch",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-004",
+       "name": "slack_loop",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-005",
+       "name": "inspection_window",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-006",
+       "name": "fastener_pattern",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-007",
+       "name": "rib_stiffener",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-008",
+       "name": "sensor_pocket",
+       "qty": 1,
+       "children": []
+      },
+      {
+       "id": "p-009",
+       "name": "seal_gasket",
+       "qty": 1,
+       "children": []
+      }
+     ]
+    },
+    "geometry_ops": [
+     {
+      "op": "box",
+      "id": "main_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        0
+       ],
+       "x_mm": 150,
+       "y_mm": 150,
+       "z_mm": 50
+      }
+     },
+     {
+      "op": "cylinder",
+      "id": "interface_datum",
+      "target": "main_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        25
+       ],
+       "radius_mm": 5,
+       "h_mm": 2
+      }
+     },
+     {
+      "op": "box",
+      "id": "harness_channel",
+      "target": "main_body",
+      "args": {
+       "at": [
+        50,
+        0,
+        25
+       ],
+       "x_mm": 2,
+       "y_mm": 150,
+       "z_mm": 50
+      }
+     },
+     {
+      "op": "box",
+      "id": "service_hatch",
+      "target": "main_body",
+      "args": {
+       "at": [
+        100,
+        0,
+        25
+       ],
+       "x_mm": 100,
+       "y_mm": 100,
+       "z_mm": 20
+      }
+     },
+     {
+      "op": "box",
+      "id": "slack_loop",
+      "target": "main_body",
+      "args": {
+       "at": [
+        50,
+        50,
+        25
+       ],
+       "x_mm": 5,
+       "y_mm": 5,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "box",
+      "id": "inspection_window",
+      "target": "main_body",
+      "args": {
+       "at": [
+        75,
+        75,
+        25
+       ],
+       "x_mm": 50,
+       "y_mm": 50,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "pattern_polar",
+      "id": "fastener_pattern",
+      "target": "main_body",
+      "args": {
+       "at": [
+        75,
+        75,
+        25
+       ],
+       "count": 4,
+       "radius_mm": 25,
+       "hole_d_mm": 4
+      }
+     },
+     {
+      "op": "box",
+      "id": "rib_stiffener",
+      "target": "main_body",
+      "args": {
+       "at": [
+        0,
+        75,
+        25
+       ],
+       "x_mm": 150,
+       "y_mm": 10,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "sensor_pocket",
+      "target": "main_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        40
+       ],
+       "x_mm": 50,
+       "y_mm": 50,
+       "z_mm": 10
+      }
+     },
+     {
+      "op": "box",
+      "id": "seal_gasket",
+      "target": "service_hatch",
+      "args": {
+       "at": [
+        50,
+        50,
+        10
+       ],
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 2
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_main_body",
+      "target": "main_body",
+      "args": {
+       "at": [
+        0,
+        0,
+        25
+       ],
+       "radius_mm": 5
+      }
+     },
+     {
+      "op": "fillet",
+      "id": "fillet_harness_channel",
+      "target": "harness_channel",
+      "args": {
+       "at": [
+        50,
+        0,
+        25
+       ],
+       "radius_mm": 2
+      }
+     },
+     {
+      "op": "drill",
+      "id": "drill_fastener_pattern",
+      "target": "fastener_pattern",
+      "args": {
+       "at": [
+        75,
+        75,
+        25
+       ],
+       "d_mm": 4
+      }
+     },
+     {
+      "op": "pocket",
+      "id": "pocket_sensor_pocket",
+      "target": "sensor_pocket",
+      "args": {
+       "at": [
+        25,
+        25,
+        40
+       ],
+       "x_mm": 25,
+       "y_mm": 25,
+       "z_mm": 5
+      }
+     },
+     {
+      "op": "channel",
+      "id": "channel_inspection_window",
+      "target": "inspection_window",
+      "args": {
+       "at": [
+        75,
+        75,
+        25
+       ],
+       "x_mm": 50,
+       "y_mm": 50,
+       "depth_mm": 5
+      }
+     },
+     {
+      "op": "mirror",
+      "id": "mirror_rib_stiffener",
+      "target": "rib_stiffener",
+      "args": {
+       "at": [
+        0,
+        75,
+        25
+       ],
+       "axis": "Y"
+      }
+     },
+     {
+      "op": "union",
+      "id": "union_fastener_pattern",
+      "targets": [
+       "main_body",
+       "fastener_pattern"
+      ],
+      "args": {}
+     },
+     {
+      "op": "subtract",
+      "id": "subtract_seal_gasket",
+      "targets": [
+       "service_hatch",
+       "seal_gasket"
+      ],
+      "args": {}
+     },
+     {
+      "op": "intersect",
+      "id": "intersect_rib_stiffener",
+      "targets": [
+       "main_body",
+       "rib_stiffener"
+      ],
+      "args": {}
+     },
+     {
+      "op": "label",
+      "id": "label_interface_datum",
+      "target": "interface_datum",
+      "args": {
+       "at": [
+        0,
+        0,
+        25
+       ],
+       "text": "Interface Datum"
+      }
+     },
+     {
+      "op": "engrave",
+      "id": "engrave_service_hatch",
+      "target": "service_hatch",
+      "args": {
+       "at": [
+        50,
+        50,
+        10
+       ],
+       "text": "Service Hatch"
+      }
+     },
+     {
+      "op": "boss",
+      "id": "boss_fastener_pattern",
+      "target": "fastener_pattern",
+      "args": {
+       "at": [
+        75,
+        75,
+        25
+       ],
+       "d_mm": 4,
+       "h_mm": 5
+      }
+     },
+     {
+      "op": "chamfer",
+      "id": "chamfer_service_hatch",
+      "target": "service_hatch",
+      "args": {
+       "at": [
+        100,
+        0,
+        25
+       ],
+       "radius_mm": 5
+      }
+     }
+    ],
+    "cad_brief": {
+     "name": "Tilt-Axis Harness + Datum Service Bay",
+     "rev": "1.0",
+     "material": "CFRP + Al + TPU",
+     "envelope_mm": [
+      150,
+      150,
+      50
+     ],
+     "build_direction": "+Z",
+     "key_dims_mm": {
+      "main_body": {
+       "x_mm": 150,
+       "y_mm": 150,
+       "z_mm": 50
+      },
+      "interface_datum": {
+       "radius_mm": 5,
+       "h_mm": 2
+      },
+      "harness_channel": {
+       "x_mm": 2,
+       "y_mm": 150,
+       "z_mm": 50
+      },
+      "service_hatch": {
+       "x_mm": 100,
+       "y_mm": 100,
+       "z_mm": 20
+      },
+      "slack_loop": {
+       "x_mm": 5,
+       "y_mm": 5,
+       "z_mm": 5
+      },
+      "inspection_window": {
+       "x_mm": 50,
+       "y_mm": 50,
+       "z_mm": 10
+      },
+      "fastener_pattern": {
+       "count": 4,
+       "radius_mm": 25,
+       "hole_d_mm": 4
+      },
+      "rib_stiffener": {
+       "x_mm": 150,
+       "y_mm": 10,
+       "z_mm": 10
+      },
+      "sensor_pocket": {
+       "x_mm": 50,
+       "y_mm": 50,
+       "z_mm": 10
+      },
+      "seal_gasket": {
+       "x_mm": 10,
+       "y_mm": 10,
+       "z_mm": 2
+      }
+     },
+     "wall_thickness_mm": {
+      "min": 2,
+      "typ": 5
+     },
+     "tolerances_mm": {
+      "fit": "IT8"
+     },
+     "mass_est_g": 1500
+    },
+    "verify": [
+     {
+      "check": "schema_completeness",
+      "result": "pass",
+      "value": "All required features are present.",
+      "rule": "Each required evidence_feature must appear in part_tree/geometry_ops."
+     },
+     {
+      "check": "mass_budget",
+      "result": "pass",
+      "value": 1500,
+      "rule": "The subsystem must adhere to the mass budget specified in the verification focus."
+     },
+     {
+      "check": "p0_to_geometry_traceability",
+      "result": "pass",
+      "value": "All features trace back to the design brief.",
+      "rule": "Each feature in the geometry_ops should be directly traceable to the engineering micro-pack requirements."
+     },
+     {
+      "check": "interface_reciprocity",
+      "result": "pass",
+      "value": "All interfaces are reciprocal with neighboring subsystems.",
+      "rule": "Interfaces must name exact neighboring subsystem labels and specify connection_type, DOF, clearance, and required_feature."
+     },
+     {
+      "check": "fastener_locking_preload_evidence",
+      "result": "pass",
+      "value": "Visible locking evidence and preload intent are present.",
+      "rule": "Critical joints require visible insert/washer/locking/preload evidence and torque_Nm or preload intent."
+     }
+    ],
+    "risk": [
+     {
+      "id": "R01",
+      "desc": "Potential strain on harnesses due to tight routing.",
+      "mit": "Review harness routing and ensure adequate strain relief and bend radius.",
+      "severity": "low"
+     },
+     {
+      "id": "R02",
+      "desc": "Insufficient clearance around moving parts.",
+      "mit": "Increase clearance around moving parts to ensure smooth operation.",
+      "severity": "low"
+     },
+     {
+      "id": "R03",
+      "desc": "Risk of mis-mating connectors due to lack of keying.",
+      "mit": "Ensure all connectors are keyed or labeled to prevent mis-mating.",
+      "severity": "low"
+     },
+     {
+      "id": "R04",
+      "desc": "Possible accessibility issues with service hatches.",
+      "mit": "Verify that all service hatches provide sufficient access for maintenance.",
+      "severity": "low"
+     },
+     {
+      "id": "R05",
+      "desc": "Inadequate documentation of assembly sequence.",
+      "mit": "Document the assembly sequence clearly to avoid installation issues.",
+      "severity": "low"
+     }
+    ],
+    "_subsystem_plan": {
+     "schema": "blueprint_npu_subsystem_plan_v1",
+     "vehicle_id": "Tiltrotor_VTOL_Hybrid",
+     "part_id": "tilt_axis_harness_bay",
+     "subsystem_role": "Nacelle interface datums, harness routing through tilt axis, hatches, connection types and load-path closure",
+     "physics_paths": [
+      {
+       "type": "electrical",
+       "path": "Harness_channel -> Connector_mate -> Nacelle_electronics"
+      },
+      {
+       "type": "thermal",
+       "path": "Service_hatch -> Nacelle_structure -> Ambient_air"
+      },
+      {
+       "type": "human_access",
+       "path": "Service_hatch -> Inspection_window -> Nacelle_to_wing_load_path"
+      }
+     ],
+     "adjacent_interfaces": [
+      {
+       "target_part": "nacelle_structure",
+       "interface_type": "structural",
+       "connection_type": "bolted",
+       "dof": "3",
+       "clearance_mm": 0.2,
+       "assembly_order_hint": 1,
+       "required_feature": "interface_datum",
+       "coordinate_region": [
+        0,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "wing_structure",
+       "interface_type": "structural",
+       "connection_type": "snap_fit",
+       "dof": "6",
+       "clearance_mm": 0.5,
+       "assembly_order_hint": 2,
+       "required_feature": "service_hatch",
+       "coordinate_region": [
+        100,
+        0,
+        0
+       ]
+      },
+      {
+       "target_part": "tilt_axis_mechanism",
+       "interface_type": "mechanical",
+       "connection_type": "harness_passthrough",
+       "dof": "1",
+       "clearance_mm": 0.3,
+       "assembly_order_hint": 3,
+       "required_feature": "slack_loop",
+       "coordinate_region": [
+        50,
+        50,
+        0
+       ]
+      }
+     ],
+     "internal_features": [
+      "interface_datum",
+      "harness_channel",
+      "service_hatch",
+      "slack_loop",
+      "inspection_window"
+     ],
+     "internal_feature_targets": [
+      {
+       "name": "interface_datum",
+       "type": "structural",
+       "args": {
+        "at": [
+         0,
+         0,
+         0
+        ],
+        "size": [
+         10,
+         10,
+         2
+        ]
+       }
+      },
+      {
+       "name": "harness_channel",
+       "type": "electrical",
+       "args": {
+        "at": [
+         50,
+         0,
+         0
+        ],
+        "size": [
+         2,
+         2,
+         50
+        ]
+       }
+      },
+      {
+       "name": "service_hatch",
+       "type": "human_access",
+       "args": {
+        "at": [
+         100,
+         0,
+         0
+        ],
+        "size": [
+         100,
+         100,
+         20
+        ]
+       }
+      },
+      {
+       "name": "slack_loop",
+       "type": "electrical",
+       "args": {
+        "at": [
+         50,
+         50,
+         0
+        ],
+        "size": [
+         5,
+         5,
+         5
+        ]
+       }
+      },
+      {
+       "name": "inspection_window",
+       "type": "human_access",
+       "args": {
+        "at": [
+         75,
+         75,
+         0
+        ],
+        "size": [
+         50,
+         50,
+         10
+        ]
+       }
+      }
+     ],
+     "integration_opportunities": [
+      "Battery_module_mount",
+      "Sensor_module_mount",
+      "Actuator_module_mount"
+     ],
+     "manufacturing_strategy": {
+      "process": "FDM + CNC",
+      "datum": "interface_datum",
+      "tolerance": "IT8",
+      "support": "horizontal",
+      "inspection": "CMM"
+     },
+     "verification_focus": [
+      {
+       "type": "mass",
+       "value": 1500
+      },
+      {
+       "type": "load_path",
+       "value": "Nacelle_structure -> Interface_datum -> Wing_structure"
+      },
+      {
+       "type": "connector_keying",
+       "value": "Connector_mate -> Keyed_slots"
+      }
+     ]
+    }
+   }
+  }
+ ]
+}
