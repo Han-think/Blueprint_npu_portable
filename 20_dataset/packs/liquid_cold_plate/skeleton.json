@@ -1,0 +1,213 @@
+{
+  "schema": "blueprint_skeleton_pack_v1",
+  "seed": "liquid_cold_plate",
+  "pass": "PASS-0",
+  "instruction": "Lay out one top-level node per required_subsystem, global datums, envelope, and stub interfaces. No detailed geometry in PASS-0.",
+  "disciplines": {
+    "structures": "Load-bearing bodies, frames, ribs, bosses, covers, and stiffness paths",
+    "rotating": "Shafts, bearings, gears, crank/rotor elements, couplings, and balance references",
+    "fluid": "Ports, channels, galleries, manifolds, volutes, pressure boundaries, and drain paths",
+    "thermal": "Heat paths, cooling plates/jackets/fins, thermal pads, and service-visible heat flow",
+    "power": "Cells, busbars, disconnects, power electronics, insulation, and protected terminals",
+    "electronics": "Boards, sensors, cable channels, EMI/grounding, connector keying, and covers",
+    "sealing": "Gaskets, O-ring grooves, gland interfaces, pressure caps, vents, and leak inspection",
+    "actuation": "Motors, screws, rails, linkages, valves, clutches, and serviceable actuator modules",
+    "integration": "Datums, fastener patterns, service access, alignment features, assembly order",
+    "safety_boundary": "Non-operational academic study/reference structure constraints, labels, blocked performance claims"
+  },
+  "required_subsystems": [
+    {
+      "id": "thermal_channel_network",
+      "discipline": "thermal",
+      "function": "Serpentine cooling path and heat source pads",
+      "evidence_features": [
+        "serpentine_channel",
+        "fin_island",
+        "thermal_pad_zone",
+        "temperature_sensor_pad",
+        "flatness_datum"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "thermal_channel_network_domain_grammar"
+      ]
+    },
+    {
+      "id": "manifold_ports",
+      "discipline": "fluid",
+      "function": "Inlet/outlet and flow distribution",
+      "evidence_features": [
+        "inlet_port",
+        "outlet_port",
+        "manifold_cap",
+        "flow_arrow",
+        "hose_boss"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "manifold_ports_domain_grammar"
+      ]
+    },
+    {
+      "id": "seal_leak_boundary",
+      "discipline": "sealing",
+      "function": "Gasket track and leak witness path",
+      "evidence_features": [
+        "gasket_groove",
+        "compression_stop",
+        "leak_witness_channel",
+        "corner_relief",
+        "bleed_screw"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "seal_leak_boundary_domain_grammar"
+      ]
+    },
+    {
+      "id": "electronics_mounting",
+      "discipline": "electronics",
+      "function": "Power device mounting and isolation",
+      "evidence_features": [
+        "module_mount_pad",
+        "isolation_washer_pocket",
+        "ground_point",
+        "fastener_pattern",
+        "service_label"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "electronics_mounting_domain_grammar"
+      ]
+    },
+    {
+      "id": "service_test_access",
+      "discipline": "integration",
+      "function": "Test/drain/cover assembly",
+      "evidence_features": [
+        "test_port",
+        "drain_plug",
+        "datum_pin",
+        "torque_sequence_mark",
+        "inspection_label"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "service_test_access_domain_grammar"
+      ]
+    }
+  ],
+  "completeness_rule": "Every required_subsystem must appear in part_tree with at least one evidence_feature in geometry_ops; missing subsystem coverage is a scorecard failure, not style.",
+  "global_judgment_summary": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "good": "Every P0 evidence feature appears as a named part_tree child or a geometry_ops target.",
+          "bad": "Subsystem claims features in prose but leaves no geometry target or child node."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "good": "Coordinates span stations, ports, bearing seats, service faces, or datum pads.",
+          "bad": "All geometry is stacked at the origin or represented as one box/cylinder."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "good": "Uses pockets, channels, bosses, bolt patterns, ribs, seals, and inspection covers.",
+          "bad": "Only primitive body solids with no interface or service evidence."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "good": "Each adjacent interface names a joint family, DOF, clearance, datum, and mating feature.",
+          "bad": "Interfaces are vague mounts with no reciprocal feature or clearance."
+        },
+        {
+          "criterion": "service_access",
+          "good": "Wear parts, covers, plugs, connectors, seals, or cartridges have visible removal paths.",
+          "bad": "Maintenance-critical items are trapped behind sealed geometry."
+        },
+        {
+          "criterion": "load_or_flow_path_closure",
+          "good": "The main load, torque, heat, fluid, or current path is traceable through named features.",
+          "bad": "Functional flow/load claims stop at a shell without interfaces."
+        }
+      ]
+    }
+  ],
+  "connection_taxonomy": {
+    "rule": "Name each inter-part interface with connection type + DOF + numeric clearance.",
+    "dof_codes": "0=fixed, 1R=revolute, 1T=prismatic, 1R1T=cylindrical, 3R=spherical",
+    "families": {
+      "fastened": [
+        "bolted_through(0)",
+        "threaded_insert(0)",
+        "retainer_plate(0)"
+      ],
+      "rotating": [
+        "bearing_seat(1R)",
+        "shaft_coupling(1R)",
+        "gear_mesh(1R)"
+      ],
+      "fluid": [
+        "flanged_gasket(0)",
+        "threaded_port(0)",
+        "hose_barb(0)",
+        "gland_seal(0)"
+      ],
+      "electrical": [
+        "keyed_connector(0)",
+        "service_disconnect(0)",
+        "ground_lug(0)"
+      ],
+      "service": [
+        "sliding_tray(1T)",
+        "inspection_cover(0)",
+        "cartridge_retainer(0)"
+      ]
+    }
+  },
+  "boundary_note": null,
+  "operability_profile": {
+    "operating_principle": "Thermal management plate that transfers heat from electronics pads into internal liquid channels and manifold ports while maintaining gasket/leak boundaries.",
+    "primary_paths": {
+      "load_path": [
+        "mount screw compression",
+        "gasket compression",
+        "module pad contact"
+      ],
+      "fluid_path": [
+        "inlet manifold",
+        "serpentine channels",
+        "outlet manifold",
+        "drain/bleed/test path"
+      ],
+      "thermal_path": [
+        "device pad to plate",
+        "plate to coolant",
+        "sensor pad feedback"
+      ],
+      "electrical_path": [
+        "ground/isolation washer context"
+      ],
+      "signal_path": [
+        "temperature sensor routing if present"
+      ]
+    },
+    "solver_focus": [
+      "OpenFOAM channel flow",
+      "thermal conduction/convection",
+      "gasket compression review"
+    ]
+  }
+}

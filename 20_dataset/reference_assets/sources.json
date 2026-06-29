@@ -1,0 +1,93 @@
+{
+  "schema": "blueprint_reference_asset_sources_v1",
+  "policy": {
+    "default_mode": "dry_run",
+    "download_only_when_explicit": true,
+    "respect_robots_txt": true,
+    "rate_limit_seconds": 1.0,
+    "max_file_mb_default": 250,
+    "quarantine_unknown_license": true
+  },
+  "allowed_extensions": [
+    ".step",
+    ".stp",
+    ".iges",
+    ".igs",
+    ".stl",
+    ".obj",
+    ".3mf",
+    ".fcstd",
+    ".scad",
+    ".vsp3",
+    ".svg",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".webp",
+    ".pdf",
+    ".json",
+    ".jsonl",
+    ".csv",
+    ".txt",
+    ".md"
+  ],
+  "sources": [
+    {
+      "id": "nasa_3d_resources",
+      "label": "NASA 3D Resources",
+      "kind": "official_public_repository",
+      "base_url": "https://science.nasa.gov/3d-resources/",
+      "seed_targets": ["cubesat", "small_launch_vehicle", "long_range_recon_wing"],
+      "license_hint": "NASA/public-government material; verify each asset page before training use.",
+      "crawl": {
+        "enabled": true,
+        "mode": "discover_links",
+        "max_depth": 1,
+        "include_url_regex": "(?i)(3d|model|cad|stl|step|obj|glb|gltf|spacecraft|satellite|aircraft|rocket|download|resource)",
+        "exclude_url_regex": "(?i)(login|account|cart|checkout|favicon|apple-touch-icon|wp-content/plugins|theme|logo|sprite|icon-[0-9])"
+      }
+    },
+    {
+      "id": "openvsp",
+      "label": "OpenVSP",
+      "kind": "open_source_tool_and_examples",
+      "base_url": "https://openvsp.org/",
+      "seed_targets": ["long_range_recon_wing", "tiltrotor"],
+      "license_hint": "OpenVSP is NASA open-source software; verify model/example license before training use.",
+      "crawl": {
+        "enabled": true,
+        "mode": "discover_links",
+        "max_depth": 1,
+        "include_url_regex": "(?i)(vsp|hangar|airshow|example|download|\\.vsp3|\\.stl|\\.step|\\.iges|\\.obj)",
+        "exclude_url_regex": "(?i)(login|forum|account|favicon|apple-touch-icon|logo|theme|sprite)"
+      }
+    },
+    {
+      "id": "abc_dataset",
+      "label": "ABC Dataset",
+      "kind": "research_dataset",
+      "base_url": "https://deep-geometry.github.io/abc-dataset/",
+      "seed_targets": ["robot_arm", "haptic_glove", "cubesat"],
+      "license_hint": "Research CAD dataset; use only after reviewing dataset terms.",
+      "crawl": {
+        "enabled": false,
+        "mode": "manual_download",
+        "max_depth": 0
+      }
+    },
+    {
+      "id": "github_open_cad",
+      "label": "GitHub Open CAD Repositories",
+      "kind": "open_source_repository_seed",
+      "base_url": "https://github.com/",
+      "seed_targets": ["robot_arm", "haptic_glove", "long_range_recon_wing", "tiltrotor", "cubesat"],
+      "license_hint": "Only ingest repositories with an explicit compatible license.",
+      "crawl": {
+        "enabled": false,
+        "mode": "manual_repo_list",
+        "max_depth": 0
+      }
+    }
+  ]
+}

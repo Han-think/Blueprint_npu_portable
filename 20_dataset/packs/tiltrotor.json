@@ -8,7 +8,7 @@
       "actuation": "Motors, servos, brakes, reducers and their mounting/replacement",
       "power": "Battery, solar generation, charging, distribution, connectors",
       "electronics": "Boards, drivers, wiring, signal routing, grounding",
-      "gnc": "Attitude/position sensing and control hardware evidence (mock level)",
+      "gnc": "Attitude/position sensing and control hardware evidence (reference structure level)",
       "payload": "Mission equipment bay, sensor mounts, removable inserts",
       "integration": "Datums, interfaces, harness routing, service access, assembly order"
     },
@@ -104,7 +104,7 @@
       {
         "id": "gnc_sensors",
         "discipline": "gnc",
-        "function": "IMU, pitot/airspeed sensor, GPS mount evidence near CG (mock level)",
+        "function": "IMU, pitot/airspeed sensor, GPS mount evidence near CG (reference structure level)",
         "evidence_features": [
           "imu_mount",
           "pitot_probe",
@@ -292,7 +292,7 @@
           "criterion": "mechanism_named_not_implied",
           "weight": 9,
           "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
-          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth reference articles, cam profiles, or linkage bars exist in geometry.",
           "signals": [
             "four_bar",
             "cam",
@@ -301,7 +301,7 @@
             "pivot_hole",
             "linkage_bar"
           ],
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry.",
           "source_refs": [
             "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
           ]
@@ -704,16 +704,16 @@
           "loop_feedback": "Expose wing spar sockets, fuselage spine datum, payload bay, and slide-in battery service feature."
         },
         {
-          "criterion": "safe_mock_vtol_boundary",
+          "criterion": "safe_study_vtol_boundary",
           "weight": 9,
-          "good": "Output remains educational mockup, avoiding operational flight tuning or control-law details.",
+          "good": "Output remains academic study structureup, avoiding operational flight tuning or control-law details.",
           "bad": "Design claims BVLOS capability, flight readiness, or actionable aircraft tuning.",
           "signals": [
-            "educational mock",
-            "display-only",
+            "academic study structure",
+            "academic non-operational",
             "design-review evidence"
           ],
-          "loop_feedback": "Frame VTOL features as educational mock assembly evidence, not flight-qualified or operational design."
+          "loop_feedback": "Frame VTOL features as academic study structure assembly evidence, not flight-qualified or operational design."
         },
         {
           "criterion": "nacelle_load_and_service_path",
@@ -1035,5 +1035,36 @@
       "label": "toc_intro",
       "text": "--- page 1 ---\n\n\n--- page 2 ---\n\n\n--- page 3 ---\n\n\n--- page 4 ---\n\n\n--- page 5 ---\n\n\n--- page 6 ---\n\n\n--- page 7 ---\n\n\n--- page 8 ---\n\n\n--- page 9 ---\n\n\n--- page 10 ---\n\n\n--- page 11 ---\n\n\n--- page 12 ---\n\n\n--- page 13 ---\n\n\n--- page 14 ---\n\n\n--- page 15 ---\n\n\n--- page 16 ---\n\n\n--- page 17 ---\n\n\n--- page 18 ---\n\n\n--- page 19 ---\n\n\n--- page 20 ---\n"
     }
-  ]
+  ],
+  "operability_profile": {
+    "operating_principle": "VTOL aircraft architecture that transitions thrust vector through nacelle tilt axes while preserving wing load paths, slack-loop harnesses, and control authority.",
+    "primary_paths": {
+      "load_path": [
+        "nacelle thrust to wing spar",
+        "tilt bearing reaction",
+        "landing gear reaction"
+      ],
+      "fluid_path": [
+        "rotor slipstream over wing",
+        "cooling airflow through nacelles"
+      ],
+      "thermal_path": [
+        "motor/ESC heat to nacelle vents",
+        "battery bay heat path"
+      ],
+      "electrical_path": [
+        "battery to tilt/propulsion ESCs",
+        "power distribution to avionics"
+      ],
+      "signal_path": [
+        "flight controller to tilt servo",
+        "IMU/GPS/pitot to controller"
+      ]
+    },
+    "solver_focus": [
+      "tilt-axis joint FEA",
+      "rotor/wing flow interaction proxy",
+      "harness slack clearance"
+    ]
+  }
 }

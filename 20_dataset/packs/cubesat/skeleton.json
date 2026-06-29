@@ -9,10 +9,10 @@
     "power": "Battery, solar generation, charging, distribution, connectors",
     "electronics": "Boards, drivers, wiring, signal routing, grounding",
     "comms": "Antennas, radios, data links and their placement/clearance",
-    "gnc": "Attitude/position sensing and control hardware evidence (mock level)",
+    "gnc": "Attitude/position sensing and control hardware evidence (study-reference level)",
     "thermal": "Heat paths, radiators, vents, thermal isolation notes",
     "payload": "Mission equipment bay, sensor mounts, removable inserts",
-    "recovery_deployment": "Parachutes, deployables, release mechanisms (display-level)",
+    "recovery_deployment": "Parachutes, deployables, release mechanisms (study-level)",
     "integration": "Datums, interfaces, harness routing, service access, assembly order"
   },
   "required_subsystems": [
@@ -30,7 +30,7 @@
     {
       "id": "eps_solar_charging",
       "discipline": "power",
-      "function": "Solar panel dummies, battery tray, charge/distribution board",
+      "function": "Solar panel reference articles, battery tray, charge/distribution board",
       "evidence_features": [
         "solar_panel_face",
         "battery_tray",
@@ -41,7 +41,7 @@
     {
       "id": "comms_antenna",
       "discipline": "comms",
-      "function": "Antenna deployer (tape-spring dummy ok), radio board slot, RF connector path",
+      "function": "Antenna deployer (tape-spring reference article ok), radio board slot, RF connector path",
       "evidence_features": [
         "antenna_slot",
         "antenna_deployer",
@@ -54,9 +54,9 @@
     {
       "id": "adcs",
       "discipline": "gnc",
-      "function": "Attitude control evidence: reaction wheel/magnetorquer dummies, star tracker mount, sun sensor windows",
+      "function": "Attitude control evidence: reaction wheel/magnetorquer reference articles, star tracker mount, sun sensor windows",
       "evidence_features": [
-        "reaction_wheel_dummy",
+        "reaction_wheel_reference article",
         "magnetorquer_rod",
         "sensor_window",
         "star_tracker_mount",
@@ -98,10 +98,10 @@
     {
       "id": "deployment_mechs",
       "discipline": "recovery_deployment",
-      "function": "Antenna/panel deployment hinges, separation spring plate, pod pusher contacts, release dummies (display-level)",
+      "function": "Antenna/panel deployment hinges, separation spring plate, pod pusher contacts, release reference articles (study-level)",
       "evidence_features": [
         "deploy_hinge",
-        "release_pin_dummy",
+        "release_pin_reference article",
         "burn_wire_note",
         "separation_spring_plate",
         "pusher_contact",
@@ -109,12 +109,12 @@
       ]
     },
     {
-      "id": "propulsion_mock",
+      "id": "propulsion_study",
       "discipline": "actuation",
-      "function": "Cold gas thruster bracket dummies and plumbing manifold mock (display-only, non-functional)",
+      "function": "Cold gas thruster bracket reference articles and plumbing manifold study reference (academic non-operational)",
       "evidence_features": [
         "thruster_bracket",
-        "cold_gas_nozzle_dummy",
+        "cold_gas_nozzle_reference article",
         "plumbing_manifold",
         "cross_pattern_mount"
       ]
@@ -149,7 +149,7 @@
         },
         {
           "criterion": "mechanism_named_not_implied",
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry."
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry."
         }
       ]
     },
@@ -247,5 +247,36 @@
         "fluid_manifold(0)"
       ]
     }
+  },
+  "operability_profile": {
+    "operating_principle": "Small spacecraft architecture that routes loads through rails/frame, power through EPS/battery/solar, data through avionics stack, and heat to radiator/structure paths.",
+    "primary_paths": {
+      "load_path": [
+        "rail/frame launch load path",
+        "panel hinge load path",
+        "payload bench to frame"
+      ],
+      "fluid_path": [],
+      "thermal_path": [
+        "battery to frame conduction",
+        "avionics heat to radiator face",
+        "solar panel thermal exposure"
+      ],
+      "electrical_path": [
+        "solar panel to EPS",
+        "battery to PDU",
+        "PDU to avionics/payload"
+      ],
+      "signal_path": [
+        "antenna to radio",
+        "OBC to sensors",
+        "payload data to storage/downlink"
+      ]
+    },
+    "solver_focus": [
+      "modal/launch-load FEA",
+      "thermal balance proxy",
+      "harness clearance review"
+    ]
   }
 }

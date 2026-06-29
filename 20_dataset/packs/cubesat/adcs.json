@@ -5,9 +5,9 @@
   "subsystem": {
     "id": "adcs",
     "discipline": "gnc",
-    "function": "Attitude control evidence: reaction wheel/magnetorquer dummies, star tracker mount, sun sensor windows",
+    "function": "Attitude control evidence: reaction wheel/magnetorquer reference articles, star tracker mount, sun sensor windows",
     "evidence_features": [
-      "reaction_wheel_dummy",
+      "reaction_wheel_reference article",
       "magnetorquer_rod",
       "sensor_window",
       "star_tracker_mount",
@@ -70,7 +70,7 @@
           "criterion": "mechanism_named_not_implied",
           "weight": 9,
           "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
-          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth reference articles, cam profiles, or linkage bars exist in geometry.",
           "signals": [
             "four_bar",
             "cam",
@@ -79,7 +79,7 @@
             "pivot_hole",
             "linkage_bar"
           ],
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry.",
           "source_refs": [
             "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
           ]
@@ -242,5 +242,36 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 100x100x340mm (3U CubeSat). Environment: LEO vacuum, -40 to +80C thermal cycling, radiation. Design loads: launch vibration 20g, deployment shock, solar pressure. Electronics: include EMI shielding, thermal dissipation path, and connector keying in design."
+  "boundary_note": "Subsystem scale: 100x100x340mm (3U CubeSat). Environment: LEO vacuum, -40 to +80C thermal cycling, radiation. Design loads: launch vibration 20g, deployment shock, solar pressure. Electronics: include EMI shielding, thermal dissipation path, and connector keying in design.",
+  "operability_profile": {
+    "operating_principle": "Small spacecraft architecture that routes loads through rails/frame, power through EPS/battery/solar, data through avionics stack, and heat to radiator/structure paths.",
+    "primary_paths": {
+      "load_path": [
+        "rail/frame launch load path",
+        "panel hinge load path",
+        "payload bench to frame"
+      ],
+      "fluid_path": [],
+      "thermal_path": [
+        "battery to frame conduction",
+        "avionics heat to radiator face",
+        "solar panel thermal exposure"
+      ],
+      "electrical_path": [
+        "solar panel to EPS",
+        "battery to PDU",
+        "PDU to avionics/payload"
+      ],
+      "signal_path": [
+        "antenna to radio",
+        "OBC to sensors",
+        "payload data to storage/downlink"
+      ]
+    },
+    "solver_focus": [
+      "modal/launch-load FEA",
+      "thermal balance proxy",
+      "harness clearance review"
+    ]
+  }
 }

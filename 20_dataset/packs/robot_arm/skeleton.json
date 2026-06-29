@@ -8,7 +8,7 @@
     "mechanisms": "Linkages, hinges, gears, cams, deployment, tilt/rotation devices",
     "actuation": "Motors, servos, brakes, reducers and their mounting/replacement",
     "electronics": "Boards, drivers, wiring, signal routing, grounding",
-    "gnc": "Attitude/position sensing and control hardware evidence (mock level)",
+    "gnc": "Attitude/position sensing and control hardware evidence (reference structure level)",
     "payload": "Mission equipment bay, sensor mounts, removable inserts",
     "integration": "Datums, interfaces, harness routing, service access, assembly order"
   },
@@ -26,10 +26,10 @@
     {
       "id": "joint_transmission",
       "discipline": "mechanisms",
-      "function": "J1-J6 joint cartridges: bearing seats, reducer dummies, wrist pitch/roll axes, shaft location",
+      "function": "J1-J6 joint cartridges: bearing seats, reducer reference articles, wrist pitch/roll axes, shaft location",
       "evidence_features": [
         "bearing_seat",
-        "reducer_dummy",
+        "reducer_reference article",
         "shoulder",
         "wrist_pitch_axis",
         "wrist_roll_axis",
@@ -43,7 +43,7 @@
       "evidence_features": [
         "motor_module",
         "fastener_access",
-        "coupling_dummy"
+        "coupling_reference article"
       ]
     },
     {
@@ -117,7 +117,7 @@
         },
         {
           "criterion": "mechanism_named_not_implied",
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry."
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry."
         }
       ]
     },
@@ -215,5 +215,36 @@
         "fluid_manifold(0)"
       ]
     }
+  },
+  "operability_profile": {
+    "operating_principle": "Serial manipulator architecture that carries torque through joints/links, routes cables along the spine, and exposes serviceable actuator/sensor modules.",
+    "primary_paths": {
+      "load_path": [
+        "base to shoulder torque path",
+        "link bending path",
+        "tool flange payload path"
+      ],
+      "fluid_path": [
+        "optional pneumatic utility routing"
+      ],
+      "thermal_path": [
+        "motor heat to joint housings",
+        "drive electronics bay heat path"
+      ],
+      "electrical_path": [
+        "drive power to each joint",
+        "grounding through base/electronics"
+      ],
+      "signal_path": [
+        "encoder feedback",
+        "tool I/O",
+        "joint command bus"
+      ]
+    },
+    "solver_focus": [
+      "joint torque/FoS screening",
+      "cable bend and service access",
+      "link stiffness"
+    ]
   }
 }

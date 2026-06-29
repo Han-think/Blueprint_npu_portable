@@ -115,7 +115,7 @@
         {
           "criterion": "axis_datum_readability",
           "weight": 14,
-          "good": "J1-J6 axis rings, reducer/bearing dummies, encoder covers, and tool flange datum are visible.",
+          "good": "J1-J6 axis rings, reducer/bearing reference articles, encoder covers, and tool flange datum are visible.",
           "bad": "Arm links are generic cylinders with no joint service evidence.",
           "signals": [
             "J1",
@@ -123,7 +123,7 @@
             "axis ring",
             "encoder cover",
             "tool flange",
-            "bearing dummy"
+            "bearing reference article"
           ],
           "loop_feedback": "Add J1-J6 axis datum labels, removable joint cartridge covers, encoder pockets, and tool flange bolt pattern."
         },
@@ -157,7 +157,7 @@
           "criterion": "bearing_shaft_mounting_sanity",
           "weight": 10,
           "good": "Each joint shows a bearing seat with shoulder or retaining feature, shaft locating geometry, and stated fit intent for inner/outer races.",
-          "bad": "Bearing dummies float in links with no seat, shoulder, retaining ring groove, or axial location scheme.",
+          "bad": "Bearing reference articles float in links with no seat, shoulder, retaining ring groove, or axial location scheme.",
           "signals": [
             "bearing_seat",
             "shoulder",
@@ -362,5 +362,36 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 80-400mm per link, 600-1200mm reach. Environment: industrial floor, IP54, 10-40C ambient. Design loads: payload 2-10kg at tip, joint torque 5-50Nm, 10k+ cycles."
+  "boundary_note": "Subsystem scale: 80-400mm per link, 600-1200mm reach. Environment: industrial floor, IP54, 10-40C ambient. Design loads: payload 2-10kg at tip, joint torque 5-50Nm, 10k+ cycles.",
+  "operability_profile": {
+    "operating_principle": "Serial manipulator architecture that carries torque through joints/links, routes cables along the spine, and exposes serviceable actuator/sensor modules.",
+    "primary_paths": {
+      "load_path": [
+        "base to shoulder torque path",
+        "link bending path",
+        "tool flange payload path"
+      ],
+      "fluid_path": [
+        "optional pneumatic utility routing"
+      ],
+      "thermal_path": [
+        "motor heat to joint housings",
+        "drive electronics bay heat path"
+      ],
+      "electrical_path": [
+        "drive power to each joint",
+        "grounding through base/electronics"
+      ],
+      "signal_path": [
+        "encoder feedback",
+        "tool I/O",
+        "joint command bus"
+      ]
+    },
+    "solver_focus": [
+      "joint torque/FoS screening",
+      "cable bend and service access",
+      "link stiffness"
+    ]
+  }
 }

@@ -1,0 +1,107 @@
+{
+  "schema": "blueprint_micro_pack_v1",
+  "seed": "inline_6_engine_gasoline",
+  "subsystem": {
+    "id": "integration_accessory_mounts",
+    "discipline": "integration",
+    "function": "Accessory brackets, engine mounts, bellhousing/flywheel interfaces",
+    "evidence_features": [
+      "mount_boss",
+      "belt_plane_datum",
+      "flywheel_flange",
+      "bellhousing_pattern",
+      "service_cover"
+    ]
+  },
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "good": "Every P0 evidence feature appears as a named part_tree child or a geometry_ops target.",
+          "bad": "Subsystem claims features in prose but leaves no geometry target or child node."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "good": "Coordinates span stations, ports, bearing seats, service faces, or datum pads.",
+          "bad": "All geometry is stacked at the origin or represented as one box/cylinder."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "good": "Uses pockets, channels, bosses, bolt patterns, ribs, seals, and inspection covers.",
+          "bad": "Only primitive body solids with no interface or service evidence."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "good": "Each adjacent interface names a joint family, DOF, clearance, datum, and mating feature.",
+          "bad": "Interfaces are vague mounts with no reciprocal feature or clearance."
+        },
+        {
+          "criterion": "service_access",
+          "good": "Wear parts, covers, plugs, connectors, seals, or cartridges have visible removal paths.",
+          "bad": "Maintenance-critical items are trapped behind sealed geometry."
+        },
+        {
+          "criterion": "load_or_flow_path_closure",
+          "good": "The main load, torque, heat, fluid, or current path is traceable through named features.",
+          "bad": "Functional flow/load claims stop at a shell without interfaces."
+        }
+      ]
+    },
+    {
+      "id": "integration_accessory_mounts_domain_grammar",
+      "criteria": [
+        {
+          "criterion": "domain_evidence_features",
+          "good": "Uses subsystem-specific evidence features: mount_boss, belt_plane_datum, flywheel_flange, bellhousing_pattern, service_cover.",
+          "bad": "Omits the visible grammar for integration_accessory_mounts and substitutes generic blocks."
+        },
+        {
+          "criterion": "service_or_boundary_visible",
+          "good": "Includes service, inspection, sealing, datum, or safety-boundary evidence where relevant.",
+          "bad": "Claims a functional subsystem without access, datums, labels, or boundary constraints."
+        }
+      ]
+    }
+  ],
+  "operability_profile": {
+    "operating_principle": "Internal combustion engine architecture study that coordinates cranktrain rotation, gas exchange, cooling, lubrication, fuel/ignition harness, and service access.",
+    "primary_paths": {
+      "load_path": [
+        "combustion load to block/crankcase",
+        "mount bracket reaction",
+        "bearing cap load path"
+      ],
+      "fluid_path": [
+        "intake/exhaust runner topology",
+        "oil gallery/pickup path",
+        "coolant jacket path"
+      ],
+      "thermal_path": [
+        "head/block heat to coolant",
+        "exhaust heat shield path",
+        "oil cooling path"
+      ],
+      "electrical_path": [
+        "ignition/fuel rail harness power",
+        "sensor power routing"
+      ],
+      "signal_path": [
+        "crank/cam sensor",
+        "temperature/pressure sensors",
+        "injector/coil command"
+      ]
+    },
+    "solver_focus": [
+      "coolant/oil passage review",
+      "block/head thermal path",
+      "mount/load FEA"
+    ]
+  }
+}

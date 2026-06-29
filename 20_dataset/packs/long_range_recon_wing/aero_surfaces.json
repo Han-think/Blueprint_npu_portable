@@ -68,7 +68,7 @@
           "criterion": "mechanism_named_not_implied",
           "weight": 9,
           "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
-          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth reference articles, cam profiles, or linkage bars exist in geometry.",
           "signals": [
             "four_bar",
             "cam",
@@ -77,7 +77,7 @@
             "pivot_hole",
             "linkage_bar"
           ],
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry.",
           "source_refs": [
             "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
           ]
@@ -104,11 +104,11 @@
         {
           "criterion": "mission_payload_non_weapon_boundary",
           "weight": 11,
-          "good": "Payload bay is labeled non-weapon/display-only with removable mission/sensor module.",
+          "good": "Payload bay is labeled non-weapon/academic non-operational with removable mission/sensor module.",
           "bad": "Design drifts into weaponized or operational payload details.",
           "signals": [
             "non-weapon",
-            "display-only",
+            "academic non-operational",
             "sensor bay",
             "payload insert"
           ],
@@ -208,5 +208,36 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 800-3000mm wingspan, 100-250mm chord. Environment: outdoor flight, -10 to +45C, dust/humidity. Design loads: wing bending 3g, servo 2-8Nm, catapult launch 15g. Structural: include fixture_points with [x,y,z] and type (fixed/pinned) in verify.boundary_conditions."
+  "boundary_note": "Subsystem scale: 800-3000mm wingspan, 100-250mm chord. Environment: outdoor flight, -10 to +45C, dust/humidity. Design loads: wing bending 3g, servo 2-8Nm, catapult launch 15g. Structural: include fixture_points with [x,y,z] and type (fixed/pinned) in verify.boundary_conditions.",
+  "operability_profile": {
+    "operating_principle": "Fixed-wing UAV architecture that carries lift through spar/rib stations, routes propulsion/power through the fuselage, and isolates payload/sensor bays.",
+    "primary_paths": {
+      "load_path": [
+        "wing spar bending path",
+        "landing/payload bay reaction",
+        "motor mount thrust reaction"
+      ],
+      "fluid_path": [
+        "external airflow over wing/body",
+        "cooling airflow through electronics bay"
+      ],
+      "thermal_path": [
+        "battery heat to bay vents",
+        "ESC/motor heat rejection"
+      ],
+      "electrical_path": [
+        "battery to ESC/motor",
+        "battery to avionics/payload"
+      ],
+      "signal_path": [
+        "autopilot to servos",
+        "payload sensor to datalink"
+      ]
+    },
+    "solver_focus": [
+      "aero CFD proxy/OpenFOAM case",
+      "wing bending FEA",
+      "payload bay cooling"
+    ]
+  }
 }

@@ -10,6 +10,7 @@ Blueprint NPU · Local HTTP Server + Validation API
     POST /validate → schema_v6.json 기반 JSON 검증
     GET  /schema   → schema_v6.json 내용 반환
     GET  /context-pack → 로컬 공학 에이전트용 compact context pack
+    GET  /reference-feature-cards → prompt-safe reference grammar cards (JSONL)
 """
 
 import http.server
@@ -54,6 +55,16 @@ VEHICLE_TO_SEED = {
     'small_launch_vehicle': 'small_launch_vehicle',
     'arm_6dof': 'robot_arm',
     'haptic_glove_pair': 'haptic_glove',
+    'inline_6_engine_gasoline': 'inline_6_engine_gasoline',
+    'inline_6_engine_diesel': 'inline_6_engine_diesel',
+    'centrifugal_pump': 'centrifugal_pump',
+    'hydraulic_manifold': 'hydraulic_manifold',
+    'battery_pack_module': 'battery_pack_module',
+    'liquid_cold_plate': 'liquid_cold_plate',
+    'cnc_axis_carriage': 'cnc_axis_carriage',
+    'gearbox_reducer': 'gearbox_reducer',
+    'underwater_sealed_sensor_housing': 'underwater_sealed_sensor_housing',
+    'liquid_rocket_engine_academic': 'liquid_rocket_engine_academic',
 }
 
 INTERFACE_MATE = {
@@ -385,6 +396,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self._handle_schema()
         elif self.path == '/context-pack':
             self._handle_context_pack()
+        elif self.path == '/reference-feature-cards':
+            self._serve_file('reference_feature_cards.jsonl', REPO / '20_dataset' / 'reference_assets')
         elif self.path.startswith('/output/'):
             self._serve_file(self.path[len('/output/'):], REPO / '10_execution' / 'cad' / 'output')
         elif self.path.startswith('/seeds/'):
@@ -605,16 +618,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 'trace part_tree children to geometry_ops ids/targets',
                 'include interface, service, negative, and datum features'
             ],
+            'operability_and_solver_readiness': [
+                'cad_brief.operating_principle explains how the subsystem participates in the real architecture',
+                'verify.multiphysics_paths covers load, fluid, thermal, electrical, and signal paths where relevant',
+                'verify.solver_readiness names CFD, thermal, FEA, electrical/signal readiness and missing inputs',
+                'high-risk systems stay physics-grounded and analysis-oriented without unsafe recipes, operating setpoints, or certification claims'
+            ],
             'grounding_discipline': [
                 'Do not invent named mechanisms, exotic acronyms, miracle materials, hidden capabilities, or fictional manufacturing processes.',
-                'Prefer conservative mock-assembly features: ribs, bosses, standoffs, access panels, datum pads, brackets, rails, harness channels, inspection windows, fastener holes, labeled interface zones.'
+                'Prefer conservative study-assembly features: ribs, bosses, standoffs, access panels, datum pads, brackets, rails, harness channels, inspection windows, fastener holes, labeled interface zones.'
             ],
             'curation_policy': {
                 'primary_training_candidate': 'kept assembly bundles',
                 'auxiliary_reference': 'single-part outputs',
                 'records': ['keep', 'reject', 'hold', 'loop_feedback', 'engineering_scorecard']
             },
-            'safety_boundary': 'Educational mock assembly and design-review evidence only; not manufacturing, flight, medical, propulsion, or certification approval.'
+            'safety_boundary': 'Physics-grounded study assembly, solver readiness, and design-review evidence only; not unsafe manufacturing, flight, medical, propulsion operation, or certification approval.'
         }
         data = json.dumps(pack, ensure_ascii=False, indent=2).encode('utf-8')
         self.send_response(200)
@@ -653,7 +672,7 @@ def main():
     print(f"  URL     : {url}")
     print(f"  LMStudio: http://127.0.0.1:1234/v1")
     print(f"  Ollama  : http://127.0.0.1:11434")
-    print(f"  API     : POST {url}/validate  |  GET {url}/schema  |  GET {url}/context-pack")
+    print(f"  API     : POST {url}/validate  |  GET {url}/schema  |  GET {url}/context-pack  |  GET {url}/reference-feature-cards")
     print(f"\n  Ctrl+C to stop\n")
 
     class ThreadingServer(socketserver.ThreadingTCPServer):

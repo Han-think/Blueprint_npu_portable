@@ -1,0 +1,106 @@
+{
+  "schema": "blueprint_micro_pack_v1",
+  "seed": "cnc_axis_carriage",
+  "subsystem": {
+    "id": "ball_screw_drive",
+    "discipline": "rotating",
+    "function": "Screw/nut/bearing drive path",
+    "evidence_features": [
+      "ball_screw",
+      "nut_housing",
+      "fixed_bearing",
+      "floating_bearing",
+      "preload_label"
+    ]
+  },
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "good": "Every P0 evidence feature appears as a named part_tree child or a geometry_ops target.",
+          "bad": "Subsystem claims features in prose but leaves no geometry target or child node."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "good": "Coordinates span stations, ports, bearing seats, service faces, or datum pads.",
+          "bad": "All geometry is stacked at the origin or represented as one box/cylinder."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "good": "Uses pockets, channels, bosses, bolt patterns, ribs, seals, and inspection covers.",
+          "bad": "Only primitive body solids with no interface or service evidence."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "good": "Each adjacent interface names a joint family, DOF, clearance, datum, and mating feature.",
+          "bad": "Interfaces are vague mounts with no reciprocal feature or clearance."
+        },
+        {
+          "criterion": "service_access",
+          "good": "Wear parts, covers, plugs, connectors, seals, or cartridges have visible removal paths.",
+          "bad": "Maintenance-critical items are trapped behind sealed geometry."
+        },
+        {
+          "criterion": "load_or_flow_path_closure",
+          "good": "The main load, torque, heat, fluid, or current path is traceable through named features.",
+          "bad": "Functional flow/load claims stop at a shell without interfaces."
+        }
+      ]
+    },
+    {
+      "id": "ball_screw_drive_domain_grammar",
+      "criteria": [
+        {
+          "criterion": "domain_evidence_features",
+          "good": "Uses subsystem-specific evidence features: ball_screw, nut_housing, fixed_bearing, floating_bearing, preload_label.",
+          "bad": "Omits the visible grammar for ball_screw_drive and substitutes generic blocks."
+        },
+        {
+          "criterion": "service_or_boundary_visible",
+          "good": "Includes service, inspection, sealing, datum, or safety-boundary evidence where relevant.",
+          "bad": "Claims a functional subsystem without access, datums, labels, or boundary constraints."
+        }
+      ]
+    }
+  ],
+  "operability_profile": {
+    "operating_principle": "Precision linear axis that constrains travel with rails/bearing blocks, drives motion through a screw/motor, protects ways, and routes sensors/lubrication.",
+    "primary_paths": {
+      "load_path": [
+        "tool/load to carriage plate",
+        "bearing block to rails",
+        "ballscrew thrust to supports"
+      ],
+      "fluid_path": [
+        "lubrication manifold to rail/block points"
+      ],
+      "thermal_path": [
+        "motor heat",
+        "bearing/screw friction heat",
+        "thermal growth datum"
+      ],
+      "electrical_path": [
+        "motor power",
+        "sensor power",
+        "grounding"
+      ],
+      "signal_path": [
+        "home/limit sensors",
+        "encoder/motor command",
+        "lubrication status"
+      ]
+    },
+    "solver_focus": [
+      "carriage stiffness FEA",
+      "motion clearance",
+      "lube routing"
+    ]
+  }
+}

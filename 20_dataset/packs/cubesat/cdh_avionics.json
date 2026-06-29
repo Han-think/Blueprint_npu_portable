@@ -254,5 +254,36 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 100x100x340mm (3U CubeSat). Environment: LEO vacuum, -40 to +80C thermal cycling, radiation. Design loads: launch vibration 20g, deployment shock, solar pressure."
+  "boundary_note": "Subsystem scale: 100x100x340mm (3U CubeSat). Environment: LEO vacuum, -40 to +80C thermal cycling, radiation. Design loads: launch vibration 20g, deployment shock, solar pressure.",
+  "operability_profile": {
+    "operating_principle": "Small spacecraft architecture that routes loads through rails/frame, power through EPS/battery/solar, data through avionics stack, and heat to radiator/structure paths.",
+    "primary_paths": {
+      "load_path": [
+        "rail/frame launch load path",
+        "panel hinge load path",
+        "payload bench to frame"
+      ],
+      "fluid_path": [],
+      "thermal_path": [
+        "battery to frame conduction",
+        "avionics heat to radiator face",
+        "solar panel thermal exposure"
+      ],
+      "electrical_path": [
+        "solar panel to EPS",
+        "battery to PDU",
+        "PDU to avionics/payload"
+      ],
+      "signal_path": [
+        "antenna to radio",
+        "OBC to sensors",
+        "payload data to storage/downlink"
+      ]
+    },
+    "solver_focus": [
+      "modal/launch-load FEA",
+      "thermal balance proxy",
+      "harness clearance review"
+    ]
+  }
 }

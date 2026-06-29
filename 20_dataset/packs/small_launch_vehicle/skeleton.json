@@ -8,36 +8,36 @@
     "mechanisms": "Linkages, hinges, gears, cams, deployment, tilt/rotation devices",
     "power": "Battery, solar generation, charging, distribution, connectors",
     "electronics": "Boards, drivers, wiring, signal routing, grounding",
-    "recovery_deployment": "Parachutes, deployables, release mechanisms (display-level)",
+    "recovery_deployment": "Parachutes, deployables, release mechanisms (study-level)",
     "integration": "Datums, interfaces, harness routing, service access, assembly order"
   },
   "required_subsystems": [
     {
       "id": "primary_structure",
       "discipline": "structures",
-      "function": "Propellant tank dummy barrels (LOX/fuel), interstage, payload fairing, fin set, skirts; stacking datums and alignment keys",
+      "function": "Propellant tank reference article barrels (LOX/fuel), interstage, payload fairing, fin set, skirts; stacking datums and alignment keys",
       "evidence_features": [
-        "tank_dummy",
-        "propellant_tank_dummy",
+        "tank_reference article",
+        "propellant_tank_reference article",
         "payload_fairing",
         "nose_cone",
         "fin_set",
         "interstage_datum",
         "alignment_key",
-        "bolt_circle_dummy"
+        "bolt_circle_reference article"
       ]
     },
     {
-      "id": "engine_display",
+      "id": "engine_study",
       "discipline": "mechanisms",
-      "function": "Removable engine display cartridge: combustion chamber dummy, bell nozzle shell, turbopump dummy in cutaway bay (non-functional)",
+      "function": "Removable engine academic study cartridge: combustion chamber reference article, bell nozzle shell, turbopump reference article in cutaway bay (non-operational academic)",
       "evidence_features": [
-        "engine_display_cartridge",
-        "combustion_chamber_dummy",
+        "engine_study_cartridge",
+        "combustion_chamber_reference article",
         "bell_nozzle_shell",
-        "turbopump_assembly_dummy",
-        "impeller_dummy",
-        "stage_engine_mock",
+        "turbopump_assembly_reference article",
+        "impeller_reference article",
+        "stage_engine_study",
         "cutaway_window",
         "slide_rail"
       ]
@@ -53,9 +53,9 @@
       ]
     },
     {
-      "id": "power_display",
+      "id": "power_study",
       "discipline": "power",
-      "function": "Battery module dummy with access panel",
+      "function": "Battery module reference article with access panel",
       "evidence_features": [
         "battery_module",
         "access_panel"
@@ -64,7 +64,7 @@
     {
       "id": "recovery_bay",
       "discipline": "recovery_deployment",
-      "function": "Parachute bay dummy with deployment door hinge (display-level)",
+      "function": "Parachute bay reference article with deployment door hinge (study-level)",
       "evidence_features": [
         "recovery_bay",
         "deploy_door",
@@ -72,12 +72,12 @@
       ]
     },
     {
-      "id": "separation_display",
+      "id": "separation_study",
       "discipline": "mechanisms",
-      "function": "Stage separation plane shown as datum + dummy clamp band (no energetic device)",
+      "function": "Stage separation plane shown as datum + reference article clamp band (no energetic device)",
       "evidence_features": [
         "separation_plane_datum",
-        "clamp_band_dummy"
+        "clamp_band_reference article"
       ]
     },
     {
@@ -110,7 +110,7 @@
         },
         {
           "criterion": "mechanism_named_not_implied",
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry."
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry."
         }
       ]
     },
@@ -209,5 +209,41 @@
       ]
     }
   },
-  "boundary_note": "All subsystems are educational display mockups; no propulsion, ignition, or flight-performance design."
+  "boundary_note": "All subsystems are educational academic study structureups; no propulsion, ignition, or flight-performance design.",
+  "operability_profile": {
+    "operating_principle": "Academic launch-vehicle architecture study that separates stage shell, tank reference articles, avionics, recovery, and propulsion study sections for reviewable load/path grammar.",
+    "primary_paths": {
+      "load_path": [
+        "stage stack axial load",
+        "interstage separation datum",
+        "fairing/payload adapter reaction"
+      ],
+      "fluid_path": [
+        "conceptual propellant route labels only",
+        "vent/drain label topology only"
+      ],
+      "thermal_path": [
+        "engine study heat-zone labels",
+        "avionics bay thermal isolation"
+      ],
+      "electrical_path": [
+        "battery/power study module to avionics",
+        "safe harness routing labels"
+      ],
+      "signal_path": [
+        "avionics to instrumentation labels",
+        "recovery command boundary labels"
+      ]
+    },
+    "solver_focus": [
+      "stage shell FEA",
+      "thermal zone annotation",
+      "non-operational topology review"
+    ],
+    "blocked_outputs": [
+      "operational propellant handling",
+      "ignition/test procedure",
+      "flight qualification instruction"
+    ]
+  }
 }

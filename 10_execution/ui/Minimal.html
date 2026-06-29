@@ -5946,6 +5946,7 @@ const MICRO_PACK_CACHE = {};   // 'seed/file' → json | null
 const SKELETON_CACHE = {};     // seed → skeleton pack (scorecard에서 동기 접근)
 const CRITERIA_CACHE = {};     // seed → criteria 배열 (전체 팩의 criteria, scorecard 동기 접근)
 const PLACEMENT_AUDIT_CACHE = {}; // seed → assembly_interference_report.json | null
+const REFERENCE_FEATURE_CARD_CACHE = {}; // seed → prompt-safe reference grammar card | null
 
 const SEED_CLOSURE_PROFILES = {
   cubesat: {
@@ -6194,6 +6195,49 @@ function microPackClause(pack) {
   }
   if (pack.boundary_note) lines.push(`- BOUNDARY: ${pack.boundary_note}`);
   lines.push(`Do not modify other subsystems or the global envelope; respect interfaces from the skeleton.`);
+  return lines.join('\n');
+}
+
+async function loadReferenceFeatureCard(seedKey) {
+  if (!seedKey) return null;
+  if (seedKey in REFERENCE_FEATURE_CARD_CACHE) return REFERENCE_FEATURE_CARD_CACHE[seedKey];
+  try {
+    const r = await fetch(`${SERVER}/reference-feature-cards`, { signal: AbortSignal.timeout(2500) });
+    const text = r.ok ? await r.text() : '';
+    const cards = text.split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(Boolean)
+      .map(line => {
+        try { return JSON.parse(line); } catch { return null; }
+      })
+      .filter(Boolean);
+    for (const card of cards) {
+      if (card.seed) REFERENCE_FEATURE_CARD_CACHE[card.seed] = card;
+    }
+    REFERENCE_FEATURE_CARD_CACHE[seedKey] = REFERENCE_FEATURE_CARD_CACHE[seedKey] || null;
+  } catch {
+    REFERENCE_FEATURE_CARD_CACHE[seedKey] = null;
+  }
+  return REFERENCE_FEATURE_CARD_CACHE[seedKey];
+}
+
+function referenceFeatureCardClause(card) {
+  if (!card) return '';
+  const contract = card.generation_contract || {};
+  const licenseGate = card.license_gate || {};
+  const lines = [
+    `REFERENCE FEATURE CARD (prompt-safe design grammar; reference-only):`,
+    `- status: ${card.status || 'unknown'} · assets: ${card.asset_count || 0}`,
+    `- use_as: ${contract.use_as || 'shape/assembly grammar'}`,
+    `- do_not_use_as: ${contract.do_not_use_as || 'direct product copy'}`,
+  ];
+  for (const item of (card.design_grammar_to_learn || []).slice(0, 6)) lines.push(`- grammar: ${item}`);
+  for (const item of (card.missing_reference_needs || []).slice(0, 4)) lines.push(`- still_needed: ${item}`);
+  for (const item of (contract.required_output_effect || []).slice(0, 4)) lines.push(`- output_effect: ${item}`);
+  if (Object.keys(licenseGate).length) {
+    lines.push(`- license_gate: ${licenseGate.current_state || 'unknown'}; allowed_now=${licenseGate.allowed_now || 'prompt inspiration only'}; blocked_now=${licenseGate.blocked_now || 'training promotion'}`);
+  }
+  for (const item of (card.anti_copy_boundary || []).slice(0, 4)) lines.push(`- boundary: ${item}`);
   return lines.join('\n');
 }
 
@@ -8914,7 +8958,14 @@ function App() {
     let microClause = '';
     const seedKey = seedForVehicleId(vehicleCtx.id);
     let matchedSubsystem = null;
+    let referenceFeatureCard = null;
+    let referenceClause = '';
     if (seedKey) {
+      referenceFeatureCard = await loadReferenceFeatureCard(seedKey);
+      referenceClause = referenceFeatureCardClause(referenceFeatureCard);
+      if (referenceClause) {
+        pushTerm({ c:C.term_green, t:`[reference-card] ${part.label} ← ${seedKey} (${referenceFeatureCard.status || 'unknown'}, ${referenceFeatureCard.asset_count || 0} assets)` });
+      }
       const skeleton = await loadPackFile(seedKey, 'skeleton.json');
       await loadSeedCriteria(seedKey);  // scorecard 통합 채점용 criteria 캐시 (가르친 것=재는 것)
       const matched = skeleton ? matchSubsystemForPart(skeleton, part, seedKey) : null;
@@ -8940,6 +8991,7 @@ function App() {
                       `Category design context:\n${categoryContext}\n` +
                       `${geomHint}\n` +
                       `${detailGuidance}\n` +
+                      `${referenceClause ? `${referenceClause}\n` : ''}` +
                       microClause +
                       `Assembly dataset contract:\n${JSON.stringify(buildAssemblyDatasetContract(vehicleCtx, vehicleCtx.parts || []), null, 2)}\n` +
                       `Reference SVG: ${assemblyPartAssetPath(vehicleCtx.id, part)}\n` +
@@ -9074,6 +9126,14 @@ function App() {
       _preset_ref: part.preset.join('/'),
       _subsystem_id: matchedSubsystem?.id || part.subsystem_id || null,
       _subsystem_match_source: matchedSubsystem?._match_source || null,
+      _reference_feature_card: referenceFeatureCard ? {
+        schema: referenceFeatureCard.schema,
+        created_at: referenceFeatureCard.created_at,
+        seed: referenceFeatureCard.seed,
+        status: referenceFeatureCard.status,
+        asset_count: referenceFeatureCard.asset_count,
+        license_gate: referenceFeatureCard.license_gate,
+      } : null,
       _subsystem_plan: subsystemPlan,
       _stage_times_s: { ...stageTimes, part_total: Math.round((Date.now() - tPart) / 1000) },
       _pipeline_stages: ['P0 subsystem plan', 'S1 part_tree', 'S2 geometry_ops', 'S3 verify_risk', 'S4 print_profile'],

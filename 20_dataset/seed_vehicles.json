@@ -1,112 +1,1645 @@
 {
   "_note": "6 evolution-seed vehicle BOMs ported verbatim from 10_execution/ui/Minimal.html (~L5090-5620). Keyed by evolution seed. Used by generate_batch.py headless runner. KEEP IN SYNC with Minimal.html if BOMs change.",
   "cubesat": {
-    "id": "cubesat_3u", "label": "3U CubeSat", "wikiTitle": "CubeSat",
+    "id": "cubesat_3u",
+    "label": "3U CubeSat",
+    "wikiTitle": "CubeSat",
     "desc": "3U CubeSat (10x10x30cm) Earth-observation demonstrator",
-    "material": "Al 7075 + CFRP + FR4", "process": "CNC + PCB", "mass": "<4 kg", "envelope": "100x100x340.5 mm",
+    "material": "Al 7075 + CFRP + FR4",
+    "process": "CNC + PCB",
+    "mass": "<4 kg",
+    "envelope": "100x100x340.5 mm",
     "parts": [
-      {"id": "p1", "label": "Primary Structure (3U)", "preset": ["space","satellite","cubesat_frame"], "spec": "3U CubeSat primary frame, Al 7075, PC/104 standoffs, deployable rail guide grooves (CDS spec)"},
-      {"id": "p2", "label": "Solar Panel x 4 (deploy)", "preset": ["space","satellite","solar_hinge"], "spec": "Deployable solar panel wing, 3U size, spring-loaded hinge, burn-wire release, deployment damper"},
-      {"id": "p3", "label": "Antenna Deployer x 2", "preset": ["space","satellite","antenna_deployer"], "spec": "Tape-spring UHF/S-band antenna deployer, stowed flat, burn-wire release, latching tab"},
-      {"id": "p4", "label": "Reaction Wheel x 3", "preset": ["space","satellite","reaction_wheel"], "spec": "Small reaction wheel assembly, brushless motor, momentum 0.005-0.05 Nms, isolation mount"},
-      {"id": "p5", "label": "Star Tracker Mount", "preset": ["space","satellite","star_tracker_mnt"], "spec": "Star tracker optical bench mount, CTE-matched, baffled sun shield, line-of-sight +-1deg"},
-      {"id": "p6", "label": "Payload Optics Bench", "preset": ["space","satellite","thermal_strap"], "spec": "EO payload optics bench, thermal stability, optical baffles, focal plane interface, lens mounts"},
-      {"id": "p7", "label": "Cold Gas Thruster x 4", "preset": ["space","satellite","thruster_bracket"], "spec": "Cold gas propulsion thruster bracket, 4 thrusters cross-pattern, 50mN class, plumbing manifold"},
-      {"id": "p8", "label": "Separation Spring Plate", "preset": ["space","satellite","sep_clamp"], "spec": "P-POD or ISIPOD separation interface plate, spring pusher contact, kill switch arm"},
-      {"id": "p9", "label": "EPS Solar Charging Module", "preset": ["space","satellite","eps_power_board"], "spec": "EPS solar charging subsystem: solar_panel_face inputs, removable battery_tray, eps_board_slot, power_connector keying, service cover, mass budget <480g"},
-      {"id": "p10", "label": "CDH Avionics Stack", "preset": ["space","satellite","cdh_avionics_stack"], "spec": "Command/data handling avionics stack: obc_board, stack_harness, debug_port_access, board standoffs, connector labels, grounding point, mass budget <260g"},
-      {"id": "p11", "label": "Thermal Path / Radiator Strap Evidence", "preset": ["space","satellite","thermal_strap"], "spec": "Thermal_path closure module: radiator_face, thermal_strap_note, vent_hole, battery-to-frame conduction pad, service-visible thermal datum, inspection label, mass budget <120g"},
-      {"id": "p12", "label": "Integration Harness + Datum Spine", "preset": ["mechanical","general","cable_clip"], "spec": "Integration_harness closure spine with harness_channel, connector_keying, assembly_datum pads, routing clips, service hatch, reciprocal interface labels, inspection checklist marks"}
+      {
+        "id": "p1",
+        "label": "Primary Structure (3U)",
+        "preset": [
+          "space",
+          "satellite",
+          "cubesat_frame"
+        ],
+        "spec": "3U CubeSat primary frame, Al 7075, PC/104 standoffs, deployable rail guide grooves (CDS spec)"
+      },
+      {
+        "id": "p2",
+        "label": "Solar Panel x 4 (deploy)",
+        "preset": [
+          "space",
+          "satellite",
+          "solar_hinge"
+        ],
+        "spec": "Deployable solar panel wing, 3U size, spring-loaded hinge, burn-wire release, deployment damper"
+      },
+      {
+        "id": "p3",
+        "label": "Antenna Deployer x 2",
+        "preset": [
+          "space",
+          "satellite",
+          "antenna_deployer"
+        ],
+        "spec": "Tape-spring UHF/S-band antenna deployer, stowed flat, burn-wire release, latching tab"
+      },
+      {
+        "id": "p4",
+        "label": "Reaction Wheel x 3",
+        "preset": [
+          "space",
+          "satellite",
+          "reaction_wheel"
+        ],
+        "spec": "Small reaction wheel assembly, brushless motor, momentum 0.005-0.05 Nms, isolation mount"
+      },
+      {
+        "id": "p5",
+        "label": "Star Tracker Mount",
+        "preset": [
+          "space",
+          "satellite",
+          "star_tracker_mnt"
+        ],
+        "spec": "Star tracker optical bench mount, CTE-matched, baffled sun shield, line-of-sight +-1deg"
+      },
+      {
+        "id": "p6",
+        "label": "Payload Optics Bench",
+        "preset": [
+          "space",
+          "satellite",
+          "thermal_strap"
+        ],
+        "spec": "EO payload optics bench, thermal stability, optical baffles, focal plane interface, lens mounts"
+      },
+      {
+        "id": "p7",
+        "label": "Cold Gas Thruster x 4",
+        "preset": [
+          "space",
+          "satellite",
+          "thruster_bracket"
+        ],
+        "spec": "Cold gas propulsion thruster bracket, 4 thrusters cross-pattern, 50mN class, plumbing manifold"
+      },
+      {
+        "id": "p8",
+        "label": "Separation Spring Plate",
+        "preset": [
+          "space",
+          "satellite",
+          "sep_clamp"
+        ],
+        "spec": "P-POD or ISIPOD separation interface plate, spring pusher contact, kill switch arm"
+      },
+      {
+        "id": "p9",
+        "label": "EPS Solar Charging Module",
+        "preset": [
+          "space",
+          "satellite",
+          "eps_power_board"
+        ],
+        "spec": "EPS solar charging subsystem: solar_panel_face inputs, removable battery_tray, eps_board_slot, power_connector keying, service cover, mass budget <480g"
+      },
+      {
+        "id": "p10",
+        "label": "CDH Avionics Stack",
+        "preset": [
+          "space",
+          "satellite",
+          "cdh_avionics_stack"
+        ],
+        "spec": "Command/data handling avionics stack: obc_board, stack_harness, debug_port_access, board standoffs, connector labels, grounding point, mass budget <260g"
+      },
+      {
+        "id": "p11",
+        "label": "Thermal Path / Radiator Strap Evidence",
+        "preset": [
+          "space",
+          "satellite",
+          "thermal_strap"
+        ],
+        "spec": "Thermal_path closure module: radiator_face, thermal_strap_note, vent_hole, battery-to-frame conduction pad, service-visible thermal datum, inspection label, mass budget <120g"
+      },
+      {
+        "id": "p12",
+        "label": "Integration Harness + Datum Spine",
+        "preset": [
+          "mechanical",
+          "general",
+          "cable_clip"
+        ],
+        "spec": "Integration_harness closure spine with harness_channel, connector_keying, assembly_datum pads, routing clips, service hatch, reciprocal interface labels, inspection checklist marks"
+      }
     ]
   },
   "robot_arm": {
-    "id": "arm_6dof", "label": "6-DOF Industrial Arm", "wikiTitle": "Universal Robots",
+    "id": "arm_6dof",
+    "label": "6-DOF Industrial Arm",
+    "wikiTitle": "Universal Robots",
     "desc": "6-DOF serial industrial robot arm, 5kg payload, 600mm reach",
-    "material": "Al 7075 + steel + composite", "process": "CNC + LPBF", "mass": "~25kg", "envelope": "600mm reach max",
+    "material": "Al 7075 + steel + composite",
+    "process": "CNC + LPBF",
+    "mass": "~25kg",
+    "envelope": "600mm reach max",
     "parts": [
-      {"id": "p1", "label": "Base Joint (J1)", "preset": ["robotics","manipulator","rev_joint"], "spec": "Base rotary joint J1, +-180deg, harmonic drive, 100Nm peak torque, mounting flange ISO 9409"},
-      {"id": "p2", "label": "Shoulder Joint (J2)", "preset": ["robotics","manipulator","rev_joint"], "spec": "Shoulder pitch joint J2, +-120deg, harmonic drive, 80Nm, cable routing through center bore"},
-      {"id": "p3", "label": "Upper Arm (Link 2-3)", "preset": ["robotics","manipulator","arm_link"], "spec": "Upper arm link, 300mm length, hollow tube with cable conduit, lightweight Al 7075"},
-      {"id": "p4", "label": "Elbow Joint (J3)", "preset": ["robotics","manipulator","rev_joint"], "spec": "Elbow pitch joint J3, +-150deg, cycloidal reducer, 50Nm, encoder dual-stack"},
-      {"id": "p5", "label": "Forearm + Wrist (J4)", "preset": ["robotics","manipulator","arm_link"], "spec": "Forearm with wrist roll J4, 250mm length, +-360deg continuous, slip ring for power/signal"},
-      {"id": "p6", "label": "Wrist Pitch (J5)", "preset": ["robotics","manipulator","rev_joint"], "spec": "Wrist pitch joint J5, +-120deg, harmonic drive, 20Nm, compact form factor"},
-      {"id": "p7", "label": "Wrist Roll (J6)", "preset": ["robotics","manipulator","rev_joint"], "spec": "Wrist final roll joint J6, +-360deg, harmonic drive, 10Nm, ISO 9409-1 50mm tool flange"},
-      {"id": "p8", "label": "Tool Flange + Changer", "preset": ["robotics","manipulator","tool_changer"], "spec": "Tool changer master plate at J6 end, pneumatic locking, 4 utility ports"},
-      {"id": "p9", "label": "Cable Management Spine", "preset": ["mechanical","general","cable_clip"], "spec": "External cable carrier from base to wrist, drag chain or spiral, signal + power + pneumatic"},
-      {"id": "p10", "label": "Replaceable Motor Module Set", "preset": ["robotics","manipulator","rev_joint"], "spec": "Actuation_motors closure module: replaceable motor_module cartridges for J1-J6, fastener_access, coupling_dummy, insert/washer preload pads, torque_Nm intent labels"},
-      {"id": "p11", "label": "Encoder Cover + Sensing Set", "preset": ["robotics","mobile","encoder_mount"], "spec": "Sensing_encoders closure module: encoder_pocket and encoder_cover at each joint, index marks, cable exit strain relief, inspection labels"},
-      {"id": "p12", "label": "Drive Electronics Bay", "preset": ["propulsion","electric","esc_housing"], "spec": "Drive_electronics bay with driver_bay, power_channel, signal_channel, ground_point, service cover, connector keying, thermal inspection window"}
+      {
+        "id": "p1",
+        "label": "Base Joint (J1)",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "rev_joint"
+        ],
+        "spec": "Base rotary joint J1, +-180deg, harmonic drive, 100Nm peak torque, mounting flange ISO 9409"
+      },
+      {
+        "id": "p2",
+        "label": "Shoulder Joint (J2)",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "rev_joint"
+        ],
+        "spec": "Shoulder pitch joint J2, +-120deg, harmonic drive, 80Nm, cable routing through center bore"
+      },
+      {
+        "id": "p3",
+        "label": "Upper Arm (Link 2-3)",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "arm_link"
+        ],
+        "spec": "Upper arm link, 300mm length, hollow tube with cable conduit, lightweight Al 7075"
+      },
+      {
+        "id": "p4",
+        "label": "Elbow Joint (J3)",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "rev_joint"
+        ],
+        "spec": "Elbow pitch joint J3, +-150deg, cycloidal reducer, 50Nm, encoder dual-stack"
+      },
+      {
+        "id": "p5",
+        "label": "Forearm + Wrist (J4)",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "arm_link"
+        ],
+        "spec": "Forearm with wrist roll J4, 250mm length, +-360deg continuous, slip ring for power/signal"
+      },
+      {
+        "id": "p6",
+        "label": "Wrist Pitch (J5)",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "rev_joint"
+        ],
+        "spec": "Wrist pitch joint J5, +-120deg, harmonic drive, 20Nm, compact form factor"
+      },
+      {
+        "id": "p7",
+        "label": "Wrist Roll (J6)",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "rev_joint"
+        ],
+        "spec": "Wrist final roll joint J6, +-360deg, harmonic drive, 10Nm, ISO 9409-1 50mm tool flange"
+      },
+      {
+        "id": "p8",
+        "label": "Tool Flange + Changer",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "tool_changer"
+        ],
+        "spec": "Tool changer master plate at J6 end, pneumatic locking, 4 utility ports"
+      },
+      {
+        "id": "p9",
+        "label": "Cable Management Spine",
+        "preset": [
+          "mechanical",
+          "general",
+          "cable_clip"
+        ],
+        "spec": "External cable carrier from base to wrist, drag chain or spiral, signal + power + pneumatic"
+      },
+      {
+        "id": "p10",
+        "label": "Replaceable Motor Module Set",
+        "preset": [
+          "robotics",
+          "manipulator",
+          "rev_joint"
+        ],
+        "spec": "Actuation_motors closure module: replaceable motor_module cartridges for J1-J6, fastener_access, coupling_reference article, insert/washer preload pads, torque_Nm intent labels"
+      },
+      {
+        "id": "p11",
+        "label": "Encoder Cover + Sensing Set",
+        "preset": [
+          "robotics",
+          "mobile",
+          "encoder_mount"
+        ],
+        "spec": "Sensing_encoders closure module: encoder_pocket and encoder_cover at each joint, index marks, cable exit strain relief, inspection labels"
+      },
+      {
+        "id": "p12",
+        "label": "Drive Electronics Bay",
+        "preset": [
+          "propulsion",
+          "electric",
+          "esc_housing"
+        ],
+        "spec": "Drive_electronics bay with driver_bay, power_channel, signal_channel, ground_point, service cover, connector keying, thermal inspection window"
+      }
     ]
   },
   "tiltrotor": {
-    "id": "tiltrotor_vtol", "label": "Tiltrotor VTOL Hybrid", "wikiTitle": "Tiltrotor",
+    "id": "tiltrotor_vtol",
+    "label": "Tiltrotor VTOL Hybrid",
+    "wikiTitle": "Tiltrotor",
     "desc": "Fixed-wing VTOL with 2 tilting rotor nacelles, BVLOS long-range capable",
-    "material": "CFRP + Al + TPU", "process": "FDM + CNC", "mass": "~2.5kg", "envelope": "1200x900x200 mm",
+    "material": "CFRP + Al + TPU",
+    "process": "FDM + CNC",
+    "mass": "~2.5kg",
+    "envelope": "1200x900x200 mm",
     "parts": [
-      {"id": "p1", "label": "Center Fuselage Spine", "preset": ["drone","fixed_uav","vtol_hw"], "spec": "CFRP box beam center fuselage, avionics bay, wing spar socket, front GPS boom mount, belly camera window"},
-      {"id": "p2", "label": "Main Wing (2-piece)", "preset": ["mechanical","structure","wing_spar"], "spec": "Straight wing, 4S NACA 2412, dual 15mm CFRP spar, 900mm half-span, 160mm chord, 3-layer CFRP skin"},
-      {"id": "p3", "label": "Nacelle Assembly x 2", "preset": ["propulsion","electric","motor_mount"], "spec": "Tilting nacelle assembly, 0-90deg tilt axis, 6309 bearing set, servo-driven worm gear, motor and ESC pocket"},
-      {"id": "p4", "label": "Tilt Servo + Linkage x 2", "preset": ["mechanical","actuation","servo_horn"], "spec": "25kg-cm DS3218 servo per nacelle, titanium pushrod, dual ball joints, tilt range 0-93deg, crash-tolerant"},
-      {"id": "p5", "label": "V-Tail x 2 (Ruddervator)", "preset": ["mechanical","structure","wing_spar"], "spec": "+-35deg V-tail ruddervator pair, MG996R servo each, 30deg dihedral, CFRP sandwich panel, hinge piano wire"},
-      {"id": "p6", "label": "Landing Gear (Tri)", "preset": ["mechanical","structure","landing_gear"], "spec": "Tricycle landing gear, spring-steel skid arms, 55mm dia wheels, CG at 1/3 chord, 200mm wheelbase"},
-      {"id": "p7", "label": "Battery Bay (Slide-In)", "preset": ["propulsion","electric","battery_tray"], "spec": "Belly slide-in battery bay, 6S 8000mAh Li-ion pack, Velcro + strap dual retention, CG position 28% MAC"},
-      {"id": "p8", "label": "Payload Nose Bay", "preset": ["mechanical","general","payload_bay"], "spec": "Interchangeable nose payload bay, Day/IR camera gimbal or survey sensor, 80x60x50mm, 300g payload limit"},
-      {"id": "p9", "label": "Tilt-Axis Harness + Datum Service Bay", "preset": ["mechanical","general","cable_clip"], "spec": "Tiltrotor integration_service module with tilt-axis harness_channel, slack_loop, interface_datum, service_hatch, connector keying, and nacelle-to-wing load-path inspection access"}
+      {
+        "id": "p1",
+        "label": "Center Fuselage Spine",
+        "preset": [
+          "drone",
+          "fixed_uav",
+          "vtol_hw"
+        ],
+        "spec": "CFRP box beam center fuselage, avionics bay, wing spar socket, front GPS boom mount, belly camera window"
+      },
+      {
+        "id": "p2",
+        "label": "Main Wing (2-piece)",
+        "preset": [
+          "mechanical",
+          "structure",
+          "wing_spar"
+        ],
+        "spec": "Straight wing, 4S NACA 2412, dual 15mm CFRP spar, 900mm half-span, 160mm chord, 3-layer CFRP skin"
+      },
+      {
+        "id": "p3",
+        "label": "Nacelle Assembly x 2",
+        "preset": [
+          "propulsion",
+          "electric",
+          "motor_mount"
+        ],
+        "spec": "Tilting nacelle assembly, 0-90deg tilt axis, 6309 bearing set, servo-driven worm gear, motor and ESC pocket"
+      },
+      {
+        "id": "p4",
+        "label": "Tilt Servo + Linkage x 2",
+        "preset": [
+          "mechanical",
+          "actuation",
+          "servo_horn"
+        ],
+        "spec": "25kg-cm DS3218 servo per nacelle, titanium pushrod, dual ball joints, tilt range 0-93deg, crash-tolerant"
+      },
+      {
+        "id": "p5",
+        "label": "V-Tail x 2 (Ruddervator)",
+        "preset": [
+          "mechanical",
+          "structure",
+          "wing_spar"
+        ],
+        "spec": "+-35deg V-tail ruddervator pair, MG996R servo each, 30deg dihedral, CFRP sandwich panel, hinge piano wire"
+      },
+      {
+        "id": "p6",
+        "label": "Landing Gear (Tri)",
+        "preset": [
+          "mechanical",
+          "structure",
+          "landing_gear"
+        ],
+        "spec": "Tricycle landing gear, spring-steel skid arms, 55mm dia wheels, CG at 1/3 chord, 200mm wheelbase"
+      },
+      {
+        "id": "p7",
+        "label": "Battery Bay (Slide-In)",
+        "preset": [
+          "propulsion",
+          "electric",
+          "battery_tray"
+        ],
+        "spec": "Belly slide-in battery bay, 6S 8000mAh Li-ion pack, Velcro + strap dual retention, CG position 28% MAC"
+      },
+      {
+        "id": "p8",
+        "label": "Payload Nose Bay",
+        "preset": [
+          "mechanical",
+          "general",
+          "payload_bay"
+        ],
+        "spec": "Interchangeable nose payload bay, Day/IR camera gimbal or survey sensor, 80x60x50mm, 300g payload limit"
+      },
+      {
+        "id": "p9",
+        "label": "Tilt-Axis Harness + Datum Service Bay",
+        "preset": [
+          "mechanical",
+          "general",
+          "cable_clip"
+        ],
+        "spec": "Tiltrotor integration_service module with tilt-axis harness_channel, slack_loop, interface_datum, service_hatch, connector keying, and nacelle-to-wing load-path inspection access"
+      }
     ]
   },
   "small_launch_vehicle": {
-    "id": "small_launch_vehicle", "label": "Small Launch Vehicle (sounding)", "wikiTitle": "Saturn V / Rocket Lab Electron",
+    "id": "small_launch_vehicle",
+    "label": "Small Launch Vehicle (sounding)",
+    "wikiTitle": "Saturn V / Rocket Lab Electron",
     "desc": "Saturn V-structured, Electron-class 2-stage smallsat launcher demonstrator",
-    "material": "Al 7075 + CFRP + Inconel + ablative", "process": "LPBF + CFRP layup", "mass": "~500-2000 kg", "envelope": "0.6x12m",
+    "material": "Al 7075 + CFRP + Inconel + ablative",
+    "process": "LPBF + CFRP layup",
+    "mass": "~500-2000 kg",
+    "envelope": "0.6x12m",
     "parts": [
-      {"id": "p1", "label": "Stage 1 Combustion Chamber Display Dummy", "preset": ["space","launch_vehicle","combustion_chmb"], "spec": "Non-functional educational engine_display cartridge: combustion_chamber_dummy, injector-face visual insert, cutaway_window, slide_rail, no pressure/ignition/flight capability"},
-      {"id": "p2", "label": "Stage 1 Bell Nozzle Display Shell", "preset": ["space","launch_vehicle","nozzle_bell"], "spec": "Non-functional bell_nozzle_shell display mock with cutaway_window, bolt_circle_dummy, throat label, removable engine_display_cartridge interface"},
-      {"id": "p3", "label": "Turbopump Assembly Display Dummy", "preset": ["space","launch_vehicle","turbopump_hsg"], "spec": "Non-functional turbopump_assembly_dummy with impeller_dummy, service cutaway bay, slide_rail, inspection label, no pump performance claim"},
-      {"id": "p4", "label": "Propellant Tank Dummy (LOX)", "preset": ["space","launch_vehicle","tank_dome"], "spec": "Primary_structure tank_dummy barrel for display only: propellant_tank_dummy, dome caps, alignment_key, inspection_window, no pressure vessel claim"},
-      {"id": "p5", "label": "Propellant Tank Dummy (Fuel)", "preset": ["space","launch_vehicle","tank_dome"], "spec": "Primary_structure fuel tank_dummy barrel for display only: propellant_tank_dummy, fill/drain labels, alignment_key, bolt_circle_dummy, no fluid service"},
-      {"id": "p6", "label": "Interstage Adapter + Separation Datum", "preset": ["space","launch_vehicle","interstage"], "spec": "Separation_display mock: separation_plane_datum, clamp_band_dummy, interstage_datum, alignment_key, no energetic device or pyro instruction"},
-      {"id": "p7", "label": "Stage 2 Engine Display Dummy", "preset": ["space","launch_vehicle","nozzle_bell"], "spec": "Non-functional stage_engine_mock with bell_nozzle_shell, cutaway_window, engine_display_cartridge slide_rail, educational label only"},
-      {"id": "p8", "label": "Payload Fairing Display Shell", "preset": ["space","launch_vehicle","payload_adapter"], "spec": "Primary_structure payload_fairing/nose_cone display shell with split seam, inspection window, acoustic blanket labels, no flight-performance claim"},
-      {"id": "p9", "label": "Fin Set x 4 Display Mock", "preset": ["space","launch_vehicle","fin_can"], "spec": "Primary_structure fin_set display mock with root tabs, alignment_key, bolt_circle_dummy, inspection callouts, no stability/performance claim"},
-      {"id": "p10", "label": "Avionics Bay Mock Tray", "preset": ["space","satellite","star_tracker_mnt"], "spec": "Avionics_bay educational tray with board_standoff, harness_passthrough, connector labels, EMI shield mock, no ordnance or flight computer authority"},
-      {"id": "p11", "label": "Battery/Power Display Module", "preset": ["propulsion","electric","battery_tray"], "spec": "Power_display battery_module dummy with access_panel, keyed connector label, service cover, mass budget note, no live energy system"},
-      {"id": "p12", "label": "Recovery Bay Display Dummy", "preset": ["space","ground_support","recovery_system"], "spec": "Recovery_bay educational display dummy with deploy_door, hinge, parachute volume label, inspection window, no deployment charge or flight recovery instruction"},
-      {"id": "p13", "label": "Integration Inspection Ring", "preset": ["space","launch_vehicle","interstage"], "spec": "Integration_inspection ring with assembly_datum pads, inspection_window, checklist_callout, connection type labels, load-path closure marks"}
+      {
+        "id": "p1",
+        "label": "Stage 1 Combustion Chamber Academic Study Section",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "combustion_chmb"
+        ],
+        "spec": "Non-operational academic educational engine_academic study cartridge: combustion_chamber_reference article, injector-face visual insert, cutaway_window, slide_rail, academic boundary: no operational pressure, ignition, or flight-use instruction"
+      },
+      {
+        "id": "p2",
+        "label": "Stage 1 Bell Nozzle Cutaway Study Shell",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "nozzle_bell"
+        ],
+        "spec": "Non-operational academic bell_nozzle_shell academic study structure with cutaway_window, bolt_circle_reference article, throat label, removable engine_study_cartridge interface"
+      },
+      {
+        "id": "p3",
+        "label": "Turbopump Assembly Academic Study Section",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "turbopump_hsg"
+        ],
+        "spec": "Non-operational academic turbopump_assembly_reference article with impeller_reference article, service cutaway bay, slide_rail, inspection label, no pump performance sizing claim"
+      },
+      {
+        "id": "p4",
+        "label": "Propellant Tank Reference Article (LOX)",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "tank_dome"
+        ],
+        "spec": "Primary_structure tank_reference article barrel for academic study only: propellant_tank_reference article, dome caps, alignment_key, inspection_window, no pressure-vessel certification claim"
+      },
+      {
+        "id": "p5",
+        "label": "Propellant Tank Reference Article (Fuel)",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "tank_dome"
+        ],
+        "spec": "Primary_structure fuel tank_reference article barrel for academic study only: propellant_tank_reference article, fill/drain labels, alignment_key, bolt_circle_reference article, no operational fluid-service instruction"
+      },
+      {
+        "id": "p6",
+        "label": "Interstage Adapter + Separation Datum",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "interstage"
+        ],
+        "spec": "Separation_academic study structure: separation_plane_datum, clamp_band_reference article, interstage_datum, alignment_key, no energetic-device, pyro, or deployment instruction"
+      },
+      {
+        "id": "p7",
+        "label": "Stage 2 Engine Academic Study Section",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "nozzle_bell"
+        ],
+        "spec": "Non-operational academic stage_engine_study with bell_nozzle_shell, cutaway_window, engine_study_cartridge slide_rail, educational label only"
+      },
+      {
+        "id": "p8",
+        "label": "Payload Fairing Cutaway Study Shell",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "payload_adapter"
+        ],
+        "spec": "Primary_structure payload_fairing/nose_cone cutaway study shell with split seam, inspection window, acoustic blanket labels, no flight-performance or flight-readiness claim"
+      },
+      {
+        "id": "p9",
+        "label": "Fin Set x 4 Academic Study Structure",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "fin_can"
+        ],
+        "spec": "Primary_structure fin_set academic study structure with root tabs, alignment_key, bolt_circle_reference article, inspection callouts, no stability/performance or flight-readiness claim"
+      },
+      {
+        "id": "p10",
+        "label": "Avionics Bay Reference Structure Tray",
+        "preset": [
+          "space",
+          "satellite",
+          "star_tracker_mnt"
+        ],
+        "spec": "Avionics_bay educational tray with board_standoff, harness_passthrough, connector labels, EMI shield reference structure, no ordnance or flight computer authority"
+      },
+      {
+        "id": "p11",
+        "label": "Battery/Power Academic Study Module",
+        "preset": [
+          "propulsion",
+          "electric",
+          "battery_tray"
+        ],
+        "spec": "Power_study battery_module reference article with access_panel, keyed connector label, service cover, mass budget note, no live-energy assembly instruction"
+      },
+      {
+        "id": "p12",
+        "label": "Recovery Bay Academic Study Section",
+        "preset": [
+          "space",
+          "ground_support",
+          "recovery_system"
+        ],
+        "spec": "Recovery_bay educational academic study section with deploy_door, hinge, parachute volume label, inspection window, no deployment-charge or flight-recovery instruction"
+      },
+      {
+        "id": "p13",
+        "label": "Integration Inspection Ring",
+        "preset": [
+          "space",
+          "launch_vehicle",
+          "interstage"
+        ],
+        "spec": "Integration_inspection ring with assembly_datum pads, inspection_window, checklist_callout, connection type labels, load-path closure marks"
+      }
     ]
   },
   "long_range_recon_wing": {
-    "id": "wing_long_range", "label": "Long-Range Surveillance Wing", "wikiTitle": "Fixed-wing unmanned aerial vehicle",
+    "id": "wing_long_range",
+    "label": "Long-Range Surveillance Wing",
+    "wikiTitle": "Fixed-wing unmanned aerial vehicle",
     "desc": "Fixed-wing flying-wing UAV, 2m wingspan, 4+ hour endurance",
-    "material": "EPP foam core + CFRP spar", "process": "FDM + foam", "mass": "~1.8kg", "envelope": "2000x1100x220 mm",
+    "material": "EPP foam core + CFRP spar",
+    "process": "FDM + foam",
+    "mass": "~1.8kg",
+    "envelope": "2000x1100x220 mm",
     "parts": [
-      {"id": "p1", "label": "Center Body Pod", "preset": ["drone","fixed_uav","flying_wing"], "spec": "Flying-wing center pod, equipment bay door, wing-spar reinforcement, motor pylon at rear"},
-      {"id": "p2", "label": "Wing Spar (2-piece)", "preset": ["mechanical","structure","wing_spar"], "spec": "20mm CFRP main spar, 2-piece centerjoint, anti-rotation key, 800mm half-span each"},
-      {"id": "p3", "label": "Wing Rib Set x 12", "preset": ["mechanical","structure","wing_spar"], "spec": "Wing rib NACA airfoil profile, lightening pockets, leading edge sock, trailing edge taper"},
-      {"id": "p4", "label": "Elevon Servo Pocket x 2", "preset": ["mechanical","actuation","servo_horn"], "spec": "Elevon servo pocket, MG90S or DS215MG, control horn linkage, removable access cover"},
-      {"id": "p5", "label": "Motor + Pusher Prop Mount", "preset": ["propulsion","electric","motor_mount"], "spec": "Rear pusher 2814 BLDC mount, 10x7 folding prop clearance, thrust line +1deg down"},
-      {"id": "p6", "label": "GPS + Pitot Boom", "preset": ["mechanical","general","bracket"], "spec": "Nose boom 8mm, GPS at tip, pitot static port forward, BEC airflow shielded"},
-      {"id": "p7", "label": "Camera Gimbal Bay", "preset": ["mechanical","actuation","gimbal"], "spec": "Forward downward camera gimbal bay 70mm deep, 2-axis micro gimbal, optical window"},
-      {"id": "p8", "label": "Battery Bay (Slide)", "preset": ["propulsion","electric","battery_tray"], "spec": "4S 16000mAh Li-ion slide-in bay, CG adjust slot, top access hatch, balance lead window"},
-      {"id": "p9", "label": "Integration Service Backbone", "preset": ["mechanical","general","cable_clip"], "spec": "Wing/fuselage integration service backbone with assembly_datum pads, harness_raceway, service_hatch, connector_keying, anti-rotation wing datum, and visible load-path inspection marks"}
+      {
+        "id": "p1",
+        "label": "Center Body Pod",
+        "preset": [
+          "drone",
+          "fixed_uav",
+          "flying_wing"
+        ],
+        "spec": "Flying-wing center pod, equipment bay door, wing-spar reinforcement, motor pylon at rear"
+      },
+      {
+        "id": "p2",
+        "label": "Wing Spar (2-piece)",
+        "preset": [
+          "mechanical",
+          "structure",
+          "wing_spar"
+        ],
+        "spec": "20mm CFRP main spar, 2-piece centerjoint, anti-rotation key, 800mm half-span each"
+      },
+      {
+        "id": "p3",
+        "label": "Wing Rib Set x 12",
+        "preset": [
+          "mechanical",
+          "structure",
+          "wing_spar"
+        ],
+        "spec": "Wing rib NACA airfoil profile, lightening pockets, leading edge sock, trailing edge taper"
+      },
+      {
+        "id": "p4",
+        "label": "Elevon Servo Pocket x 2",
+        "preset": [
+          "mechanical",
+          "actuation",
+          "servo_horn"
+        ],
+        "spec": "Elevon servo pocket, MG90S or DS215MG, control horn linkage, removable access cover"
+      },
+      {
+        "id": "p5",
+        "label": "Motor + Pusher Prop Mount",
+        "preset": [
+          "propulsion",
+          "electric",
+          "motor_mount"
+        ],
+        "spec": "Rear pusher 2814 BLDC mount, 10x7 folding prop clearance, thrust line +1deg down"
+      },
+      {
+        "id": "p6",
+        "label": "GPS + Pitot Boom",
+        "preset": [
+          "mechanical",
+          "general",
+          "bracket"
+        ],
+        "spec": "Nose boom 8mm, GPS at tip, pitot static port forward, BEC airflow shielded"
+      },
+      {
+        "id": "p7",
+        "label": "Camera Gimbal Bay",
+        "preset": [
+          "mechanical",
+          "actuation",
+          "gimbal"
+        ],
+        "spec": "Forward downward camera gimbal bay 70mm deep, 2-axis micro gimbal, optical window"
+      },
+      {
+        "id": "p8",
+        "label": "Battery Bay (Slide)",
+        "preset": [
+          "propulsion",
+          "electric",
+          "battery_tray"
+        ],
+        "spec": "4S 16000mAh Li-ion slide-in bay, CG adjust slot, top access hatch, balance lead window"
+      },
+      {
+        "id": "p9",
+        "label": "Integration Service Backbone",
+        "preset": [
+          "mechanical",
+          "general",
+          "cable_clip"
+        ],
+        "spec": "Wing/fuselage integration service backbone with assembly_datum pads, harness_raceway, service_hatch, connector_keying, anti-rotation wing datum, and visible load-path inspection marks"
+      }
     ]
   },
   "haptic_glove": {
-    "id": "haptic_glove_pair", "label": "Force-Feedback Haptic Glove Pair", "wikiTitle": "Haptic technology",
+    "id": "haptic_glove_pair",
+    "label": "Force-Feedback Haptic Glove Pair",
+    "wikiTitle": "Haptic technology",
     "desc": "Wearable force-feedback exo-glove pair for VR grasp resistance, serviceable actuator cartridges, linkages, wrist band, and dorsal control module",
-    "material": "PETG + TPU + PA12", "process": "FDM + SLS", "mass": "~650g pair", "envelope": "220x200x60 mm",
+    "material": "PETG + TPU + PA12",
+    "process": "FDM + SLS",
+    "mass": "~650g pair",
+    "envelope": "220x200x60 mm",
     "parts": [
-      {"id": "p1", "label": "Dorsal Control Module x 2", "preset": ["medical","rehab","sensory_glove"], "spec": "Snap-in dorsal electronics and battery module, tool-less lid, wireless board bay, service label and cable exits"},
-      {"id": "p2", "label": "Finger Exo Linkage Cartridge x 10", "preset": ["robotics","wearable","hand_exo_finger"], "spec": "Two-segment exoskeleton finger linkage cartridge, single-pin removable, hinge datum pads, thimble slip interface"},
-      {"id": "p3", "label": "Flexion-Resistance Actuator x 10", "preset": ["robotics","wearable","cable_pulley"], "spec": "Plug-in tendon brake/clutch actuator module, knuckle row mount, cable pulley, connector pocket, service access"},
-      {"id": "p4", "label": "Adjustable Wrist Band x 2", "preset": ["medical","rehab","sensory_glove"], "spec": "Quick-release wrist band, cable raceway, soft-contact interface, buckle, dorsal module anchor"},
-      {"id": "p5", "label": "Cable Raceway + Harness Cover x 2", "preset": ["mechanical","general","cable_clip"], "spec": "Snap-fit cable routing cover from wrist band to fingers, strain relief slots, inspection windows"},
-      {"id": "p6", "label": "Finger Thimble Interface Set", "preset": ["medical","rehab","sensory_glove"], "spec": "Replaceable fingertip thimbles, slip-clearance sockets, soft liner cue, per-finger label and hinge pin access"},
-      {"id": "p7", "label": "Palm Sensor Plate x 2", "preset": ["medical","rehab","sensory_glove"], "spec": "Palm-side flex/bend sensor channel plate, IMU mount pad, per-finger sensor channel exits, sensor connector pocket, washable liner interface"},
-      {"id": "p8", "label": "Battery + Power Module x 2", "preset": ["propulsion","electric","battery_tray"], "spec": "Wrist battery pocket with quick-swap door, li-ion pack 2S 18650, BMS access window, power connector keying, charge LED window"},
-      {"id": "p9", "label": "Wiring Loom + Service Loop Set", "preset": ["mechanical","general","cable_clip"], "spec": "Knuckle-crossing wiring loom with service loops, strain relief at every flex boundary, flex-rated bend radius, power vs signal channel separation"},
-      {"id": "p10", "label": "Knuckle Mount Rail x 2", "preset": ["robotics","wearable","hand_exo_finger"], "spec": "Dorsal knuckle row mounting rail, actuator plug-in pockets, datum pads per finger station, fastener pattern and removal path"},
-      {"id": "p11", "label": "Fit Calibration + Safety Release Set", "preset": ["medical","rehab","sensory_glove"], "spec": "Wearable_structure closure module: wrist_quick_release, soft_liner_zone, finger_clearance gauges, don/doff datum labels, emergency release pull tab"},
-      {"id": "p12", "label": "Service Port + Flex-Wiring Inspection Cover", "preset": ["mechanical","general","cable_clip"], "spec": "Flex_wiring closure module: service_loop inspection cover, strain_relief, bend_radius_note, connector keying, charge/debug service port, power vs signal separation label"}
+      {
+        "id": "p1",
+        "label": "Dorsal Control Module x 2",
+        "preset": [
+          "medical",
+          "rehab",
+          "sensory_glove"
+        ],
+        "spec": "Snap-in dorsal electronics and battery module, tool-less lid, wireless board bay, service label and cable exits"
+      },
+      {
+        "id": "p2",
+        "label": "Finger Exo Linkage Cartridge x 10",
+        "preset": [
+          "robotics",
+          "wearable",
+          "hand_exo_finger"
+        ],
+        "spec": "Two-segment exoskeleton finger linkage cartridge, single-pin removable, hinge datum pads, thimble slip interface"
+      },
+      {
+        "id": "p3",
+        "label": "Flexion-Resistance Actuator x 10",
+        "preset": [
+          "robotics",
+          "wearable",
+          "cable_pulley"
+        ],
+        "spec": "Plug-in tendon brake/clutch actuator module, knuckle row mount, cable pulley, connector pocket, service access"
+      },
+      {
+        "id": "p4",
+        "label": "Adjustable Wrist Band x 2",
+        "preset": [
+          "medical",
+          "rehab",
+          "sensory_glove"
+        ],
+        "spec": "Quick-release wrist band, cable raceway, soft-contact interface, buckle, dorsal module anchor"
+      },
+      {
+        "id": "p5",
+        "label": "Cable Raceway + Harness Cover x 2",
+        "preset": [
+          "mechanical",
+          "general",
+          "cable_clip"
+        ],
+        "spec": "Snap-fit cable routing cover from wrist band to fingers, strain relief slots, inspection windows"
+      },
+      {
+        "id": "p6",
+        "label": "Finger Thimble Interface Set",
+        "preset": [
+          "medical",
+          "rehab",
+          "sensory_glove"
+        ],
+        "spec": "Replaceable fingertip thimbles, slip-clearance sockets, soft liner cue, per-finger label and hinge pin access"
+      },
+      {
+        "id": "p7",
+        "label": "Palm Sensor Plate x 2",
+        "preset": [
+          "medical",
+          "rehab",
+          "sensory_glove"
+        ],
+        "spec": "Palm-side flex/bend sensor channel plate, IMU mount pad, per-finger sensor channel exits, sensor connector pocket, washable liner interface"
+      },
+      {
+        "id": "p8",
+        "label": "Battery + Power Module x 2",
+        "preset": [
+          "propulsion",
+          "electric",
+          "battery_tray"
+        ],
+        "spec": "Wrist battery pocket with quick-swap door, li-ion pack 2S 18650, BMS access window, power connector keying, charge LED window"
+      },
+      {
+        "id": "p9",
+        "label": "Wiring Loom + Service Loop Set",
+        "preset": [
+          "mechanical",
+          "general",
+          "cable_clip"
+        ],
+        "spec": "Knuckle-crossing wiring loom with service loops, strain relief at every flex boundary, flex-rated bend radius, power vs signal channel separation"
+      },
+      {
+        "id": "p10",
+        "label": "Knuckle Mount Rail x 2",
+        "preset": [
+          "robotics",
+          "wearable",
+          "hand_exo_finger"
+        ],
+        "spec": "Dorsal knuckle row mounting rail, actuator plug-in pockets, datum pads per finger station, fastener pattern and removal path"
+      },
+      {
+        "id": "p11",
+        "label": "Fit Calibration + Safety Release Set",
+        "preset": [
+          "medical",
+          "rehab",
+          "sensory_glove"
+        ],
+        "spec": "Wearable_structure closure module: wrist_quick_release, soft_liner_zone, finger_clearance gauges, don/doff datum labels, emergency release pull tab"
+      },
+      {
+        "id": "p12",
+        "label": "Service Port + Flex-Wiring Inspection Cover",
+        "preset": [
+          "mechanical",
+          "general",
+          "cable_clip"
+        ],
+        "spec": "Flex_wiring closure module: service_loop inspection cover, strain_relief, bend_radius_note, connector keying, charge/debug service port, power vs signal separation label"
+      }
+    ]
+  },
+  "inline_6_engine_gasoline": {
+    "id": "inline_6_engine_gasoline",
+    "label": "Inline-6 Gasoline Engine Assembly",
+    "wikiTitle": "Straight-six engine",
+    "desc": "Conceptual inline-six gasoline engine cutaway assembly for structural, cooling, lubrication, valvetrain, intake, exhaust, and service-access grammar; not a certified running engine",
+    "material": "Al alloy + cast iron + steel + elastomer",
+    "process": "CNC + casting reference structure + FDM",
+    "mass": "~180kg reference class",
+    "envelope": "900x650x750 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Cylinder Block + Crankcase",
+        "preset": [
+          "mechanical",
+          "engine",
+          "block"
+        ],
+        "spec": "Inline-6 block with six cylinder bores, crankcase skirt, coolant jacket cues, oil gallery, main bearing cap pads, deck gasket face"
+      },
+      {
+        "id": "p2",
+        "label": "Crankshaft + Main Bearing Set",
+        "preset": [
+          "mechanical",
+          "rotating",
+          "shaft"
+        ],
+        "spec": "Seven-main-bearing crankshaft module with counterweights, thrust bearing face, oil holes, flywheel flange, journal labels"
+      },
+      {
+        "id": "p3",
+        "label": "Piston + Connecting Rod Set x 6",
+        "preset": [
+          "mechanical",
+          "engine",
+          "piston_rod"
+        ],
+        "spec": "Piston/rod educational cartridge set with wrist pin bosses, big-end caps, ring groove cues, orientation marks"
+      },
+      {
+        "id": "p4",
+        "label": "Cylinder Head + DOHC Valvetrain",
+        "preset": [
+          "mechanical",
+          "engine",
+          "cylinder_head"
+        ],
+        "spec": "Cylinder head with intake/exhaust ports, cam carrier, valve cover face, spark plug wells, gasket datum"
+      },
+      {
+        "id": "p5",
+        "label": "Intake Manifold + Throttle Body",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "manifold"
+        ],
+        "spec": "Gasoline intake plenum with six runners, throttle body flange, injector/fuel rail clearance, sensor boss"
+      },
+      {
+        "id": "p6",
+        "label": "Exhaust Manifold + Heat Shield",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "manifold"
+        ],
+        "spec": "Six-runner exhaust manifold reference structure with collector flange, oxygen sensor boss, heat shield standoff, gasket face"
+      },
+      {
+        "id": "p7",
+        "label": "Timing Chain Front Cover",
+        "preset": [
+          "mechanical",
+          "engine",
+          "timing_cover"
+        ],
+        "spec": "Front timing cover with chain path window, cam/crank alignment marks, seal bore, service fasteners"
+      },
+      {
+        "id": "p8",
+        "label": "Oil Pan + Pump Pickup",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "sump"
+        ],
+        "spec": "Oil sump with drain plug, baffle ribs, pickup tube reference article, gasket rail, service access"
+      },
+      {
+        "id": "p9",
+        "label": "Fuel Rail + Injector Harness",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "fuel_rail"
+        ],
+        "spec": "Low-pressure gasoline fuel rail reference structure with injector pockets, connector keying, harness clips, pressure sensor boss"
+      },
+      {
+        "id": "p10",
+        "label": "Accessory Drive + Mount Brackets",
+        "preset": [
+          "mechanical",
+          "actuation",
+          "bracket"
+        ],
+        "spec": "Belt accessory bracket set with alternator/AC/pump bosses, belt plane datum, tensioner pivot, mounting ears"
+      }
+    ]
+  },
+  "inline_6_engine_diesel": {
+    "id": "inline_6_engine_diesel",
+    "label": "Inline-6 Diesel Engine Assembly",
+    "wikiTitle": "Diesel engine",
+    "desc": "Conceptual inline-six diesel engine cutaway assembly emphasizing stronger block/head grammar, common-rail fuel path, turbo air path, cooling/lubrication, and service access; not a certified running engine",
+    "material": "Compacted graphite iron + steel + Al alloy",
+    "process": "CNC + casting reference structure + FDM",
+    "mass": "~320kg reference class",
+    "envelope": "1100x720x850 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Reinforced Cylinder Block",
+        "preset": [
+          "mechanical",
+          "engine",
+          "block"
+        ],
+        "spec": "Diesel I6 block with thick deck, six bores, cross-bolted main cap cues, coolant jacket, oil gallery"
+      },
+      {
+        "id": "p2",
+        "label": "Forged Crankshaft + Bearing Ladder",
+        "preset": [
+          "mechanical",
+          "rotating",
+          "shaft"
+        ],
+        "spec": "Heavy crankshaft and bearing ladder with main caps, thrust face, oil feeds, flywheel flange"
+      },
+      {
+        "id": "p3",
+        "label": "Piston/Rod Assembly x 6",
+        "preset": [
+          "mechanical",
+          "engine",
+          "piston_rod"
+        ],
+        "spec": "Diesel piston/rod educational set with bowl crown cue, wrist pin boss, rod cap bolts, ring bands"
+      },
+      {
+        "id": "p4",
+        "label": "Cylinder Head + Injector Wells",
+        "preset": [
+          "mechanical",
+          "engine",
+          "cylinder_head"
+        ],
+        "spec": "Diesel head with injector wells, glow plug ports, valve bridge, intake/exhaust ports, gasket datum"
+      },
+      {
+        "id": "p5",
+        "label": "Common Rail + Injector Harness",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "fuel_rail"
+        ],
+        "spec": "Common-rail layout reference structure with rail brackets, injector pockets, return line path, harness channel; non-operational academic low-detail reference"
+      },
+      {
+        "id": "p6",
+        "label": "Turbocharger + Exhaust Manifold Reference Structure",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "turbo"
+        ],
+        "spec": "Turbo/exhaust academic study structure with turbine housing shell, compressor shell, oil feed/return bosses, heat shield"
+      },
+      {
+        "id": "p7",
+        "label": "Intake/EGR Cooler Path Reference Structure",
+        "preset": [
+          "mechanical",
+          "thermal",
+          "cooler"
+        ],
+        "spec": "Charge-air/EGR cooler routing reference structure with flanges, gasket faces, bypass/service cover, sensor bosses"
+      },
+      {
+        "id": "p8",
+        "label": "Oil Cooler + Filter Module",
+        "preset": [
+          "mechanical",
+          "thermal",
+          "oil_cooler"
+        ],
+        "spec": "Oil cooler/filter module with cartridge cap, coolant ports, gasket face, drain boss"
+      },
+      {
+        "id": "p9",
+        "label": "Timing Gear Housing",
+        "preset": [
+          "mechanical",
+          "rotating",
+          "gear_housing"
+        ],
+        "spec": "Front gear housing with idler gear pockets, crank/cam gear datums, service cover, seal bore"
+      },
+      {
+        "id": "p10",
+        "label": "Engine Mount + Bellhousing Interfaces",
+        "preset": [
+          "mechanical",
+          "structure",
+          "mount"
+        ],
+        "spec": "Mount brackets and bellhousing adapter pattern with datum pads, bolt groups, lifting lug cues"
+      }
+    ]
+  },
+  "centrifugal_pump": {
+    "id": "centrifugal_pump",
+    "label": "Centrifugal Pump Assembly",
+    "wikiTitle": "Centrifugal pump",
+    "desc": "Industrial centrifugal pump cutaway assembly for volute, impeller, shaft, bearing, seal, flange, and service-access grammar",
+    "material": "Cast iron + stainless steel + elastomer",
+    "process": "Casting reference structure + CNC + FDM",
+    "mass": "~35kg",
+    "envelope": "520x320x380 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Volute Casing",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "pump_volute"
+        ],
+        "spec": "Spiral volute casing with inlet eye, outlet flange, pressure boundary, drain plug, inspection boss"
+      },
+      {
+        "id": "p2",
+        "label": "Impeller",
+        "preset": [
+          "mechanical",
+          "rotating",
+          "impeller"
+        ],
+        "spec": "Closed impeller with hub, blade channels, wear ring face, balance drill cues"
+      },
+      {
+        "id": "p3",
+        "label": "Pump Shaft",
+        "preset": [
+          "mechanical",
+          "rotating",
+          "shaft"
+        ],
+        "spec": "Stepped shaft with keyway, impeller nut, bearing journals, coupling end"
+      },
+      {
+        "id": "p4",
+        "label": "Bearing Housing",
+        "preset": [
+          "mechanical",
+          "structure",
+          "bearing_housing"
+        ],
+        "spec": "Bearing frame with front/rear bearing seats, grease ports, oil sight window, mounting feet"
+      },
+      {
+        "id": "p5",
+        "label": "Mechanical Seal Cartridge",
+        "preset": [
+          "mechanical",
+          "sealing",
+          "seal"
+        ],
+        "spec": "Seal cartridge reference structure with gland plate, O-ring groove, flush port, leakage drain"
+      },
+      {
+        "id": "p6",
+        "label": "Suction/Discharge Flange Set",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "flange"
+        ],
+        "spec": "ANSI-style flanges with bolt circle, gasket face, flow arrow, pipe alignment datum"
+      },
+      {
+        "id": "p7",
+        "label": "Coupling Guard + Motor Adapter",
+        "preset": [
+          "mechanical",
+          "integration",
+          "guard"
+        ],
+        "spec": "Motor adapter and coupling guard with service window, fastener tabs, alignment slots"
+      },
+      {
+        "id": "p8",
+        "label": "Baseplate + Mount Pads",
+        "preset": [
+          "mechanical",
+          "structure",
+          "baseplate"
+        ],
+        "spec": "Baseplate with slotted mount holes, leveling pads, drain channel, lifting points"
+      }
+    ]
+  },
+  "hydraulic_manifold": {
+    "id": "hydraulic_manifold",
+    "label": "Hydraulic Manifold Block Assembly",
+    "wikiTitle": "Hydraulic machinery",
+    "desc": "Hydraulic manifold block concept for porting, cross-drilled galleries, cartridge valves, plugs, labels, and service access",
+    "material": "Al 6061 + steel plugs + elastomer seals",
+    "process": "CNC",
+    "mass": "~8kg",
+    "envelope": "260x160x120 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Main Manifold Block",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "manifold"
+        ],
+        "spec": "CNC manifold block with P/T/A/B ports, cross-drilled galleries, plug bosses, datum faces"
+      },
+      {
+        "id": "p2",
+        "label": "Cartridge Valve Set",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "valve"
+        ],
+        "spec": "Screw-in cartridge valve cavities with O-ring lands, wrench clearance, port labels"
+      },
+      {
+        "id": "p3",
+        "label": "Pressure Relief Valve Section",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "relief_valve"
+        ],
+        "spec": "Relief valve pocket, adjustment cap, spring chamber cue, tank return path"
+      },
+      {
+        "id": "p4",
+        "label": "Check Valve Section",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "check_valve"
+        ],
+        "spec": "Check valve cavity with flow arrow, seat cone cue, service plug"
+      },
+      {
+        "id": "p5",
+        "label": "Sensor + Test Port Set",
+        "preset": [
+          "mechanical",
+          "electronics",
+          "sensor_port"
+        ],
+        "spec": "Pressure transducer boss, test coupler port, cable exit, protective cover"
+      },
+      {
+        "id": "p6",
+        "label": "Mounting Feet + Label Plate",
+        "preset": [
+          "mechanical",
+          "integration",
+          "mount"
+        ],
+        "spec": "Mounting feet, engraved circuit label plate, orientation arrows, service side datum"
+      }
+    ]
+  },
+  "battery_pack_module": {
+    "id": "battery_pack_module",
+    "label": "Battery Pack Module",
+    "wikiTitle": "Electric vehicle battery",
+    "desc": "Serviceable battery module concept for cell support, busbars, BMS, cooling plate interface, venting, isolation, and enclosure grammar; no live-energy build instruction",
+    "material": "Al enclosure + polymer holders + copper busbar reference structure",
+    "process": "Sheet metal + FDM + CNC",
+    "mass": "~18kg",
+    "envelope": "520x360x160 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Cell Carrier Tray",
+        "preset": [
+          "propulsion",
+          "electric",
+          "battery_tray"
+        ],
+        "spec": "Cell holder tray with repeated cell pockets, compression pads, locator ribs, module datum"
+      },
+      {
+        "id": "p2",
+        "label": "Busbar + Fuse Cover Reference Structure",
+        "preset": [
+          "propulsion",
+          "electric",
+          "busbar"
+        ],
+        "spec": "Insulated busbar reference structure with fuse windows, terminal guards, polarity labels, no live-energy claim"
+      },
+      {
+        "id": "p3",
+        "label": "BMS Electronics Bay",
+        "preset": [
+          "electronics",
+          "power",
+          "bms"
+        ],
+        "spec": "BMS board pocket, sensing harness channels, service connector, EMI shield cover"
+      },
+      {
+        "id": "p4",
+        "label": "Cooling Plate Interface",
+        "preset": [
+          "mechanical",
+          "thermal",
+          "cold_plate"
+        ],
+        "spec": "Cooling plate contact face, thermal pad zones, inlet/outlet ports, leak inspection channel"
+      },
+      {
+        "id": "p5",
+        "label": "Pack Enclosure + Lid",
+        "preset": [
+          "mechanical",
+          "structure",
+          "enclosure"
+        ],
+        "spec": "Gasketed enclosure shell with lid flange, fastener pattern, vent path, service label"
+      },
+      {
+        "id": "p6",
+        "label": "HV Connector + Service Disconnect Reference Structure",
+        "preset": [
+          "propulsion",
+          "electric",
+          "connector"
+        ],
+        "spec": "Keyed HV connector reference structure, service disconnect handle, low-voltage connector, strain relief"
+      },
+      {
+        "id": "p7",
+        "label": "Crash/Isolation End Plates",
+        "preset": [
+          "mechanical",
+          "structure",
+          "end_plate"
+        ],
+        "spec": "End plates with crush ribs, isolation spacers, tie rod bosses, lifting tabs"
+      }
+    ]
+  },
+  "liquid_cold_plate": {
+    "id": "liquid_cold_plate",
+    "label": "Liquid Cold Plate Assembly",
+    "wikiTitle": "Cold plate",
+    "desc": "Liquid cold plate concept for serpentine channels, manifolds, gasket, electronics mounting, leak inspection, and thermal interface grammar",
+    "material": "Al 6061 + copper insert + elastomer gasket",
+    "process": "CNC + brazed reference structure",
+    "mass": "~3kg",
+    "envelope": "320x220x40 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Cold Plate Body",
+        "preset": [
+          "mechanical",
+          "thermal",
+          "cold_plate"
+        ],
+        "spec": "Machined plate body with serpentine channel, fin islands, mounting bosses, flatness datum"
+      },
+      {
+        "id": "p2",
+        "label": "Inlet/Outlet Manifold Cap",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "manifold"
+        ],
+        "spec": "Manifold cap with hose barb/AN port faces, O-ring groove, flow arrow, fastener pattern"
+      },
+      {
+        "id": "p3",
+        "label": "Gasket + Seal Track",
+        "preset": [
+          "mechanical",
+          "sealing",
+          "gasket"
+        ],
+        "spec": "Continuous gasket groove, compression stops, leak witness channel, corner reliefs"
+      },
+      {
+        "id": "p4",
+        "label": "Power Module Mount Pads",
+        "preset": [
+          "electronics",
+          "thermal",
+          "mount"
+        ],
+        "spec": "IGBT/MOSFET mount pads, thermal paste zones, isolation washer pockets, sensor pad"
+      },
+      {
+        "id": "p5",
+        "label": "Leak Test + Drain Ports",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "test_port"
+        ],
+        "spec": "Pressure test port, drain plug, bleed screw, service labels"
+      },
+      {
+        "id": "p6",
+        "label": "Cover Plate",
+        "preset": [
+          "mechanical",
+          "structure",
+          "cover"
+        ],
+        "spec": "Bolted cover with ribbing, datum pins, inspection window label, torque sequence marks"
+      }
+    ]
+  },
+  "cnc_axis_carriage": {
+    "id": "cnc_axis_carriage",
+    "label": "CNC Linear Axis Carriage",
+    "wikiTitle": "Linear motion",
+    "desc": "Precision CNC linear axis carriage concept for rails, bearing blocks, ball screw, motor mount, way covers, sensors, and lubrication grammar",
+    "material": "Cast Al + steel rails + polymer covers",
+    "process": "CNC + FDM cover reference structure",
+    "mass": "~22kg",
+    "envelope": "700x220x180 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Carriage Plate",
+        "preset": [
+          "mechanical",
+          "structure",
+          "carriage"
+        ],
+        "spec": "Machined carriage with rail block bolt pattern, datum edge, dowel holes, lightening pockets"
+      },
+      {
+        "id": "p2",
+        "label": "Linear Rail Pair + Bearing Blocks",
+        "preset": [
+          "mechanical",
+          "actuation",
+          "linear_rail"
+        ],
+        "spec": "Two linear rails with four bearing block footprints, grease ports, rail datum references"
+      },
+      {
+        "id": "p3",
+        "label": "Ball Screw + Nut Housing",
+        "preset": [
+          "mechanical",
+          "actuation",
+          "ballscrew"
+        ],
+        "spec": "Ball screw shaft, nut housing, fixed/floating bearing ends, preload label"
+      },
+      {
+        "id": "p4",
+        "label": "Servo Motor Mount + Coupling Guard",
+        "preset": [
+          "mechanical",
+          "actuation",
+          "motor_mount"
+        ],
+        "spec": "Servo flange, coupling guard, belt/shaft alignment datum, service slots"
+      },
+      {
+        "id": "p5",
+        "label": "Limit/Home Sensor Brackets",
+        "preset": [
+          "electronics",
+          "sensor",
+          "limit_switch"
+        ],
+        "spec": "Home and limit switch brackets, cable channel, target flag, adjustment slots"
+      },
+      {
+        "id": "p6",
+        "label": "Way Cover + Wiper Set",
+        "preset": [
+          "mechanical",
+          "sealing",
+          "way_cover"
+        ],
+        "spec": "Telescoping way cover reference structure, wiper lip, chip guard, fastener tabs"
+      },
+      {
+        "id": "p7",
+        "label": "Lubrication Manifold",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "lube"
+        ],
+        "spec": "Lubrication ports, distribution channels, grease nipples, service labels"
+      }
+    ]
+  },
+  "gearbox_reducer": {
+    "id": "gearbox_reducer",
+    "label": "Two-Stage Gearbox Reducer",
+    "wikiTitle": "Gear train",
+    "desc": "Two-stage gearbox reducer concept for housing, gears, shafts, bearings, oiling, seals, covers, and mounting grammar",
+    "material": "Cast Al housing + steel gears/shafts + elastomer seals",
+    "process": "Casting reference structure + CNC + FDM",
+    "mass": "~14kg",
+    "envelope": "360x240x220 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Split Gearbox Housing",
+        "preset": [
+          "mechanical",
+          "structure",
+          "gearbox"
+        ],
+        "spec": "Split housing with bearing bores, gasket flange, ribbing, inspection cover"
+      },
+      {
+        "id": "p2",
+        "label": "Input Shaft + Pinion",
+        "preset": [
+          "mechanical",
+          "rotating",
+          "gear"
+        ],
+        "spec": "Input shaft with pinion gear, keyway, seal journal, bearing seats"
+      },
+      {
+        "id": "p3",
+        "label": "Intermediate Shaft + Gear Pair",
+        "preset": [
+          "mechanical",
+          "rotating",
+          "gear"
+        ],
+        "spec": "Intermediate compound gear shaft with two gears, spacer, bearing seats"
+      },
+      {
+        "id": "p4",
+        "label": "Output Shaft + Bull Gear",
+        "preset": [
+          "mechanical",
+          "rotating",
+          "gear"
+        ],
+        "spec": "Output shaft with bull gear, output flange, keyway, bearing support"
+      },
+      {
+        "id": "p5",
+        "label": "Bearing + Seal Set",
+        "preset": [
+          "mechanical",
+          "sealing",
+          "bearing_seal"
+        ],
+        "spec": "Bearing cartridges, oil seals, shims, retainer plates"
+      },
+      {
+        "id": "p6",
+        "label": "Lubrication + Breather System",
+        "preset": [
+          "mechanical",
+          "fluid",
+          "lubrication"
+        ],
+        "spec": "Oil fill/drain/level plugs, splash baffle, breather cap, sight glass"
+      },
+      {
+        "id": "p7",
+        "label": "Mounting Feet + Torque Arm",
+        "preset": [
+          "mechanical",
+          "integration",
+          "mount"
+        ],
+        "spec": "Mount feet, torque arm boss, dowel pads, bolt groups"
+      }
+    ]
+  },
+  "underwater_sealed_sensor_housing": {
+    "id": "underwater_sealed_sensor_housing",
+    "label": "Underwater Sealed Sensor Housing",
+    "wikiTitle": "Underwater acoustics",
+    "desc": "Underwater sensor housing concept for pressure shell, O-ring cap, cable gland, optical/acoustic window, mounting cradle, and service boundary grammar",
+    "material": "Al 6061 + acrylic window + elastomer seals + stainless hardware",
+    "process": "CNC + FDM fixture reference structure",
+    "mass": "~4kg",
+    "envelope": "320x180x180 mm",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Cylindrical Pressure Shell",
+        "preset": [
+          "marine",
+          "structure",
+          "pressure_shell"
+        ],
+        "spec": "Cylindrical housing shell with wall-thickness cue, internal rail slots, external cradle pads"
+      },
+      {
+        "id": "p2",
+        "label": "Front Sensor Window Cap",
+        "preset": [
+          "marine",
+          "sealing",
+          "window_cap"
+        ],
+        "spec": "Front cap with optical/acoustic window, O-ring groove, retaining ring, anti-rotation pins"
+      },
+      {
+        "id": "p3",
+        "label": "Rear Service Cap",
+        "preset": [
+          "marine",
+          "sealing",
+          "service_cap"
+        ],
+        "spec": "Rear cap with double O-ring cue, service screws, puller holes, orientation mark"
+      },
+      {
+        "id": "p4",
+        "label": "Cable Gland + Strain Relief",
+        "preset": [
+          "marine",
+          "electronics",
+          "cable_gland"
+        ],
+        "spec": "Wet-mate cable gland reference structure, bend relief boot, potting pocket, connector key"
+      },
+      {
+        "id": "p5",
+        "label": "Internal Electronics Tray",
+        "preset": [
+          "electronics",
+          "sensor",
+          "tray"
+        ],
+        "spec": "Slide-in board tray, sensor board standoffs, desiccant pocket, ground lug"
+      },
+      {
+        "id": "p6",
+        "label": "Mounting Cradle + Anode Pad",
+        "preset": [
+          "marine",
+          "integration",
+          "cradle"
+        ],
+        "spec": "ROV/vehicle cradle with clamp bands, sacrificial anode pad, drain path, lifting tab"
+      },
+      {
+        "id": "p7",
+        "label": "Leak Test Port + Label Set",
+        "preset": [
+          "marine",
+          "fluid",
+          "test_port"
+        ],
+        "spec": "Leak test plug, pressure label, inspection witness groove, serial plate"
+      }
+    ]
+  },
+  "liquid_rocket_engine_academic": {
+    "id": "liquid_rocket_engine_academic",
+    "label": "Academic Liquid Rocket Engine System",
+    "wikiTitle": "Liquid-propellant rocket",
+    "desc": "Academic liquid rocket propulsion system seed for conceptual chamber/nozzle, injector taxonomy, regenerative cooling, feed-system architecture, turbomachinery, instrumentation, controls, and mount/load-path grammar; non-buildable and non-operational",
+    "material": "academic multi-material reference: copper alloy liner + steel jacket + Al/steel structures",
+    "process": "concept CAD + cutaway study model",
+    "mass": "academic reference only",
+    "envelope": "conceptual study envelope",
+    "parts": [
+      {
+        "id": "p1",
+        "label": "Combustion Chamber Heat-Transfer Study Section",
+        "preset": [
+          "space",
+          "propulsion",
+          "combustion_chamber"
+        ],
+        "spec": "Academic chamber section with liner/jacket zones, heat-transfer labels, sensor bosses, flange datums, and no operational pressure/thrust sizing"
+      },
+      {
+        "id": "p2",
+        "label": "Injector Architecture Taxonomy Plate",
+        "preset": [
+          "space",
+          "propulsion",
+          "injector_face"
+        ],
+        "spec": "Non-buildable injector concept plate comparing injector families with blocked detail holes, manifold zones, face datum, and no orifice dimensions"
+      },
+      {
+        "id": "p3",
+        "label": "Nozzle Contour Phenomena Study Shell",
+        "preset": [
+          "space",
+          "propulsion",
+          "nozzle_bell"
+        ],
+        "spec": "Nozzle contour study shell with throat/exit/station labels, thermal/structural callouts, cutaway window, and no expansion-ratio performance claim"
+      },
+      {
+        "id": "p4",
+        "label": "Regenerative Cooling Path Study Jacket",
+        "preset": [
+          "space",
+          "thermal",
+          "regen_cooling"
+        ],
+        "spec": "Cooling-path teaching jacket with channel-route vocabulary, inlet/outlet interface labels, leak-inspection path, and no flow-rate/sizing recipe"
+      },
+      {
+        "id": "p5",
+        "label": "Feed-System Architecture Manifold",
+        "preset": [
+          "space",
+          "fluid",
+          "feed_system"
+        ],
+        "spec": "Conceptual oxidizer/fuel feed manifold map with valve/filter/check-element placeholders, port labels, isolation zones, and no propellant handling instruction"
+      },
+      {
+        "id": "p6",
+        "label": "Turbopump Energy-Path Study Module",
+        "preset": [
+          "space",
+          "propulsion",
+          "turbopump"
+        ],
+        "spec": "Academic turbopump module showing pump/turbine/shaft/bearing regions, energy-path arrows, service covers, and no performance/speed sizing"
+      },
+      {
+        "id": "p7",
+        "label": "Instrumentation + Data Acquisition Ring",
+        "preset": [
+          "electronics",
+          "sensor",
+          "daq_ring"
+        ],
+        "spec": "Sensor boss ring, harness channels, DAQ connector zones, calibration labels, and safe measurement vocabulary without operating procedure"
+      },
+      {
+        "id": "p8",
+        "label": "Control Logic + Interlock Panel",
+        "preset": [
+          "electronics",
+          "control",
+          "interlock_panel"
+        ],
+        "spec": "Conceptual control/interlock panel with state labels, inhibit blocks, connector keying, and no ignition/start sequence instructions"
+      },
+      {
+        "id": "p9",
+        "label": "Thrust-Frame Load-Path Study Mount",
+        "preset": [
+          "mechanical",
+          "structure",
+          "thrust_frame"
+        ],
+        "spec": "Academic thrust-frame/mount interface with trunnion pads, load-path arrows, bolted datum pads, and no flight qualification claim"
+      },
+      {
+        "id": "p10",
+        "label": "Cutaway Safety Boundary + Annotation Cover",
+        "preset": [
+          "mechanical",
+          "integration",
+          "annotation_cover"
+        ],
+        "spec": "Transparent cutaway cover and annotation frame that marks non-buildable academic boundaries, blocked parameters, and inspection labels"
+      }
     ]
   }
 }

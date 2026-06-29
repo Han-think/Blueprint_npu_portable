@@ -46,6 +46,50 @@ def exportable(shape):
     return shape
 
 
+def is_exportable_shape(shape) -> bool:
+    try:
+        shape = exportable(shape)
+        return hasattr(shape, "wrapped")
+    except Exception:
+        return False
+
+
+def positioned_shape(shape, pos, fallback=None):
+    """Place a shape, but never let build123d Location/list quirks kill a batch.
+
+    Some generated op combinations leave part.solid as a non-shape build123d
+    object. `Pos * object` then raises "other must be a list of Locations".
+    For audit/corpus recovery, replace that bad local solid with a simple
+    fallback body and record the skip at the caller.
+    """
+    candidate = shape if is_exportable_shape(shape) else fallback
+    if not is_exportable_shape(candidate):
+        return None
+    try:
+        return exportable(Pos(*pos) * exportable(candidate))
+    except Exception as exc:
+        if fallback is not None and fallback is not candidate and is_exportable_shape(fallback):
+            try:
+                return exportable(Pos(*pos) * exportable(fallback))
+            except Exception as exc2:
+                print(f"[build_solid] positioned_shape fallback failed: {exc2}")
+                return None
+        print(f"[build_solid] positioned_shape failed: {exc}")
+        return None
+
+
+def boolean_join(base, piece):
+    if piece is None:
+        return base
+    if base is None:
+        return piece
+    try:
+        return base + piece
+    except Exception:
+        print("[build_solid] boolean_join: union failed, using Compound fallback")
+        return Compound([exportable(base), exportable(piece)])
+
+
 @dataclass
 class PartState:
     id: str
@@ -66,6 +110,10 @@ def safe_num(value, default=0.0) -> float:
 
 
 def axis_open(open_faces, axis):
+    if isinstance(open_faces, str):
+        open_faces = [open_faces]
+    if not isinstance(open_faces, (list, tuple, set)):
+        return False
     return any(axis in f for f in (open_faces or []))
 
 
@@ -123,6 +171,10 @@ def root_children(part_tree: dict) -> list[dict]:
     return part_tree.get("children", []) or []
 
 
+def _normalize_label(s: str) -> str:
+    return str(s or "").lower().replace(" ", "_").replace("-", "_")
+
+
 def build_target_parent_map(children: list[dict]) -> dict[str, str]:
     out = {}
 
@@ -130,6 +182,13 @@ def build_target_parent_map(children: list[dict]) -> dict[str, str]:
         node_id = node.get("id")
         if node_id:
             out[node_id] = parent_id
+        node_name = node.get("name") or node.get("label") or ""
+        if node_name:
+            if node_name not in out:
+                out[node_name] = parent_id
+            norm = _normalize_label(node_name)
+            if norm not in out:
+                out[norm] = parent_id
         for child in node.get("children", []) or []:
             visit(child, parent_id)
 
@@ -142,8 +201,16 @@ def build_target_parent_map(children: list[dict]) -> dict[str, str]:
 
 def op_parent_id(op: dict, parent_map: dict[str, str], fallback_id: str) -> str:
     target = op.get("target", "")
+    if isinstance(target, list):
+        target = target[0] if target else ""
+    if target is None:
+        target = ""
+    target = str(target)
     if target in parent_map:
         return parent_map[target]
+    norm = _normalize_label(target) if target else ""
+    if norm and norm in parent_map:
+        return parent_map[norm]
     for key, parent in parent_map.items():
         if key and key in target:
             return parent
@@ -296,7 +363,10 @@ def primitive_for_op(op: dict, fallback_dims) -> tuple[object | None, tuple[floa
         return make_primitive("cone", (rb, rt, h)), (2 * rb, 2 * rb, h), "cone"
     if t == "loft":
         h = safe_num(args.get("height_mm", args.get("length_mm")), fallback_dims[2])
-        diams = [safe_num(x, 0) for s in args.get("sections", []) for x in re.findall(r"(\d+(?:\.\d+)?)\s*mm", str(s))]
+        sections = args.get("sections", [])
+        if not isinstance(sections, (list, tuple)):
+            sections = [sections]
+        diams = [safe_num(x, 0) for s in sections for x in re.findall(r"(\d+(?:\.\d+)?)\s*mm", str(s))]
         if diams:
             d = max(sum(diams) / len(diams), 1)
             return make_primitive("cyl", (d / 2, 0, h)), (d, d, h), "loft(approx)"
@@ -392,6 +462,20 @@ def apply_feature_op(part: PartState, op: dict, seed: str, env, op_index: int):
                 marker = Box(max(2, dims[0] * 0.05), max(2, dims[1] * 0.06), max(2, dims[2] * 0.035))
                 part.solid = part.solid - (Pos(x, dims[1] / 2, z) * marker)
             part.applied.append((oid, t))
+        elif t == "mirror":
+            # The LLM often emits mirror as an intent marker, not a concrete
+            # build123d operation. Preserve the evidence without invoking
+            # location-list APIs that can throw inside OCCT/build123d.
+            marker = Box(max(2, dims[0] * 0.045), max(2, dims[1] * 0.045), max(2, dims[2] * 0.045))
+            axis = str(args.get("axis", "X")).upper()
+            if "Y" in axis:
+                pos = (0, -dims[1] * 0.42, 0)
+            elif "Z" in axis:
+                pos = (0, 0, -dims[2] * 0.42)
+            else:
+                pos = (-dims[0] * 0.42, 0, 0)
+            part.solid = part.solid + (Pos(*pos) * marker)
+            part.applied.append((oid, "mirror(reference-marker)"))
         elif t == "engrave":
             cut = Box(min(28, dims[0] * 0.55), 0.8, min(8, dims[2] * 0.16))
             part.solid = part.solid - (Pos(dims[0] / 2, 0, 0) * cut)
@@ -821,12 +905,18 @@ def build(seed: str, seed_dir: str | None = None):
         primitive, dims, label = primitive_for_op(op, nominal_dims(seed, part, env))
         t = op.get("op")
         oid = op.get("id", f"op-{idx}")
-        if primitive is not None and (part.solid is None or op.get("target") == part.id):
+        op_target = op.get("target", "")
+        if isinstance(op_target, list):
+            op_target = op_target[0] if op_target else ""
+        if primitive is not None and (part.solid is None or op_target == part.id):
             # 모델이 준 로컬 좌표(args.at)를 실제 배치에 반영. 없을 때만 인공 분산 폴백.
             at = op_at(op)
             pos = at if at is not None else (feature_offset(part, idx) if part.solid is not None else (0.0, 0.0, 0.0))
-            piece = Pos(*pos) * primitive
-            part.solid = piece if part.solid is None else part.solid + piece
+            piece = positioned_shape(primitive, pos)
+            if piece is None:
+                part.skipped.append((oid, label, "primitive placement failed"))
+                continue
+            part.solid = boolean_join(part.solid, piece)
             if part.dims is None:
                 part.dims = dims
             part.applied.append((oid, label))
@@ -850,15 +940,19 @@ def build(seed: str, seed_dir: str | None = None):
         apply_edge_finishes(part)
         pos = place_for_seed(seed, part, env)
         placements[part.id] = pos
-        placed = exportable(Pos(*pos) * part.solid)
-        final = placed if final is None else final + placed
+        fallback_body = Box(*(part.dims or nominal_dims(seed, part, env)))
+        placed = positioned_shape(part.solid, pos, fallback=fallback_body)
+        if placed is None:
+            part.skipped.append(("placement", "solid", "final placement failed; part omitted"))
+            continue
+        final = boolean_join(final, placed)
 
     # Add thin interface beams for visible mating relationships.
     for joint in joints:
         pa, pb = joint.get("partA"), joint.get("partB")
         if pa in placements and pb in placements:
             try:
-                final = final + connector_between(placements[pa], placements[pb])
+                final = boolean_join(final, connector_between(placements[pa], placements[pb]))
             except Exception:
                 pass
 

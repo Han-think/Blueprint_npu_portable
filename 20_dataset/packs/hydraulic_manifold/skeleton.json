@@ -1,0 +1,213 @@
+{
+  "schema": "blueprint_skeleton_pack_v1",
+  "seed": "hydraulic_manifold",
+  "pass": "PASS-0",
+  "instruction": "Lay out one top-level node per required_subsystem, global datums, envelope, and stub interfaces. No detailed geometry in PASS-0.",
+  "disciplines": {
+    "structures": "Load-bearing bodies, frames, ribs, bosses, covers, and stiffness paths",
+    "rotating": "Shafts, bearings, gears, crank/rotor elements, couplings, and balance references",
+    "fluid": "Ports, channels, galleries, manifolds, volutes, pressure boundaries, and drain paths",
+    "thermal": "Heat paths, cooling plates/jackets/fins, thermal pads, and service-visible heat flow",
+    "power": "Cells, busbars, disconnects, power electronics, insulation, and protected terminals",
+    "electronics": "Boards, sensors, cable channels, EMI/grounding, connector keying, and covers",
+    "sealing": "Gaskets, O-ring grooves, gland interfaces, pressure caps, vents, and leak inspection",
+    "actuation": "Motors, screws, rails, linkages, valves, clutches, and serviceable actuator modules",
+    "integration": "Datums, fastener patterns, service access, alignment features, assembly order",
+    "safety_boundary": "Non-operational academic study/reference structure constraints, labels, blocked performance claims"
+  },
+  "required_subsystems": [
+    {
+      "id": "manifold_flow_network",
+      "discipline": "fluid",
+      "function": "Port map and drilled gallery grammar",
+      "evidence_features": [
+        "p_port",
+        "t_port",
+        "a_port",
+        "b_port",
+        "cross_drill",
+        "plug_boss"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "manifold_flow_network_domain_grammar"
+      ]
+    },
+    {
+      "id": "cartridge_valve_cavities",
+      "discipline": "fluid",
+      "function": "Cartridge pockets and seal lands",
+      "evidence_features": [
+        "valve_cavity",
+        "o_ring_land",
+        "wrench_clearance",
+        "retainer_thread",
+        "flow_arrow"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "cartridge_valve_cavities_domain_grammar"
+      ]
+    },
+    {
+      "id": "pressure_control",
+      "discipline": "fluid",
+      "function": "Relief/check valve sections",
+      "evidence_features": [
+        "relief_adjuster_cap",
+        "spring_chamber",
+        "check_seat",
+        "tank_return_path",
+        "service_plug"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "pressure_control_domain_grammar"
+      ]
+    },
+    {
+      "id": "instrumentation_access",
+      "discipline": "electronics",
+      "function": "Sensor and test access",
+      "evidence_features": [
+        "pressure_sensor_boss",
+        "test_port",
+        "cable_exit",
+        "protective_cover",
+        "label_plate"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "instrumentation_access_domain_grammar"
+      ]
+    },
+    {
+      "id": "mounting_datum",
+      "discipline": "integration",
+      "function": "Mounting and service orientation",
+      "evidence_features": [
+        "mounting_foot",
+        "datum_face",
+        "engraved_label",
+        "service_side",
+        "bolt_pattern"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "mounting_datum_domain_grammar"
+      ]
+    }
+  ],
+  "completeness_rule": "Every required_subsystem must appear in part_tree with at least one evidence_feature in geometry_ops; missing subsystem coverage is a scorecard failure, not style.",
+  "global_judgment_summary": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "good": "Every P0 evidence feature appears as a named part_tree child or a geometry_ops target.",
+          "bad": "Subsystem claims features in prose but leaves no geometry target or child node."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "good": "Coordinates span stations, ports, bearing seats, service faces, or datum pads.",
+          "bad": "All geometry is stacked at the origin or represented as one box/cylinder."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "good": "Uses pockets, channels, bosses, bolt patterns, ribs, seals, and inspection covers.",
+          "bad": "Only primitive body solids with no interface or service evidence."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "good": "Each adjacent interface names a joint family, DOF, clearance, datum, and mating feature.",
+          "bad": "Interfaces are vague mounts with no reciprocal feature or clearance."
+        },
+        {
+          "criterion": "service_access",
+          "good": "Wear parts, covers, plugs, connectors, seals, or cartridges have visible removal paths.",
+          "bad": "Maintenance-critical items are trapped behind sealed geometry."
+        },
+        {
+          "criterion": "load_or_flow_path_closure",
+          "good": "The main load, torque, heat, fluid, or current path is traceable through named features.",
+          "bad": "Functional flow/load claims stop at a shell without interfaces."
+        }
+      ]
+    }
+  ],
+  "connection_taxonomy": {
+    "rule": "Name each inter-part interface with connection type + DOF + numeric clearance.",
+    "dof_codes": "0=fixed, 1R=revolute, 1T=prismatic, 1R1T=cylindrical, 3R=spherical",
+    "families": {
+      "fastened": [
+        "bolted_through(0)",
+        "threaded_insert(0)",
+        "retainer_plate(0)"
+      ],
+      "rotating": [
+        "bearing_seat(1R)",
+        "shaft_coupling(1R)",
+        "gear_mesh(1R)"
+      ],
+      "fluid": [
+        "flanged_gasket(0)",
+        "threaded_port(0)",
+        "hose_barb(0)",
+        "gland_seal(0)"
+      ],
+      "electrical": [
+        "keyed_connector(0)",
+        "service_disconnect(0)",
+        "ground_lug(0)"
+      ],
+      "service": [
+        "sliding_tray(1T)",
+        "inspection_cover(0)",
+        "cartridge_retainer(0)"
+      ]
+    }
+  },
+  "boundary_note": null,
+  "operability_profile": {
+    "operating_principle": "Hydraulic block architecture that routes pressure/return/work ports through drilled galleries, cartridge valves, plugs, sensors, and service labels.",
+    "primary_paths": {
+      "load_path": [
+        "port pressure to block body",
+        "mount feet reaction",
+        "plug/valve thread reaction"
+      ],
+      "fluid_path": [
+        "P/T/A/B port network",
+        "cross-drilled galleries",
+        "relief/check return path"
+      ],
+      "thermal_path": [
+        "fluid heating to block",
+        "sensor/coil local heat"
+      ],
+      "electrical_path": [
+        "sensor/solenoid power routing"
+      ],
+      "signal_path": [
+        "pressure sensor/test port signals",
+        "valve command wiring"
+      ]
+    },
+    "solver_focus": [
+      "gallery pressure-loss CFD",
+      "block stress around ports",
+      "service access"
+    ]
+  }
+}

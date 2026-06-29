@@ -48,6 +48,7 @@ PACKS = REPO / "20_dataset" / "packs"
 OUT = CAD_DIR / "output"
 VEHICLES_FILE = REPO / "20_dataset" / "seed_vehicles.json"
 CKPT_FILE = REPO / "30_model" / "curation" / "batch_checkpoint.json"
+REFERENCE_FEATURE_CARDS = REPO / "20_dataset" / "reference_assets" / "reference_feature_cards.jsonl"
 
 LM_URL = os.environ.get("BP_LM_URL", "http://127.0.0.1:1234/v1").rstrip("/")
 LM_MODEL = os.environ.get("BP_LM_MODEL", "")
@@ -60,8 +61,15 @@ WORKERS = int(os.environ.get("BP_WORKERS", "1"))
 sys.path.insert(0, str(SERVER_DIR))
 import serve  # noqa: E402  (export_bundle_to_seed_dir, persist_curation_row, VEHICLE_TO_SEED)
 
-SEED_LIST = ["cubesat", "robot_arm", "tiltrotor", "small_launch_vehicle",
-             "long_range_recon_wing", "haptic_glove"]
+SEED_LIST = [
+    "cubesat", "robot_arm", "tiltrotor", "small_launch_vehicle",
+    "long_range_recon_wing", "haptic_glove",
+    "inline_6_engine_gasoline", "inline_6_engine_diesel",
+    "centrifugal_pump", "hydraulic_manifold",
+    "battery_pack_module", "liquid_cold_plate",
+    "cnc_axis_carriage", "gearbox_reducer",
+    "underwater_sealed_sensor_housing", "liquid_rocket_engine_academic",
+]
 
 # ── 프롬프트 (Minimal.html에서 verbatim 포팅) ────────────────────────────────
 P0_PLAN_SYS = (
@@ -252,6 +260,7 @@ def s4_user_prompt(brief, merged):
 
 # ── micro-pack (디스크에서 직접 로드; serve /packs 라우트 불필요) ────────────
 _PACK_CACHE = {}
+_REFERENCE_CARD_CACHE = None
 
 
 def load_pack(seed, fname):
@@ -304,14 +313,86 @@ def micro_pack_clause(pack):
             lines.append(f"- [{c.get('criterion')}] good: {c.get('good')} | bad: {c.get('bad')}")
     if pack.get("boundary_note"):
         lines.append(f"- BOUNDARY: {pack['boundary_note']}")
+    profile = pack.get("operability_profile") or {}
+    if profile:
+        lines.append("OPERABILITY PROFILE (seed-level, required in output):")
+        lines.append(f"- operating_principle: {profile.get('operating_principle', '')}")
+        paths = profile.get("primary_paths") or {}
+        for key in ("load_path", "fluid_path", "thermal_path", "electrical_path", "signal_path"):
+            values = paths.get(key) or []
+            lines.append(f"- {key}: {', '.join(values) if values else 'not primary for this subsystem'}")
+        focus = profile.get("solver_focus") or []
+        if focus:
+            lines.append(f"- solver_focus: {', '.join(focus)}")
+        blocked = profile.get("blocked_outputs") or []
+        if blocked:
+            lines.append(f"- blocked_outputs: {', '.join(blocked)}")
     lines.append("Do not modify other subsystems or the global envelope; respect interfaces from the skeleton.")
     return "\n".join(lines)
 
 
+def load_reference_feature_cards():
+    global _REFERENCE_CARD_CACHE
+    if _REFERENCE_CARD_CACHE is not None:
+        return _REFERENCE_CARD_CACHE
+    cards = {}
+    try:
+        for line in REFERENCE_FEATURE_CARDS.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            card = json.loads(line)
+            seed = card.get("seed")
+            if seed:
+                cards[seed] = card
+    except Exception:
+        cards = {}
+    _REFERENCE_CARD_CACHE = cards
+    return cards
+
+
+def reference_feature_card_clause(seed):
+    card = load_reference_feature_cards().get(seed)
+    if not card:
+        return "", None
+    contract = card.get("generation_contract") or {}
+    license_gate = card.get("license_gate") or {}
+    lines = [
+        "REFERENCE FEATURE CARD (prompt-safe design grammar; reference-only):",
+        f"- status: {card.get('status', 'unknown')} · assets: {card.get('asset_count', 0)}",
+        f"- use_as: {contract.get('use_as', 'shape/assembly grammar')}",
+        f"- do_not_use_as: {contract.get('do_not_use_as', 'direct product copy')}",
+    ]
+    for item in (card.get("design_grammar_to_learn") or [])[:6]:
+        lines.append(f"- grammar: {item}")
+    for item in (card.get("missing_reference_needs") or [])[:4]:
+        lines.append(f"- still_needed: {item}")
+    for item in (contract.get("required_output_effect") or [])[:4]:
+        lines.append(f"- output_effect: {item}")
+    if license_gate:
+        lines.append(
+            f"- license_gate: {license_gate.get('current_state', 'unknown')}; "
+            f"allowed_now={license_gate.get('allowed_now', 'prompt inspiration only')}; "
+            f"blocked_now={license_gate.get('blocked_now', 'training promotion')}"
+        )
+    for item in (card.get("anti_copy_boundary") or [])[:4]:
+        lines.append(f"- boundary: {item}")
+    summary = {
+        "schema": card.get("schema"),
+        "created_at": card.get("created_at"),
+        "seed": seed,
+        "status": card.get("status"),
+        "asset_count": card.get("asset_count"),
+        "license_gate": license_gate,
+    }
+    return "\n".join(lines), summary
+
+
 # ── 생성 규칙 블록 (Minimal.html synthesizeAssemblySubsystem 포팅) ───────────
 RULES = (
-    "Output target: detailed manufacturable assembly-subsystem blueprint, not a standalone single-part choice and not "
-    "a generic block. It must fit the complete vehicle architecture.\n"
+    "Output target: detailed manufacturing-aware, solver-ready assembly-subsystem blueprint, not a standalone "
+    "single-part choice and not a generic block. It must fit the complete vehicle architecture and describe how the "
+    "subsystem would participate in operation, inspection, and analysis.\n"
     "Granularity rule: decompose this subsystem into 5-9 meaningful internal child features in part_tree when possible "
     "(shell/body, flange/interface, fastener pattern, channel/duct, rib/stiffener, seal/gasket, sensor/avionics pocket, "
     "service access, mounting datum, harness/pipe interface).\n"
@@ -331,6 +412,18 @@ RULES = (
     "connection_type + DOF + clearance_mm + required_feature so the neighbor can declare the same joint family back.\n"
     "Budget rule: cad_brief.mass_est_g must be a numeric grams value, and verify must include a mass/budget check.\n"
     "Joint evidence rule: critical joints need visible insert/washer/locking/preload evidence and torque_Nm or preload intent.\n"
+    "Operability rule: cad_brief must include operating_principle, failure_modes, inspection_points, and "
+    "service_limits. These must explain what the subsystem does in the real architecture and how its function would "
+    "be checked, without inventing unsupported performance claims.\n"
+    "Multiphysics path rule: verify must include multiphysics_paths with load_path, fluid_path, thermal_path, "
+    "electrical_path, and signal_path lists. Use empty lists only when the path is truly irrelevant, and explain why "
+    "in solver_readiness.notes.\n"
+    "Solver readiness rule: verify must include solver_readiness with cfd, thermal, fea, electrical_signal, "
+    "required_geometry_exports, mesh_risk, and missing_inputs. The output should be ready for downstream OpenFOAM, "
+    "thermal, electrical/signal, or structural screening when applicable.\n"
+    "High-risk operational boundary rule: for propulsion, flight, high-voltage, pressure, medical, or other hazardous "
+    "systems, keep the design physics-grounded and analysis-oriented, but do not provide actionable build recipes, "
+    "propellant/ignition/test procedures, flight qualification steps, unsafe operating setpoints, or certification claims.\n"
     "Training-quality rule: make part_tree children and geometry_ops mutually traceable by id/name. "
     "Every child id that appears in part_tree must appear as a target in geometry_ops at least 4 times.\n"
     "Analysis-ready rule: verify must include a boundary_conditions object with "
@@ -350,7 +443,7 @@ RULES = (
 )
 
 
-def build_part_brief(vehicle, part, micro_clause, variant=""):
+def build_part_brief(vehicle, part, micro_clause, reference_clause="", variant=""):
     desc = vehicle['desc']
     if variant:
         desc = f"{desc}\n{variant}"
@@ -359,6 +452,7 @@ def build_part_brief(vehicle, part, micro_clause, variant=""):
         f"Spec: {part['spec']}\n"
         f"Vehicle context: {desc}\n"
         f"Suggested material: {vehicle.get('material','PETG')}, process: {vehicle.get('process','FDM')}\n"
+        f"{reference_clause}\n"
         f"{micro_clause}\n{RULES}"
     )
 
@@ -505,7 +599,10 @@ def synthesize_subsystem(vehicle, part, seed, log, variant=""):
         if mp:
             micro_clause = "\n" + micro_pack_clause(mp) + "\n"
             log(f"    micro-pack <- {matched['id']} ({matched.get('discipline')})")
-    part_brief = build_part_brief(vehicle, part, micro_clause, variant=variant)
+    reference_clause, reference_meta = reference_feature_card_clause(seed)
+    if reference_clause:
+        log(f"    reference-card <- {seed} ({reference_meta.get('status')}, {reference_meta.get('asset_count')} assets)")
+    part_brief = build_part_brief(vehicle, part, micro_clause, reference_clause, variant=variant)
 
     plan = generate_with_retry(P0_PLAN_SYS, p0_plan_prompt(part_brief, vehicle, part), "p0", 0.45)
     staged = part_brief + (f"\nSubsystem planning output:\n{json.dumps(plan, ensure_ascii=False)}\n" if plan else "")
@@ -530,6 +627,8 @@ def synthesize_subsystem(vehicle, part, seed, log, variant=""):
         merged["slicer_job"] = s4.get("slicer_job", merged.get("slicer_job"))
 
     merged["_subsystem_plan"] = plan
+    if reference_meta:
+        merged["_reference_feature_card"] = reference_meta
     merged.setdefault("cad_brief", {}).setdefault("material", vehicle.get("material", "PETG"))
     n_ops = len(merged.get("geometry_ops") or [])
     log(f"    {part['label']}: ops {n_ops} · parts {len((merged.get('part_tree') or {}).get('children') or [])}")
@@ -575,9 +674,9 @@ PROMPT_VARIANTS = {
     ],
     "small_launch_vehicle": [
         "",
-        "Display variant: university teaching model, labeled cross-sections, transparent inspection windows",
-        "Display variant: museum exhibit scale, reinforced for public handling, LED-lit internal features",
-        "Display variant: engineering trade-study mock, swappable engine and tank dummy modules",
+        "Academic variant: university teaching cutaway, labeled cross-sections, transparent inspection windows",
+        "Academic variant: public engineering exhibit scale, reinforced handling features, LED-lit internal subsystem cues",
+        "Academic variant: engineering trade-study reference structure, swappable chamber/tank study sections",
     ],
     "long_range_recon_wing": [
         "",
@@ -591,6 +690,66 @@ PROMPT_VARIANTS = {
         "Application variant: industrial teleop for hazmat, ruggedized exo-links, chemical-resistant TPU",
         "Application variant: VR gaming consumer product, lightweight (< 400g), quick-swap finger cartridges",
     ],
+    "inline_6_engine_gasoline": [
+        "",
+        "Design variant: service-training cutaway, visible oil galleries, coolant jacket, gasket faces, and accessory brackets",
+        "Design variant: compact passenger-car packaging, front accessory drive, serviceable timing cover, clear harness routing",
+        "Design variant: motorsport study cutaway, reinforced block cues, dry-sump visual module, labeled cranktrain sections",
+    ],
+    "inline_6_engine_diesel": [
+        "",
+        "Design variant: heavy-duty cutaway, reinforced block/head, common-rail layout, turbo air path, oil cooler access",
+        "Design variant: marine auxiliary study assembly, corrosion-resistant covers, serviceable filters, lifting and mount datums",
+        "Design variant: truck training cutaway, gear timing housing, injector well service access, turbo heat shield emphasis",
+    ],
+    "centrifugal_pump": [
+        "",
+        "Service variant: back-pull-out maintenance layout, mechanical seal cartridge, bearing frame access, drain/vent plugs",
+        "Process variant: corrosive-fluid pump, gasketed flanges, inspection bosses, flush port and leak witness channel",
+        "Compact variant: close-coupled motor adapter, coupling guard, aligned baseplate and pipe flange datums",
+    ],
+    "hydraulic_manifold": [
+        "",
+        "Circuit variant: valve cartridge training block, P/T/A/B engraved ports, cross-drilled galleries, plug access",
+        "Service variant: sensor/test port priority, protective cover, adjustment caps, wrench clearances, label plate",
+        "Compact variant: mobile equipment manifold, mount feet, grouped ports, return path and relief valve visibility",
+    ],
+    "battery_pack_module": [
+        "",
+        "Safety variant: no-live-energy training reference module, service disconnect, vent path, isolation end plates, warning labels",
+        "Thermal variant: cold-plate interface, thermal pad zones, leak channel, BMS harness separation",
+        "Service variant: removable lid, busbar cover windows, sensing harness access, replaceable cell carrier tray",
+    ],
+    "liquid_cold_plate": [
+        "",
+        "Power electronics variant: IGBT/MOSFET pads, isolation washer pockets, serpentine channel, leak test ports",
+        "Compact manifold variant: inlet/outlet cap, gasket compression stops, torque sequence marks, flatness datum",
+        "Service variant: drain/bleed plugs, inspection labels, leak witness groove, replaceable cover plate",
+    ],
+    "cnc_axis_carriage": [
+        "",
+        "Precision variant: dowel datums, linear rail reference edge, ball screw preload label, sensor adjustment slots",
+        "Chip-protection variant: telescoping way cover, wiper lips, lubrication manifold, protected cable channel",
+        "Maintenance variant: accessible bearing blocks, motor coupling guard, home/limit sensors, grease nipples",
+    ],
+    "gearbox_reducer": [
+        "",
+        "Service variant: split housing, inspection cover, fill/drain/level plugs, breather and sight glass",
+        "Precision variant: bearing bore datums, shim stack, retainer plates, gear mesh centerline labels",
+        "Mounting variant: torque arm, output flange, mounting feet, oil seal access and dowel pads",
+    ],
+    "underwater_sealed_sensor_housing": [
+        "",
+        "Deep-service variant: double O-ring caps, cable gland, leak test port, desiccant pocket, pressure label",
+        "ROV integration variant: clamp cradle, anode pad, drain path, internal slide tray, strain relief boot",
+        "Optical payload variant: front window cap, retaining ring, anti-rotation pins, service cap puller holes",
+    ],
+    "liquid_rocket_engine_academic": [
+        "",
+        "Academic variant: heat-transfer study cutaway, chamber liner/jacket zones, regenerative cooling path labels, instrumentation bosses",
+        "Academic variant: injector architecture taxonomy, manifold zones, blocked operational detail, DAQ and interlock vocabulary",
+        "Academic variant: turbomachinery energy-path study, feed-system topology, thrust-frame load path, non-buildable boundary labels",
+    ],
 }
 
 
@@ -601,6 +760,16 @@ SEED_FOS_THRESHOLDS = {
     "small_launch_vehicle": {"reject_below": 0.05, "keep_min": 0.5,  "good": 2.5,  "excellent": 10.0},
     "long_range_recon_wing":{"reject_below": 0.2,  "keep_min": 0.5,  "good": 1.0,  "excellent": 1.8},
     "haptic_glove":         {"reject_below": 0.05, "keep_min": 0.8,  "good": 5.0,  "excellent": 20.0},
+    "inline_6_engine_gasoline": {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "inline_6_engine_diesel":   {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "centrifugal_pump":         {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "hydraulic_manifold":       {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "battery_pack_module":      {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "liquid_cold_plate":        {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "cnc_axis_carriage":        {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "gearbox_reducer":          {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "underwater_sealed_sensor_housing": {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
+    "liquid_rocket_engine_academic": {"reject_below": 0.05, "keep_min": 0.5, "good": 2.0, "excellent": 8.0},
 }
 SEED_FOS_DEFAULT = {"reject_below": 0.1, "keep_min": 1.5, "good": 5.0, "excellent": 15.0}
 

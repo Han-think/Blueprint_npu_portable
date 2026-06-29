@@ -1,0 +1,105 @@
+{
+  "schema": "blueprint_micro_pack_v1",
+  "seed": "liquid_cold_plate",
+  "subsystem": {
+    "id": "seal_leak_boundary",
+    "discipline": "sealing",
+    "function": "Gasket track and leak witness path",
+    "evidence_features": [
+      "gasket_groove",
+      "compression_stop",
+      "leak_witness_channel",
+      "corner_relief",
+      "bleed_screw"
+    ]
+  },
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "good": "Every P0 evidence feature appears as a named part_tree child or a geometry_ops target.",
+          "bad": "Subsystem claims features in prose but leaves no geometry target or child node."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "good": "Coordinates span stations, ports, bearing seats, service faces, or datum pads.",
+          "bad": "All geometry is stacked at the origin or represented as one box/cylinder."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "good": "Uses pockets, channels, bosses, bolt patterns, ribs, seals, and inspection covers.",
+          "bad": "Only primitive body solids with no interface or service evidence."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "good": "Each adjacent interface names a joint family, DOF, clearance, datum, and mating feature.",
+          "bad": "Interfaces are vague mounts with no reciprocal feature or clearance."
+        },
+        {
+          "criterion": "service_access",
+          "good": "Wear parts, covers, plugs, connectors, seals, or cartridges have visible removal paths.",
+          "bad": "Maintenance-critical items are trapped behind sealed geometry."
+        },
+        {
+          "criterion": "load_or_flow_path_closure",
+          "good": "The main load, torque, heat, fluid, or current path is traceable through named features.",
+          "bad": "Functional flow/load claims stop at a shell without interfaces."
+        }
+      ]
+    },
+    {
+      "id": "seal_leak_boundary_domain_grammar",
+      "criteria": [
+        {
+          "criterion": "domain_evidence_features",
+          "good": "Uses subsystem-specific evidence features: gasket_groove, compression_stop, leak_witness_channel, corner_relief, bleed_screw.",
+          "bad": "Omits the visible grammar for seal_leak_boundary and substitutes generic blocks."
+        },
+        {
+          "criterion": "service_or_boundary_visible",
+          "good": "Includes service, inspection, sealing, datum, or safety-boundary evidence where relevant.",
+          "bad": "Claims a functional subsystem without access, datums, labels, or boundary constraints."
+        }
+      ]
+    }
+  ],
+  "operability_profile": {
+    "operating_principle": "Thermal management plate that transfers heat from electronics pads into internal liquid channels and manifold ports while maintaining gasket/leak boundaries.",
+    "primary_paths": {
+      "load_path": [
+        "mount screw compression",
+        "gasket compression",
+        "module pad contact"
+      ],
+      "fluid_path": [
+        "inlet manifold",
+        "serpentine channels",
+        "outlet manifold",
+        "drain/bleed/test path"
+      ],
+      "thermal_path": [
+        "device pad to plate",
+        "plate to coolant",
+        "sensor pad feedback"
+      ],
+      "electrical_path": [
+        "ground/isolation washer context"
+      ],
+      "signal_path": [
+        "temperature sensor routing if present"
+      ]
+    },
+    "solver_focus": [
+      "OpenFOAM channel flow",
+      "thermal conduction/convection",
+      "gasket compression review"
+    ]
+  }
+}

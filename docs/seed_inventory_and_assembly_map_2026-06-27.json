@@ -1,0 +1,2968 @@
+{
+  "schema": "blueprint_seed_inventory_and_assembly_map_v1",
+  "seeds": [
+    {
+      "seed": "cubesat",
+      "label": "3U CubeSat",
+      "parts_count": 12,
+      "subsystems_count": 10,
+      "reference_status": "watch",
+      "asset_count": 32,
+      "assembly_position_hint": "Use Z as 3U stack axis; PC/104 boards and harness spine run along the body, deployables attach to side faces.",
+      "crawl_priorities": [
+        "3U frame STEP with rails/standoffs",
+        "solar deploy panel hinge CAD/drawing",
+        "EPS/battery/PC104 stack layout",
+        "harness spine/service cover reference"
+      ],
+      "source_targets": [
+        {
+          "label": "HeliosCube-Eleni Arduino Project Hub",
+          "url": "https://projecthub.arduino.cc/petros_mpla/helioscube-eleni-a-cost-effective-open-source-1u-cubesat-for-microgravity-research-9d78f4",
+          "license_hint": "Project page shows MIT; verify attached CAD/model file terms before training use.",
+          "why": "Open-source CubeSat educational structure, electronics stack, sensors, assembly/BOM references."
+        },
+        {
+          "label": "NASA 3D Resources",
+          "url": "https://science.nasa.gov/3d-resources/",
+          "license_hint": "NASA/public-government material; verify each asset page.",
+          "why": "Satellite/spacecraft visual and 3D reference."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Primary Structure (3U)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "structure_rails",
+              "score": 4
+            },
+            {
+              "subsystem": "thermal_path",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Solar Panel x 4 (deploy)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "deployment_mechs",
+              "score": 5
+            },
+            {
+              "subsystem": "comms_antenna",
+              "score": 2
+            },
+            {
+              "subsystem": "eps_solar_charging",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Antenna Deployer x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "comms_antenna",
+              "score": 3
+            },
+            {
+              "subsystem": "deployment_mechs",
+              "score": 2
+            },
+            {
+              "subsystem": "structure_rails",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Reaction Wheel x 3",
+          "subsystem_candidates": [
+            {
+              "subsystem": "adcs",
+              "score": 3
+            },
+            {
+              "subsystem": "integration_harness",
+              "score": 1
+            },
+            {
+              "subsystem": "payload_bay",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Star Tracker Mount",
+          "subsystem_candidates": [
+            {
+              "subsystem": "adcs",
+              "score": 5
+            },
+            {
+              "subsystem": "payload_bay",
+              "score": 2
+            },
+            {
+              "subsystem": "propulsion_study",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Payload Optics Bench",
+          "subsystem_candidates": [
+            {
+              "subsystem": "payload_bay",
+              "score": 8
+            },
+            {
+              "subsystem": "thermal_path",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Cold Gas Thruster x 4",
+          "subsystem_candidates": [
+            {
+              "subsystem": "propulsion_study",
+              "score": 7
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Separation Spring Plate",
+          "subsystem_candidates": [
+            {
+              "subsystem": "deployment_mechs",
+              "score": 8
+            },
+            {
+              "subsystem": "comms_antenna",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "EPS Solar Charging Module",
+          "subsystem_candidates": [
+            {
+              "subsystem": "eps_solar_charging",
+              "score": 11
+            },
+            {
+              "subsystem": "comms_antenna",
+              "score": 3
+            },
+            {
+              "subsystem": "payload_bay",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p10",
+          "label": "CDH Avionics Stack",
+          "subsystem_candidates": [
+            {
+              "subsystem": "cdh_avionics",
+              "score": 9
+            },
+            {
+              "subsystem": "comms_antenna",
+              "score": 2
+            },
+            {
+              "subsystem": "eps_solar_charging",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p11",
+          "label": "Thermal Path / Radiator Strap Evidence",
+          "subsystem_candidates": [
+            {
+              "subsystem": "thermal_path",
+              "score": 8
+            },
+            {
+              "subsystem": "payload_bay",
+              "score": 3
+            },
+            {
+              "subsystem": "integration_harness",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p12",
+          "label": "Integration Harness + Datum Spine",
+          "subsystem_candidates": [
+            {
+              "subsystem": "integration_harness",
+              "score": 9
+            },
+            {
+              "subsystem": "cdh_avionics",
+              "score": 1
+            },
+            {
+              "subsystem": "comms_antenna",
+              "score": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "haptic_glove",
+      "label": "Force-Feedback Haptic Glove Pair",
+      "parts_count": 12,
+      "subsystems_count": 7,
+      "reference_status": "watch",
+      "asset_count": 72,
+      "assembly_position_hint": "Use wrist-to-fingertip as the station axis; dorsal module at wrist/back-of-hand, finger cartridges repeat per finger.",
+      "crawl_priorities": [
+        "URDF/joint-order docs",
+        "finger linkage assembly CAD",
+        "tendon/cable routing diagrams",
+        "wearable fit/soft-contact reference"
+      ],
+      "source_targets": [
+        {
+          "label": "DOGlove project",
+          "url": "https://do-glove.github.io/",
+          "github_repo": "TEA-Lab/DOGlove",
+          "license_hint": "Project links code/docs and describes open-source hardware; verify repository license and CAD terms.",
+          "why": "Haptic force-feedback glove finger assembly, cable-driven mechanism, palm base, modular joints."
+        },
+        {
+          "label": "CDF-Glove project",
+          "url": "https://cdfglove.github.io/",
+          "license_hint": "Project describes open-source code/designs; verify repository license and CAD terms.",
+          "why": "Cable-driven glove design reference for tendon routing and finger force feedback."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Dorsal Control Module x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "electronics_hub",
+              "score": 3
+            },
+            {
+              "subsystem": "flex_wiring",
+              "score": 2
+            },
+            {
+              "subsystem": "actuation_brakes",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Finger Exo Linkage Cartridge x 10",
+          "subsystem_candidates": [
+            {
+              "subsystem": "finger_linkages",
+              "score": 7
+            },
+            {
+              "subsystem": "sensing",
+              "score": 1
+            },
+            {
+              "subsystem": "wearable_structure",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Flexion-Resistance Actuator x 10",
+          "subsystem_candidates": [
+            {
+              "subsystem": "actuation_brakes",
+              "score": 8
+            },
+            {
+              "subsystem": "power",
+              "score": 3
+            },
+            {
+              "subsystem": "electronics_hub",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Adjustable Wrist Band x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "wearable_structure",
+              "score": 3
+            },
+            {
+              "subsystem": "actuation_brakes",
+              "score": 1
+            },
+            {
+              "subsystem": "power",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Cable Raceway + Harness Cover x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "flex_wiring",
+              "score": 2
+            },
+            {
+              "subsystem": "wearable_structure",
+              "score": 2
+            },
+            {
+              "subsystem": "power",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Finger Thimble Interface Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "finger_linkages",
+              "score": 5
+            },
+            {
+              "subsystem": "wearable_structure",
+              "score": 3
+            },
+            {
+              "subsystem": "electronics_hub",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Palm Sensor Plate x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "sensing",
+              "score": 7
+            },
+            {
+              "subsystem": "actuation_brakes",
+              "score": 2
+            },
+            {
+              "subsystem": "flex_wiring",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Battery + Power Module x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "power",
+              "score": 9
+            },
+            {
+              "subsystem": "actuation_brakes",
+              "score": 2
+            },
+            {
+              "subsystem": "electronics_hub",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "Wiring Loom + Service Loop Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "flex_wiring",
+              "score": 12
+            },
+            {
+              "subsystem": "sensing",
+              "score": 3
+            },
+            {
+              "subsystem": "power",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p10",
+          "label": "Knuckle Mount Rail x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "actuation_brakes",
+              "score": 5
+            },
+            {
+              "subsystem": "sensing",
+              "score": 3
+            },
+            {
+              "subsystem": "electronics_hub",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p11",
+          "label": "Fit Calibration + Safety Release Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "wearable_structure",
+              "score": 10
+            },
+            {
+              "subsystem": "actuation_brakes",
+              "score": 1
+            },
+            {
+              "subsystem": "finger_linkages",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p12",
+          "label": "Service Port + Flex-Wiring Inspection Cover",
+          "subsystem_candidates": [
+            {
+              "subsystem": "flex_wiring",
+              "score": 10
+            },
+            {
+              "subsystem": "power",
+              "score": 2
+            },
+            {
+              "subsystem": "sensing",
+              "score": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "long_range_recon_wing",
+      "label": "Long-Range Surveillance Wing",
+      "parts_count": 9,
+      "subsystems_count": 8,
+      "reference_status": "watch",
+      "asset_count": 12,
+      "assembly_position_hint": "Use X as fuselage/chord and Y as span; center pod at root, spars/ribs span outward, payload bays near centerline.",
+      "crawl_priorities": [
+        "3-view/cutaway flying wing",
+        "center pod payload bay CAD",
+        "spar/rib/battery bay drawings",
+        "servo/elevon linkage reference"
+      ],
+      "source_targets": [
+        {
+          "label": "OpenVSP Airshow",
+          "url": "https://airshow.openvsp.org/",
+          "license_hint": "Verify per-model license/terms.",
+          "why": "Aircraft .vsp3-style geometry references, useful for silhouette, stations, wing/nacelle/tail grammar."
+        },
+        {
+          "label": "OpenVSP",
+          "url": "https://openvsp.org/",
+          "license_hint": "OpenVSP tool is NASA open source; verify model/example license.",
+          "why": "Parametric aircraft geometry and export workflow reference."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Center Body Pod",
+          "subsystem_candidates": [
+            {
+              "subsystem": "propulsion_mount",
+              "score": 2
+            },
+            {
+              "subsystem": "recon_payload",
+              "score": 2
+            },
+            {
+              "subsystem": "power_battery",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Wing Spar (2-piece)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "primary_structure",
+              "score": 3
+            },
+            {
+              "subsystem": "aero_surfaces",
+              "score": 1
+            },
+            {
+              "subsystem": "integration_service",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Wing Rib Set x 12",
+          "subsystem_candidates": [
+            {
+              "subsystem": "aero_surfaces",
+              "score": 2
+            },
+            {
+              "subsystem": "control_actuation",
+              "score": 1
+            },
+            {
+              "subsystem": "integration_service",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Elevon Servo Pocket x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "control_actuation",
+              "score": 5
+            },
+            {
+              "subsystem": "aero_surfaces",
+              "score": 2
+            },
+            {
+              "subsystem": "integration_service",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Motor + Pusher Prop Mount",
+          "subsystem_candidates": [
+            {
+              "subsystem": "propulsion_mount",
+              "score": 4
+            },
+            {
+              "subsystem": "aero_surfaces",
+              "score": 1
+            },
+            {
+              "subsystem": "avionics_comms",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "GPS + Pitot Boom",
+          "subsystem_candidates": [
+            {
+              "subsystem": "avionics_comms",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Camera Gimbal Bay",
+          "subsystem_candidates": [
+            {
+              "subsystem": "recon_payload",
+              "score": 4
+            },
+            {
+              "subsystem": "power_battery",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Battery Bay (Slide)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "power_battery",
+              "score": 5
+            },
+            {
+              "subsystem": "integration_service",
+              "score": 2
+            },
+            {
+              "subsystem": "recon_payload",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "Integration Service Backbone",
+          "subsystem_candidates": [
+            {
+              "subsystem": "integration_service",
+              "score": 11
+            },
+            {
+              "subsystem": "power_battery",
+              "score": 3
+            },
+            {
+              "subsystem": "aero_surfaces",
+              "score": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "tiltrotor",
+      "label": "Tiltrotor VTOL Hybrid",
+      "parts_count": 9,
+      "subsystems_count": 8,
+      "reference_status": "watch",
+      "asset_count": 12,
+      "assembly_position_hint": "Use X fuselage, Y wing span, Z vertical; nacelles sit on wing stations with tilt-axis across nacelle/wing interface.",
+      "crawl_priorities": [
+        "tilt nacelle axis CAD/cutaway",
+        "servo linkage and bearing layout",
+        "slack-loop harness around tilt axis",
+        "wing/nacelle load-path drawing"
+      ],
+      "source_targets": [
+        {
+          "label": "OpenVSP Airshow",
+          "url": "https://airshow.openvsp.org/",
+          "license_hint": "Verify per-model license/terms.",
+          "why": "VTOL/tiltrotor/nacelle/wing geometry references when available."
+        },
+        {
+          "label": "OpenVSP",
+          "url": "https://openvsp.org/",
+          "license_hint": "OpenVSP tool is NASA open source; verify model/example license.",
+          "why": "Aircraft geometry construction and export workflow reference."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Center Fuselage Spine",
+          "subsystem_candidates": [
+            {
+              "subsystem": "wing_structure",
+              "score": 6
+            },
+            {
+              "subsystem": "gnc_sensors",
+              "score": 3
+            },
+            {
+              "subsystem": "flight_electronics",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Main Wing (2-piece)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "wing_structure",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Nacelle Assembly x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "integration_service",
+              "score": 4
+            },
+            {
+              "subsystem": "flight_electronics",
+              "score": 3
+            },
+            {
+              "subsystem": "nacelle_propulsion",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Tilt Servo + Linkage x 2",
+          "subsystem_candidates": [
+            {
+              "subsystem": "tilt_mechanism",
+              "score": 3
+            },
+            {
+              "subsystem": "flight_electronics",
+              "score": 2
+            },
+            {
+              "subsystem": "integration_service",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "V-Tail x 2 (Ruddervator)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "flight_electronics",
+              "score": 2
+            },
+            {
+              "subsystem": "wing_structure",
+              "score": 2
+            },
+            {
+              "subsystem": "tilt_mechanism",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Landing Gear (Tri)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "wing_structure",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Battery Bay (Slide-In)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "power_battery",
+              "score": 5
+            },
+            {
+              "subsystem": "payload_nose_bay",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Payload Nose Bay",
+          "subsystem_candidates": [
+            {
+              "subsystem": "payload_nose_bay",
+              "score": 4
+            },
+            {
+              "subsystem": "gnc_sensors",
+              "score": 1
+            },
+            {
+              "subsystem": "power_battery",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "Tilt-Axis Harness + Datum Service Bay",
+          "subsystem_candidates": [
+            {
+              "subsystem": "integration_service",
+              "score": 9
+            },
+            {
+              "subsystem": "flight_electronics",
+              "score": 5
+            },
+            {
+              "subsystem": "power_battery",
+              "score": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "robot_arm",
+      "label": "6-DOF Industrial Arm",
+      "parts_count": 12,
+      "subsystems_count": 8,
+      "reference_status": "watch",
+      "asset_count": 64,
+      "assembly_position_hint": "Use serial joint chain from base J1 to tool flange J6; each link owns its joint datum and cable pass-through.",
+      "crawl_priorities": [
+        "permissive URDF/visual mesh",
+        "joint reducer/bearing cutaway",
+        "cable spine routing reference",
+        "tool flange/ISO pattern drawing"
+      ],
+      "source_targets": [
+        {
+          "label": "ARMADA project",
+          "url": "https://sites.google.com/view/im2-humanoid-arm",
+          "github_repo": "iMSquared/armada",
+          "license_hint": "Project states open-sourced CAD/URDF/code; verify GitHub repository license.",
+          "why": "6-DOF arm CAD/URDF/assembly reference for joints, links, motor modules, and cable routing."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Base Joint (J1)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "base_mounting",
+              "score": 2
+            },
+            {
+              "subsystem": "link_structure",
+              "score": 2
+            },
+            {
+              "subsystem": "actuation_motors",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Shoulder Joint (J2)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "joint_transmission",
+              "score": 3
+            },
+            {
+              "subsystem": "cable_spine",
+              "score": 2
+            },
+            {
+              "subsystem": "actuation_motors",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Upper Arm (Link 2-3)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "base_mounting",
+              "score": 2
+            },
+            {
+              "subsystem": "cable_spine",
+              "score": 2
+            },
+            {
+              "subsystem": "link_structure",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Elbow Joint (J3)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "joint_transmission",
+              "score": 3
+            },
+            {
+              "subsystem": "sensing_encoders",
+              "score": 2
+            },
+            {
+              "subsystem": "actuation_motors",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Forearm + Wrist (J4)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "drive_electronics",
+              "score": 2
+            },
+            {
+              "subsystem": "joint_transmission",
+              "score": 2
+            },
+            {
+              "subsystem": "actuation_motors",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Wrist Pitch (J5)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "joint_transmission",
+              "score": 3
+            },
+            {
+              "subsystem": "actuation_motors",
+              "score": 1
+            },
+            {
+              "subsystem": "cable_spine",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Wrist Roll (J6)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "joint_transmission",
+              "score": 3
+            },
+            {
+              "subsystem": "end_effector_interface",
+              "score": 2
+            },
+            {
+              "subsystem": "link_structure",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Tool Flange + Changer",
+          "subsystem_candidates": [
+            {
+              "subsystem": "end_effector_interface",
+              "score": 3
+            },
+            {
+              "subsystem": "link_structure",
+              "score": 2
+            },
+            {
+              "subsystem": "base_mounting",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "Cable Management Spine",
+          "subsystem_candidates": [
+            {
+              "subsystem": "cable_spine",
+              "score": 3
+            },
+            {
+              "subsystem": "base_mounting",
+              "score": 2
+            },
+            {
+              "subsystem": "drive_electronics",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p10",
+          "label": "Replaceable Motor Module Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "actuation_motors",
+              "score": 10
+            },
+            {
+              "subsystem": "joint_transmission",
+              "score": 4
+            },
+            {
+              "subsystem": "cable_spine",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p11",
+          "label": "Encoder Cover + Sensing Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "sensing_encoders",
+              "score": 8
+            },
+            {
+              "subsystem": "cable_spine",
+              "score": 6
+            },
+            {
+              "subsystem": "actuation_motors",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p12",
+          "label": "Drive Electronics Bay",
+          "subsystem_candidates": [
+            {
+              "subsystem": "drive_electronics",
+              "score": 9
+            },
+            {
+              "subsystem": "actuation_motors",
+              "score": 1
+            },
+            {
+              "subsystem": "base_mounting",
+              "score": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "small_launch_vehicle",
+      "label": "Small Launch Vehicle (sounding)",
+      "parts_count": 13,
+      "subsystems_count": 7,
+      "reference_status": "watch",
+      "asset_count": 31,
+      "assembly_position_hint": "Use Z as stage stack axis; shells, rings, fairings, and academic study modules stack vertically with cutaway windows.",
+      "crawl_priorities": [
+        "academic non-operational stage shell cutaway",
+        "avionics/recovery bay study reference",
+        "chamber/tank reference-section CAD",
+        "academic boundary labels"
+      ],
+      "source_targets": [
+        {
+          "label": "NASA 3D Resources",
+          "url": "https://science.nasa.gov/3d-resources/",
+          "license_hint": "NASA/public-government material; verify each asset page.",
+          "why": "Academic non-operational rocket/spacecraft shape and subsystem references only."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Stage 1 Combustion Chamber Academic Study Section",
+          "subsystem_candidates": [
+            {
+              "subsystem": "engine_study",
+              "score": 14
+            },
+            {
+              "subsystem": "separation_study",
+              "score": 4
+            },
+            {
+              "subsystem": "power_study",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Stage 1 Bell Nozzle Cutaway Study Shell",
+          "subsystem_candidates": [
+            {
+              "subsystem": "engine_study",
+              "score": 14
+            },
+            {
+              "subsystem": "primary_structure",
+              "score": 5
+            },
+            {
+              "subsystem": "power_study",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Turbopump Assembly Academic Study Section",
+          "subsystem_candidates": [
+            {
+              "subsystem": "engine_study",
+              "score": 12
+            },
+            {
+              "subsystem": "power_study",
+              "score": 4
+            },
+            {
+              "subsystem": "recovery_bay",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Propellant Tank Reference Article (LOX)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "primary_structure",
+              "score": 9
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 5
+            },
+            {
+              "subsystem": "power_study",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Propellant Tank Reference Article (Fuel)",
+          "subsystem_candidates": [
+            {
+              "subsystem": "primary_structure",
+              "score": 11
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 4
+            },
+            {
+              "subsystem": "power_study",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Interstage Adapter + Separation Datum",
+          "subsystem_candidates": [
+            {
+              "subsystem": "separation_study",
+              "score": 8
+            },
+            {
+              "subsystem": "primary_structure",
+              "score": 7
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Stage 2 Engine Academic Study Section",
+          "subsystem_candidates": [
+            {
+              "subsystem": "engine_study",
+              "score": 13
+            },
+            {
+              "subsystem": "power_study",
+              "score": 2
+            },
+            {
+              "subsystem": "separation_study",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Payload Fairing Cutaway Study Shell",
+          "subsystem_candidates": [
+            {
+              "subsystem": "primary_structure",
+              "score": 6
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 4
+            },
+            {
+              "subsystem": "integration_inspection",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "Fin Set x 4 Academic Study Structure",
+          "subsystem_candidates": [
+            {
+              "subsystem": "primary_structure",
+              "score": 10
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 4
+            },
+            {
+              "subsystem": "power_study",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "part_id": "p10",
+          "label": "Avionics Bay Reference Structure Tray",
+          "subsystem_candidates": [
+            {
+              "subsystem": "avionics_bay",
+              "score": 8
+            },
+            {
+              "subsystem": "recovery_bay",
+              "score": 3
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p11",
+          "label": "Battery/Power Academic Study Module",
+          "subsystem_candidates": [
+            {
+              "subsystem": "power_study",
+              "score": 9
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 5
+            },
+            {
+              "subsystem": "recovery_bay",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p12",
+          "label": "Recovery Bay Academic Study Section",
+          "subsystem_candidates": [
+            {
+              "subsystem": "recovery_bay",
+              "score": 7
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 4
+            },
+            {
+              "subsystem": "avionics_bay",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p13",
+          "label": "Integration Inspection Ring",
+          "subsystem_candidates": [
+            {
+              "subsystem": "integration_inspection",
+              "score": 10
+            },
+            {
+              "subsystem": "avionics_bay",
+              "score": 2
+            },
+            {
+              "subsystem": "engine_study",
+              "score": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "inline_6_engine_gasoline",
+      "label": "Inline-6 Gasoline Engine Assembly",
+      "parts_count": 10,
+      "subsystems_count": 7,
+      "reference_status": "needs_reference_crawl",
+      "asset_count": 0,
+      "assembly_position_hint": "Use X along crankshaft/cylinder row, Z vertical bore axis, Y intake/exhaust sides; service covers on top/front/bottom.",
+      "crawl_priorities": [
+        "engine block/head cutaway CAD",
+        "cranktrain exploded view",
+        "intake/exhaust manifold CAD",
+        "oil/coolant gallery diagram"
+      ],
+      "source_targets": [
+        {
+          "label": "Wikipedia Straight-six engine",
+          "url": "https://en.wikipedia.org/wiki/Straight-six_engine",
+          "license_hint": "CC BY-SA text/images where applicable; verify media and CAD separately.",
+          "why": "General inline-six architecture vocabulary and external layout references."
+        },
+        {
+          "label": "GrabCAD inline-six / engine block search",
+          "url": "https://grabcad.com/library?query=inline%206%20engine",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Potential CAD-like visual references for block, cranktrain, head, and accessory layout."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Cylinder Block + Crankcase",
+          "subsystem_candidates": [
+            {
+              "subsystem": "engine_block",
+              "score": 14
+            },
+            {
+              "subsystem": "lubrication_cooling",
+              "score": 3
+            },
+            {
+              "subsystem": "rotating_cranktrain",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Crankshaft + Main Bearing Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "engine_block",
+              "score": 4
+            },
+            {
+              "subsystem": "rotating_cranktrain",
+              "score": 4
+            },
+            {
+              "subsystem": "integration_accessory_mounts",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Piston + Connecting Rod Set x 6",
+          "subsystem_candidates": [
+            {
+              "subsystem": "rotating_cranktrain",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Cylinder Head + DOHC Valvetrain",
+          "subsystem_candidates": [
+            {
+              "subsystem": "cylinder_head_valvetrain",
+              "score": 14
+            },
+            {
+              "subsystem": "engine_block",
+              "score": 3
+            },
+            {
+              "subsystem": "fuel_ignition_harness",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Intake Manifold + Throttle Body",
+          "subsystem_candidates": [
+            {
+              "subsystem": "fuel_ignition_harness",
+              "score": 5
+            },
+            {
+              "subsystem": "intake_exhaust",
+              "score": 3
+            },
+            {
+              "subsystem": "integration_accessory_mounts",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Exhaust Manifold + Heat Shield",
+          "subsystem_candidates": [
+            {
+              "subsystem": "intake_exhaust",
+              "score": 6
+            },
+            {
+              "subsystem": "cylinder_head_valvetrain",
+              "score": 2
+            },
+            {
+              "subsystem": "engine_block",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Timing Chain Front Cover",
+          "subsystem_candidates": [
+            {
+              "subsystem": "cylinder_head_valvetrain",
+              "score": 2
+            },
+            {
+              "subsystem": "integration_accessory_mounts",
+              "score": 2
+            },
+            {
+              "subsystem": "engine_block",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Oil Pan + Pump Pickup",
+          "subsystem_candidates": [
+            {
+              "subsystem": "lubrication_cooling",
+              "score": 5
+            },
+            {
+              "subsystem": "cylinder_head_valvetrain",
+              "score": 2
+            },
+            {
+              "subsystem": "engine_block",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "Fuel Rail + Injector Harness",
+          "subsystem_candidates": [
+            {
+              "subsystem": "fuel_ignition_harness",
+              "score": 7
+            },
+            {
+              "subsystem": "integration_accessory_mounts",
+              "score": 1
+            },
+            {
+              "subsystem": "rotating_cranktrain",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p10",
+          "label": "Accessory Drive + Mount Brackets",
+          "subsystem_candidates": [
+            {
+              "subsystem": "integration_accessory_mounts",
+              "score": 6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "inline_6_engine_diesel",
+      "label": "Inline-6 Diesel Engine Assembly",
+      "parts_count": 10,
+      "subsystems_count": 7,
+      "reference_status": "needs_reference_crawl",
+      "asset_count": 0,
+      "assembly_position_hint": "Use X along crankshaft/cylinder row, Z bore/head axis; turbo/exhaust on one side, intake/common rail service on the other.",
+      "crawl_priorities": [
+        "reinforced diesel block/head cutaway",
+        "common rail/injector well layout",
+        "turbo/exhaust routing CAD",
+        "oil cooler/filter module drawing"
+      ],
+      "source_targets": [
+        {
+          "label": "Wikipedia Diesel engine",
+          "url": "https://en.wikipedia.org/wiki/Diesel_engine",
+          "license_hint": "CC BY-SA text/images where applicable; verify media and CAD separately.",
+          "why": "Diesel-specific architecture vocabulary: injector wells, common rail, turbo path, reinforced block."
+        },
+        {
+          "label": "GrabCAD diesel engine / inline six search",
+          "url": "https://grabcad.com/library?query=diesel%20engine%20inline%206",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Potential CAD-like visual references for diesel block/head/common-rail/turbo layouts."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Reinforced Cylinder Block",
+          "subsystem_candidates": [
+            {
+              "subsystem": "reinforced_block_head",
+              "score": 5
+            },
+            {
+              "subsystem": "diesel_cranktrain",
+              "score": 3
+            },
+            {
+              "subsystem": "thermal_lubrication",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Forged Crankshaft + Bearing Ladder",
+          "subsystem_candidates": [
+            {
+              "subsystem": "diesel_cranktrain",
+              "score": 7
+            },
+            {
+              "subsystem": "reinforced_block_head",
+              "score": 4
+            },
+            {
+              "subsystem": "thermal_lubrication",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Piston/Rod Assembly x 6",
+          "subsystem_candidates": [
+            {
+              "subsystem": "diesel_cranktrain",
+              "score": 3
+            },
+            {
+              "subsystem": "thermal_lubrication",
+              "score": 2
+            },
+            {
+              "subsystem": "reinforced_block_head",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Cylinder Head + Injector Wells",
+          "subsystem_candidates": [
+            {
+              "subsystem": "reinforced_block_head",
+              "score": 2
+            },
+            {
+              "subsystem": "common_rail_injection_study",
+              "score": 1
+            },
+            {
+              "subsystem": "diesel_cranktrain",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Common Rail + Injector Harness",
+          "subsystem_candidates": [
+            {
+              "subsystem": "common_rail_injection_study",
+              "score": 10
+            },
+            {
+              "subsystem": "turbo_air_exhaust_study",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Turbocharger + Exhaust Manifold Reference Structure",
+          "subsystem_candidates": [
+            {
+              "subsystem": "turbo_air_exhaust_study",
+              "score": 12
+            },
+            {
+              "subsystem": "common_rail_injection_study",
+              "score": 3
+            },
+            {
+              "subsystem": "gear_timing_access",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Intake/EGR Cooler Path Reference Structure",
+          "subsystem_candidates": [
+            {
+              "subsystem": "turbo_air_exhaust_study",
+              "score": 3
+            },
+            {
+              "subsystem": "thermal_lubrication",
+              "score": 2
+            },
+            {
+              "subsystem": "gear_timing_access",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Oil Cooler + Filter Module",
+          "subsystem_candidates": [
+            {
+              "subsystem": "thermal_lubrication",
+              "score": 9
+            },
+            {
+              "subsystem": "reinforced_block_head",
+              "score": 3
+            },
+            {
+              "subsystem": "turbo_air_exhaust_study",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "Timing Gear Housing",
+          "subsystem_candidates": [
+            {
+              "subsystem": "gear_timing_access",
+              "score": 8
+            },
+            {
+              "subsystem": "mounting_integration",
+              "score": 2
+            },
+            {
+              "subsystem": "thermal_lubrication",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p10",
+          "label": "Engine Mount + Bellhousing Interfaces",
+          "subsystem_candidates": [
+            {
+              "subsystem": "mounting_integration",
+              "score": 6
+            },
+            {
+              "subsystem": "diesel_cranktrain",
+              "score": 2
+            },
+            {
+              "subsystem": "reinforced_block_head",
+              "score": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "centrifugal_pump",
+      "label": "Centrifugal Pump Assembly",
+      "parts_count": 8,
+      "subsystems_count": 5,
+      "reference_status": "needs_reference_crawl",
+      "asset_count": 0,
+      "assembly_position_hint": "Use X shaft axis, radial impeller/volute around shaft, suction at impeller eye, discharge tangent to volute.",
+      "crawl_priorities": [
+        "volute casing STEP/cutaway",
+        "impeller CAD",
+        "mechanical seal cartridge drawing",
+        "bearing frame/baseplate assembly"
+      ],
+      "source_targets": [
+        {
+          "label": "NIST / public pump reference search",
+          "url": "https://www.nist.gov/",
+          "license_hint": "Verify each asset.",
+          "why": "Public technical references for pump components and inspection vocabulary."
+        },
+        {
+          "label": "GrabCAD centrifugal pump search",
+          "url": "https://grabcad.com/library?query=centrifugal%20pump",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Volute, impeller, bearing frame, and flange CAD references."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Volute Casing",
+          "subsystem_candidates": [
+            {
+              "subsystem": "volute_pressure_boundary",
+              "score": 12
+            },
+            {
+              "subsystem": "seal_gland",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Impeller",
+          "subsystem_candidates": [
+            {
+              "subsystem": "impeller_rotor",
+              "score": 6
+            },
+            {
+              "subsystem": "pipe_motor_integration",
+              "score": 1
+            },
+            {
+              "subsystem": "seal_gland",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Pump Shaft",
+          "subsystem_candidates": [
+            {
+              "subsystem": "impeller_rotor",
+              "score": 4
+            },
+            {
+              "subsystem": "bearing_support",
+              "score": 1
+            },
+            {
+              "subsystem": "pipe_motor_integration",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Bearing Housing",
+          "subsystem_candidates": [
+            {
+              "subsystem": "bearing_support",
+              "score": 9
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Mechanical Seal Cartridge",
+          "subsystem_candidates": [
+            {
+              "subsystem": "seal_gland",
+              "score": 9
+            },
+            {
+              "subsystem": "bearing_support",
+              "score": 1
+            },
+            {
+              "subsystem": "volute_pressure_boundary",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Suction/Discharge Flange Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "pipe_motor_integration",
+              "score": 7
+            },
+            {
+              "subsystem": "volute_pressure_boundary",
+              "score": 2
+            },
+            {
+              "subsystem": "impeller_rotor",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Coupling Guard + Motor Adapter",
+          "subsystem_candidates": [
+            {
+              "subsystem": "pipe_motor_integration",
+              "score": 5
+            },
+            {
+              "subsystem": "bearing_support",
+              "score": 2
+            },
+            {
+              "subsystem": "impeller_rotor",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Baseplate + Mount Pads",
+          "subsystem_candidates": [
+            {
+              "subsystem": "pipe_motor_integration",
+              "score": 2
+            },
+            {
+              "subsystem": "volute_pressure_boundary",
+              "score": 2
+            },
+            {
+              "subsystem": "impeller_rotor",
+              "score": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "hydraulic_manifold",
+      "label": "Hydraulic Manifold Block Assembly",
+      "parts_count": 6,
+      "subsystems_count": 5,
+      "reference_status": "watch",
+      "asset_count": 9,
+      "assembly_position_hint": "Use block datum faces; ports occupy named faces, cross-drilled galleries run between P/T/A/B and cartridge cavities.",
+      "crawl_priorities": [
+        "manifold port map drawing",
+        "cross-drilled gallery CAD",
+        "cartridge valve cavity reference",
+        "sensor/test port layout"
+      ],
+      "source_targets": [
+        {
+          "label": "GrabCAD hydraulic manifold search",
+          "url": "https://grabcad.com/library?query=hydraulic%20manifold",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Manifold block porting, cartridge valve, plug, and label layout references."
+        },
+        {
+          "label": "OpenSCAD MCAD block/hole/fastener primitives",
+          "url": "https://github.com/openscad/MCAD",
+          "github_repo": "openscad/MCAD",
+          "license_hint": "Repository license was not identified by GitHub API in this run; keep blocked_until_license_review until manually reviewed.",
+          "why": "OpenSCAD boxes, polyholes, fasteners, hardware, and regular-shape grammar for manifold block ports and service features."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Main Manifold Block",
+          "subsystem_candidates": [
+            {
+              "subsystem": "manifold_flow_network",
+              "score": 2
+            },
+            {
+              "subsystem": "mounting_datum",
+              "score": 1
+            },
+            {
+              "subsystem": "pressure_control",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Cartridge Valve Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "cartridge_valve_cavities",
+              "score": 6
+            },
+            {
+              "subsystem": "instrumentation_access",
+              "score": 1
+            },
+            {
+              "subsystem": "manifold_flow_network",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Pressure Relief Valve Section",
+          "subsystem_candidates": [
+            {
+              "subsystem": "pressure_control",
+              "score": 9
+            },
+            {
+              "subsystem": "cartridge_valve_cavities",
+              "score": 1
+            },
+            {
+              "subsystem": "instrumentation_access",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Check Valve Section",
+          "subsystem_candidates": [
+            {
+              "subsystem": "pressure_control",
+              "score": 5
+            },
+            {
+              "subsystem": "cartridge_valve_cavities",
+              "score": 4
+            },
+            {
+              "subsystem": "manifold_flow_network",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Sensor + Test Port Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "instrumentation_access",
+              "score": 9
+            },
+            {
+              "subsystem": "manifold_flow_network",
+              "score": 2
+            },
+            {
+              "subsystem": "pressure_control",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Mounting Feet + Label Plate",
+          "subsystem_candidates": [
+            {
+              "subsystem": "mounting_datum",
+              "score": 7
+            },
+            {
+              "subsystem": "instrumentation_access",
+              "score": 2
+            },
+            {
+              "subsystem": "pressure_control",
+              "score": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "battery_pack_module",
+      "label": "Battery Pack Module",
+      "parts_count": 7,
+      "subsystems_count": 5,
+      "reference_status": "watch",
+      "asset_count": 8,
+      "assembly_position_hint": "Use module length/width as cell array plane and Z as lid/service direction; cooling plate and busbars are separated layers.",
+      "crawl_priorities": [
+        "cell tray CAD",
+        "busbar/BMS cover reference",
+        "cooling plate interface",
+        "vent/disconnect/enclosure drawing"
+      ],
+      "source_targets": [
+        {
+          "label": "NREL battery thermal management publications",
+          "url": "https://www.nrel.gov/transportation/battery-thermal-management.html",
+          "license_hint": "Verify publication/media terms.",
+          "why": "Battery thermal, module, and safety vocabulary for non-live concept generation."
+        },
+        {
+          "label": "GrabCAD battery module search",
+          "url": "https://grabcad.com/library?query=battery%20module",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Cell holders, busbar covers, BMS pockets, enclosures, and connector references."
+        },
+        {
+          "label": "NopSCADlib battery/connector/enclosure primitives",
+          "url": "https://github.com/nophead/NopSCADlib",
+          "github_repo": "nophead/NopSCADlib",
+          "license_hint": "GitHub API reported GPL-3.0; reference-only unless license review approves compatible use.",
+          "why": "Battery, fuseholder, connector, cable strip, PCB mount, and enclosure grammar for battery module references."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Cell Carrier Tray",
+          "subsystem_candidates": [
+            {
+              "subsystem": "cell_support",
+              "score": 6
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Busbar + Fuse Cover Reference Structure",
+          "subsystem_candidates": [
+            {
+              "subsystem": "electrical_distribution_study",
+              "score": 5
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "BMS Electronics Bay",
+          "subsystem_candidates": [
+            {
+              "subsystem": "bms_harness",
+              "score": 9
+            },
+            {
+              "subsystem": "cell_support",
+              "score": 1
+            },
+            {
+              "subsystem": "electrical_distribution_study",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Cooling Plate Interface",
+          "subsystem_candidates": [
+            {
+              "subsystem": "thermal_interface",
+              "score": 11
+            },
+            {
+              "subsystem": "bms_harness",
+              "score": 1
+            },
+            {
+              "subsystem": "cell_support",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Pack Enclosure + Lid",
+          "subsystem_candidates": [
+            {
+              "subsystem": "sealed_enclosure_safety",
+              "score": 6
+            },
+            {
+              "subsystem": "bms_harness",
+              "score": 1
+            },
+            {
+              "subsystem": "electrical_distribution_study",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "HV Connector + Service Disconnect Reference Structure",
+          "subsystem_candidates": [
+            {
+              "subsystem": "bms_harness",
+              "score": 2
+            },
+            {
+              "subsystem": "sealed_enclosure_safety",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Crash/Isolation End Plates",
+          "subsystem_candidates": [
+            {
+              "subsystem": "cell_support",
+              "score": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "liquid_cold_plate",
+      "label": "Liquid Cold Plate Assembly",
+      "parts_count": 6,
+      "subsystems_count": 5,
+      "reference_status": "needs_reference_crawl",
+      "asset_count": 0,
+      "assembly_position_hint": "Use plate XY as heat-source plane and Z as stacked cover/gasket direction; inlet/outlet manifolds sit on one edge.",
+      "crawl_priorities": [
+        "serpentine channel CAD",
+        "manifold cap/gasket drawing",
+        "thermal pad/mount pattern",
+        "leak-test/drain port reference"
+      ],
+      "source_targets": [
+        {
+          "label": "GrabCAD liquid cold plate search",
+          "url": "https://grabcad.com/library?query=liquid%20cold%20plate",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Serpentine channels, manifolds, gasket tracks, and mounting pad references."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Cold Plate Body",
+          "subsystem_candidates": [
+            {
+              "subsystem": "thermal_channel_network",
+              "score": 5
+            },
+            {
+              "subsystem": "electronics_mounting",
+              "score": 1
+            },
+            {
+              "subsystem": "seal_leak_boundary",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Inlet/Outlet Manifold Cap",
+          "subsystem_candidates": [
+            {
+              "subsystem": "manifold_ports",
+              "score": 8
+            },
+            {
+              "subsystem": "electronics_mounting",
+              "score": 2
+            },
+            {
+              "subsystem": "seal_leak_boundary",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Gasket + Seal Track",
+          "subsystem_candidates": [
+            {
+              "subsystem": "seal_leak_boundary",
+              "score": 9
+            },
+            {
+              "subsystem": "thermal_channel_network",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Power Module Mount Pads",
+          "subsystem_candidates": [
+            {
+              "subsystem": "electronics_mounting",
+              "score": 6
+            },
+            {
+              "subsystem": "thermal_channel_network",
+              "score": 4
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Leak Test + Drain Ports",
+          "subsystem_candidates": [
+            {
+              "subsystem": "service_test_access",
+              "score": 5
+            },
+            {
+              "subsystem": "seal_leak_boundary",
+              "score": 3
+            },
+            {
+              "subsystem": "manifold_ports",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Cover Plate",
+          "subsystem_candidates": [
+            {
+              "subsystem": "service_test_access",
+              "score": 6
+            },
+            {
+              "subsystem": "electronics_mounting",
+              "score": 1
+            },
+            {
+              "subsystem": "thermal_channel_network",
+              "score": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "cnc_axis_carriage",
+      "label": "CNC Linear Axis Carriage",
+      "parts_count": 7,
+      "subsystems_count": 5,
+      "reference_status": "watch",
+      "asset_count": 29,
+      "assembly_position_hint": "Use X as travel axis; rails parallel X, ball screw on centerline, carriage plate rides above bearing blocks.",
+      "crawl_priorities": [
+        "linear rail/carriage CAD",
+        "ball screw support assembly",
+        "servo mount/coupling guard",
+        "way cover/lube manifold reference"
+      ],
+      "source_targets": [
+        {
+          "label": "OpenBuilds linear motion documentation",
+          "url": "https://openbuilds.com/",
+          "license_hint": "Verify product/CAD terms; reference-only until reviewed.",
+          "why": "Linear rail/carriage, actuator, motor mount, and sensor bracket vocabulary."
+        },
+        {
+          "label": "GrabCAD CNC linear axis search",
+          "url": "https://grabcad.com/library?query=cnc%20linear%20axis",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Carriage plate, ball screw, linear rail, and cover references."
+        },
+        {
+          "label": "NopSCADlib rail/bearing/motor primitives",
+          "url": "https://github.com/nophead/NopSCADlib",
+          "github_repo": "nophead/NopSCADlib",
+          "license_hint": "GitHub API reported GPL-3.0; reference-only unless license review approves compatible use.",
+          "why": "Linear rail, SBR rail, bearing block, screw, stepper, motor, pulley, and drag-chain grammar for CNC axis references."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Carriage Plate",
+          "subsystem_candidates": [
+            {
+              "subsystem": "carriage_structure",
+              "score": 10
+            },
+            {
+              "subsystem": "linear_guidance",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Linear Rail Pair + Bearing Blocks",
+          "subsystem_candidates": [
+            {
+              "subsystem": "linear_guidance",
+              "score": 8
+            },
+            {
+              "subsystem": "carriage_structure",
+              "score": 4
+            },
+            {
+              "subsystem": "ball_screw_drive",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Ball Screw + Nut Housing",
+          "subsystem_candidates": [
+            {
+              "subsystem": "ball_screw_drive",
+              "score": 9
+            },
+            {
+              "subsystem": "linear_guidance",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Servo Motor Mount + Coupling Guard",
+          "subsystem_candidates": [
+            {
+              "subsystem": "motor_sensor_integration",
+              "score": 5
+            },
+            {
+              "subsystem": "carriage_structure",
+              "score": 2
+            },
+            {
+              "subsystem": "linear_guidance",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Limit/Home Sensor Brackets",
+          "subsystem_candidates": [
+            {
+              "subsystem": "motor_sensor_integration",
+              "score": 5
+            },
+            {
+              "subsystem": "linear_guidance",
+              "score": 1
+            },
+            {
+              "subsystem": "protection_lubrication",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Way Cover + Wiper Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "protection_lubrication",
+              "score": 6
+            },
+            {
+              "subsystem": "carriage_structure",
+              "score": 1
+            },
+            {
+              "subsystem": "linear_guidance",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Lubrication Manifold",
+          "subsystem_candidates": [
+            {
+              "subsystem": "protection_lubrication",
+              "score": 3
+            },
+            {
+              "subsystem": "linear_guidance",
+              "score": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "gearbox_reducer",
+      "label": "Two-Stage Gearbox Reducer",
+      "parts_count": 7,
+      "subsystems_count": 5,
+      "reference_status": "watch",
+      "asset_count": 7,
+      "assembly_position_hint": "Use parallel shaft axes through housing; gear mesh centerlines define internal layout, service cover on top/side.",
+      "crawl_priorities": [
+        "split housing cutaway",
+        "gear/shaft/bearing layout",
+        "oil seal/plug/breather details",
+        "mounting feet/torque arm drawing"
+      ],
+      "source_targets": [
+        {
+          "label": "GrabCAD gearbox reducer search",
+          "url": "https://grabcad.com/library?query=gearbox%20reducer",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Housing, gear train, shaft, bearing, seal, and lubrication references."
+        },
+        {
+          "label": "OpenSCAD MCAD mechanical library",
+          "url": "https://github.com/openscad/MCAD",
+          "github_repo": "openscad/MCAD",
+          "license_hint": "Repository license was not identified by GitHub API in this run; keep blocked_until_license_review until manually reviewed.",
+          "why": "OpenSCAD bearing, gear, involute gear, screw, motor, stepper, and linear-bearing grammar for reducer/rotating machinery references."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Split Gearbox Housing",
+          "subsystem_candidates": [
+            {
+              "subsystem": "gearbox_housing",
+              "score": 9
+            },
+            {
+              "subsystem": "shaft_bearing_support",
+              "score": 2
+            },
+            {
+              "subsystem": "mounting_service",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Input Shaft + Pinion",
+          "subsystem_candidates": [
+            {
+              "subsystem": "shaft_bearing_support",
+              "score": 4
+            },
+            {
+              "subsystem": "gear_train",
+              "score": 3
+            },
+            {
+              "subsystem": "gearbox_housing",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Intermediate Shaft + Gear Pair",
+          "subsystem_candidates": [
+            {
+              "subsystem": "gear_train",
+              "score": 4
+            },
+            {
+              "subsystem": "shaft_bearing_support",
+              "score": 3
+            },
+            {
+              "subsystem": "gearbox_housing",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Output Shaft + Bull Gear",
+          "subsystem_candidates": [
+            {
+              "subsystem": "shaft_bearing_support",
+              "score": 5
+            },
+            {
+              "subsystem": "gear_train",
+              "score": 3
+            },
+            {
+              "subsystem": "gearbox_housing",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Bearing + Seal Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "sealing_lubrication",
+              "score": 3
+            },
+            {
+              "subsystem": "shaft_bearing_support",
+              "score": 2
+            },
+            {
+              "subsystem": "gearbox_housing",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Lubrication + Breather System",
+          "subsystem_candidates": [
+            {
+              "subsystem": "sealing_lubrication",
+              "score": 9
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Mounting Feet + Torque Arm",
+          "subsystem_candidates": [
+            {
+              "subsystem": "mounting_service",
+              "score": 5
+            },
+            {
+              "subsystem": "gearbox_housing",
+              "score": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "underwater_sealed_sensor_housing",
+      "label": "Underwater Sealed Sensor Housing",
+      "parts_count": 7,
+      "subsystems_count": 5,
+      "reference_status": "watch",
+      "asset_count": 12,
+      "assembly_position_hint": "Use cylinder axis through front window and rear cap; cable gland exits rear/side, cradle supports shell below.",
+      "crawl_priorities": [
+        "pressure shell/end cap CAD",
+        "O-ring/cable gland drawing",
+        "internal electronics tray",
+        "cradle/anode/leak-test reference"
+      ],
+      "source_targets": [
+        {
+          "label": "Blue Robotics documentation",
+          "url": "https://bluerobotics.com/learn/",
+          "license_hint": "Verify documentation/CAD terms; reference-only until reviewed.",
+          "why": "Underwater enclosure, cable gland, O-ring, thruster/sensor mounting vocabulary."
+        },
+        {
+          "label": "GrabCAD underwater housing search",
+          "url": "https://grabcad.com/library?query=underwater%20housing",
+          "license_hint": "Verify each model license before use; default reference-only.",
+          "why": "Sealed pressure shell, end cap, cable gland, and cradle references."
+        },
+        {
+          "label": "NopSCADlib enclosure/sealing primitives",
+          "url": "https://github.com/nophead/NopSCADlib",
+          "github_repo": "nophead/NopSCADlib",
+          "license_hint": "GitHub API reported GPL-3.0; reference-only unless license review approves compatible use.",
+          "why": "Box, camera housing, tube, cable grommet, O-ring, and sealing-strip grammar for sealed housing references."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Cylindrical Pressure Shell",
+          "subsystem_candidates": [
+            {
+              "subsystem": "pressure_shell",
+              "score": 8
+            },
+            {
+              "subsystem": "internal_sensor_tray",
+              "score": 2
+            },
+            {
+              "subsystem": "marine_mount_service",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Front Sensor Window Cap",
+          "subsystem_candidates": [
+            {
+              "subsystem": "window_and_caps",
+              "score": 7
+            },
+            {
+              "subsystem": "internal_sensor_tray",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Rear Service Cap",
+          "subsystem_candidates": [
+            {
+              "subsystem": "window_and_caps",
+              "score": 4
+            },
+            {
+              "subsystem": "pressure_shell",
+              "score": 2
+            },
+            {
+              "subsystem": "marine_mount_service",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Cable Gland + Strain Relief",
+          "subsystem_candidates": [
+            {
+              "subsystem": "cable_penetration",
+              "score": 9
+            },
+            {
+              "subsystem": "internal_sensor_tray",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Internal Electronics Tray",
+          "subsystem_candidates": [
+            {
+              "subsystem": "internal_sensor_tray",
+              "score": 10
+            },
+            {
+              "subsystem": "cable_penetration",
+              "score": 2
+            },
+            {
+              "subsystem": "pressure_shell",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Mounting Cradle + Anode Pad",
+          "subsystem_candidates": [
+            {
+              "subsystem": "marine_mount_service",
+              "score": 6
+            },
+            {
+              "subsystem": "pressure_shell",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Leak Test Port + Label Set",
+          "subsystem_candidates": [
+            {
+              "subsystem": "marine_mount_service",
+              "score": 5
+            },
+            {
+              "subsystem": "pressure_shell",
+              "score": 1
+            },
+            {
+              "subsystem": "window_and_caps",
+              "score": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seed": "liquid_rocket_engine_academic",
+      "label": "Academic Liquid Rocket Engine System",
+      "parts_count": 10,
+      "subsystems_count": 8,
+      "reference_status": "needs_reference_crawl",
+      "asset_count": 0,
+      "assembly_position_hint": "Use Z as chamber/nozzle study axis; feed-system modules sit radially, turbomachinery/DAQ modules sit off-axis, thrust-frame datum is aft.",
+      "crawl_priorities": [
+        "NASA/NTRS academic liquid propulsion reports",
+        "safe cutaway diagrams for chamber/nozzle/cooling/feed topology",
+        "instrumentation/control architecture references",
+        "turbomachinery educational diagrams without performance sizing"
+      ],
+      "source_targets": [
+        {
+          "label": "NASA 3D Resources",
+          "url": "https://science.nasa.gov/3d-resources/",
+          "license_hint": "NASA/public-government material; verify each asset page.",
+          "why": "Safe public spacecraft/engine visual references for academic cutaway and annotation grammar."
+        },
+        {
+          "label": "NASA technical reports / NTRS liquid propulsion references",
+          "url": "https://ntrs.nasa.gov/",
+          "license_hint": "Verify each report/media asset; use as academic literature reference only.",
+          "why": "Academic liquid propulsion terminology, subsystem decomposition, instrumentation, cooling, and turbomachinery vocabulary."
+        },
+        {
+          "label": "NASA 3D Resources",
+          "url": "https://science.nasa.gov/3d-resources/",
+          "license_hint": "NASA/public-government material; verify each asset page.",
+          "why": "Academic non-operational rocket engine cutaway and subsystem references only."
+        }
+      ],
+      "bom_to_subsystem_candidates": [
+        {
+          "part_id": "p1",
+          "label": "Combustion Chamber Heat-Transfer Study Section",
+          "subsystem_candidates": [
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 9
+            },
+            {
+              "subsystem": "thrust_frame_integration",
+              "score": 4
+            },
+            {
+              "subsystem": "nozzle_expansion_study",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p2",
+          "label": "Injector Architecture Taxonomy Plate",
+          "subsystem_candidates": [
+            {
+              "subsystem": "injector_architecture",
+              "score": 11
+            },
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 2
+            },
+            {
+              "subsystem": "feed_system_architecture",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p3",
+          "label": "Nozzle Contour Phenomena Study Shell",
+          "subsystem_candidates": [
+            {
+              "subsystem": "nozzle_expansion_study",
+              "score": 11
+            },
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 4
+            },
+            {
+              "subsystem": "regenerative_cooling_study",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p4",
+          "label": "Regenerative Cooling Path Study Jacket",
+          "subsystem_candidates": [
+            {
+              "subsystem": "regenerative_cooling_study",
+              "score": 9
+            },
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 3
+            },
+            {
+              "subsystem": "turbomachinery_energy_path",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p5",
+          "label": "Feed-System Architecture Manifold",
+          "subsystem_candidates": [
+            {
+              "subsystem": "feed_system_architecture",
+              "score": 11
+            },
+            {
+              "subsystem": "injector_architecture",
+              "score": 3
+            },
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p6",
+          "label": "Turbopump Energy-Path Study Module",
+          "subsystem_candidates": [
+            {
+              "subsystem": "turbomachinery_energy_path",
+              "score": 8
+            },
+            {
+              "subsystem": "regenerative_cooling_study",
+              "score": 3
+            },
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p7",
+          "label": "Instrumentation + Data Acquisition Ring",
+          "subsystem_candidates": [
+            {
+              "subsystem": "instrumentation_controls",
+              "score": 9
+            },
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 3
+            },
+            {
+              "subsystem": "injector_architecture",
+              "score": 2
+            }
+          ]
+        },
+        {
+          "part_id": "p8",
+          "label": "Control Logic + Interlock Panel",
+          "subsystem_candidates": [
+            {
+              "subsystem": "instrumentation_controls",
+              "score": 3
+            },
+            {
+              "subsystem": "feed_system_architecture",
+              "score": 2
+            },
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 1
+            }
+          ]
+        },
+        {
+          "part_id": "p9",
+          "label": "Thrust-Frame Load-Path Study Mount",
+          "subsystem_candidates": [
+            {
+              "subsystem": "thrust_frame_integration",
+              "score": 5
+            },
+            {
+              "subsystem": "chamber_heat_transfer",
+              "score": 3
+            },
+            {
+              "subsystem": "injector_architecture",
+              "score": 3
+            }
+          ]
+        },
+        {
+          "part_id": "p10",
+          "label": "Cutaway Safety Boundary + Annotation Cover",
+          "subsystem_candidates": [
+            {
+              "subsystem": "thrust_frame_integration",
+              "score": 5
+            },
+            {
+              "subsystem": "regenerative_cooling_study",
+              "score": 4
+            },
+            {
+              "subsystem": "injector_architecture",
+              "score": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

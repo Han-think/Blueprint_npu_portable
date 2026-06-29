@@ -7,7 +7,7 @@
       "mechanisms": "Linkages, hinges, gears, cams, deployment, tilt/rotation devices",
       "actuation": "Motors, servos, brakes, reducers and their mounting/replacement",
       "electronics": "Boards, drivers, wiring, signal routing, grounding",
-      "gnc": "Attitude/position sensing and control hardware evidence (mock level)",
+      "gnc": "Attitude/position sensing and control hardware evidence (reference structure level)",
       "payload": "Mission equipment bay, sensor mounts, removable inserts",
       "integration": "Datums, interfaces, harness routing, service access, assembly order"
     },
@@ -29,10 +29,10 @@
       {
         "id": "joint_transmission",
         "discipline": "mechanisms",
-        "function": "J1-J6 joint cartridges: bearing seats, reducer dummies, wrist pitch/roll axes, shaft location",
+        "function": "J1-J6 joint cartridges: bearing seats, reducer reference articles, wrist pitch/roll axes, shaft location",
         "evidence_features": [
           "bearing_seat",
-          "reducer_dummy",
+          "reducer_reference article",
           "shoulder",
           "wrist_pitch_axis",
           "wrist_roll_axis",
@@ -50,7 +50,7 @@
         "evidence_features": [
           "motor_module",
           "fastener_access",
-          "coupling_dummy"
+          "coupling_reference article"
         ],
         "criteria_refs": [
           "robot_arm",
@@ -272,7 +272,7 @@
           "criterion": "mechanism_named_not_implied",
           "weight": 9,
           "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
-          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth reference articles, cam profiles, or linkage bars exist in geometry.",
           "signals": [
             "four_bar",
             "cam",
@@ -281,7 +281,7 @@
             "pivot_hole",
             "linkage_bar"
           ],
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry.",
           "source_refs": [
             "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
           ]
@@ -658,7 +658,7 @@
         {
           "criterion": "axis_datum_readability",
           "weight": 14,
-          "good": "J1-J6 axis rings, reducer/bearing dummies, encoder covers, and tool flange datum are visible.",
+          "good": "J1-J6 axis rings, reducer/bearing reference articles, encoder covers, and tool flange datum are visible.",
           "bad": "Arm links are generic cylinders with no joint service evidence.",
           "signals": [
             "J1",
@@ -666,7 +666,7 @@
             "axis ring",
             "encoder cover",
             "tool flange",
-            "bearing dummy"
+            "bearing reference article"
           ],
           "loop_feedback": "Add J1-J6 axis datum labels, removable joint cartridge covers, encoder pockets, and tool flange bolt pattern."
         },
@@ -700,7 +700,7 @@
           "criterion": "bearing_shaft_mounting_sanity",
           "weight": 10,
           "good": "Each joint shows a bearing seat with shoulder or retaining feature, shaft locating geometry, and stated fit intent for inner/outer races.",
-          "bad": "Bearing dummies float in links with no seat, shoulder, retaining ring groove, or axial location scheme.",
+          "bad": "Bearing reference articles float in links with no seat, shoulder, retaining ring groove, or axial location scheme.",
           "signals": [
             "bearing_seat",
             "shoulder",
@@ -1013,5 +1013,36 @@
       "label": "toc_intro",
       "text": "--- page 1 ---\n\n\n--- page 2 ---\n\n\n--- page 3 ---\n\n\n--- page 4 ---\n\n\n--- page 5 ---\n\n\n--- page 6 ---\n\n\n--- page 7 ---\n\n\n--- page 8 ---\n\n\n--- page 9 ---\n\n\n--- page 10 ---\n\n\n--- page 11 ---\n\n\n--- page 12 ---\n\n\n--- page 13 ---\n\n\n--- page 14 ---\n\n\n--- page 15 ---\n\n\n--- page 16 ---\n\n\n--- page 17 ---\n\n\n--- page 18 ---\n\n\n--- page 19 ---\n\n\n--- page 20 ---\n"
     }
-  ]
+  ],
+  "operability_profile": {
+    "operating_principle": "Serial manipulator architecture that carries torque through joints/links, routes cables along the spine, and exposes serviceable actuator/sensor modules.",
+    "primary_paths": {
+      "load_path": [
+        "base to shoulder torque path",
+        "link bending path",
+        "tool flange payload path"
+      ],
+      "fluid_path": [
+        "optional pneumatic utility routing"
+      ],
+      "thermal_path": [
+        "motor heat to joint housings",
+        "drive electronics bay heat path"
+      ],
+      "electrical_path": [
+        "drive power to each joint",
+        "grounding through base/electronics"
+      ],
+      "signal_path": [
+        "encoder feedback",
+        "tool I/O",
+        "joint command bus"
+      ]
+    },
+    "solver_focus": [
+      "joint torque/FoS screening",
+      "cable bend and service access",
+      "link stiffness"
+    ]
+  }
 }

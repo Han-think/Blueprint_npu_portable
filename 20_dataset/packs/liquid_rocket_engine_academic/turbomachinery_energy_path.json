@@ -1,0 +1,109 @@
+{
+  "schema": "blueprint_micro_pack_v1",
+  "seed": "liquid_rocket_engine_academic",
+  "subsystem": {
+    "id": "turbomachinery_energy_path",
+    "discipline": "rotating",
+    "function": "Pump/turbine/shaft/bearing energy-path study without performance sizing",
+    "evidence_features": [
+      "pump_region",
+      "turbine_region",
+      "shaft_axis",
+      "bearing_region",
+      "energy_path_arrow"
+    ]
+  },
+  "criteria": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "good": "Every P0 evidence feature appears as a named part_tree child or a geometry_ops target.",
+          "bad": "Subsystem claims features in prose but leaves no geometry target or child node."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "good": "Coordinates span chamber/nozzle stations, feed-interface faces, sensor bosses, service covers, or datum pads.",
+          "bad": "All academic features are stacked at the origin or represented as one shell."
+        },
+        {
+          "criterion": "academic_non_operational_boundary",
+          "good": "Uses conceptual labels, cutaway/study sections, blocked manufacturing details, and no build/test/performance recipe.",
+          "bad": "Provides operational dimensions, propellant procedures, ignition instructions, performance sizing, or test steps."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "interface_named",
+          "good": "Each study module has named datums, service covers, instrumentation ports, and adjacent conceptual interfaces.",
+          "bad": "Subsystems float independently without interfaces or assembly position."
+        },
+        {
+          "criterion": "phenomena_map_visible",
+          "good": "Heat transfer, flow path, turbomachinery energy path, controls/sensing, and structural support are visible as separate study zones.",
+          "bad": "Claims liquid-engine understanding while showing only a generic chamber/nozzle shell."
+        }
+      ]
+    },
+    {
+      "id": "turbomachinery_energy_path_domain_grammar",
+      "criteria": [
+        {
+          "criterion": "academic_evidence_features",
+          "good": "Uses academic evidence features: pump_region, turbine_region, shaft_axis, bearing_region, energy_path_arrow.",
+          "bad": "Omitted visible study grammar for turbomachinery_energy_path."
+        },
+        {
+          "criterion": "blocked_operational_detail",
+          "good": "Keeps dimensions, propellant handling, ignition, sizing, and operating steps blocked.",
+          "bad": "Turns academic vocabulary into a build/test/operate recipe."
+        }
+      ]
+    }
+  ],
+  "boundary_note": "Academic liquid rocket propulsion study only. Do not generate buildable engine dimensions, propellant handling or ignition procedures, chamber pressure/thrust sizing, injector hole sizing, turbopump performance, test-stand operating steps, or flight-use instructions.",
+  "operability_profile": {
+    "operating_principle": "Academic liquid propulsion architecture study linking chamber/nozzle, injector taxonomy, regenerative cooling, feed topology, turbomachinery, instrumentation, controls, and thrust-frame load path.",
+    "primary_paths": {
+      "load_path": [
+        "chamber/nozzle thrust-frame path",
+        "feed/turbomachinery mount reactions",
+        "sensor/cover service loads"
+      ],
+      "fluid_path": [
+        "conceptual fuel/oxidizer feed topology",
+        "injector manifold zones",
+        "cooling jacket route labels"
+      ],
+      "thermal_path": [
+        "chamber liner to jacket",
+        "nozzle thermal callouts",
+        "regenerative cooling study path"
+      ],
+      "electrical_path": [
+        "DAQ/control/interlock power boundaries",
+        "sensor power routing"
+      ],
+      "signal_path": [
+        "pressure/temperature/vibration sensor paths",
+        "interlock state labels",
+        "DAQ connector routing"
+      ]
+    },
+    "solver_focus": [
+      "topology-only CFD/thermal study",
+      "thrust-frame FEA",
+      "instrumentation/control review"
+    ],
+    "blocked_outputs": [
+      "buildable injector sizing",
+      "propellant handling",
+      "ignition/start/test procedure",
+      "operating pressure/thrust/mass-flow recipe"
+    ]
+  }
+}

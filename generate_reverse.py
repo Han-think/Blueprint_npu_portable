@@ -9,11 +9,14 @@ generate_reverse.py -- 역설계 분석 학습 데이터 생성
 분석 태스크:
   1. structural  — 구조 취약점 + 보강 제안 (FEA 관점)
   2. thermal     — 열경로 병목 + 냉각 개선 (CFD 관점)
-  3. dfa         — 조립 효율 + 서비스성 개선 (DFA/DFM)
-  4. fmea        — 고장 모드 + 심각도 + 대책 (FMEA)
-  5. cost        — 원가 절감 + 대안 재료/공정
-  6. weight      — 경량화 기회 + 토폴로지 힌트
-  7. tolerance   — 공차 체인 + 누적 위험 + fit 개선
+  3. fluid       — 유로/압력손실/CFD topology 검토
+  4. electrical_signal — 전원/신호/하네스/EMI 경로 검토
+  5. solver_readiness — FEA/CFD/thermal/electrical 해석 준비도
+  6. dfa         — 조립 효율 + 서비스성 개선 (DFA/DFM)
+  7. fmea        — 고장 모드 + 심각도 + 대책 (FMEA)
+  8. cost        — 원가 절감 + 대안 재료/공정
+  9. weight      — 경량화 기회 + 토폴로지 힌트
+  10. tolerance  — 공차 체인 + 누적 위험 + fit 개선
 
 Usage:
   python generate_reverse.py --tasks all --max 50     # 50개 역분석 생성
@@ -38,12 +41,16 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent
 CURATION_LOG = REPO / "30_model" / "curation" / "curation_log.jsonl"
 REVERSE_LOG = REPO / "30_model" / "curation" / "reverse_log.jsonl"
+PACKS = REPO / "20_dataset" / "packs"
 
 LM_URL = os.environ.get("BP_LM_URL", "http://127.0.0.1:1234/v1").rstrip("/")
 LM_MODEL = os.environ.get("BP_LM_MODEL", "")
 LM_API_KEY = os.environ.get("BP_LM_API_KEY", "")
 
-TASK_LIST = ["structural", "thermal", "dfa", "fmea", "cost", "weight", "tolerance"]
+TASK_LIST = [
+    "structural", "thermal", "fluid", "electrical_signal", "solver_readiness",
+    "dfa", "fmea", "cost", "weight", "tolerance",
+]
 
 # ── 역설계 분석 태스크 정의 ─────────────────────────────────────────────────
 
@@ -80,6 +87,56 @@ REVERSE_TASKS = {
             'target, delta_temp_C, priority:1-5}],\n'
             ' "cfd_setup": {domain_mm:[x,y,z], inlet_faces:[], outlet_faces:[], '
             'wall_bc:[{face,type:adiabatic|fixed_T|heat_flux,value}]}}'
+        ),
+    },
+    "fluid": {
+        "name": "Fluid Path / CFD Topology Analysis",
+        "system": (
+            "You are Blueprint XPU Reverse Engineering Analyst — fluid/CFD topology domain. "
+            "Given a subsystem blueprint JSON plus operability profile, analyze flow paths, pressure boundaries, "
+            "ports, manifolds, vents, ducts, cooling channels, and OpenFOAM readiness. For high-risk propulsion or "
+            "pressure systems, stay topology- and analysis-focused: do not output buildable sizing, operating setpoints, "
+            "propellant handling, ignition, or test procedures. Output ONLY raw JSON, no prose.\n\n"
+            "Output schema:\n"
+            '{"analysis_type":"fluid", "seed":"<seed>", "part_label":"<label>",\n'
+            ' "flow_paths": [{path_id, from_feature, to_feature, medium_class:air|water|oil|coolant|gas|conceptual_propellant|none, '
+            'path_type:duct|channel|gallery|manifold|external_flow|leak_path|vent, continuity:complete|partial|missing}],\n'
+            ' "pressure_boundaries": [{feature, boundary_type:sealed|vented|open|conceptual, risk:low|med|high, reason}],\n'
+            ' "cfd_domain_hints": {domain_type:internal|external|conjugate|not_applicable, inlet_candidates:[], outlet_candidates:[], wall_groups:[], mesh_risk:low|med|high},\n'
+            ' "improvements": [{target, action:simplify_path|add_port_label|add_radius|add_inspection_port|separate_hot_cold_path|add_leak_witness, rationale, priority:1-5}],\n'
+            ' "blocked_operational_details": []}'
+        ),
+    },
+    "electrical_signal": {
+        "name": "Electrical / Signal Path Analysis",
+        "system": (
+            "You are Blueprint XPU Reverse Engineering Analyst — electrical, signal, harness, EMI, and control-boundary domain. "
+            "Given a subsystem blueprint JSON plus operability profile, analyze power paths, signal paths, connectors, grounding, "
+            "service disconnects, sensor routing, and EMI separation. For high-voltage or hazardous controls, stay architecture- "
+            "and safety-boundary focused; do not output live wiring instructions or unsafe operating procedures. Output ONLY raw JSON, no prose.\n\n"
+            "Output schema:\n"
+            '{"analysis_type":"electrical_signal", "seed":"<seed>", "part_label":"<label>",\n'
+            ' "power_paths": [{from_node, to_node, protection_feature, separation_risk:low|med|high}],\n'
+            ' "signal_paths": [{sensor_or_controller, route_feature, noise_risk:low|med|high, mitigation}],\n'
+            ' "grounding_emi": [{feature, issue:missing_ground|loop_risk|shield_gap|too_close_to_power|ok, recommendation}],\n'
+            ' "connector_serviceability": [{connector, access:good|limited|blocked, keying_present:true|false, improvement}],\n'
+            ' "control_boundaries": [{function, interlock_or_state_label, unsafe_detail_blocked:true|false}]}'
+        ),
+    },
+    "solver_readiness": {
+        "name": "Multiphysics Solver Readiness Review",
+        "system": (
+            "You are Blueprint XPU Reverse Engineering Analyst — multiphysics solver readiness domain. "
+            "Given a subsystem blueprint JSON plus operability profile, judge whether it can be exported into FEA, CFD/OpenFOAM, "
+            "thermal, and electrical/signal screening. Identify missing boundary conditions, mesh risks, and geometry export needs. "
+            "For hazardous systems, keep the review solver/topology-focused and avoid operational recipes. Output ONLY raw JSON, no prose.\n\n"
+            "Output schema:\n"
+            '{"analysis_type":"solver_readiness", "seed":"<seed>", "part_label":"<label>",\n'
+            ' "readiness": {fea:0-100, cfd:0-100, thermal:0-100, electrical_signal:0-100, assembly:0-100},\n'
+            ' "missing_inputs": [{solver:fea|cfd|thermal|electrical_signal|assembly, missing_field, why_needed}],\n'
+            ' "geometry_export_plan": [{artifact:step|stl|surface_groups|boundary_json|mesh_region, target_solver, required:true|false}],\n'
+            ' "boundary_condition_gaps": [{path:load|fluid|thermal|electrical|signal, gap, suggested_metadata}],\n'
+            ' "promotion_decision": {status:ready|watch|blocked, reason}}'
         ),
     },
     "dfa": {
@@ -304,6 +361,20 @@ def _compact_verify(v):
     return out
 
 
+def load_operability_profile(seed: str):
+    """Load the seed-level operability profile from its skeleton pack."""
+    if not seed:
+        return {}
+    path = PACKS / seed / "skeleton.json"
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+        return data.get("operability_profile") or {}
+    except Exception:
+        return {}
+
+
 def blueprint_summary(row):
     """Extract a compact blueprint representation for the LLM input.
     Keeps total prompt under ~6000 tokens so LLM has room to respond."""
@@ -328,6 +399,7 @@ def blueprint_summary(row):
         "vehicle": {"label": vehicle.get("label"), "desc": vehicle.get("desc"),
                      "material": vehicle.get("material"), "envelope": vehicle.get("envelope")},
         "seed": row.get("seed"),
+        "operability_profile": load_operability_profile(row.get("seed", "")),
         "engineering_scorecard": row.get("engineering_scorecard", {}),
         "parts": summary_parts,
     }
@@ -419,7 +491,7 @@ def show_stats():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tasks", default="all",
-                    help="all | comma list (structural,thermal,dfa,fmea,cost,weight,tolerance)")
+                    help="all | comma list (structural,thermal,fluid,electrical_signal,solver_readiness,dfa,fmea,cost,weight,tolerance)")
     ap.add_argument("--seed", default="", help="filter to specific seed")
     ap.add_argument("--max", type=int, default=50, help="max analyses to generate")
     ap.add_argument("--workers", type=int, default=int(os.environ.get("BP_WORKERS", "6")),

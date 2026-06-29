@@ -1,0 +1,250 @@
+{
+  "schema": "blueprint_skeleton_pack_v1",
+  "seed": "inline_6_engine_diesel",
+  "pass": "PASS-0",
+  "instruction": "Lay out one top-level node per required_subsystem, global datums, envelope, and stub interfaces. No detailed geometry in PASS-0.",
+  "disciplines": {
+    "structures": "Load-bearing bodies, frames, ribs, bosses, covers, and stiffness paths",
+    "rotating": "Shafts, bearings, gears, crank/rotor elements, couplings, and balance references",
+    "fluid": "Ports, channels, galleries, manifolds, volutes, pressure boundaries, and drain paths",
+    "thermal": "Heat paths, cooling plates/jackets/fins, thermal pads, and service-visible heat flow",
+    "power": "Cells, busbars, disconnects, power electronics, insulation, and protected terminals",
+    "electronics": "Boards, sensors, cable channels, EMI/grounding, connector keying, and covers",
+    "sealing": "Gaskets, O-ring grooves, gland interfaces, pressure caps, vents, and leak inspection",
+    "actuation": "Motors, screws, rails, linkages, valves, clutches, and serviceable actuator modules",
+    "integration": "Datums, fastener patterns, service access, alignment features, assembly order",
+    "safety_boundary": "Non-operational academic study/reference structure constraints, labels, blocked performance claims"
+  },
+  "required_subsystems": [
+    {
+      "id": "reinforced_block_head",
+      "discipline": "structures",
+      "function": "High-compression structural block/head grammar",
+      "evidence_features": [
+        "thick_deck",
+        "cross_bolt_boss",
+        "main_bearing_ladder",
+        "head_bolt_pattern",
+        "gasket_face"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "reinforced_block_head_domain_grammar"
+      ]
+    },
+    {
+      "id": "diesel_cranktrain",
+      "discipline": "rotating",
+      "function": "Heavy rotating group and bearing support",
+      "evidence_features": [
+        "main_journal",
+        "rod_cap_bolt_pad",
+        "counterweight",
+        "bearing_ladder",
+        "flywheel_flange"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "diesel_cranktrain_domain_grammar"
+      ]
+    },
+    {
+      "id": "common_rail_injection_study",
+      "discipline": "fluid",
+      "function": "Non-operational academic high-pressure layout vocabulary only",
+      "evidence_features": [
+        "common_rail",
+        "injector_well",
+        "return_line_channel",
+        "rail_bracket",
+        "harness_key"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "common_rail_injection_study_domain_grammar"
+      ]
+    },
+    {
+      "id": "turbo_air_exhaust_study",
+      "discipline": "fluid",
+      "function": "Turbo/exhaust/charge air routing reference structure",
+      "evidence_features": [
+        "turbine_shell",
+        "compressor_shell",
+        "oil_feed_boss",
+        "charge_pipe_flange",
+        "heat_shield"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "turbo_air_exhaust_study_domain_grammar"
+      ]
+    },
+    {
+      "id": "thermal_lubrication",
+      "discipline": "thermal",
+      "function": "Coolant/oil galleries, cooler and filter access",
+      "evidence_features": [
+        "coolant_port",
+        "oil_cooler_face",
+        "filter_cartridge_cap",
+        "drain_boss",
+        "service_plug"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "thermal_lubrication_domain_grammar"
+      ]
+    },
+    {
+      "id": "gear_timing_access",
+      "discipline": "rotating",
+      "function": "Timing gears and front housing serviceability",
+      "evidence_features": [
+        "gear_pocket",
+        "idler_axis",
+        "seal_bore",
+        "timing_mark",
+        "front_cover"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "gear_timing_access_domain_grammar"
+      ]
+    },
+    {
+      "id": "mounting_integration",
+      "discipline": "integration",
+      "function": "Mounts, lifting, bellhousing, service datums",
+      "evidence_features": [
+        "mount_bracket",
+        "lifting_lug",
+        "bellhousing_pattern",
+        "datum_pad",
+        "service_window"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "mounting_integration_domain_grammar"
+      ]
+    }
+  ],
+  "completeness_rule": "Every required_subsystem must appear in part_tree with at least one evidence_feature in geometry_ops; missing subsystem coverage is a scorecard failure, not style.",
+  "global_judgment_summary": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "good": "Every P0 evidence feature appears as a named part_tree child or a geometry_ops target.",
+          "bad": "Subsystem claims features in prose but leaves no geometry target or child node."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "good": "Coordinates span stations, ports, bearing seats, service faces, or datum pads.",
+          "bad": "All geometry is stacked at the origin or represented as one box/cylinder."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "good": "Uses pockets, channels, bosses, bolt patterns, ribs, seals, and inspection covers.",
+          "bad": "Only primitive body solids with no interface or service evidence."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "good": "Each adjacent interface names a joint family, DOF, clearance, datum, and mating feature.",
+          "bad": "Interfaces are vague mounts with no reciprocal feature or clearance."
+        },
+        {
+          "criterion": "service_access",
+          "good": "Wear parts, covers, plugs, connectors, seals, or cartridges have visible removal paths.",
+          "bad": "Maintenance-critical items are trapped behind sealed geometry."
+        },
+        {
+          "criterion": "load_or_flow_path_closure",
+          "good": "The main load, torque, heat, fluid, or current path is traceable through named features.",
+          "bad": "Functional flow/load claims stop at a shell without interfaces."
+        }
+      ]
+    }
+  ],
+  "connection_taxonomy": {
+    "rule": "Name each inter-part interface with connection type + DOF + numeric clearance.",
+    "dof_codes": "0=fixed, 1R=revolute, 1T=prismatic, 1R1T=cylindrical, 3R=spherical",
+    "families": {
+      "fastened": [
+        "bolted_through(0)",
+        "threaded_insert(0)",
+        "retainer_plate(0)"
+      ],
+      "rotating": [
+        "bearing_seat(1R)",
+        "shaft_coupling(1R)",
+        "gear_mesh(1R)"
+      ],
+      "fluid": [
+        "flanged_gasket(0)",
+        "threaded_port(0)",
+        "hose_barb(0)",
+        "gland_seal(0)"
+      ],
+      "electrical": [
+        "keyed_connector(0)",
+        "service_disconnect(0)",
+        "ground_lug(0)"
+      ],
+      "service": [
+        "sliding_tray(1T)",
+        "inspection_cover(0)",
+        "cartridge_retainer(0)"
+      ]
+    }
+  },
+  "boundary_note": null,
+  "operability_profile": {
+    "operating_principle": "Diesel engine architecture study with reinforced block/head, heavy cranktrain, common-rail topology, turbo air path, cooling/lubrication, and service datums.",
+    "primary_paths": {
+      "load_path": [
+        "high-compression block/head load path",
+        "bearing ladder reaction",
+        "mount/bellhousing reaction"
+      ],
+      "fluid_path": [
+        "common-rail layout topology",
+        "turbo/exhaust/charge air route",
+        "oil/coolant route"
+      ],
+      "thermal_path": [
+        "turbo/exhaust heat shield",
+        "oil cooler/filter module",
+        "head/block heat rejection"
+      ],
+      "electrical_path": [
+        "injector harness",
+        "sensor/actuator power",
+        "glow/control harness"
+      ],
+      "signal_path": [
+        "rail pressure sensor",
+        "temperature/boost sensors",
+        "engine control signals"
+      ]
+    },
+    "solver_focus": [
+      "reinforced housing FEA",
+      "air/exhaust routing CFD proxy",
+      "thermal shielding"
+    ]
+  }
+}

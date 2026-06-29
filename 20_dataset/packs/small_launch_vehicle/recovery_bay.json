@@ -5,19 +5,19 @@
   "subsystem": {
     "id": "recovery_bay",
     "discipline": "recovery_deployment",
-    "function": "Parachute bay dummy with deployment door hinge (display-level)",
+    "function": "Parachute bay reference article with deployment door hinge (study-level)",
     "evidence_features": [
       "recovery_bay",
       "deploy_door",
       "hinge",
-      "bolt_circle_dummy",
-      "impeller_dummy",
-      "combustion_chamber_dummy",
-      "turbopump_assembly_dummy",
-      "engine_display_cartridge"
+      "bolt_circle_reference article",
+      "impeller_reference article",
+      "combustion_chamber_reference article",
+      "turbopump_assembly_reference article",
+      "engine_study_cartridge"
     ],
     "criteria_refs": [
-      "small_launch_vehicle_mock_boundary",
+      "small_launch_vehicle_study_boundary",
       "geometry_grounding"
     ]
   },
@@ -71,7 +71,7 @@
           "criterion": "mechanism_named_not_implied",
           "weight": 9,
           "good": "Motion claims are grounded in a named mechanism type (four-bar linkage, cam, rack-and-pinion, lead screw, ratchet, geneva) with its pivot/axis geometry present.",
-          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth dummies, cam profiles, or linkage bars exist in geometry.",
+          "bad": "Design claims motion ('arm rotates', 'finger flexes') but no pivot holes, gear teeth reference articles, cam profiles, or linkage bars exist in geometry.",
           "signals": [
             "four_bar",
             "cam",
@@ -80,7 +80,7 @@
             "pivot_hole",
             "linkage_bar"
           ],
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry.",
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry.",
           "source_refs": [
             "sources/public/1800.mechanical.movements.devices.and.appliances.pdf"
           ]
@@ -88,61 +88,61 @@
       ]
     },
     {
-      "id": "small_launch_vehicle_mock_boundary",
-      "title": "Small Launch Vehicle Educational Mock Boundary",
+      "id": "small_launch_vehicle_study_boundary",
+      "title": "Small Launch Vehicle Educational Reference Structure Boundary",
       "criteria": [
         {
-          "criterion": "display_only_flowpath",
+          "criterion": "study_only_flowpath",
           "weight": 14,
-          "good": "Tank, interstage, avionics, recovery, and engine-display modules are labeled educational/display-only.",
+          "good": "Tank, interstage, avionics, recovery, and engine-academic study modules are labeled educational/academic non-operational.",
           "bad": "Output drifts into actionable propulsion, ignition, or flight-performance instructions.",
           "signals": [
-            "display-only",
-            "non-functional",
+            "academic non-operational",
+            "non-operational academic",
             "cutaway",
-            "educational mock"
+            "academic study structure"
           ],
-          "loop_feedback": "Use display-only cutaway modules and avoid operational propulsion, ignition, or flight-performance details."
+          "loop_feedback": "Use academic non-operational cutaway modules and avoid operational propulsion, ignition, or flight-performance details."
         },
         {
           "criterion": "cutaway_internal_readability",
           "weight": 12,
-          "good": "Cutaway shows tank dummies, interstage datum, avionics bay, recovery bay, and removable engine display cartridge.",
+          "good": "Cutaway shows tank reference articles, interstage datum, avionics bay, recovery bay, and removable engine academic study cartridge.",
           "bad": "Vehicle is a smooth cylinder with no internal evidence.",
           "signals": [
             "cutaway",
             "tank module",
             "interstage",
             "avionics bay",
-            "engine display cartridge"
+            "engine academic study cartridge"
           ],
-          "loop_feedback": "Add cutaway windows, slide-in tank dummies, interstage datum, avionics bay, and removable engine display cartridge."
+          "loop_feedback": "Add cutaway windows, slide-in tank reference articles, interstage datum, avionics bay, and removable engine academic study cartridge."
         },
         {
           "criterion": "safe_risk_language",
           "weight": 10,
-          "good": "Risk/verification focuses on mockup structure, inspection, interfaces, and unsafe overclaiming.",
+          "good": "Risk/verification focuses on study assembly structure, inspection, interfaces, and unsafe overclaiming.",
           "bad": "Risk/verification implies real launch readiness or manufacturing assurance.",
           "signals": [
-            "mockup",
+            "study assembly",
             "inspection",
             "overclaim",
             "not flight-ready"
           ],
-          "loop_feedback": "Frame verification around mock assembly inspection and explicitly avoid launch/propulsion readiness claims."
+          "loop_feedback": "Frame verification around study assembly inspection and explicitly avoid launch/propulsion readiness claims."
         },
         {
           "criterion": "stage_interface_datum_evidence",
           "weight": 9,
-          "good": "Interstage and module joints show locating datums, bolt-circle dummies, and alignment keys so the mock stack assembles repeatably for review.",
-          "bad": "Stages stack as butted cylinders with no locating feature, making the mock unassemblable and uninspectable.",
+          "good": "Interstage and module joints show locating datums, bolt-circle reference articles, and alignment keys so the reference structure stack assembles repeatably for review.",
+          "bad": "Stages stack as butted cylinders with no locating feature, making the reference structure unassemblable and uninspectable.",
           "signals": [
             "interstage_datum",
             "bolt_circle",
             "alignment_key",
             "stacking_feature"
           ],
-          "loop_feedback": "Add locating datums, dummy bolt circles, and alignment keys at every stage and module joint of the mock stack.",
+          "loop_feedback": "Add locating datums, reference article bolt circles, and alignment keys at every stage and module joint of the reference structure stack.",
           "source_refs": [
             "sources/public/nasa_systems_engineering_handbook_0.pdf"
           ]
@@ -186,7 +186,7 @@
         {
           "criterion": "dimensional_realism",
           "weight": 10,
-          "good": "Dimensions match small_launch_vehicle scale: 100-500mm dia, 500-2000mm length (display model). Wall thickness, hole diameters, fillet radii are physically plausible.",
+          "good": "Dimensions match small_launch_vehicle scale: 100-500mm dia, 500-2000mm length (study model). Wall thickness, hole diameters, fillet radii are physically plausible.",
           "bad": "Dimensions are placeholder (all 10mm) or unrealistic for the subsystem scale."
         }
       ]
@@ -213,5 +213,41 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 100-500mm dia, 500-2000mm length (display model). Environment: indoor display, handling loads, educational use. Design loads: static display 1g, handling 2g, no flight loads."
+  "boundary_note": "Subsystem scale: 100-500mm dia, 500-2000mm length (study model). Environment: indoor study, handling loads, educational use. Design loads: static study 1g, handling 2g, no flight loads.",
+  "operability_profile": {
+    "operating_principle": "Academic launch-vehicle architecture study that separates stage shell, tank reference articles, avionics, recovery, and propulsion study sections for reviewable load/path grammar.",
+    "primary_paths": {
+      "load_path": [
+        "stage stack axial load",
+        "interstage separation datum",
+        "fairing/payload adapter reaction"
+      ],
+      "fluid_path": [
+        "conceptual propellant route labels only",
+        "vent/drain label topology only"
+      ],
+      "thermal_path": [
+        "engine study heat-zone labels",
+        "avionics bay thermal isolation"
+      ],
+      "electrical_path": [
+        "battery/power study module to avionics",
+        "safe harness routing labels"
+      ],
+      "signal_path": [
+        "avionics to instrumentation labels",
+        "recovery command boundary labels"
+      ]
+    },
+    "solver_focus": [
+      "stage shell FEA",
+      "thermal zone annotation",
+      "non-operational topology review"
+    ],
+    "blocked_outputs": [
+      "operational propellant handling",
+      "ignition/test procedure",
+      "flight qualification instruction"
+    ]
+  }
 }

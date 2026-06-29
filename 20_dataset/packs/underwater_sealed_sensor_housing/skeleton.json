@@ -1,0 +1,213 @@
+{
+  "schema": "blueprint_skeleton_pack_v1",
+  "seed": "underwater_sealed_sensor_housing",
+  "pass": "PASS-0",
+  "instruction": "Lay out one top-level node per required_subsystem, global datums, envelope, and stub interfaces. No detailed geometry in PASS-0.",
+  "disciplines": {
+    "structures": "Load-bearing bodies, frames, ribs, bosses, covers, and stiffness paths",
+    "rotating": "Shafts, bearings, gears, crank/rotor elements, couplings, and balance references",
+    "fluid": "Ports, channels, galleries, manifolds, volutes, pressure boundaries, and drain paths",
+    "thermal": "Heat paths, cooling plates/jackets/fins, thermal pads, and service-visible heat flow",
+    "power": "Cells, busbars, disconnects, power electronics, insulation, and protected terminals",
+    "electronics": "Boards, sensors, cable channels, EMI/grounding, connector keying, and covers",
+    "sealing": "Gaskets, O-ring grooves, gland interfaces, pressure caps, vents, and leak inspection",
+    "actuation": "Motors, screws, rails, linkages, valves, clutches, and serviceable actuator modules",
+    "integration": "Datums, fastener patterns, service access, alignment features, assembly order",
+    "safety_boundary": "Non-operational academic study/reference structure constraints, labels, blocked performance claims"
+  },
+  "required_subsystems": [
+    {
+      "id": "pressure_shell",
+      "discipline": "structures",
+      "function": "Sealed cylinder and internal support",
+      "evidence_features": [
+        "cylindrical_shell",
+        "wall_thickness_cue",
+        "internal_rail",
+        "external_cradle_pad",
+        "datum_mark"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "pressure_shell_domain_grammar"
+      ]
+    },
+    {
+      "id": "window_and_caps",
+      "discipline": "sealing",
+      "function": "Front/rear caps and O-ring boundaries",
+      "evidence_features": [
+        "sensor_window",
+        "o_ring_groove",
+        "retaining_ring",
+        "service_screw",
+        "puller_hole"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "window_and_caps_domain_grammar"
+      ]
+    },
+    {
+      "id": "cable_penetration",
+      "discipline": "electronics",
+      "function": "Cable gland and strain relief",
+      "evidence_features": [
+        "cable_gland",
+        "bend_relief",
+        "potting_pocket",
+        "connector_key",
+        "strain_relief"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "cable_penetration_domain_grammar"
+      ]
+    },
+    {
+      "id": "internal_sensor_tray",
+      "discipline": "electronics",
+      "function": "Slide-in electronics and sensor tray",
+      "evidence_features": [
+        "board_tray",
+        "standoff",
+        "desiccant_pocket",
+        "ground_lug",
+        "slide_rail"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "internal_sensor_tray_domain_grammar"
+      ]
+    },
+    {
+      "id": "marine_mount_service",
+      "discipline": "integration",
+      "function": "Cradle, anode, leak test, labels",
+      "evidence_features": [
+        "clamp_band",
+        "anode_pad",
+        "drain_path",
+        "leak_test_port",
+        "serial_plate"
+      ],
+      "criteria_refs": [
+        "geometry_grounding",
+        "assembly_integration",
+        "marine_mount_service_domain_grammar"
+      ]
+    }
+  ],
+  "completeness_rule": "Every required_subsystem must appear in part_tree with at least one evidence_feature in geometry_ops; missing subsystem coverage is a scorecard failure, not style.",
+  "global_judgment_summary": [
+    {
+      "id": "geometry_grounding",
+      "criteria": [
+        {
+          "criterion": "p0_feature_mapping",
+          "good": "Every P0 evidence feature appears as a named part_tree child or a geometry_ops target.",
+          "bad": "Subsystem claims features in prose but leaves no geometry target or child node."
+        },
+        {
+          "criterion": "coordinate_distribution",
+          "good": "Coordinates span stations, ports, bearing seats, service faces, or datum pads.",
+          "bad": "All geometry is stacked at the origin or represented as one box/cylinder."
+        },
+        {
+          "criterion": "non_box_feature_variety",
+          "good": "Uses pockets, channels, bosses, bolt patterns, ribs, seals, and inspection covers.",
+          "bad": "Only primitive body solids with no interface or service evidence."
+        }
+      ]
+    },
+    {
+      "id": "assembly_integration",
+      "criteria": [
+        {
+          "criterion": "connection_type_named",
+          "good": "Each adjacent interface names a joint family, DOF, clearance, datum, and mating feature.",
+          "bad": "Interfaces are vague mounts with no reciprocal feature or clearance."
+        },
+        {
+          "criterion": "service_access",
+          "good": "Wear parts, covers, plugs, connectors, seals, or cartridges have visible removal paths.",
+          "bad": "Maintenance-critical items are trapped behind sealed geometry."
+        },
+        {
+          "criterion": "load_or_flow_path_closure",
+          "good": "The main load, torque, heat, fluid, or current path is traceable through named features.",
+          "bad": "Functional flow/load claims stop at a shell without interfaces."
+        }
+      ]
+    }
+  ],
+  "connection_taxonomy": {
+    "rule": "Name each inter-part interface with connection type + DOF + numeric clearance.",
+    "dof_codes": "0=fixed, 1R=revolute, 1T=prismatic, 1R1T=cylindrical, 3R=spherical",
+    "families": {
+      "fastened": [
+        "bolted_through(0)",
+        "threaded_insert(0)",
+        "retainer_plate(0)"
+      ],
+      "rotating": [
+        "bearing_seat(1R)",
+        "shaft_coupling(1R)",
+        "gear_mesh(1R)"
+      ],
+      "fluid": [
+        "flanged_gasket(0)",
+        "threaded_port(0)",
+        "hose_barb(0)",
+        "gland_seal(0)"
+      ],
+      "electrical": [
+        "keyed_connector(0)",
+        "service_disconnect(0)",
+        "ground_lug(0)"
+      ],
+      "service": [
+        "sliding_tray(1T)",
+        "inspection_cover(0)",
+        "cartridge_retainer(0)"
+      ]
+    }
+  },
+  "boundary_note": null,
+  "operability_profile": {
+    "operating_principle": "Sealed marine electronics housing that carries pressure loads through shell/caps, routes cable penetration safely, and supports internal sensor/electronics trays.",
+    "primary_paths": {
+      "load_path": [
+        "external pressure to shell/caps",
+        "cradle clamp reaction",
+        "window/cap retaining ring"
+      ],
+      "fluid_path": [
+        "external water exclusion boundary",
+        "leak-test port path",
+        "drain path"
+      ],
+      "thermal_path": [
+        "electronics heat to shell/water",
+        "window/cap thermal path"
+      ],
+      "electrical_path": [
+        "cable gland power entry",
+        "grounding to tray/shell"
+      ],
+      "signal_path": [
+        "sensor signal through cable gland",
+        "internal board connector routing"
+      ]
+    },
+    "solver_focus": [
+      "pressure shell FEA",
+      "seal/gland leak boundary",
+      "thermal dissipation to water"
+    ]
+  }
+}

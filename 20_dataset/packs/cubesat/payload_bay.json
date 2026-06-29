@@ -111,7 +111,7 @@
     },
     {
       "id": "cubesat",
-      "title": "3U CubeSat Mock Assembly Criteria",
+      "title": "3U CubeSat Reference Structure Assembly Criteria",
       "criteria": [
         {
           "criterion": "rail_standoff_visibility",
@@ -142,16 +142,16 @@
           "loop_feedback": "Add removable avionics/battery trays, antenna slot, and labeled service cover geometry."
         },
         {
-          "criterion": "space_mock_boundary",
+          "criterion": "space_study_boundary",
           "weight": 9,
-          "good": "Design is an educational structural/electrical mockup and avoids flight qualification claims.",
+          "good": "Design is an educational structural/electrical study assembly and avoids flight qualification claims.",
           "bad": "Output claims deployer compliance, orbital readiness, or mission certification.",
           "signals": [
-            "mockup",
+            "study assembly",
             "design review",
             "not flight qualified"
           ],
-          "loop_feedback": "State CubeSat as educational mock assembly; include inspection/readiness evidence, not flight certification claims."
+          "loop_feedback": "State CubeSat as academic study structure assembly; include inspection/readiness evidence, not flight certification claims."
         },
         {
           "criterion": "subsystem_budget_decomposition",
@@ -273,5 +273,36 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 100x100x340mm (3U CubeSat). Environment: LEO vacuum, -40 to +80C thermal cycling, radiation. Design loads: launch vibration 20g, deployment shock, solar pressure. Thermal design: include heat source/sink zones with W or degC values in verify.boundary_conditions.thermal_zones."
+  "boundary_note": "Subsystem scale: 100x100x340mm (3U CubeSat). Environment: LEO vacuum, -40 to +80C thermal cycling, radiation. Design loads: launch vibration 20g, deployment shock, solar pressure. Thermal design: include heat source/sink zones with W or degC values in verify.boundary_conditions.thermal_zones.",
+  "operability_profile": {
+    "operating_principle": "Small spacecraft architecture that routes loads through rails/frame, power through EPS/battery/solar, data through avionics stack, and heat to radiator/structure paths.",
+    "primary_paths": {
+      "load_path": [
+        "rail/frame launch load path",
+        "panel hinge load path",
+        "payload bench to frame"
+      ],
+      "fluid_path": [],
+      "thermal_path": [
+        "battery to frame conduction",
+        "avionics heat to radiator face",
+        "solar panel thermal exposure"
+      ],
+      "electrical_path": [
+        "solar panel to EPS",
+        "battery to PDU",
+        "PDU to avionics/payload"
+      ],
+      "signal_path": [
+        "antenna to radio",
+        "OBC to sensors",
+        "payload data to storage/downlink"
+      ]
+    },
+    "solver_focus": [
+      "modal/launch-load FEA",
+      "thermal balance proxy",
+      "harness clearance review"
+    ]
+  }
 }

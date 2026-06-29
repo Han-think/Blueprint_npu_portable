@@ -255,5 +255,36 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 800-3000mm wingspan, 100-250mm chord. Environment: outdoor flight, -10 to +45C, dust/humidity. Design loads: wing bending 3g, servo 2-8Nm, catapult launch 15g."
+  "boundary_note": "Subsystem scale: 800-3000mm wingspan, 100-250mm chord. Environment: outdoor flight, -10 to +45C, dust/humidity. Design loads: wing bending 3g, servo 2-8Nm, catapult launch 15g.",
+  "operability_profile": {
+    "operating_principle": "Fixed-wing UAV architecture that carries lift through spar/rib stations, routes propulsion/power through the fuselage, and isolates payload/sensor bays.",
+    "primary_paths": {
+      "load_path": [
+        "wing spar bending path",
+        "landing/payload bay reaction",
+        "motor mount thrust reaction"
+      ],
+      "fluid_path": [
+        "external airflow over wing/body",
+        "cooling airflow through electronics bay"
+      ],
+      "thermal_path": [
+        "battery heat to bay vents",
+        "ESC/motor heat rejection"
+      ],
+      "electrical_path": [
+        "battery to ESC/motor",
+        "battery to avionics/payload"
+      ],
+      "signal_path": [
+        "autopilot to servos",
+        "payload sensor to datalink"
+      ]
+    },
+    "solver_focus": [
+      "aero CFD proxy/OpenFOAM case",
+      "wing bending FEA",
+      "payload bay cooling"
+    ]
+  }
 }

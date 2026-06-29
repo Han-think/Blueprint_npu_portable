@@ -8,7 +8,7 @@
     "actuation": "Motors, servos, brakes, reducers and their mounting/replacement",
     "power": "Battery, solar generation, charging, distribution, connectors",
     "electronics": "Boards, drivers, wiring, signal routing, grounding",
-    "gnc": "Attitude/position sensing and control hardware evidence (mock level)",
+    "gnc": "Attitude/position sensing and control hardware evidence (reference structure level)",
     "human_factors": "Wearability, ergonomics, don/doff, comfort, safety contact",
     "integration": "Datums, interfaces, harness routing, service access, assembly order"
   },
@@ -104,7 +104,7 @@
         },
         {
           "criterion": "mechanism_named_not_implied",
-          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear dummy geometry."
+          "loop_feedback": "Name the mechanism type behind every motion claim and add its pivot holes, links, or cam/gear reference article geometry."
         }
       ]
     },
@@ -202,5 +202,33 @@
         "fluid_manifold(0)"
       ]
     }
+  },
+  "operability_profile": {
+    "operating_principle": "Wearable robotic hand interface that transfers finger motion through linkages/cables while preserving ergonomic fit, sensor routing, and safe contact surfaces.",
+    "primary_paths": {
+      "load_path": [
+        "finger link force path",
+        "palm base reaction path",
+        "strap/contact pressure path"
+      ],
+      "fluid_path": [],
+      "thermal_path": [
+        "electronics heat to palm shell",
+        "skin-contact thermal comfort"
+      ],
+      "electrical_path": [
+        "battery/control board to actuators",
+        "sensor power rail"
+      ],
+      "signal_path": [
+        "finger sensors to controller",
+        "haptic actuator command routing"
+      ]
+    },
+    "solver_focus": [
+      "linkage clearance",
+      "ergonomic contact pressure",
+      "cable bend radius"
+    ]
   }
 }

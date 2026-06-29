@@ -172,7 +172,7 @@
         {
           "criterion": "dimensional_realism",
           "weight": 10,
-          "good": "Dimensions match small_launch_vehicle scale: 100-500mm dia, 500-2000mm length (display model). Wall thickness, hole diameters, fillet radii are physically plausible.",
+          "good": "Dimensions match small_launch_vehicle scale: 100-500mm dia, 500-2000mm length (study model). Wall thickness, hole diameters, fillet radii are physically plausible.",
           "bad": "Dimensions are placeholder (all 10mm) or unrealistic for the subsystem scale."
         }
       ]
@@ -206,5 +206,41 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 100-500mm dia, 500-2000mm length (display model). Environment: indoor display, handling loads, educational use. Design loads: static display 1g, handling 2g, no flight loads."
+  "boundary_note": "Subsystem scale: 100-500mm dia, 500-2000mm length (study model). Environment: indoor study, handling loads, educational use. Design loads: static study 1g, handling 2g, no flight loads.",
+  "operability_profile": {
+    "operating_principle": "Academic launch-vehicle architecture study that separates stage shell, tank reference articles, avionics, recovery, and propulsion study sections for reviewable load/path grammar.",
+    "primary_paths": {
+      "load_path": [
+        "stage stack axial load",
+        "interstage separation datum",
+        "fairing/payload adapter reaction"
+      ],
+      "fluid_path": [
+        "conceptual propellant route labels only",
+        "vent/drain label topology only"
+      ],
+      "thermal_path": [
+        "engine study heat-zone labels",
+        "avionics bay thermal isolation"
+      ],
+      "electrical_path": [
+        "battery/power study module to avionics",
+        "safe harness routing labels"
+      ],
+      "signal_path": [
+        "avionics to instrumentation labels",
+        "recovery command boundary labels"
+      ]
+    },
+    "solver_focus": [
+      "stage shell FEA",
+      "thermal zone annotation",
+      "non-operational topology review"
+    ],
+    "blocked_outputs": [
+      "operational propellant handling",
+      "ignition/test procedure",
+      "flight qualification instruction"
+    ]
+  }
 }

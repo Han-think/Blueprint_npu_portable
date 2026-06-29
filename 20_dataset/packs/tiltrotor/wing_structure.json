@@ -141,16 +141,16 @@
           "loop_feedback": "Expose wing spar sockets, fuselage spine datum, payload bay, and slide-in battery service feature."
         },
         {
-          "criterion": "safe_mock_vtol_boundary",
+          "criterion": "safe_study_vtol_boundary",
           "weight": 9,
-          "good": "Output remains educational mockup, avoiding operational flight tuning or control-law details.",
+          "good": "Output remains academic study structureup, avoiding operational flight tuning or control-law details.",
           "bad": "Design claims BVLOS capability, flight readiness, or actionable aircraft tuning.",
           "signals": [
-            "educational mock",
-            "display-only",
+            "academic study structure",
+            "academic non-operational",
             "design-review evidence"
           ],
-          "loop_feedback": "Frame VTOL features as educational mock assembly evidence, not flight-qualified or operational design."
+          "loop_feedback": "Frame VTOL features as academic study structure assembly evidence, not flight-qualified or operational design."
         },
         {
           "criterion": "nacelle_load_and_service_path",
@@ -248,5 +248,36 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 200-1500mm wingspan, 50-300mm fuselage dia. Environment: outdoor flight, -20 to +50C, rain/dust/salt. Design loads: rotor thrust 20-200N, tilt servo 5-30Nm, 3g maneuvering. Structural: include fixture_points with [x,y,z] and type (fixed/pinned) in verify.boundary_conditions."
+  "boundary_note": "Subsystem scale: 200-1500mm wingspan, 50-300mm fuselage dia. Environment: outdoor flight, -20 to +50C, rain/dust/salt. Design loads: rotor thrust 20-200N, tilt servo 5-30Nm, 3g maneuvering. Structural: include fixture_points with [x,y,z] and type (fixed/pinned) in verify.boundary_conditions.",
+  "operability_profile": {
+    "operating_principle": "VTOL aircraft architecture that transitions thrust vector through nacelle tilt axes while preserving wing load paths, slack-loop harnesses, and control authority.",
+    "primary_paths": {
+      "load_path": [
+        "nacelle thrust to wing spar",
+        "tilt bearing reaction",
+        "landing gear reaction"
+      ],
+      "fluid_path": [
+        "rotor slipstream over wing",
+        "cooling airflow through nacelles"
+      ],
+      "thermal_path": [
+        "motor/ESC heat to nacelle vents",
+        "battery bay heat path"
+      ],
+      "electrical_path": [
+        "battery to tilt/propulsion ESCs",
+        "power distribution to avionics"
+      ],
+      "signal_path": [
+        "flight controller to tilt servo",
+        "IMU/GPS/pitot to controller"
+      ]
+    },
+    "solver_focus": [
+      "tilt-axis joint FEA",
+      "rotor/wing flow interaction proxy",
+      "harness slack clearance"
+    ]
+  }
 }

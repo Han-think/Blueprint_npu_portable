@@ -54,7 +54,7 @@
         {
           "criterion": "wearable_comfort_boundary",
           "weight": 9,
-          "good": "Rigid mock assembly preserves soft-contact cues, wrist quick release, and ergonomic clearance.",
+          "good": "Rigid study assembly preserves soft-contact cues, wrist quick release, and ergonomic clearance.",
           "bad": "Rigid shell ignores don/doff, comfort, and finger clearance.",
           "signals": [
             "wrist band",
@@ -187,5 +187,33 @@
       ]
     }
   ],
-  "boundary_note": "Subsystem scale: 150-250mm palm, 60-100mm per finger segment. Environment: human contact, skin-safe, 20-35C, sweat/moisture. Design loads: finger force 2-10N, cable tension 5-30N, 100k+ flex cycles."
+  "boundary_note": "Subsystem scale: 150-250mm palm, 60-100mm per finger segment. Environment: human contact, skin-safe, 20-35C, sweat/moisture. Design loads: finger force 2-10N, cable tension 5-30N, 100k+ flex cycles.",
+  "operability_profile": {
+    "operating_principle": "Wearable robotic hand interface that transfers finger motion through linkages/cables while preserving ergonomic fit, sensor routing, and safe contact surfaces.",
+    "primary_paths": {
+      "load_path": [
+        "finger link force path",
+        "palm base reaction path",
+        "strap/contact pressure path"
+      ],
+      "fluid_path": [],
+      "thermal_path": [
+        "electronics heat to palm shell",
+        "skin-contact thermal comfort"
+      ],
+      "electrical_path": [
+        "battery/control board to actuators",
+        "sensor power rail"
+      ],
+      "signal_path": [
+        "finger sensors to controller",
+        "haptic actuator command routing"
+      ]
+    },
+    "solver_focus": [
+      "linkage clearance",
+      "ergonomic contact pressure",
+      "cable bend radius"
+    ]
+  }
 }
