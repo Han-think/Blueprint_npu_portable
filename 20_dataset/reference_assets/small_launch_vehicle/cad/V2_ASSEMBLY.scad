@@ -1,0 +1,44 @@
+include<dimensions.scad>;
+rotate([90,0,0])
+difference(){
+	rotate([0,0,360/(finCount*2)])
+	union(){
+		//Assembly
+		import("STL/engineBay.stl");
+		for ( i = [0:360/finCount:360]){
+			rotate([0,0,i]){
+				translate([finThickness/2,-mainHousing_r,0]){
+					rotate([0,-90,0]){
+						import("STL/fins.stl");
+					}
+				}
+			}
+		}
+		import("STL/endRing.stl");
+		translate([0,0,finRoot+.1]){
+			import("STL/ring.stl");
+		}
+		translate([0,0,mainHousing_l-35]){
+			import("STL/ring.stl");
+		}
+		translate([0,0,mainHousing_l/2]){
+			import("STL/ring.stl");
+		}
+		rotate([0,0,(360/finCount)/2])
+		import("STL/mainBody.stl");
+
+		for ( i = [0:360/subCount:360]){
+			rotate([0,0,i]){
+				translate([subThickness/2,-mainHousing_r,subPosition+subRoot]){
+					rotate([0,90,0]){
+						import("STL/subFins.stl");
+					}
+				}
+			}
+		}
+		translate([0,0,mainHousing_l]){
+			import("STL/noseCone.stl");
+		}
+	}
+	cube([1000,1000,1000]);
+}
