@@ -1,0 +1,30 @@
+{
+  "schema": "blueprint_reference_seed_metadata_v1",
+  "seed": "battery_pack_module",
+  "reference_goals": [
+    "Cell carrier tray — cell pocket geometry, compression pads, spacing",
+    "Busbar and interconnect — welded/bolted tab routing, current path",
+    "BMS integration — sensing harness channel, voltage tap, thermistor pocket",
+    "Thermal interface — cold plate contact zone, thermal pad recess, leak channel",
+    "Enclosure — sealed lid, vent path, service disconnect, isolation end plates",
+    "Safety features — fuse/pyro-disconnect, warning label zone, crash structure"
+  ],
+  "preferred_formats": ["step", "stp", "stl", "scad", "fcstd", "pdf"],
+  "needed_metadata": [
+    "BOM — cell format (cylindrical/prismatic/pouch), busbar material, enclosure material",
+    "Cell arrangement — series/parallel config, nominal voltage/capacity",
+    "Thermal resistance budget — cell-to-coolant path",
+    "Assembly sequence — cell insertion, busbar install, lid seal, harness connect"
+  ],
+  "needed_engineering_docs": [
+    "Thermal boundary — cell heat generation rates, coolant flow/temp",
+    "Structural boundary — crush load cases, vibration spectrum (GRMS)",
+    "Electrical boundary — isolation test voltage, current interrupt response"
+  ],
+  "safety_boundary": "No-live-energy training reference module; no cell chemistry recipes, charging algorithms, or BMS firmware.",
+  "crawl_targets": [
+    {"repo": "nophead/NopSCADlib", "search": "battery fuseholder connector pcb"},
+    {"repo": "ElmerCSC/elmerfem", "search": "battery heat thermal"},
+    {"source": "GrabCAD", "search": "battery pack module cell carrier STEP", "mode": "manual_download"}
+  ]
+}

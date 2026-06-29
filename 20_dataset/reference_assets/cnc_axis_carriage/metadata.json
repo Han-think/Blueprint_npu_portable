@@ -1,0 +1,29 @@
+{
+  "schema": "blueprint_reference_seed_metadata_v1",
+  "seed": "cnc_axis_carriage",
+  "reference_goals": [
+    "Linear guidance — rail/block interface, preload adjustment, wiper lip",
+    "Ball screw drive — nut housing, angular contact bearings, axial preload",
+    "Motor mount — NEMA/servo flange, coupling guard, belt/direct drive",
+    "Carriage structure — gantry plate, ribbing, tool mount interface",
+    "Cable management — drag chain, protected cable channel, connector panel",
+    "Sensor integration — home/limit switch mount, linear encoder scale"
+  ],
+  "preferred_formats": ["step", "stp", "stl", "scad", "fcstd", "pdf"],
+  "needed_metadata": [
+    "BOM — rail type (HGR/SBR), screw lead/diameter, motor NEMA size, bearing type",
+    "Accuracy specs — positioning repeatability, backlash, thermal growth",
+    "Lubrication schedule — grease type, interval, fitting locations",
+    "Assembly sequence — rail alignment, bearing preload, motor coupling"
+  ],
+  "needed_engineering_docs": [
+    "Structural boundary — cutting force vector, acceleration loads, deflection limit",
+    "Thermal boundary — motor/bearing heat, thermal growth compensation",
+    "Vibration — resonance avoidance, damping requirements"
+  ],
+  "safety_boundary": "Mechanical design reference only; no spindle/cutting parameters or machine control firmware.",
+  "crawl_targets": [
+    {"repo": "nophead/NopSCADlib", "search": "linear rail bearing stepper pulley drag_chain"},
+    {"source": "GrabCAD", "search": "CNC linear axis carriage ball screw STEP", "mode": "manual_download"}
+  ]
+}

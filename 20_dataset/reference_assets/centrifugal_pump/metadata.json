@@ -1,0 +1,30 @@
+{
+  "schema": "blueprint_reference_seed_metadata_v1",
+  "seed": "centrifugal_pump",
+  "reference_goals": [
+    "Volute/casing — spiral geometry, cutwater tongue, discharge flange",
+    "Impeller — vane count/profile, wear ring, hub/shroud, balance holes",
+    "Mechanical seal — cartridge assembly, gland plate, flush/quench ports",
+    "Bearing frame — radial/thrust bearing housing, oil level sight glass, grease fitting",
+    "Back-pull-out design — removal sequence, coupling guard, alignment datums",
+    "Baseplate and piping — suction/discharge flange orientation, drain/vent plugs"
+  ],
+  "preferred_formats": ["step", "stp", "fcstd", "stl", "obj", "pdf"],
+  "needed_metadata": [
+    "Hydraulic performance curve (H-Q, efficiency, NPSH) — reference shape only",
+    "BOM — impeller material (316SS, duplex, bronze), shaft, mechanical seal type",
+    "Maintenance interval checklist — seal replacement, bearing inspection, alignment",
+    "Flange standards reference (ASME B16.5 / EN 1092)"
+  ],
+  "needed_engineering_docs": [
+    "CFD boundary conditions — inlet velocity profile, outlet pressure, wall roughness",
+    "Structural — shaft deflection limits, critical speed margin, bearing L10 life",
+    "Seal flush plan (API Plan 11/13/21/32/53)"
+  ],
+  "safety_boundary": "Design reference and hydraulic grammar only; no operational start/stop procedures or process-specific chemical compatibility claims.",
+  "crawl_targets": [
+    {"repo": "OpenFOAM/OpenFOAM-dev", "search": "pump impeller mixer tutorial"},
+    {"repo": "FreeCAD/FreeCAD-library", "search": "pump impeller volute flange"},
+    {"source": "GrabCAD", "search": "centrifugal pump cutaway STEP", "mode": "manual_download"}
+  ]
+}

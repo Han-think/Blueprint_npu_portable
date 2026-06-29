@@ -1,0 +1,30 @@
+{
+  "schema": "blueprint_reference_seed_metadata_v1",
+  "seed": "gearbox_reducer",
+  "reference_goals": [
+    "Gear train — spur/helical/bevel mesh, module/pitch, face width, profile shift",
+    "Housing — split-case geometry, inspection cover, bearing bore datums",
+    "Shaft/bearing — stepped shaft, key/spline, radial + thrust bearing arrangement",
+    "Sealing — input/output lip seals, housing gasket, breather/vent",
+    "Lubrication — oil level sight glass, fill/drain plugs, splash/forced-feed path",
+    "Mounting — foot/flange mount, torque arm, output coupling interface"
+  ],
+  "preferred_formats": ["step", "stp", "stl", "scad", "fcstd", "pdf"],
+  "needed_metadata": [
+    "BOM — gear material (case-hardened 20MnCr5, ground 16MnCr5), housing material",
+    "Gear data sheet — module, tooth count, helix angle, center distance, backlash",
+    "Bearing selection — designation, L10 life, preload method (shim stack/locknut)",
+    "Assembly sequence — gear/shaft subassembly, bearing press, housing close, oil fill"
+  ],
+  "needed_engineering_docs": [
+    "Structural boundary — input torque, shock factor, tooth bending/contact stress",
+    "Thermal boundary — power loss heat rejection, oil sump temperature limit",
+    "Vibration — gear mesh frequency, housing natural frequency avoidance"
+  ],
+  "safety_boundary": "Design reference only; no specific load ratings for sizing certificates.",
+  "crawl_targets": [
+    {"repo": "openscad/MCAD", "search": "gear involute bearing motor shaft"},
+    {"repo": "FreeCAD/FreeCAD-library", "search": "gearbox gear reducer"},
+    {"source": "GrabCAD", "search": "gearbox reducer cutaway STEP", "mode": "manual_download"}
+  ]
+}

@@ -88,6 +88,109 @@
         "mode": "manual_repo_list",
         "max_depth": 0
       }
+    },
+    {
+      "id": "mcad_openscad",
+      "label": "OpenSCAD MCAD Library",
+      "kind": "open_source_repository_seed",
+      "base_url": "https://github.com/openscad/MCAD",
+      "seed_targets": ["gearbox_reducer", "hydraulic_manifold", "cnc_axis_carriage"],
+      "license_hint": "LGPL-2.1; parametric mechanical parts library. Reference grammar only until license review.",
+      "crawl": {
+        "enabled": true,
+        "mode": "github_repo",
+        "max_depth": 1,
+        "include_url_regex": "(?i)(bearing|gear|involute|motor|screw|stepper|pulley|nut|bolt|shaft|bushing|coupling).*\\.scad$",
+        "exclude_url_regex": "(?i)(bitmap|lego|test|example|logo)"
+      }
+    },
+    {
+      "id": "nopscadlib",
+      "label": "NopSCADlib Parametric Parts",
+      "kind": "open_source_repository_seed",
+      "base_url": "https://github.com/nophead/NopSCADlib",
+      "seed_targets": ["battery_pack_module", "cnc_axis_carriage", "underwater_sealed_sensor_housing"],
+      "license_hint": "GPL-3.0; detailed parametric hardware library. Reference grammar only until license review.",
+      "crawl": {
+        "enabled": true,
+        "mode": "github_repo",
+        "max_depth": 2,
+        "include_url_regex": "(?i)(battery|bearing|rail|stepper|motor|o_ring|seal|box|cable|connector|pcb|drag_chain|fuseholder).*\\.scad$",
+        "exclude_url_regex": "(?i)(examples|stls|tests|all\\.scad)"
+      }
+    },
+    {
+      "id": "freecad_models",
+      "label": "FreeCAD Example Models",
+      "kind": "open_source_tool_and_examples",
+      "base_url": "https://github.com/FreeCAD/FreeCAD-library",
+      "seed_targets": ["centrifugal_pump", "gearbox_reducer", "inline_6_engine_gasoline", "inline_6_engine_diesel"],
+      "license_hint": "CC-BY-3.0 / LGPL; FreeCAD community library. Verify per-file license before training use.",
+      "crawl": {
+        "enabled": true,
+        "mode": "github_repo",
+        "max_depth": 2,
+        "include_url_regex": "(?i)(pump|impeller|volute|gear|engine|piston|valve|manifold|bearing|coupling|flange).*\\.(step|stp|fcstd|stl)$",
+        "exclude_url_regex": "(?i)(logo|icon|test|thumbnail)"
+      }
+    },
+    {
+      "id": "grabcad_community",
+      "label": "GrabCAD Community Library",
+      "kind": "community_model_repository",
+      "base_url": "https://grabcad.com/library",
+      "seed_targets": ["centrifugal_pump", "inline_6_engine_gasoline", "inline_6_engine_diesel", "liquid_cold_plate", "gearbox_reducer"],
+      "license_hint": "Per-model CC/public domain; must verify each model's license individually. Manual download only.",
+      "crawl": {
+        "enabled": false,
+        "mode": "manual_download",
+        "max_depth": 0
+      }
+    },
+    {
+      "id": "openfoam_tutorials",
+      "label": "OpenFOAM Tutorial Geometries",
+      "kind": "open_source_tool_and_examples",
+      "base_url": "https://github.com/OpenFOAM/OpenFOAM-dev",
+      "seed_targets": ["centrifugal_pump", "liquid_cold_plate"],
+      "license_hint": "GPL-3.0; CFD tutorial meshes/geometries. Reference boundary condition grammar only.",
+      "crawl": {
+        "enabled": true,
+        "mode": "github_repo",
+        "max_depth": 2,
+        "include_url_regex": "(?i)(pump|mixer|impeller|channel|heat|cold|plate).*\\.(stl|obj|step)$",
+        "exclude_url_regex": "(?i)(test|doc|logo|icon)"
+      }
+    },
+    {
+      "id": "openrocket",
+      "label": "OpenRocket Motor/Component Database",
+      "kind": "open_source_tool_and_examples",
+      "base_url": "https://github.com/openrocket/openrocket",
+      "seed_targets": ["small_launch_vehicle", "liquid_rocket_engine_academic"],
+      "license_hint": "GPL-3.0; rocket simulation software. Motor specs and component geometry for reference grammar.",
+      "crawl": {
+        "enabled": true,
+        "mode": "github_repo",
+        "max_depth": 2,
+        "include_url_regex": "(?i)(motor|engine|nozzle|thrust|chamber|component|preset).*\\.(csv|json|xml|stl|step|obj)$",
+        "exclude_url_regex": "(?i)(test|doc|logo|icon|gradle|maven)"
+      }
+    },
+    {
+      "id": "caelinux_elmer_examples",
+      "label": "Elmer FEM Tutorial Geometries",
+      "kind": "open_source_tool_and_examples",
+      "base_url": "https://github.com/ElmerCSC/elmerfem",
+      "seed_targets": ["liquid_cold_plate", "battery_pack_module"],
+      "license_hint": "GPL-2.0; FEM solver tutorial geometries. Boundary condition / mesh grammar reference.",
+      "crawl": {
+        "enabled": true,
+        "mode": "github_repo",
+        "max_depth": 2,
+        "include_url_regex": "(?i)(heat|thermal|channel|plate|battery|convection).*\\.(stl|step|stp|geo|msh)$",
+        "exclude_url_regex": "(?i)(test|doc|logo|icon)"
+      }
     }
   ]
 }

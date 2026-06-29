@@ -1,0 +1,32 @@
+{
+  "schema": "blueprint_reference_seed_metadata_v1",
+  "seed": "liquid_rocket_engine_academic",
+  "reference_goals": [
+    "Thrust chamber topology — converging section, throat, diverging nozzle contour (Rao/conical)",
+    "Injector architecture — manifold zones, element patterns, face plate, acoustic cavity zones",
+    "Regenerative cooling — channel-route topology, inlet/outlet manifolds, turn-around point",
+    "Feed system — oxidizer/fuel valve tree, filter, venturi/orifice, check valve positions",
+    "Turbopump layout — impeller/inducer, turbine rotor, shaft/bearing, seal drain",
+    "Thrust structure — gimbal block, trunnion pads, flex lines, instrumentation bosses",
+    "Instrumentation/DAQ — thermocouple/pressure tap bosses, wiring conduit, interlock vocabulary"
+  ],
+  "preferred_formats": ["step", "stp", "stl", "scad", "obj", "pdf", "csv"],
+  "needed_metadata": [
+    "Component taxonomy (not sizing) — chamber, injector, nozzle extension, TPA, valves",
+    "Material families — Inconel/copper-alloy liner, nickel superalloy turbine, SS manifolds",
+    "Interface definitions — flange bolt patterns, seal types, flex joint DOF",
+    "Energy/flow path diagram — propellant circuit topology (no flow rates or pressures)"
+  ],
+  "needed_engineering_docs": [
+    "Thermal boundary grammar — wall heat flux zones, film cooling regions, radiation shield",
+    "Structural boundary grammar — chamber pressure load, thrust vector, gimbal actuator loads",
+    "Vibration/acoustics grammar — combustion instability modes, baffle/cavity damper zones",
+    "Test-stand interface vocabulary — thrust measurement frame, propellant feed disconnect"
+  ],
+  "safety_boundary": "Academic study reference ONLY. Do NOT include: propellant handling procedures, ignition sequences, chamber pressure/thrust sizing numbers, injector orifice dimensions, turbopump performance maps, test-stand operating steps, flight qualification criteria, or any content that could enable construction or operation of a rocket engine.",
+  "crawl_targets": [
+    {"repo": "openrocket/openrocket", "search": "motor component nozzle thrust"},
+    {"source": "NASA Technical Reports Server", "url": "https://ntrs.nasa.gov/", "search": "liquid rocket engine design cutaway", "mode": "manual_download"},
+    {"source": "GrabCAD", "search": "rocket engine nozzle cutaway academic STEP", "mode": "manual_download"}
+  ]
+}

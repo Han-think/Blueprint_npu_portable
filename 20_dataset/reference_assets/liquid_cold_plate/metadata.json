@@ -1,0 +1,30 @@
+{
+  "schema": "blueprint_reference_seed_metadata_v1",
+  "seed": "liquid_cold_plate",
+  "reference_goals": [
+    "Channel geometry — serpentine, parallel, pin-fin micro-channel cross-sections",
+    "Inlet/outlet manifold — port diameter, O-ring groove, fitting thread boss",
+    "Mounting interface — IGBT/MOSFET pad areas, isolation washer pockets, bolt pattern",
+    "Cover plate — brazing/FSW joint line, gasket compression stops, flatness datum",
+    "Leak test and service — test port boss, drain/bleed plug, witness groove",
+    "Thermal interface — thermal pad zone, contact pressure distribution, surface finish callout"
+  ],
+  "preferred_formats": ["step", "stp", "stl", "fcstd", "pdf"],
+  "needed_metadata": [
+    "BOM — plate material (6061-T6, copper), cover material, brazing alloy, O-ring compound",
+    "Channel hydraulic diameter and pressure drop table",
+    "Thermal resistance target (°C/W per device pad)",
+    "Torque sequence for cover bolts"
+  ],
+  "needed_engineering_docs": [
+    "CFD boundary conditions — inlet flow rate, inlet temp, heat flux per device pad",
+    "FEA boundary conditions — clamping force, thermal cycling range, fatigue life",
+    "Manufacturing notes — CNC channel depth tolerance, brazing/FSW parameters (reference only)"
+  ],
+  "safety_boundary": "Thermal management design reference only; no high-voltage safety procedures or coolant chemical handling instructions.",
+  "crawl_targets": [
+    {"repo": "OpenFOAM/OpenFOAM-dev", "search": "heat channel plate conjugate"},
+    {"repo": "ElmerCSC/elmerfem", "search": "heat convection plate thermal"},
+    {"source": "GrabCAD", "search": "cold plate heat sink liquid cooling STEP", "mode": "manual_download"}
+  ]
+}

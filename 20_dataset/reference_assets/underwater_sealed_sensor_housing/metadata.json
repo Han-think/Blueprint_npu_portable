@@ -1,0 +1,29 @@
+{
+  "schema": "blueprint_reference_seed_metadata_v1",
+  "seed": "underwater_sealed_sensor_housing",
+  "reference_goals": [
+    "Pressure hull — cylinder/end cap geometry, wall thickness, material (6061/Ti)",
+    "Sealing — double O-ring grooves, face seal, radial seal, compression stop",
+    "Penetrators — cable gland, bulkhead connector, strain relief boot",
+    "Internal layout — slide tray/chassis, sensor mount, desiccant pocket",
+    "Optical/sensor window — front port, retaining ring, anti-rotation pins",
+    "External features — clamp cradle, anode pad, lifting eye, depth rating label"
+  ],
+  "preferred_formats": ["step", "stp", "stl", "scad", "fcstd", "pdf"],
+  "needed_metadata": [
+    "BOM — hull tube material, end cap material, O-ring compound (Buna-N/Viton), connector type",
+    "Pressure rating — depth class, safety factor, proof test pressure",
+    "Assembly sequence — internal tray install, end cap torque, leak test",
+    "Corrosion protection — anodizing, sacrificial anode placement"
+  ],
+  "needed_engineering_docs": [
+    "Structural boundary — external pressure (hydrostatic), axial seal compression, bolt preload",
+    "Thermal boundary — internal heat dissipation, ambient sea temperature",
+    "Sealing analysis — O-ring compression ratio, extrusion gap, backup ring need"
+  ],
+  "safety_boundary": "Design reference only; no specific depth ratings for operational use.",
+  "crawl_targets": [
+    {"repo": "nophead/NopSCADlib", "search": "o_ring box camera_housing seal tube"},
+    {"source": "GrabCAD", "search": "underwater housing pressure vessel ROV STEP", "mode": "manual_download"}
+  ]
+}

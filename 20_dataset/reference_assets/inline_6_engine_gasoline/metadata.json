@@ -1,0 +1,31 @@
+{
+  "schema": "blueprint_reference_seed_metadata_v1",
+  "seed": "inline_6_engine_gasoline",
+  "reference_goals": [
+    "Block/head casting topology — bore spacing, water jacket, oil gallery routing",
+    "Cranktrain layout — crank journal, rod bearing, piston/pin/ring stack geometry",
+    "Valvetrain architecture — cam lobe, rocker/follower, spring pocket, valve guide",
+    "Accessory drive — belt/chain path, tensioner, alternator/pump bracket",
+    "Gasket interface — MLS head gasket, intake/exhaust manifold flange bolt pattern",
+    "Service access — timing cover, oil pan, dipstick boss, drain plug, filter mount"
+  ],
+  "preferred_formats": ["step", "stp", "fcstd", "stl", "scad", "pdf", "csv"],
+  "needed_metadata": [
+    "BOM with material callouts (cast iron vs aluminum block/head)",
+    "Bore/stroke/displacement spec sheet",
+    "Assembly torque sequence (head bolts, main caps, rod caps)",
+    "Cooling system flow path diagram",
+    "Lubrication circuit schematic"
+  ],
+  "needed_engineering_docs": [
+    "Interface control drawing — block-to-head, block-to-oil-pan gasket surfaces",
+    "Thermal boundary conditions — combustion face temps, coolant jacket flow rates",
+    "Structural load cases — peak cylinder pressure, bearing loads, bolt preloads"
+  ],
+  "safety_boundary": "Cutaway/service-training reference only; no performance tuning recipes or emissions calibration data.",
+  "crawl_targets": [
+    {"repo": "FreeCAD/FreeCAD-library", "search": "engine piston valve"},
+    {"repo": "openscad/MCAD", "search": "bearing motor shaft"},
+    {"source": "GrabCAD", "search": "inline 6 engine cutaway STEP", "mode": "manual_download"}
+  ]
+}
